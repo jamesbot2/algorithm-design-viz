@@ -73,6 +73,7 @@ export function solveDp2d(inst: KnapsackInstance): {
   const selectedIds: string[] = []
   let w = W
   const path: [number, number][] = [[n, W]]
+  snap('开始回溯重构选中物品', { phase: 'reconstruct' }, { current: [n, W] }, undefined, ref('reconstruct'))
   for (let i = n; i >= 1; i--) {
     if (dp[i]![w] !== dp[i - 1]![w]) {
       selectedIds.push(items[i - 1]!.id)
@@ -95,7 +96,7 @@ export function solveDp2d(inst: KnapsackInstance): {
     { answer: maxValue },
     { current: [n, W], path },
     solution,
-    ref('reconstruct'),
+    ref('done'),
   )
   return { solution, dp, steps }
 }

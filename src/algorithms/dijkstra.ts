@@ -154,6 +154,7 @@ export function generateSteps(
     { dist: dist.map((d) => (d === Infinity ? '∞' : d)).join(',') },
     { ok: true, dist: distOut, parent: [...parent], impl: 'naiveDijkstraScan', start },
     'done',
+    ref('done'),
   )
   return steps
 }

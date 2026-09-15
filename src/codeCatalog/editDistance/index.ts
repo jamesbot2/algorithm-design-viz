@@ -48,6 +48,15 @@ export function getEDIT_DISTANCECatalog(): {
       "endLine": 16
     }
   }
+,
+  {
+    "id": "return",
+    "label": "返回",
+    "range": {
+      "startLine": 16,
+      "endLine": 16
+    }
+  }
 ],
   }
   const pseudocode: CodeDocument | undefined = undefined

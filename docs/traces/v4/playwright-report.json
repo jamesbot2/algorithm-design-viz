@@ -4,7 +4,8 @@
       "/home/box/.local/node-v24.20.0-linux-x64/bin/node",
       "/workspace/algorithm-design-viz/node_modules/.bin/playwright",
       "test",
-      "tests/e2e/v5-r1-r4.spec.ts"
+      "tests/e2e/v5-r1-r4.spec.ts",
+      "tests/e2e/v5-m3-m4.spec.ts"
     ],
     "configFile": "/workspace/algorithm-design-viz/playwright.config.ts",
     "rootDir": "/workspace/algorithm-design-viz/tests/e2e",
@@ -71,6 +72,193 @@
   },
   "suites": [
     {
+      "title": "v5-m3-m4.spec.ts",
+      "file": "v5-m3-m4.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "V5 M3/M4 workbench + expand e2e",
+          "file": "v5-m3-m4.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "binarySearch TS↔pseudo mid lines differ by document",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1250,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-15T12:12:43.281Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5864b949189d35594b31-544c8b13c59c21f4aed4",
+              "file": "v5-m3-m4.spec.ts",
+              "line": 4,
+              "column": 3
+            },
+            {
+              "title": "LCS write primary anchor present after run",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1589,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-15T12:12:44.683Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5864b949189d35594b31-56a5406fafb70267a8c1",
+              "file": "v5-m3-m4.spec.ts",
+              "line": 27,
+              "column": 3
+            },
+            {
+              "title": "quickSort play advances steps",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1744,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-15T12:12:46.281Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5864b949189d35594b31-65d554684b8d87f84e24",
+              "file": "v5-m3-m4.spec.ts",
+              "line": 50,
+              "column": 3
+            },
+            {
+              "title": "cancel enabled while heavy nQueens running",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 719,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-15T12:12:48.033Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5864b949189d35594b31-6a92ab9a0551bfb93f5f",
+              "file": "v5-m3-m4.spec.ts",
+              "line": 64,
+              "column": 3
+            },
+            {
+              "title": "theme switch readability smoke",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 706,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-15T12:12:48.762Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5864b949189d35594b31-3d6ccb09dce6b38dcd1a",
+              "file": "v5-m3-m4.spec.ts",
+              "line": 77,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "v5-r1-r4.spec.ts",
       "file": "v5-r1-r4.spec.ts",
       "column": 0,
@@ -99,12 +287,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1286,
+                      "duration": 1055,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T12:02:29.169Z",
+                      "startTime": "2026-09-15T12:12:49.486Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -133,12 +321,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1770,
+                      "duration": 1563,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T12:02:30.687Z",
+                      "startTime": "2026-09-15T12:12:50.549Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -158,9 +346,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-15T12:02:27.798Z",
-    "duration": 4798.066000000001,
-    "expected": 2,
+    "startTime": "2026-09-15T12:12:42.501Z",
+    "duration": 9755.362000000001,
+    "expected": 7,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

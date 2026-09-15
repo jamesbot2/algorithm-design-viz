@@ -4,9 +4,9 @@ import { algorithms } from '../algorithms'
 import { getAlgo } from '../algorithms/registry'
 import type { Trace } from '../core/trace/types'
 import { createCancelFlag, runAlgoAsync, yieldToEventLoop } from '../core/runner'
-import { runSyncGeneratorCancelable } from '../core/runner/chunkedSolve'
+import { runHeavyPreferWorker } from '../core/runner/runHeavy'
 import { pickPrimaryCodeRef, weakContextRefs } from '../utils/codeRefs'
-import { formatFinalAnswer } from '../utils/formatAnswer'
+import FinalAnswerResult from '../components/result/FinalAnswerResult'
 import Visualizer from '../components/Visualizer'
 import GraphInput from '../components/graph/GraphInput'
 import GraphResultPanel from '../components/graph/GraphResultPanel'
@@ -137,6 +137,7 @@ export default function AlgoPage() {
   const [runLabel, setRunLabel] = useState<'idle' | 'running' | 'cancelled' | 'truncated'>('idle')
   const pendingAutoRun = useRef(false)
   const pendingSeek = useRef(0)
+  const [chromeHost, setChromeHost] = useState<HTMLDivElement | null>(null)
 
   const patch = useCallback((partial: Partial<DraftState>) => {
     setDraft((d) => ({ ...d, ...partial }))
@@ -429,18 +430,34 @@ export default function AlgoPage() {
               return { steps: [], result: { ok: false }, status: 'cancelled' as const }
             }
             if (heavy) {
-              const chunked = await runSyncGeneratorCancelable(
+              const preferWorker = id === 'nQueens' || id === 'knapsackBrute' || id?.includes('brute')
+              const workerReq =
+                id === 'nQueens'
+                  ? {
+                      kind: 'nQueens' as const,
+                      n: Number((input as { n?: number }).n ?? 4),
+                      mode: ((input as { mode?: 'one' | 'all' }).mode ?? 'all') as 'one' | 'all',
+                      runId: `ui-${thisToken}`,
+                    }
+                  : null
+              const heavyOut = await runHeavyPreferWorker(
                 () => {
                   const solved = entry.solve!(input)
                   return (solved.trace.steps as Step[]) ?? []
                 },
-                { cancel: ctx.cancel, budget: { maxSteps }, chunkEvery: heavy ? 8 : 32 },
+                {
+                  cancel: ctx.cancel,
+                  runId: `ui-${thisToken}`,
+                  maxSteps,
+                  preferWorker: Boolean(preferWorker),
+                  workerRequest: workerReq,
+                },
               )
-              if (chunked.status === 'cancelled' || ctx.cancel.cancelled) {
-                return { steps: chunked.steps, result: { ok: false }, status: 'cancelled' as const }
+              if (heavyOut.status === 'cancelled' || ctx.cancel.cancelled) {
+                return { steps: heavyOut.steps, result: { ok: false }, status: 'cancelled' as const }
               }
-              let steps = chunked.steps
-              if (chunked.truncated) {
+              let steps = heavyOut.steps
+              if (heavyOut.truncated) {
                 const last = steps[steps.length - 1]
                 if (last && !String(last.message).includes('截断')) {
                   steps = [
@@ -919,7 +936,11 @@ export default function AlgoPage() {
             <>
               <label className="field-target">
                 n
-                <input value={draft.nQueensN} onChange={(e) => patch({ nQueensN: e.target.value })} />
+                <input
+                  data-testid="nqueens-n"
+                  value={draft.nQueensN}
+                  onChange={(e) => patch({ nQueensN: e.target.value })}
+                />
               </label>
               <label className="field-mode">
                 模式
@@ -1040,24 +1061,22 @@ export default function AlgoPage() {
               : `步骤 ${cursorIndex + 1}/${Math.max(steps.length, 1)}`
         }
         transport={
-          hasRun && steps[cursorIndex] ? (
-            <div className="workbench-inspector" data-testid="workbench-inspector">
-              <strong>检查器</strong>
-              <span className="muted"> · {steps[cursorIndex]?.message}</span>
-              {steps[cursorIndex]?.frameId && (
-                <span className="muted"> · frame {steps[cursorIndex]?.frameId}</span>
-              )}
-              {steps[cursorIndex]?.vars && (
-                <div className="muted" style={{ marginTop: 4 }}>
-                  vars:{' '}
-                  {Object.entries(steps[cursorIndex]!.vars!)
-                    .slice(0, 8)
-                    .map(([k, v]) => `${k}=${String(v)}`)
-                    .join(' · ')}
-                </div>
-              )}
-            </div>
-          ) : null
+          <div className="workbench-transport-inner">
+            <div
+              ref={setChromeHost}
+              className="workbench-chrome-host"
+              data-testid="workbench-transport"
+            />
+            {hasRun && steps[cursorIndex] ? (
+              <div className="workbench-inspector" data-testid="workbench-inspector">
+                <strong>检查器</strong>
+                <span className="muted"> · {steps[cursorIndex]?.message}</span>
+                {steps[cursorIndex]?.frameId && (
+                  <span className="muted"> · frame {steps[cursorIndex]?.frameId}</span>
+                )}
+              </div>
+            ) : null}
+          </div>
         }
         viz={
           <>
@@ -1075,20 +1094,24 @@ export default function AlgoPage() {
               runId={hasRun ? (runSnapshot?.runId ?? runId) : 'preview'}
               onStepIndexChange={hasRun ? onStepChange : undefined}
               staleResult={hasRun && (staleResult || draftDirty)}
+              chromePlacement="workbench"
+              externalChromeHost={chromeHost}
               finalAnswer={
                 hasRun && steps.length ? (
-                  <div className="final-answer-human" data-testid="final-answer">
-                    {formatFinalAnswer(
-                      steps[steps.length - 1]?.result,
-                      steps[steps.length - 1]?.vars,
-                    )}
-                    {runLabel === 'cancelled' && (
-                      <div className="run-status-cancelled">状态：已取消</div>
-                    )}
-                    {runLabel === 'truncated' && (
-                      <div className="run-status-truncated">状态：采样截断</div>
-                    )}
-                  </div>
+                  <FinalAnswerResult
+                    result={steps[steps.length - 1]?.result}
+                    vars={steps[steps.length - 1]?.vars}
+                    statusNote={
+                      <>
+                        {runLabel === 'cancelled' && (
+                          <div className="run-status-cancelled">状态：已取消</div>
+                        )}
+                        {runLabel === 'truncated' && (
+                          <div className="run-status-truncated">状态：采样截断</div>
+                        )}
+                      </>
+                    }
+                  />
                 ) : null
               }
             />

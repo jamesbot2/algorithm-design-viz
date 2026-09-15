@@ -39,7 +39,18 @@ export function getDijkstraCatalog(): {
       label: '松弛更新',
       range: { startLine: 28, endLine: 28 },
     }
-    ],
+    ,
+    {
+      id: 'done',
+      label: '返回 dist/parent',
+      range: { startLine: 33, endLine: 33 },
+    },
+    {
+      id: 'return',
+      label: '返回',
+      range: { startLine: 33, endLine: 33 },
+    }
+],
   }
   const pseudocode: CodeDocument = {
     documentId: 'dijkstra.naive.pseudo',

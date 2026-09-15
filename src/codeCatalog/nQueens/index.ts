@@ -64,6 +64,23 @@ export function getN_QUEENSCatalog(): {
       "endLine": 14
     }
   }
+,
+  {
+    "id": "done",
+    "label": "返回全部解",
+    "range": {
+      "startLine": 25,
+      "endLine": 25
+    }
+  },
+  {
+    "id": "return",
+    "label": "返回",
+    "range": {
+      "startLine": 25,
+      "endLine": 25
+    }
+  }
 ],
   }
   const pseudocode: CodeDocument | undefined = undefined

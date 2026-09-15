@@ -48,6 +48,23 @@ export function getDIJKSTRA_HEAPCatalog(): {
       "endLine": 46
     }
   }
+,
+  {
+    "id": "done",
+    "label": "返回 dist/parent",
+    "range": {
+      "startLine": 53,
+      "endLine": 53
+    }
+  },
+  {
+    "id": "return",
+    "label": "返回",
+    "range": {
+      "startLine": 53,
+      "endLine": 53
+    }
+  }
 ],
   }
   const pseudocode: CodeDocument | undefined = undefined

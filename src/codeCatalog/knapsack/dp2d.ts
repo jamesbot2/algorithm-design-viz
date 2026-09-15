@@ -48,6 +48,23 @@ export function getKNAPSACK_DP2DCatalog(): {
       "endLine": 24
     }
   }
+,
+  {
+    "id": "done",
+    "label": "返回最优解",
+    "range": {
+      "startLine": 29,
+      "endLine": 29
+    }
+  },
+  {
+    "id": "return",
+    "label": "返回",
+    "range": {
+      "startLine": 29,
+      "endLine": 29
+    }
+  }
 ],
   }
   const pseudocode: CodeDocument | undefined = undefined

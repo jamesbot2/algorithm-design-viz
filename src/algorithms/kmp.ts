@@ -110,6 +110,8 @@ export function generateSteps(
           Array.from({ length: m }, (_, k) => ti - m + k),
           Array.from({ length: m }, (_, k) => k),
           { hit: ti - m },
+          undefined,
+          ref('hit'),
         )
         pj = next[pj - 1]
       }
@@ -127,6 +129,7 @@ export function generateSteps(
     [],
     { hits: hits.join(',') || '无' },
     { ok: true, hits, pi: [...next] },
+    ref('done'),
   )
   return steps
 }

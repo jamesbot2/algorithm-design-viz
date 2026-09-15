@@ -152,7 +152,7 @@ export function generateSteps(
   const steps: Step[] = []
   const DOC = 'dijkstraHeap.ts'
   const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
-  const PHASE_ANCHOR: Record<string, string> = { init: "init", extract: "extract", stale: "stale", relax: "relax", done: "init", error: "init" }
+  const PHASE_ANCHOR: Record<string, string> = { init: "init", extract: "extract", stale: "stale", relax: "relax", done: "done", error: "init" }
   let id = 0
 
   const neg = edgeList.find(([, , w]) => w < 0)

@@ -48,6 +48,23 @@ export function getKMPCatalog(): {
       "endLine": 16
     }
   }
+,
+  {
+    "id": "done",
+    "label": "返回命中位置",
+    "range": {
+      "startLine": 22,
+      "endLine": 22
+    }
+  },
+  {
+    "id": "return",
+    "label": "返回",
+    "range": {
+      "startLine": 22,
+      "endLine": 22
+    }
+  }
 ],
   }
   const pseudocode: CodeDocument | undefined = undefined

@@ -1,5 +1,6 @@
 import { memo, useMemo } from 'react'
 import type { Step } from '../types/step'
+import { formatFinalAnswer } from '../utils/formatAnswer'
 
 function serialize(v: string | number | boolean | null | undefined): string {
   if (v === null || v === undefined) return 'null'
@@ -50,11 +51,9 @@ function VarsPanel({ step, prevStep }: { step: Step; prevStep?: Step }) {
       {hasInlineResult && (
         <div className="result-panel-enter" style={{ marginTop: '0.65rem' }}>
           <div className="panel-title">中间结果</div>
-          <pre className="result-snap muted" style={{ fontSize: '0.72rem', margin: 0, whiteSpace: 'pre-wrap' }}>
-            {typeof step.result === 'object'
-              ? JSON.stringify(step.result, null, 0).slice(0, 280)
-              : String(step.result)}
-          </pre>
+          <div className="result-snap muted" style={{ fontSize: '0.82rem' }}>
+            {formatFinalAnswer(step.result, step.vars)}
+          </div>
         </div>
       )}
     </div>

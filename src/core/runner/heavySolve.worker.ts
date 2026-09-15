@@ -2,14 +2,7 @@
 import { generateSteps as nQueensGenerate } from '../../algorithms/nQueens'
 import { bruteForceKnapsack } from '../../algorithms/knapsack/bruteForce'
 
-export type HeavyRequest =
-  | { kind: 'nQueens'; n: number; mode: 'one' | 'all'; runId: string }
-  | {
-      kind: 'knapsackBrute'
-      items: { id: string; weight: number; value: number }[]
-      capacity: number
-      runId: string
-    }
+import type { HeavyRequest } from './heavyTypes'
 
 self.onmessage = (ev: MessageEvent<HeavyRequest>) => {
   const msg = ev.data

@@ -166,7 +166,7 @@ export function solveNQueens(
       prunedNodes,
     },
     result,
-    codeRefs: ref('solution'),
+    codeRefs: ref('done'),
   })
   return { result, steps, tree: snapshotTree(root) }
 }

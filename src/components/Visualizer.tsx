@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import type { EdgeRole, HighlightRole, Step } from '../types/step'
 import type { Trace } from '../core/trace/types'
 import { ArraysFromStep } from './ArrayView'
@@ -10,6 +11,7 @@ import SearchTreeView from './search/SearchTreeView'
 import { SEMANTIC_ROLE_LABELS } from '../theme/semanticColors'
 import { motionCssVars, speedFeelMultiplier } from '../theme/motion'
 import { useMotion } from '../theme/MotionContext'
+import PlaybackTransport from './workbench/PlaybackTransport'
 
 /** Parent sends this only on scene load / new run / explicit external seek — never from onStepIndexChange. */
 export type SeekCommand = { requestId: number | string; target: number }
@@ -30,6 +32,13 @@ interface Props {
   codeSlot?: ReactNode
   /** Final-answer panel content (collapsed by default) */
   finalAnswer?: ReactNode
+  /**
+   * Where to place play/pause/scrub chrome.
+   * `workbench` portals into externalChromeHost (spans both panels).
+   */
+  chromePlacement?: 'embedded' | 'workbench'
+  /** Host element for workbench transport portal */
+  externalChromeHost?: HTMLElement | null
 }
 
 type LegendRole = HighlightRole | EdgeRole | 'frontier' | 'settled' | 'pruned' | 'optimal' | 'error'
@@ -160,7 +169,7 @@ function shouldIgnoreKeyboard(e: KeyboardEvent): boolean {
   ) {
     // Allow Space/arrows on the visualizer's own transport buttons via explicit handling;
     // but do not steal from other buttons / editors / sliders / separators.
-    if (t.closest('.viz-toolbar, .scrub-row, .phase-jump, .phase-track')) return false
+    if (t.closest('.viz-toolbar, .scrub-row, .phase-jump, .phase-track, .playback-transport')) return false
     if (tag === 'BUTTON' || t.closest('button')) return true
     if (t.closest('.cm-editor, .cm-content, .code-browser')) return true
     if (t.closest('[role="slider"], input[type="range"]')) return true
@@ -182,6 +191,8 @@ export default function Visualizer({
   staleResult = false,
   codeSlot,
   finalAnswer,
+  chromePlacement = 'embedded',
+  externalChromeHost = null,
 }: Props) {
   const steps = useMemo(() => resolveSteps(stepsProp, trace), [stepsProp, trace])
   const clamp = (i: number, len: number) => Math.max(0, Math.min(i, Math.max(0, len - 1)))
@@ -320,122 +331,52 @@ export default function Visualizer({
   const hasBoard = Boolean(step?.matrices?.board)
   const displayMessage = step?.message ?? '就绪：调整输入后点击「运行」。'
 
+  const seekTo = useCallback(
+    (i: number) => {
+      setPlaying(false)
+      setIdx(clamp(i, steps.length))
+    },
+    [steps.length],
+  )
+
+  const transport = (
+    <PlaybackTransport
+      idx={idx}
+      max={max}
+      stepsLen={steps.length}
+      playing={playing}
+      playPulse={playPulse}
+      speed={speed}
+      phase={step?.phase}
+      progress={progress}
+      segments={segments}
+      scrubPreview={scrubPreview}
+      previewMessage={previewStep?.message}
+      onReset={reset}
+      onPrev={goPrev}
+      onNext={goNext}
+      onTogglePlay={togglePlay}
+      onSpeed={setSpeed}
+      onSeek={seekTo}
+      onScrubPreview={setScrubPreview}
+    />
+  )
+
+  const chrome =
+    chromePlacement === 'workbench' && externalChromeHost
+      ? createPortal(transport, externalChromeHost)
+      : chromePlacement === 'embedded'
+        ? transport
+        : null
+
   return (
-    <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties} data-playing={playing ? '1' : '0'} data-step-index={idx} data-preview={isPreview ? '1' : '0'} data-testid="visualizer">
+    <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties} data-playing={playing ? '1' : '0'} data-step-index={idx} data-preview={isPreview ? '1' : '0'} data-testid="visualizer" data-chrome={chromePlacement}>
       <div className="viz-banner viz-banner-slot" data-testid="viz-banner" role="status">
         <div className="viz-banner-text">{displayMessage}</div>
         {staleResult && <span className="stale-result-badge">上一轮结果</span>}
       </div>
 
-      <div className="viz-toolbar">
-        <button type="button" onClick={reset} title="重置">
-          重置
-        </button>
-        <button type="button" onClick={goPrev} disabled={idx <= 0} title="上一步 (←)">
-          上一步
-        </button>
-        <button
-          type="button"
-          className={`primary play-btn tactile${playing ? ' is-playing' : ''}${playPulse ? ' pulse' : ''}`}
-          onClick={togglePlay}
-          title="播放/暂停 (空格)"
-          data-testid="play-btn"
-        >
-          {playing ? '暂停' : '播放'}
-        </button>
-        <button type="button" onClick={goNext} disabled={idx >= max} title="下一步 (→)">
-          下一步
-        </button>
-        <label className="speed-label">
-          速度
-          <input
-            type="range"
-            min={100}
-            max={1500}
-            step={50}
-            value={1600 - speed}
-            onChange={(e) => setSpeed(1600 - Number(e.target.value))}
-            aria-label="播放速度"
-          />
-        </label>
-        <span className="spacer" />
-        <span className="step-counter tabular-nums" data-testid="step-counter">
-          {steps.length ? `${idx + 1} / ${steps.length}` : '— / —'}
-          {step?.phase ? ` · ${step.phase}` : ''}
-        </span>
-      </div>
-
-      <div className="scrub-row">
-        <span className="scrub-label">进度</span>
-        <input
-          type="range"
-          min={0}
-          max={Math.max(0, max)}
-          step={1}
-          value={steps.length ? idx : 0}
-          disabled={!steps.length}
-          onChange={(e) => {
-            setPlaying(false)
-            setIdx(Number(e.target.value))
-            setScrubPreview(null)
-          }}
-          onInput={(e) => {
-            const v = Number((e.target as HTMLInputElement).value)
-            setScrubPreview(v)
-          }}
-          onMouseUp={() => setScrubPreview(null)}
-          onTouchEnd={() => setScrubPreview(null)}
-          aria-label="步骤进度"
-          role="slider"
-        />
-        <span className="scrub-pct tabular-nums">{Math.round(progress)}%</span>
-      </div>
-      {segments.length > 0 && (
-        <div className="phase-track" aria-hidden>
-          {segments.map((seg) => {
-            const left = max === 0 ? 0 : (seg.start / max) * 100
-            const width = max === 0 ? 100 : ((seg.end - seg.start + 1) / max) * 100
-            return (
-              <button
-                key={`${seg.phase}-${seg.start}`}
-                type="button"
-                className="phase-segment"
-                style={{ left: `${left}%`, width: `${Math.max(width, 1.5)}%` }}
-                data-phase={seg.phase}
-                title={`${seg.phase} (#${seg.start + 1}–${seg.end + 1})`}
-                onClick={() => {
-                  setPlaying(false)
-                  setIdx(seg.start)
-                }}
-              />
-            )
-          })}
-        </div>
-      )}
-      {previewStep && scrubPreview !== idx && (
-        <div className="scrub-preview scrub-preview-overlay" data-testid="scrub-preview">
-          预览 #{scrubPreview! + 1}：{previewStep.message}
-        </div>
-      )}
-
-      {segments.length > 0 && (
-        <div className="phase-jump">
-          <span className="muted">阶段跳转：</span>
-          {segments.map((seg) => (
-            <button
-              key={`btn-${seg.phase}-${seg.start}`}
-              type="button"
-              className={idx >= seg.start && idx <= seg.end ? 'active' : ''}
-              onClick={() => {
-                setPlaying(false)
-                setIdx(seg.start)
-              }}
-            >
-              {seg.phase}
-            </button>
-          ))}
-        </div>
-      )}
+      {chrome}
 
       <div className="stats-row stats-row-fixed" data-testid="stats-row">
         <span className="stat-chip">
@@ -472,6 +413,16 @@ export default function Visualizer({
           {!step && <div className="viz-empty soft">暂无画布内容</div>}
         </div>
         <div className="viz-inspector" data-testid="viz-inspector">
+          <div className="inspector-explanation" data-testid="step-explanation">
+            <div className="panel-title">步骤说明</div>
+            <p className="inspector-explain-text">{displayMessage}</p>
+          </div>
+          {(step?.frameId || (step?.vars && 'frameId' in step.vars)) && (
+            <div className="inspector-stack" data-testid="call-stack">
+              <div className="panel-title">调用栈 / frame</div>
+              <code className="frame-id">{String(step?.frameId ?? step?.vars?.frameId)}</code>
+            </div>
+          )}
           <div className="viz-vars-stable">
             {step ? <VarsPanel step={step} prevStep={prevStep} /> : null}
           </div>
@@ -482,7 +433,11 @@ export default function Visualizer({
               onToggle={(e) => setAnswerOpen((e.target as HTMLDetailsElement).open)}
             >
               <summary>最终结果（折叠）</summary>
-              <div className="final-answer-body">{finalAnswer}</div>
+              <div className="final-answer-body">
+                {typeof finalAnswer === 'object' && finalAnswer !== null && 'type' in (finalAnswer as object)
+                  ? finalAnswer
+                  : finalAnswer}
+              </div>
             </details>
           )}
           {/* Legacy fallback only when codeSlot explicitly passed; Workbench owns CodeBrowser */}

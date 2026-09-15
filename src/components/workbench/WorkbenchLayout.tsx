@@ -1,21 +1,20 @@
 import type { ReactNode } from 'react'
 import { Group, Panel, Separator } from 'react-resizable-panels'
-import { useMotion } from '../../theme/MotionContext'
-import { useLabTheme, type LabThemeId } from '../../theme/LabThemeContext'
 
 interface Props {
   title?: string
   inputSummary?: ReactNode
   viz: ReactNode
   code?: ReactNode
-  /** Optional bottom transport slot (Visualizer usually embeds its own) */
+  /** Unified transport spanning both panels (play/pause/scrub + optional inspector strip) */
   transport?: ReactNode
   /** Hide duplicate title when page header already shows it */
   hideTitle?: boolean
 }
 
 /**
- * Shared workbench shell: summary | viz ~55% + code ~45% | optional transport.
+ * Shared workbench shell: summary | viz ~55% + code ~45% | transport spanning both.
+ * Theme/motion controls live in Layout topbar only (single primary entry).
  * Height chain uses min-height:0 so CodeMirror gets real height.
  * Stable: callers must NOT key this on cursor/step.id.
  */
@@ -27,57 +26,11 @@ export default function WorkbenchLayout({
   transport,
   hideTitle = false,
 }: Props) {
-  const { userPref, setUserPref, density, setDensity } = useMotion()
-  const { theme, setTheme } = useLabTheme()
-
   return (
     <div className="workbench-layout" data-testid="workbench-layout">
       <div className="workbench-header">
         {!hideTitle && title && <h2 className="workbench-title">{title}</h2>}
         {inputSummary && <div className="workbench-input-summary">{inputSummary}</div>}
-        <span className="spacer" style={{ flex: 1 }} />
-        <div className="workbench-desktop-controls" data-testid="workbench-desktop-controls">
-          <label className="topbar-motion" title="主题（实验 Lab tokens）">
-            <span className="muted" style={{ fontSize: '0.72rem', marginRight: 4 }}>
-              主题
-            </span>
-            <select
-              aria-label="主题"
-              value={theme}
-              onChange={(e) => setTheme(e.target.value as LabThemeId)}
-            >
-              <option value="lab-dark">Lab 深色</option>
-              <option value="lab-light">Lab 浅色</option>
-              <option value="legacy">经典</option>
-            </select>
-          </label>
-          <label className="topbar-motion" title="动画模式">
-            <span className="muted" style={{ fontSize: '0.72rem', marginRight: 4 }}>
-              动效
-            </span>
-            <select
-              aria-label="动画模式"
-              value={userPref === null ? 'system' : userPref}
-              onChange={(e) => {
-                const v = e.target.value
-                setUserPref(v === 'system' ? null : (v as 'standard' | 'reduced'))
-              }}
-            >
-              <option value="system">跟随系统</option>
-              <option value="standard">标准</option>
-              <option value="reduced">减弱</option>
-            </select>
-          </label>
-          <button
-            type="button"
-            className="ghost icon-btn"
-            title={density === 'projection' ? '切换普通密度' : '投影友好密度'}
-            aria-label="投影密度 / 焦点"
-            onClick={() => setDensity(density === 'projection' ? 'normal' : 'projection')}
-          >
-            {density === 'projection' ? '密' : '焦'}
-          </button>
-        </div>
       </div>
 
       <Group orientation="horizontal" className="workbench-panels">
@@ -94,7 +47,11 @@ export default function WorkbenchLayout({
         )}
       </Group>
 
-      {transport && <div className="workbench-transport">{transport}</div>}
+      {transport && (
+        <div className="workbench-transport" data-testid="workbench-transport-slot">
+          {transport}
+        </div>
+      )}
     </div>
   )
 }

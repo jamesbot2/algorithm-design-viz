@@ -28,7 +28,7 @@ export function generateSteps(input: number[]): Step[] {
   let id = 0
   const DOC = 'mergeSort.ts'
   const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
-  const PHASE_ANCHOR: Record<string, string> = {"init":"divide","divide":"divide","recurse":"recurse","merge":"mergeCompare","done":"mergePush"}
+  const PHASE_ANCHOR: Record<string, string> = {"init":"divide","divide":"divide","recurse":"recurse","merge":"mergeCompare","done":"done"}
   let comparisons = 0
   let writes = 0
   const callStack: string[] = []

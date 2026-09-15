@@ -48,6 +48,15 @@ export function getINSERTION_SORTCatalog(): {
       "endLine": 13
     }
   }
+,
+  {
+    "id": "return",
+    "label": "返回",
+    "range": {
+      "startLine": 13,
+      "endLine": 13
+    }
+  }
 ],
   }
   const pseudocode: CodeDocument | undefined = undefined

@@ -49,6 +49,15 @@ export function getBUBBLE_SORTCatalog(): {
       "endLine": 14
     }
   }
+,
+  {
+    "id": "return",
+    "label": "返回",
+    "range": {
+      "startLine": 14,
+      "endLine": 14
+    }
+  }
 ],
   }
   const pseudocode: CodeDocument | undefined = {

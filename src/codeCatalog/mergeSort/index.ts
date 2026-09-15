@@ -47,6 +47,22 @@ export function getMERGE_SORTCatalog(): {
       "startLine": 15,
       "endLine": 15
     }
+  },
+  {
+    "id": "done",
+    "label": "返回排序结果",
+    "range": {
+      "startLine": 7,
+      "endLine": 7
+    }
+  },
+  {
+    "id": "return",
+    "label": "返回",
+    "range": {
+      "startLine": 7,
+      "endLine": 7
+    }
   }
 ],
   }
