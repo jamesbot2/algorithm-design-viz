@@ -99,6 +99,8 @@ export interface Step {
   graph?: GraphState
   /** Structured result on terminal / summary steps when practical */
   result?: unknown
+  /** Optional frame id for search/recursion (same source line may hit different frames) */
+  frameId?: string
   /** Optional backtracking / branch-and-bound search tree snapshot */
   searchTree?: SearchTreeNode
   /** Optional coarse phase marker for stage jump (init/extract/relax/done/…) */

@@ -45,6 +45,8 @@ export function generateSteps(
   const inMST = Array(n).fill(false)
   key[start] = 0
   const steps: Step[] = []
+  const DOC = 'prim.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const nodes = layoutGraph(n)
   const allEdges = edgeList.map(([u, v, w]) => ({
@@ -62,6 +64,7 @@ export function generateSteps(
     checking?: string,
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const roles = { ...edgeRoles }
     for (const e of treeEdges) roles[e] = 'tree'
@@ -85,6 +88,7 @@ export function generateSteps(
         edgeRoles: roles,
       },
       result,
+      codeRefs: codeRefs ?? ref('init'),
     })
   }
 

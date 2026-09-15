@@ -34,6 +34,8 @@ export function generateSteps(
   const m = p.length
   const next = Array(m).fill(0)
   const steps: Step[] = []
+  const DOC = 'kmp.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
 
   const snap = (
@@ -42,6 +44,7 @@ export function generateSteps(
     hp: number[] = [],
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const arrayPointers: Record<string, Record<string, number>> = {}
     if (ht.length === 1) arrayPointers.text = { i: ht[0]! }
@@ -58,6 +61,7 @@ export function generateSteps(
       arrayPointers,
       vars,
       result,
+      codeRefs: codeRefs,
     })
   }
 
@@ -70,15 +74,15 @@ export function generateSteps(
     return steps
   }
 
-  snap('构建 π/next 数组（最长真前后缀长度）', [], [], { phase: 'prefix' })
+  snap('构建 π/next 数组（最长真前后缀长度）', [], [], { phase: 'prefix' }, undefined, ref('buildLps'))
   let len = 0
   let i = 1
   while (i < m) {
-    snap(`比较 p[${i}]='${p[i]}' 与 p[${len}]='${p[len]}'`, [], [i, len], { i, len })
+    snap(`比较 p[${i}]='${p[i]}' 与 p[${len}]='${p[len]}'`, [], [i, len], { i, len }, undefined, ref('buildLps'))
     if (p[i] === p[len]) {
       len++
       next[i] = len
-      snap(`匹配，next[${i}]=${len}`, [], [i], { i, len })
+      snap(`匹配，next[${i}]=${len}`, [], [i], { i, len }, undefined, ref('buildLps'))
       i++
     } else if (len > 0) {
       len = next[len - 1]
@@ -95,7 +99,7 @@ export function generateSteps(
   let pj = 0
   const hits: number[] = []
   while (ti < t.length) {
-    snap(`比较 t[${ti}]='${t[ti]}' 与 p[${pj}]='${p[pj]}'`, [ti], [pj], { ti, pj })
+    snap(`比较 t[${ti}]='${t[ti]}' 与 p[${pj}]='${p[pj]}'`, [ti], [pj], { ti, pj }, undefined, ref('match'))
     if (t[ti] === p[pj]) {
       ti++
       pj++
@@ -111,7 +115,7 @@ export function generateSteps(
       }
     } else if (pj > 0) {
       pj = next[pj - 1]
-      snap(`失配，模式串跳转 j ← ${pj}`, [ti], [pj], { ti, pj })
+      snap(`失配，模式串跳转 j ← ${pj}`, [ti], [pj], { ti, pj }, undefined, ref('fallback'))
     } else {
       ti++
       snap('失配且 j=0，文本前进', [ti < t.length ? ti : t.length - 1], [], { ti, pj })

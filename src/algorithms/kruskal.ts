@@ -35,6 +35,8 @@ export function generateSteps(
   const edgesSorted = [...edgeList].sort((a, b) => a[2] - b[2])
   const mst: [number, number, number][] = []
   const steps: Step[] = []
+  const DOC = 'kruskal.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const nodes = layoutGraph(n)
   const allEdges = edgeList.map(([u, v, w]) => ({
@@ -52,6 +54,7 @@ export function generateSteps(
     checking?: string,
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const roles = { ...edgeRoles }
     for (const e of accepted) roles[e] = 'accepted'
@@ -81,6 +84,7 @@ export function generateSteps(
         edgeRoles: roles,
       },
       result,
+      codeRefs: codeRefs ?? ref('sort'),
     })
   }
 

@@ -51,6 +51,8 @@ export function solveMaxSubarrayDC(a: number[]): {
   steps: Step[]
 } {
   const steps: Step[] = []
+  const DOC = 'maxSubarrayDC.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const snap = (
     message: string,
@@ -71,6 +73,7 @@ export function solveMaxSubarrayDC(a: number[]): {
       vars,
       result,
       ranges,
+      codeRefs: ref('base'),
     })
   }
 

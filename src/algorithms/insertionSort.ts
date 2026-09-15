@@ -27,6 +27,9 @@ export function generateSteps(input: number[]): Step[] {
   const elementIds = input.map((_, i) => `ins${i}`)
   const steps: Step[] = []
   let id = 0
+  const DOC = 'insertionSort.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+  const PHASE_ANCHOR: Record<string, string> = {"init":"outer","insert":"insert","shift":"shift","done":"done"}
   let comparisons = 0
   let writes = 0
 
@@ -39,6 +42,7 @@ export function generateSteps(input: number[]): Step[] {
     pointers?: Record<string, number>,
     arrayOps?: ArrayOp[],
     phase?: string,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const sortedRoles: Record<number, HighlightRole> = { ...(roles ?? {}) }
     const iVar = typeof vars.i === 'number' ? vars.i : -1
@@ -66,6 +70,7 @@ export function generateSteps(input: number[]): Step[] {
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
       stats: { comparisons, writes, swaps: 0 },
       codeLine,
+      codeRefs: codeRefs ?? (phase && PHASE_ANCHOR[phase] ? ref(PHASE_ANCHOR[phase]) : undefined),
     })
   }
 

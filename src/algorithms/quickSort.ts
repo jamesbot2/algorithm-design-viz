@@ -24,6 +24,9 @@ export function generateSteps(input: number[]): Step[] {
   const elementIds = input.map((_, i) => `q${i}`)
   const steps: Step[] = []
   let id = 0
+  const DOC = 'quickSort.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+  const PHASE_ANCHOR: Record<string, string> = {"init":"partition","partition":"partition","compare":"compare","swap":"swap","done":"partition","recurse":"recurse"}
   let comparisons = 0
   let swaps = 0
 
@@ -36,6 +39,7 @@ export function generateSteps(input: number[]): Step[] {
     pointers?: Record<string, number>,
     arrayOps?: ArrayOp[],
     phase?: string,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const ptrs: Record<string, number> = { ...(pointers ?? {}) }
     for (const k of ['L', 'R', 'i', 'j', 'p', 'mid'] as const) {
@@ -56,6 +60,7 @@ export function generateSteps(input: number[]): Step[] {
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
       stats: { comparisons, swaps },
       codeLine,
+      codeRefs: codeRefs ?? (phase && PHASE_ANCHOR[phase] ? ref(PHASE_ANCHOR[phase]) : undefined),
     })
   }
 
@@ -87,7 +92,7 @@ export function generateSteps(input: number[]): Step[] {
         { [j]: 'compare', [R]: 'pivot' },
         { L, R, ...(i >= 0 ? { i } : {}), j },
         [{ type: 'compare', indices: [j, R], elementIds: [elementIds[j]!, elementIds[R]!] }],
-        'partition',
+        'compare',
       )
       if (a[j]! <= pivot) {
         i++
@@ -101,7 +106,7 @@ export function generateSteps(input: number[]): Step[] {
           { [i]: 'swap', [j]: 'swap', [R]: 'pivot' },
           { L, R, i, j },
           [{ type: 'swap', indices: [i, j], elementIds: [elementIds[i]!, elementIds[j]!] }],
-          'partition',
+          'swap',
         )
       }
     }
@@ -116,7 +121,7 @@ export function generateSteps(input: number[]): Step[] {
       { [p]: 'pivot' },
       { L, R, p },
       [{ type: 'swap', indices: [p, R], elementIds: [elementIds[p]!, elementIds[R]!] }],
-      'partition',
+      'swap',
     )
     return p
   }

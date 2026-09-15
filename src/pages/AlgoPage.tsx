@@ -27,7 +27,10 @@ import { createRunId, freezeRunSnapshot, type RunSnapshot } from '../core/runSna
 import type { SeekCommand } from '../components/Visualizer'
 import WorkbenchLayout from '../components/workbench/WorkbenchLayout'
 import CodeBrowser from '../components/codeBrowser/CodeBrowser'
-import { getDijkstraCatalog } from '../codeCatalog'
+import { getCatalog } from '../codeCatalog'
+import * as nQueensMod from '../algorithms/nQueens'
+import * as matrixChainMod from '../algorithms/matrixChain'
+import * as huffmanMod from '../algorithms/huffman'
 
 const DEFAULT_ARRAY = [5, 2, 8, 1, 9, 3, 7]
 
@@ -57,6 +60,14 @@ type DraftState = {
   bsMode: BinarySearchMode
   graph: GraphDraft | null
   mode: 'teach' | 'experiment'
+  nQueensN: string
+  nQueensMode: 'one' | 'all'
+  matrixDims: string
+  huffmanSymbols: string
+  huffmanFreqs: string
+  knapsackWeights: string
+  knapsackValues: string
+  knapsackW: string
 }
 
 function defaultDraft(id: string): DraftState {
@@ -72,6 +83,14 @@ function defaultDraft(id: string): DraftState {
     bsMode: 'requireSorted',
     graph: isGraphAlgo(id) ? defaultDraftFor(id) : null,
     mode: 'teach',
+    nQueensN: String(nQueensMod.meta.defaultN),
+    nQueensMode: 'all',
+    matrixDims: (matrixChainMod.meta.defaultDims as number[]).join(', '),
+    huffmanSymbols: (huffmanMod.meta.defaultSymbols as string[]).join(', '),
+    huffmanFreqs: (huffmanMod.meta.defaultFreqs as number[]).join(', '),
+    knapsackWeights: (knapsack01.meta.defaultWeights as number[]).join(', '),
+    knapsackValues: (knapsack01.meta.defaultValues as number[]).join(', '),
+    knapsackW: String(knapsack01.meta.defaultCapacity),
   }
   if (id === 'binarySearch') {
     d.arrayText = (binarySearch.meta.defaultArray as number[]).join(', ')
@@ -284,11 +303,22 @@ export default function AlgoPage() {
     }
 
     if (id === 'knapsack01') {
+      const wts = parseNumberList(draft.knapsackWeights, 'weights', { allowEmpty: true, maxLen: DEMO_LIMITS.arrayLen })
+      const vals = parseNumberList(draft.knapsackValues, 'values', { allowEmpty: true, maxLen: DEMO_LIMITS.arrayLen })
+      const W = parseIntStrict(draft.knapsackW, 'W')
+      errs.push(...wts.errors, ...vals.errors, ...W.errors)
+      if (wts.values.length !== vals.values.length) {
+        errs.push({ field: 'weights', reason: 'weights 与 values 长度须一致' })
+      }
+      if (errs.length) return { ok: false, errors: errs }
+      const weights = wts.values
+      const values = vals.values
+      const cap = W.value ?? 0
       return {
         ok: true,
-        registryInput: {},
-        fallbackSteps: maybeSteps(() => knapsack01.generateSteps([])),
-        inputSize: 8,
+        registryInput: { weights, values, capacity: cap },
+        fallbackSteps: maybeSteps(() => knapsack01.generateSteps([], weights, values, cap)),
+        inputSize: weights.length * Math.max(1, cap),
       }
     }
     if (id === 'activitySelection') {
@@ -300,27 +330,43 @@ export default function AlgoPage() {
       }
     }
     if (id === 'nQueens') {
+      const nParsed = parseIntStrict(draft.nQueensN, 'n')
+      errs.push(...nParsed.errors)
+      const n = nParsed.value ?? 4
+      if (n < 1 || n > 12) errs.push({ field: 'n', reason: 'n 须在 1..12' })
+      if (errs.length) return { ok: false, errors: errs }
       return {
         ok: true,
-        registryInput: { n: 4, mode: 'all' },
-        fallbackSteps: maybeSteps(() => algo.generateSteps([], 4, 'all')),
-        inputSize: 4,
+        registryInput: { n, mode: draft.nQueensMode },
+        fallbackSteps: maybeSteps(() => algo.generateSteps([], n, draft.nQueensMode)),
+        inputSize: n,
       }
     }
     if (id === 'matrixChain') {
+      const dims = parseNumberList(draft.matrixDims, 'dims', { allowEmpty: false, maxLen: 20 })
+      errs.push(...dims.errors)
+      if (dims.values.length < 2) errs.push({ field: 'dims', reason: 'dims 至少 2 个数（n 个矩阵需要 n+1 维）' })
+      if (errs.length) return { ok: false, errors: errs }
       return {
         ok: true,
-        registryInput: {},
-        fallbackSteps: maybeSteps(() => algo.generateSteps([])),
-        inputSize: 4,
+        registryInput: { dims: dims.values },
+        fallbackSteps: maybeSteps(() => algo.generateSteps([], dims.values)),
+        inputSize: dims.values.length,
       }
     }
     if (id === 'huffman') {
+      const syms = draft.huffmanSymbols.split(/[,\s]+/).map((x) => x.trim()).filter(Boolean)
+      const freqs = parseNumberList(draft.huffmanFreqs, 'freqs', { allowEmpty: true, maxLen: 64 })
+      errs.push(...freqs.errors)
+      if (syms.length !== freqs.values.length) {
+        errs.push({ field: 'symbols', reason: 'symbols 与 freqs 长度须一致' })
+      }
+      if (errs.length) return { ok: false, errors: errs }
       return {
         ok: true,
-        registryInput: {},
-        fallbackSteps: maybeSteps(() => algo.generateSteps([])),
-        inputSize: 4,
+        registryInput: { symbols: syms, freqs: freqs.values },
+        fallbackSteps: maybeSteps(() => algo.generateSteps([], syms, freqs.values)),
+        inputSize: syms.length,
       }
     }
 
@@ -732,15 +778,63 @@ export default function AlgoPage() {
           />
         )}
 
-        {(id === 'knapsack01' ||
-          id === 'activitySelection' ||
-          id === 'nQueens' ||
-          id === 'matrixChain' ||
-          id === 'huffman') && (
-          <p className="hint">
-            本算法当前使用内置示例；点击「运行」生成步骤。背包多策略见{' '}
-            <Link to="/teach/knapsack">教学单元</Link>。练习见 <Link to="/practice">练习台</Link>。
-          </p>
+        {id === 'nQueens' && (
+          <>
+            <label>
+              n
+              <input value={draft.nQueensN} onChange={(e) => patch({ nQueensN: e.target.value })} />
+            </label>
+            <label>
+              模式
+              <select
+                value={draft.nQueensMode}
+                onChange={(e) => patch({ nQueensMode: e.target.value as 'one' | 'all' })}
+              >
+                <option value="one">求一个解</option>
+                <option value="all">全部解</option>
+              </select>
+            </label>
+          </>
+        )}
+        {id === 'matrixChain' && (
+          <label>
+            维度 dims（逗号分隔）
+            <input value={draft.matrixDims} onChange={(e) => patch({ matrixDims: e.target.value })} />
+          </label>
+        )}
+        {id === 'huffman' && (
+          <>
+            <label>
+              符号
+              <input value={draft.huffmanSymbols} onChange={(e) => patch({ huffmanSymbols: e.target.value })} />
+            </label>
+            <label>
+              频率
+              <input value={draft.huffmanFreqs} onChange={(e) => patch({ huffmanFreqs: e.target.value })} />
+            </label>
+          </>
+        )}
+        {id === 'knapsack01' && (
+          <>
+            <label>
+              重量
+              <input value={draft.knapsackWeights} onChange={(e) => patch({ knapsackWeights: e.target.value })} />
+            </label>
+            <label>
+              价值
+              <input value={draft.knapsackValues} onChange={(e) => patch({ knapsackValues: e.target.value })} />
+            </label>
+            <label>
+              容量 W
+              <input value={draft.knapsackW} onChange={(e) => patch({ knapsackW: e.target.value })} />
+            </label>
+            <p className="hint">
+              多策略对比见 <Link to="/teach/knapsack">教学单元</Link>。
+            </p>
+          </>
+        )}
+        {id === 'activitySelection' && (
+          <p className="hint">本算法使用内置示例；点击「运行」生成步骤。</p>
         )}
 
         {errors.length > 0 && (
@@ -815,23 +909,27 @@ export default function AlgoPage() {
               />
             </>
           }
-          code={
-            id === 'dijkstra' ? (
-              <CodeBrowser
-                document={getDijkstraCatalog().typescript}
-                execAnchorId={
-                  steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase
-                }
-                activeLine={steps[cursorIndex]?.codeLine}
-                pseudocode={getDijkstraCatalog().pseudocode.source}
-              />
-            ) : (
+          code={(() => {
+            const catalog = id ? getCatalog(id) : null
+            if (catalog) {
+              return (
+                <CodeBrowser
+                  document={catalog.typescript}
+                  execAnchorId={
+                    steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase
+                  }
+                  activeLine={steps[cursorIndex]?.codeLine}
+                  pseudocode={catalog.pseudocode?.source}
+                />
+              )
+            }
+            return (
               <div className="code-stub muted">
                 <div className="panel-title">参考代码</div>
                 <pre className="code-pre">{(algo.meta.code as string) || '（暂无目录文档）'}</pre>
               </div>
             )
-          }
+          })()}
         />
       ) : (
         <div className="viz-empty">调整输入后点击「运行」开始可视化。</div>

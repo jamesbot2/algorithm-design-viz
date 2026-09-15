@@ -26,6 +26,9 @@ export function generateSteps(input: number[]): Step[] {
   const elementIds = input.map((_, i) => `m${i}`)
   const steps: Step[] = []
   let id = 0
+  const DOC = 'mergeSort.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+  const PHASE_ANCHOR: Record<string, string> = {"init":"divide","divide":"divide","recurse":"recurse","merge":"mergeCompare","done":"mergePush"}
   let comparisons = 0
   let writes = 0
   const callStack: string[] = []
@@ -47,6 +50,7 @@ export function generateSteps(input: number[]): Step[] {
     pointers?: Record<string, number>,
     arrayOps?: ArrayOp[],
     phase?: string,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const ptrs: Record<string, number> = { ...(pointers ?? {}) }
     for (const k of ['L', 'R', 'mid', 'i', 'j', 'k'] as const) {
@@ -72,6 +76,7 @@ export function generateSteps(input: number[]): Step[] {
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
       stats: { comparisons, writes, swaps: 0 },
       codeLine,
+      codeRefs: codeRefs ?? (phase && PHASE_ANCHOR[phase] ? ref(PHASE_ANCHOR[phase]) : undefined),
       searchTree: cloneTree(treeRoot),
     })
   }

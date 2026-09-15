@@ -27,6 +27,8 @@ export function generateSteps(input: number[]): Step[] {
   let comparisons = 0
   let swaps = 0
 
+  const DOC = 'bubbleSort.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   const snap = (
     message: string,
     highlights: number[] = [],
@@ -36,6 +38,7 @@ export function generateSteps(input: number[]): Step[] {
     pointers?: Record<string, number>,
     arrayOps?: ArrayOp[],
     phase?: string,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ): void => {
     const sortedRoles: Record<number, HighlightRole> = { ...(roles ?? {}) }
     const iVar = typeof vars.i === 'number' ? vars.i : -1
@@ -62,13 +65,14 @@ export function generateSteps(input: number[]): Step[] {
         : undefined),
       stats: { comparisons, swaps },
       codeLine,
+      codeRefs,
     })
   }
 
-  snap('开始冒泡排序', [], { i: null, j: null }, 0, undefined, undefined, undefined, 'init')
+  snap('开始冒泡排序', [], { i: null, j: null }, 0, undefined, undefined, undefined, 'init', ref('init'))
   const n = a.length
   for (let i = 0; i < n - 1; i++) {
-    snap(`外层循环 i = ${i}，已排好区间 [${n - i}, ${n - 1}]`, [], { i, j: null }, 1, undefined, { i }, undefined, 'outer')
+    snap(`外层循环 i = ${i}，已排好区间 [${n - i}, ${n - 1}]`, [], { i, j: null }, 1, undefined, { i }, undefined, 'outer', ref('init'))
     for (let j = 0; j < n - 1 - i; j++) {
       comparisons++
       snap(
@@ -80,6 +84,7 @@ export function generateSteps(input: number[]): Step[] {
         { i, j },
         [{ type: 'compare', indices: [j, j + 1], elementIds: [elementIds[j]!, elementIds[j + 1]!] }],
         'compare',
+        ref('compare'),
       )
       if (a[j]! > a[j + 1]!) {
         ;[a[j], a[j + 1]] = [a[j + 1]!, a[j]!]
@@ -94,6 +99,7 @@ export function generateSteps(input: number[]): Step[] {
           { i, j },
           [{ type: 'swap', indices: [j, j + 1], elementIds: [elementIds[j]!, elementIds[j + 1]!] }],
           'swap',
+          ref('swap'),
         )
       } else {
         snap(
@@ -105,12 +111,13 @@ export function generateSteps(input: number[]): Step[] {
           { i, j },
           [{ type: 'compare', indices: [j, j + 1], elementIds: [elementIds[j]!, elementIds[j + 1]!] }],
           'compare',
+          ref('compare'),
         )
       }
     }
   }
   const allSorted: Record<number, HighlightRole> = {}
   for (let s = 0; s < n; s++) allSorted[s] = 'sorted'
-  snap('排序完成', [], { i: null, j: null }, 0, allSorted, undefined, undefined, 'done')
+  snap('排序完成', [], { i: null, j: null }, 0, allSorted, undefined, undefined, 'done', ref('done'))
   return steps
 }

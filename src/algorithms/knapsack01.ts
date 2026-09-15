@@ -33,6 +33,8 @@ export function generateSteps(
   const n = weights.length
   const dp: number[][] = Array.from({ length: n + 1 }, () => Array(W + 1).fill(0))
   const steps: Step[] = []
+  const DOC = 'knapsack.dp2d.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const snap = (
     message: string,
@@ -45,6 +47,7 @@ export function generateSteps(
       writes?: [number, number][]
     },
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     steps.push({
       id: id++,
@@ -57,6 +60,7 @@ export function generateSteps(
       vars: { n, W, ...vars },
       codeLine,
       result,
+      codeRefs,
     })
   }
   snap(
@@ -64,6 +68,9 @@ export function generateSteps(
     {},
     [],
     0,
+    undefined,
+    undefined,
+    ref('init'),
   )
   for (let i = 1; i <= n; i++) {
     for (let w = 0; w <= W; w++) {
@@ -78,6 +85,8 @@ export function generateSteps(
           reads: [[i - 1, w]],
           writes: [[i, w]],
         },
+        undefined,
+        ref('fill'),
       )
       if (w >= weights[i - 1]) {
         const take = dp[i - 1][w - weights[i - 1]] + values[i - 1]
@@ -93,6 +102,8 @@ export function generateSteps(
               [i - 1, w - weights[i - 1]],
             ],
           },
+          undefined,
+          ref('take'),
         )
         if (take > dp[i][w]) {
           dp[i][w] = take
@@ -102,6 +113,8 @@ export function generateSteps(
             [i - 1],
             4,
             { current: [i, w], writes: [[i, w]] },
+            undefined,
+            ref('take'),
           )
         }
       }

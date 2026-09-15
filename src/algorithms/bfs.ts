@@ -59,6 +59,8 @@ export function generateSteps(
   const order: number[] = []
   const queue: number[] = []
   const steps: Step[] = []
+  const DOC = 'bfs.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const treeEdges = new Set<string>()
   const edgeRoles: Record<string, EdgeRole> = {}
@@ -69,6 +71,7 @@ export function generateSteps(
     checking?: string,
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const roles = { ...edgeRoles }
     for (const e of treeEdges) roles[e] = 'tree'
@@ -97,20 +100,21 @@ export function generateSteps(
         edgeRoles: roles,
       },
       result,
+      codeRefs,
     })
   }
 
   queue.push(start)
   visited[start] = true
   distArr[start] = 0
-  snap(`入队起点 ${start}`, [start], undefined, { start, front: start })
+  snap(`入队起点 ${start}`, [start], undefined, { start, front: start }, undefined, ref('init'))
   while (queue.length) {
     const u = queue.shift()!
     order.push(u)
-    snap(`出队访问 ${u}`, [u], undefined, { u, queueSize: queue.length })
+    snap(`出队访问 ${u}`, [u], undefined, { u, queueSize: queue.length }, undefined, ref('dequeue'))
     for (const v of adj[u] || []) {
       const eid = undirectedEdgeId(u, v)
-      snap(`检查边 ${u}-${v}`, [u, v], eid, { u, v, visited_v: visited[v] })
+      snap(`检查边 ${u}-${v}`, [u, v], eid, { u, v, visited_v: visited[v] }, undefined, ref('visit'))
       if (!visited[v]) {
         visited[v] = true
         parent[v] = u
@@ -118,7 +122,7 @@ export function generateSteps(
         queue.push(v)
         treeEdges.add(eid)
         edgeRoles[eid] = 'tree'
-        snap(`发现 ${v}，入队`, [v], eid, { u, v })
+        snap(`发现 ${v}，入队`, [v], eid, { u, v }, undefined, ref('enqueue'))
       } else {
         edgeRoles[eid] = edgeRoles[eid] ?? 'rejected'
       }

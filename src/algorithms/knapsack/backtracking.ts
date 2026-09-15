@@ -14,6 +14,8 @@ export function solveBacktracking(
   let truncated = false
   let sid = 0
   const steps: Step[] = []
+  const DOC = 'knapsack.backtracking.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
 
   const root: SearchTreeNode = {
     id: 'root',
@@ -84,6 +86,7 @@ export function solveBacktracking(
     message: '开始回溯',
     searchTree: snapshotTree(root),
     vars: { best: 0, nodes: 0, truncated: false },
+    codeRefs: ref('call'),
   })
 
   dfs(0, 0, 0, [], root)
@@ -106,6 +109,7 @@ export function solveBacktracking(
     searchTree: snapshotTree(root),
     vars: { best, nodes: nodeCount, truncated },
     result: solution,
+    codeRefs: ref('best'),
   })
   return { solution, steps, tree: snapshotTree(root) }
 }

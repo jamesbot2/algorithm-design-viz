@@ -41,6 +41,8 @@ export function solveMatrixChain(dims: number[]): {
   const dp: number[][] = Array.from({ length: n + 1 }, () => Array(n + 1).fill(0))
   const split: number[][] = Array.from({ length: n + 1 }, () => Array(n + 1).fill(0))
   const steps: Step[] = []
+  const DOC = 'matrixChain.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
 
   const snap = (
@@ -52,6 +54,7 @@ export function solveMatrixChain(dims: number[]): {
       writes?: [number, number][]
     },
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     steps.push({
       id: id++,
@@ -63,6 +66,7 @@ export function solveMatrixChain(dims: number[]): {
       arrays: { dims: [...dims] },
       vars,
       result,
+      codeRefs: codeRefs ?? ref('lenLoop'),
     })
   }
 

@@ -62,6 +62,8 @@ export function solveHuffman(
   freqs: number[],
 ): { result: HuffmanResult; steps: Step[] } {
   const steps: Step[] = []
+  const DOC = 'huffman.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const snap = (message: string, vars: Record<string, string | number | boolean | null> = {}, result?: unknown) => {
     steps.push({
@@ -70,6 +72,7 @@ export function solveHuffman(
       arrays: { symbols: [...symbols], freqs: [...freqs] },
       vars,
       result,
+      codeRefs: ref('init'),
     })
   }
 

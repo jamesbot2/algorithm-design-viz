@@ -22,6 +22,8 @@ for i = 1 to n-1:
 export function generateSteps(input: number[]): Step[] {
   const a = [...input]
   const steps: Step[] = []
+  const DOC = 'kadane.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const snap = (
     message: string,
@@ -30,6 +32,7 @@ export function generateSteps(input: number[]): Step[] {
     codeLine?: number,
     result?: unknown,
     ranges?: { current?: [number, number]; best?: [number, number] },
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     steps.push({
       id: id++,
@@ -42,6 +45,7 @@ export function generateSteps(input: number[]): Step[] {
       codeLine,
       result,
       ranges,
+      codeRefs,
     })
   }
   if (a.length === 0) {
@@ -58,16 +62,16 @@ export function generateSteps(input: number[]): Step[] {
   let bestL = 0
   let bestR = 0
   let curL = 0
-  snap(`初始化 best = cur = a[0] = ${a[0]}`, [0], { best, cur, bestL, bestR }, 0, undefined, { current: [0, 0], best: [0, 0] })
+  snap(`初始化 best = cur = a[0] = ${a[0]}`, [0], { best, cur, bestL, bestR }, 0, undefined, { current: [0, 0], best: [0, 0] }, ref('init'))
   for (let i = 1; i < a.length; i++) {
     snap(`考察 a[${i}] = ${a[i]}`, [i], { i, best, cur, curL }, 1, undefined, { current: [curL, i - 1 >= curL ? i - 1 : curL], best: [bestL, bestR] })
     if (cur + a[i] < a[i]) {
       cur = a[i]
       curL = i
-      snap(`重新开始：cur ← a[${i}] = ${cur}`, [i], { i, best, cur, curL }, 2, undefined, { current: [curL, i], best: [bestL, bestR] })
+      snap(`重新开始：cur ← a[${i}] = ${cur}`, [i], { i, best, cur, curL }, 2, undefined, { current: [curL, i], best: [bestL, bestR] }, ref('extendOrReset'))
     } else {
       cur = cur + a[i]
-      snap(`延伸：cur ← cur + a[${i}] = ${cur}`, [i], { i, best, cur, curL }, 2, undefined, { current: [curL, i], best: [bestL, bestR] })
+      snap(`延伸：cur ← cur + a[${i}] = ${cur}`, [i], { i, best, cur, curL }, 2, undefined, { current: [curL, i], best: [bestL, bestR] }, ref('extendOrReset'))
     }
     if (cur > best) {
       best = cur
@@ -80,6 +84,7 @@ export function generateSteps(input: number[]): Step[] {
         3,
         undefined,
         { current: [curL, i], best: [bestL, bestR] },
+        ref('updateBest'),
       )
     }
   }
@@ -90,6 +95,7 @@ export function generateSteps(input: number[]): Step[] {
     0,
     { ok: true, hasSubarray: true, best, range: [bestL, bestR] },
     { current: [bestL, bestR], best: [bestL, bestR] },
+    ref('done'),
   )
   return steps
 }

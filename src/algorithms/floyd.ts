@@ -29,6 +29,9 @@ export function generateSteps(_arr: number[], matrix = meta.defaultMatrix): Step
   const n = matrix.length
   const d = matrix.map((r) => r.map((x) => x))
   const steps: Step[] = []
+  const DOC = 'floyd.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+  const LINE_ANCHOR: Record<number, string> = { 0: 'kLoop', 1: 'kLoop', 3: 'relax' }
   let id = 0
   const fmt = (x: number) => (x === Infinity ? '∞' : x)
 
@@ -38,6 +41,7 @@ export function generateSteps(_arr: number[], matrix = meta.defaultMatrix): Step
     codeLine?: number,
     targets?: { current?: [number, number]; reads?: [number, number][]; writes?: [number, number][]; path?: [number, number][] },
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     steps.push({
       id: id++,
@@ -47,6 +51,7 @@ export function generateSteps(_arr: number[], matrix = meta.defaultMatrix): Step
       vars,
       codeLine,
       result,
+      codeRefs: codeRefs ?? (codeLine !== undefined && LINE_ANCHOR[codeLine] ? ref(LINE_ANCHOR[codeLine]) : ref('done')),
     })
   }
 

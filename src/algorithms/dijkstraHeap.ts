@@ -150,6 +150,9 @@ export function generateSteps(
 ): Step[] {
   const heavy = opts?.heavyTrace !== false
   const steps: Step[] = []
+  const DOC = 'dijkstraHeap.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+  const PHASE_ANCHOR: Record<string, string> = { init: "init", extract: "extract", stale: "stale", relax: "relax", done: "init", error: "init" }
   let id = 0
 
   const neg = edgeList.find(([, , w]) => w < 0)
@@ -189,6 +192,7 @@ export function generateSteps(
     vars: Record<string, string | number | boolean | null> = {},
     phase?: string,
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     if (!heavy && !result && phase !== 'init' && phase !== 'done' && phase !== 'error') return
     const roles: Record<string, EdgeRole> = { ...edgeRoles }
@@ -214,6 +218,7 @@ export function generateSteps(
         edgeRoles: roles,
       },
       result,
+      codeRefs: codeRefs ?? (phase && PHASE_ANCHOR[phase] ? ref(PHASE_ANCHOR[phase]) : undefined),
     })
   }
 

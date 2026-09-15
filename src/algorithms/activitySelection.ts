@@ -19,31 +19,39 @@ export function generateSteps(
   const n = starts.length
   const acts = starts.map((s, i) => ({ i, s, e: ends[i] })).sort((a, b) => a.e - b.e)
   const steps: Step[] = []
+  const DOC = 'activitySelection.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const selected: number[] = []
   const labels = acts.map((a) => `A${a.i}[${a.s},${a.e})`)
-  const snap = (message: string, highlights: number[] = [], vars: Record<string, string | number | boolean | null> = {}) => {
+  const snap = (
+    message: string,
+    highlights: number[] = [],
+    vars: Record<string, string | number | boolean | null> = {},
+    codeRefs?: { documentId: string; anchorId: string }[],
+  ) => {
     steps.push({
       id: id++,
       message,
       arrays: { activities: [...labels], selected: selected.map((x) => `A${acts[x].i}`) },
       highlights: { activities: highlights },
       vars,
+      codeRefs,
     })
   }
-  snap('按结束时间排序活动', [], { n })
+  snap('按结束时间排序活动', [], { n }, ref('sort'))
   let lastEnd = -Infinity
   for (let k = 0; k < acts.length; k++) {
     const a = acts[k]
-    snap(`考察 A${a.i}：[${a.s},${a.e})，上次结束=${lastEnd === -Infinity ? '无' : lastEnd}`, [k], { k, start: a.s, end: a.e, lastEnd: lastEnd === -Infinity ? '无' : lastEnd })
+    snap(`考察 A${a.i}：[${a.s},${a.e})，上次结束=${lastEnd === -Infinity ? '无' : lastEnd}`, [k], { k, start: a.s, end: a.e, lastEnd: lastEnd === -Infinity ? '无' : lastEnd }, ref('check'))
     if (a.s >= lastEnd) {
       selected.push(k)
       lastEnd = a.e
-      snap(`选取 A${a.i}，更新 lastEnd=${lastEnd}`, [k], { selected: selected.length, lastEnd })
+      snap(`选取 A${a.i}，更新 lastEnd=${lastEnd}`, [k], { selected: selected.length, lastEnd }, ref('pick'))
     } else {
-      snap(`与已选冲突，跳过 A${a.i}`, [k], { selected: selected.length, lastEnd })
+      snap(`与已选冲突，跳过 A${a.i}`, [k], { selected: selected.length, lastEnd }, ref('check'))
     }
   }
-  snap(`完成：共选 ${selected.length} 个活动`, selected, { answer: selected.length })
+  snap(`完成：共选 ${selected.length} 个活动`, selected, { answer: selected.length }, ref('done'))
   return steps
 }

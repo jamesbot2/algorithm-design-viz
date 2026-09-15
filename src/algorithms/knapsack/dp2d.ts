@@ -10,6 +10,8 @@ export function solveDp2d(inst: KnapsackInstance): {
   const n = items.length
   const dp: number[][] = Array.from({ length: n + 1 }, () => Array(W + 1).fill(0))
   const steps: Step[] = []
+  const DOC = 'knapsack.dp2d.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const weights = items.map((i) => i.weight)
   const values = items.map((i) => i.value)
@@ -17,13 +19,14 @@ export function solveDp2d(inst: KnapsackInstance): {
   const snap = (
     message: string,
     vars: Record<string, string | number | boolean | null> = {},
-    targets?: Step['matrixTargets'] extends infer _ ? {
+    targets?: {
       current?: [number, number]
       reads?: [number, number][]
       writes?: [number, number][]
       path?: [number, number][]
-    } : never,
+    },
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     steps.push({
       id: id++,
@@ -33,30 +36,40 @@ export function solveDp2d(inst: KnapsackInstance): {
       arrays: { weights: [...weights], values: [...values] },
       vars: { n, W, ...vars },
       result,
+      codeRefs,
     })
   }
 
-  snap('初始化 dp[0..n][0..W]=0（伪多项式 O(nW)）')
+  snap('初始化 dp[0..n][0..W]=0（伪多项式 O(nW)）', {}, undefined, undefined, ref('init'))
   for (let i = 1; i <= n; i++) {
     const wt = items[i - 1]!.weight
     const val = items[i - 1]!.value
     for (let w = 0; w <= W; w++) {
       dp[i]![w] = dp[i - 1]![w]!
+      let took = false
       if (w >= wt) {
         const take = dp[i - 1]![w - wt]! + val
-        if (take > dp[i]![w]!) dp[i]![w] = take
+        if (take > dp[i]![w]!) {
+          dp[i]![w] = take
+          took = true
+        }
       }
       if (w === W || w % Math.max(1, Math.floor(W / 4)) === 0) {
-        snap(`填 dp[${i}][${w}]=${dp[i]![w]}（物品 ${items[i - 1]!.id}）`, { i, w }, {
-          current: [i, w],
-          writes: [[i, w]],
-          reads: w >= wt ? [[i - 1, w], [i - 1, w - wt]] : [[i - 1, w]],
-        })
+        snap(
+          `填 dp[${i}][${w}]=${dp[i]![w]}（物品 ${items[i - 1]!.id}）`,
+          { i, w },
+          {
+            current: [i, w],
+            writes: [[i, w]],
+            reads: w >= wt ? [[i - 1, w], [i - 1, w - wt]] : [[i - 1, w]],
+          },
+          undefined,
+          took ? ref('take') : ref('fill'),
+        )
       }
     }
   }
 
-  // Reconstruct
   const selectedIds: string[] = []
   let w = W
   const path: [number, number][] = [[n, W]]
@@ -82,6 +95,7 @@ export function solveDp2d(inst: KnapsackInstance): {
     { answer: maxValue },
     { current: [n, W], path },
     solution,
+    ref('reconstruct'),
   )
   return { solution, dp, steps }
 }

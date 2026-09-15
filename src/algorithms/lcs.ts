@@ -12,7 +12,7 @@ else: dp[i][j]=max(dp[i-1][j], dp[i][j-1])
   defaultX: 'ABCBDAB',
   defaultY: 'BDCABA',
   implName: 'lcsDP2D',
-  implVersion: '1.2.0',
+  implVersion: '1.3.0',
   timeComplexity: 'O(mn)',
   spaceComplexity: 'O(mn)',
   spaceNotes: 'dp[m+1][n+1]。',
@@ -62,6 +62,9 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
   const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0))
   const steps: Step[] = []
   let id = 0
+  const DOC = 'lcs.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+
   const snap = (
     message: string,
     vars: Record<string, string | number | boolean | null> = {},
@@ -73,6 +76,8 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
       path?: [number, number][]
     },
     result?: unknown,
+    phase?: string,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const arrayPointers: Record<string, Record<string, number>> = {}
     if (typeof vars.i === 'number' && (vars.i as number) > 0) {
@@ -84,16 +89,22 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
     steps.push({
       id: id++,
       message,
+      phase,
       matrices: { dp: dp.map((r) => [...r]) },
       matrixTargets: targets ? { dp: targets } : undefined,
       arrays: { X: X.split(''), Y: Y.split('') },
       arrayPointers: Object.keys(arrayPointers).length ? arrayPointers : undefined,
       vars,
       codeLine,
+      codeRefs,
       result,
     })
   }
-  snap(`计算 LCS("${X}", "${Y}")`, { m, n }, 0)
+
+  snap(`计算 LCS("${X}", "${Y}")`, { m, n }, 0, undefined, undefined, 'init', ref('init'))
+  for (let i = 0; i <= m; i++) dp[i]![0] = 0
+  for (let j = 0; j <= n; j++) dp[0]![j] = 0
+
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
       if (X[i - 1] === Y[j - 1]) {
@@ -107,6 +118,9 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
             reads: [[i - 1, j - 1]],
             writes: [[i, j]],
           },
+          undefined,
+          'fill',
+          [...ref('compareChars'), ...ref('takeDiagonal')],
         )
       } else {
         dp[i]![j] = Math.max(dp[i - 1]![j]!, dp[i]![j - 1]!)
@@ -122,11 +136,71 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
             ],
             writes: [[i, j]],
           },
+          undefined,
+          'fill',
+          [...ref('compareChars'), ...ref('dpFill')],
         )
       }
     }
   }
-  const lcsStr = reconstructLcs(X, Y, dp)
+
+  // Reconstruct as playable later phase
+  let i = m
+  let j = n
+  const chars: string[] = []
+  const pathSoFar: [number, number][] = [[i, j]]
+  snap(
+    `填表完成，开始回溯重建 LCS（从 (${m},${n})）`,
+    { i, j, phase: 'reconstruct' },
+    2,
+    { current: [i, j], path: [...pathSoFar] },
+    undefined,
+    'reconstruct',
+    ref('reconstruct'),
+  )
+  while (i > 0 && j > 0) {
+    if (X[i - 1] === Y[j - 1]) {
+      const ch = X[i - 1]!
+      chars.push(ch)
+      i--
+      j--
+      pathSoFar.push([i, j])
+      snap(
+        `匹配 '${ch}'：取对角 → (${i},${j})，已收集 "${[...chars].reverse().join('')}"`,
+        { i, j, collected: [...chars].reverse().join('') },
+        2,
+        { current: [i, j], path: [...pathSoFar], writes: [[i + 1, j + 1]] },
+        undefined,
+        'reconstruct',
+        ref('reconstruct'),
+      )
+    } else if (dp[i - 1]![j]! >= dp[i]![j - 1]!) {
+      i--
+      pathSoFar.push([i, j])
+      snap(
+        `上移 → (${i},${j})`,
+        { i, j },
+        2,
+        { current: [i, j], path: [...pathSoFar] },
+        undefined,
+        'reconstruct',
+        ref('reconstructMove'),
+      )
+    } else {
+      j--
+      pathSoFar.push([i, j])
+      snap(
+        `左移 → (${i},${j})`,
+        { i, j },
+        2,
+        { current: [i, j], path: [...pathSoFar] },
+        undefined,
+        'reconstruct',
+        ref('reconstructMove'),
+      )
+    }
+  }
+  const lcsStr = chars.reverse().join('')
   const path = lcsPath(X, Y, dp)
   snap(
     `LCS 长度 = ${dp[m]![n]}；一条 LCS = "${lcsStr}"`,
@@ -134,6 +208,8 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
     2,
     { current: [m, n], path },
     { ok: true, length: dp[m]![n], lcs: lcsStr },
+    'done',
+    ref('reconstruct'),
   )
   return steps
 }

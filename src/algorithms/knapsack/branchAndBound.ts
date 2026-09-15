@@ -38,6 +38,8 @@ export function solveBranchAndBound(inst: KnapsackInstance): {
     }))
     .sort((a, b) => b.density - a.density || a.id.localeCompare(b.id))
 
+  const DOC = 'knapsack.branchAndBound.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let best = 0
   let bestIds: string[] = []
   let sid = 0
@@ -118,6 +120,7 @@ export function solveBranchAndBound(inst: KnapsackInstance): {
       id: 0,
       message: '开始分支限界',
       searchTree: snapshotTree(root),
+      codeRefs: ref('bound'),
       vars: { best: 0, note: 'fractional UB' },
     },
   ]
@@ -135,6 +138,7 @@ export function solveBranchAndBound(inst: KnapsackInstance): {
     id: steps.length,
     message: `分支限界完成：最优值 ${best}（分数上界剪枝；注意 float）`,
     searchTree: snapshotTree(root),
+      codeRefs: ref('bound'),
     vars: { best, note: 'fractional UB' },
     result: solution,
   })

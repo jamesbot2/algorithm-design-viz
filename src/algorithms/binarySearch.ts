@@ -43,6 +43,8 @@ function searchOnSorted(
 ): { steps: Step[]; id: number; comparisons: number; found: number | null } {
   let id = idStart
   let comparisons = comparisonsStart
+  const DOC = 'binarySearch.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
 
   const snap = (
     message: string,
@@ -51,6 +53,7 @@ function searchOnSorted(
     codeLine?: number,
     roles?: Record<number, HighlightRole>,
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const pointers: Record<string, number> = {}
     for (const k of ['lo', 'mid', 'hi'] as const) {
@@ -68,6 +71,7 @@ function searchOnSorted(
       stats: { comparisons },
       codeLine,
       result,
+      codeRefs,
     })
   }
 
@@ -75,25 +79,25 @@ function searchOnSorted(
   let hi = a.length - 1
   // Leftmost: when equal, continue left (hi = mid - 1) after recording candidate
   let found: number | null = null
-  snap(`有序数组上二分查找 target=${target}（重复取最左）`, [], { lo, hi }, 0)
+  snap(`有序数组上二分查找 target=${target}（重复取最左）`, [], { lo, hi }, 0, undefined, undefined, ref('init'))
 
   while (lo <= hi) {
     const mid = Math.floor((lo + hi) / 2)
     comparisons++
     snap(`mid = ${mid}，a[mid]=${a[mid]}（第 ${comparisons} 次值比较）`, [mid], { lo, mid, hi }, 2, {
       [mid]: 'focus',
-    })
+    }, undefined, ref('mid'))
     if (a[mid] === target) {
       found = mid
       snap(`命中下标 ${mid}，继续向左找更早匹配`, [mid], { lo, mid, hi, candidate: mid }, 3, {
         [mid]: 'sorted',
-      })
+      }, undefined, ref('compare'))
       hi = mid - 1
     } else if (a[mid] < target) {
-      snap(`a[mid] < target，lo ← mid+1`, [mid], { lo, mid, hi }, 4, { [mid]: 'compare' })
+      snap(`a[mid] < target，lo ← mid+1`, [mid], { lo, mid, hi }, 4, { [mid]: 'compare' }, undefined, ref('narrow'))
       lo = mid + 1
     } else {
-      snap(`a[mid] > target，hi ← mid-1`, [mid], { lo, mid, hi }, 5, { [mid]: 'compare' })
+      snap(`a[mid] > target，hi ← mid-1`, [mid], { lo, mid, hi }, 5, { [mid]: 'compare' }, undefined, ref('narrow'))
       hi = mid - 1
     }
   }

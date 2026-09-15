@@ -85,6 +85,8 @@ export function generateSteps(_arr: number[], A = meta.defaultA, B = meta.defaul
   const n = B.length
   const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0))
   const steps: Step[] = []
+  const DOC = 'editDistance.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const snap = (
     message: string,
@@ -97,6 +99,7 @@ export function generateSteps(_arr: number[], A = meta.defaultA, B = meta.defaul
       path?: [number, number][]
     },
     result?: unknown,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     steps.push({
       id: id++,
@@ -107,11 +110,12 @@ export function generateSteps(_arr: number[], A = meta.defaultA, B = meta.defaul
       vars,
       codeLine,
       result,
+      codeRefs,
     })
   }
   for (let i = 0; i <= m; i++) dp[i]![0] = i
   for (let j = 0; j <= n; j++) dp[0]![j] = j
-  snap('边界：空串编辑距离 = 长度', { m, n }, 0, { writes: [[0, 0]] })
+  snap('边界：空串编辑距离 = 长度', { m, n }, 0, { writes: [[0, 0]] }, undefined, ref('init'))
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
       if (A[i - 1] === B[j - 1]) {
@@ -120,7 +124,7 @@ export function generateSteps(_arr: number[], A = meta.defaultA, B = meta.defaul
           current: [i, j],
           reads: [[i - 1, j - 1]],
           writes: [[i, j]],
-        })
+        }, undefined, ref('equal'))
       } else {
         const ins = dp[i]![j - 1]!
         const del = dp[i - 1]![j]!
@@ -134,7 +138,7 @@ export function generateSteps(_arr: number[], A = meta.defaultA, B = meta.defaul
             [i - 1, j - 1],
           ],
           writes: [[i, j]],
-        })
+        }, undefined, ref('replace'))
       }
     }
   }
@@ -147,6 +151,7 @@ export function generateSteps(_arr: number[], A = meta.defaultA, B = meta.defaul
     2,
     { current: [m, n], path },
     { ok: true, distance: dp[m]![n], ops },
+    ref('done'),
   )
   return steps
 }

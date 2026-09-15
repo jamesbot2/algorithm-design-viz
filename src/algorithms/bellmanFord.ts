@@ -45,6 +45,8 @@ export function generateSteps(
   }))
   const nodes = layoutGraph(n)
   const steps: Step[] = []
+  const DOC = 'bellmanFord.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   let id = 0
   const edgeRoles: Record<string, EdgeRole> = {}
 
@@ -75,6 +77,7 @@ export function generateSteps(
         nodeRoles: opts?.nodeRoles,
       },
       result,
+      codeRefs: ref('init'),
     })
   }
 

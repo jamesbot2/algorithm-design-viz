@@ -93,6 +93,7 @@ export function copyStepArrays(step: Step): Step {
     codeRefs: step.codeRefs
       ? step.codeRefs.map((r) => ({ ...r }))
       : undefined,
+    frameId: step.frameId,
   }
 }
 

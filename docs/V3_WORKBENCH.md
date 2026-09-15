@@ -65,7 +65,20 @@ projects: [
 ]
 ```
 
-## Remaining (D / E)
+## Phase D — Catalog coverage (done locally)
 
-- D: more code catalogs (sorts, DP), richer CodeBrowser follow, FLIP polish
-- E: practice/code sync, deploy verification after push, Playwright E2E
+- `getCatalog(algoId)` generalized; AlgoPage + KnapsackUnit look up by id/strategy.
+- Full TS CodeDocuments + anchors + `sourceHash` for runnable algos listed in `docs/CODE_COVERAGE_MATRIX.md`.
+- LCS reconstruct playable phase; N-Queens `frameId` + tree immutability kept; knapsack per-strategy catalogs.
+
+## Phase E — start
+
+- Vitest DOM smoke for Dijkstra + CodeBrowser (`tests/dom/v3-phase-e-codebrowser.test.tsx`).
+- Playwright **not** added (install reliability); do not claim E2E passed.
+- Screenshots skipped.
+
+## Still open
+
+- Richer CodeBrowser follow / FLIP polish
+- Deploy verification after push
+- Optional Playwright when environment supports reliable install
