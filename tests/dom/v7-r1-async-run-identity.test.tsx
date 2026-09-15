@@ -125,9 +125,13 @@ describe('V7 R1 async run identity', () => {
 
     gate.resolve()
 
-    await waitFor(() => {
-      expect(screen.queryByTestId('run-status')?.textContent ?? '').not.toMatch(/运行中/)
-    })
+    // nQueens n=8 sync fallback (~0.8s) can exceed default 1s waitFor under CI CPU load
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId('run-status')?.textContent ?? '').not.toMatch(/运行中/)
+      },
+      { timeout: 10_000 },
+    )
 
     expect((screen.getByTestId('nqueens-n') as HTMLInputElement).value).toBe('9')
     expect(document.querySelector('.dirty-banner')).toBeTruthy()
