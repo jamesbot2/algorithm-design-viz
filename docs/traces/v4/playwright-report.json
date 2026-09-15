@@ -3,7 +3,10 @@
     "argv": [
       "/home/box/.local/node-v24.20.0-linux-x64/bin/node",
       "/workspace/algorithm-design-viz/node_modules/.bin/playwright",
-      "test"
+      "test",
+      "tests/e2e/v4-stability.spec.ts",
+      "-g",
+      "empty exec"
     ],
     "configFile": "/workspace/algorithm-design-viz/playwright.config.ts",
     "rootDir": "/workspace/algorithm-design-viz/tests/e2e",
@@ -98,12 +101,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 831,
+                      "duration": 799,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T10:10:20.458Z",
+                      "startTime": "2026-09-15T10:14:16.590Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -115,330 +118,6 @@
               "file": "v4-stability.spec.ts",
               "line": 104,
               "column": 3
-            },
-            {
-              "title": "workbench height stable pre-run vs post-run (delta <= 1px)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1005,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:10:21.477Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-f0dfb4ab2aff82536096",
-              "file": "v4-stability.spec.ts",
-              "line": 121,
-              "column": 3
-            }
-          ]
-        },
-        {
-          "title": "V4 E — stability sampling",
-          "file": "v4-stability.spec.ts",
-          "line": 151,
-          "column": 6,
-          "specs": [
-            {
-              "title": "binarySearch play sample @1357x743",
-              "ok": true,
-              "tags": [
-                "1357x743"
-              ],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9075,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:10:22.494Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-7fc4186b69c3626f638d",
-              "file": "v4-stability.spec.ts",
-              "line": 155,
-              "column": 5
-            },
-            {
-              "title": "binarySearch play sample @1280x800",
-              "ok": true,
-              "tags": [
-                "1280x800"
-              ],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 8968,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:10:31.599Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-590532b011fe783c3d29",
-              "file": "v4-stability.spec.ts",
-              "line": 155,
-              "column": 5
-            },
-            {
-              "title": "binarySearch play sample @1440x900",
-              "ok": true,
-              "tags": [
-                "1440x900"
-              ],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 8927,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:10:40.580Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-e3136406df913dfba32f",
-              "file": "v4-stability.spec.ts",
-              "line": 155,
-              "column": 5
-            },
-            {
-              "title": "binarySearch play sample @768x1024",
-              "ok": true,
-              "tags": [
-                "768x1024"
-              ],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 8880,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:10:49.514Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-1a85dba46e6f9bd38886",
-              "file": "v4-stability.spec.ts",
-              "line": 155,
-              "column": 5
-            },
-            {
-              "title": "binarySearch play sample @390x844",
-              "ok": true,
-              "tags": [
-                "390x844"
-              ],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4827,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:10:58.402Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-730af867a84aad00c6df",
-              "file": "v4-stability.spec.ts",
-              "line": 155,
-              "column": 5
-            },
-            {
-              "title": "code visible; manual scroll pauses follow; no window scroll",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 811,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:11:03.237Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-746d50ea6ef570b33fef",
-              "file": "v4-stability.spec.ts",
-              "line": 211,
-              "column": 3
-            },
-            {
-              "title": "LCS / nQueens / dijkstra / knapsack teach paths",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2227,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:11:04.059Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-9673b268b326a2ff14e2",
-              "file": "v4-stability.spec.ts",
-              "line": 228,
-              "column": 3
-            },
-            {
-              "title": "theme switch does not remount workbench",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 832,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T10:11:06.302Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d0125f66806f65818517-a7f4d52564c6cf2581e9",
-              "file": "v4-stability.spec.ts",
-              "line": 244,
-              "column": 3
             }
           ]
         }
@@ -447,9 +126,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-15T10:10:19.054Z",
-    "duration": 48202.204,
-    "expected": 10,
+    "startTime": "2026-09-15T10:14:15.194Z",
+    "duration": 2509.4550000000004,
+    "expected": 1,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

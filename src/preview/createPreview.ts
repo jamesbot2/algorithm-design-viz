@@ -98,7 +98,6 @@ export function createBinarySearchPreview(input: BinarySearchPreviewInput): Step
     arrayPointers: Object.keys(pointers).length ? { a: pointers } : undefined,
     stats: {},
     phase: 'preview',
-    codeRefs: [{ documentId: 'binarySearch.ts', anchorId: 'init' }],
   }
 }
 

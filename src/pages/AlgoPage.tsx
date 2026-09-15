@@ -961,7 +961,7 @@ export default function AlgoPage() {
                 document={catalog.typescript}
                 execAnchorId={
                   isPreviewMode
-                    ? displaySteps[0]?.codeRefs?.[0]?.anchorId
+                    ? undefined
                     : (steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase)
                 }
                 activeLine={isPreviewMode ? undefined : steps[cursorIndex]?.codeLine}

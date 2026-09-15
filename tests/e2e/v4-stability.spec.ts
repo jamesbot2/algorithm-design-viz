@@ -111,10 +111,9 @@ test.describe('V4 A — fail-first gates (must pass after fix)', () => {
     await expect(page.getByTestId('visualizer')).toBeVisible()
     // Array preview cells present
     await expect(page.locator('.array-view, .array-cells, .bars-wrap').first()).toBeVisible()
-    // Exec arrow gutter reserved; arrow may be empty (no ▶ text) or show init anchor
-    const arrowCount = await page.locator('.cm-exec-arrow').count()
-    // Gutter reserved from init — either 0 arrows (null line) or 1 at init
-    expect(arrowCount).toBeLessThanOrEqual(1)
+    // Prep: gutter reserved but no execution arrow glyph
+    await expect(page.locator('.cm-exec-arrow')).toHaveCount(0)
+    await expect(page.getByText(/就绪|未执行|preview/i).first()).toBeVisible()
     await page.screenshot({ path: path.join(OUT_SHOTS, 'binarySearch-init.png'), fullPage: true })
   })
 

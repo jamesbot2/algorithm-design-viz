@@ -11,7 +11,7 @@
   "controlDriftPx": 0,
   "overflowX": 0,
   "first": {
-    "t": 1,
+    "t": 2.599999964237213,
     "workbench": {
       "x": 16,
       "y": 246.359375,
@@ -46,7 +46,7 @@
     "codeScrollTop": 0
   },
   "last": {
-    "t": 8000.5,
+    "t": 8002.099999964237,
     "workbench": {
       "x": 16,
       "y": 246.359375,
