@@ -64,7 +64,19 @@ export interface Step {
   graph?: GraphState
   /** Structured result on terminal / summary steps when practical */
   result?: unknown
+  /** Optional backtracking / branch-and-bound search tree snapshot */
+  searchTree?: SearchTreeNode
 }
+
+export interface SearchTreeNode {
+  id: string
+  label: string
+  /** status for styling */
+  status?: 'exploring' | 'pruned' | 'feasible' | 'optimal' | 'rejected' | 'root'
+  children?: SearchTreeNode[]
+  meta?: Record<string, string | number | boolean | null>
+}
+
 
 /** Common var names that usually mean array indices */
 export const INDEX_VAR_NAMES = [

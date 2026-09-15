@@ -1,17 +1,28 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Step } from '../types/step'
+import type { Trace } from '../core/trace/types'
 import { ArraysFromStep } from './ArrayView'
 import MatrixView from './MatrixView'
 import VarsPanel from './VarsPanel'
 import CodePanel from './CodePanel'
 import GraphView from './GraphView'
+import SearchTreeView from './search/SearchTreeView'
 
 interface Props {
-  steps: Step[]
+  /** Legacy: raw step list */
+  steps?: Step[]
+  /** M1: Trace protocol (preferred when available) */
+  trace?: Trace
   code?: string
 }
 
-export default function Visualizer({ steps, code }: Props) {
+function resolveSteps(steps?: Step[], trace?: Trace): Step[] {
+  if (trace?.steps?.length) return trace.steps as Step[]
+  return steps ?? []
+}
+
+export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
+  const steps = useMemo(() => resolveSteps(stepsProp, trace), [stepsProp, trace])
   const [idx, setIdx] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(600)
@@ -199,6 +210,7 @@ export default function Visualizer({ steps, code }: Props) {
       <div className="viz-body">
         <div className="viz-main">
           {step.graph && <GraphView graph={step.graph} />}
+      {step.searchTree && <SearchTreeView tree={step.searchTree} />}
           <ArraysFromStep step={step} />
           <MatrixView step={step} />
         </div>

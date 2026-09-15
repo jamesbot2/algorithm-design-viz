@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { algorithms } from '../algorithms'
+import { getAlgo } from '../algorithms/registry'
+import type { Trace } from '../core/trace/types'
 import Visualizer from '../components/Visualizer'
 import * as binarySearch from '../algorithms/binarySearch'
 import type { BinarySearchMode } from '../algorithms/binarySearch'
@@ -46,7 +48,7 @@ function defaultsForAlgo(id: string): DraftState {
   if (id === 'binarySearch') {
     d.arrayText = (binarySearch.meta.defaultArray as number[]).join(', ')
   }
-  if (id === 'kadane') {
+  if (id === 'kadane' || id === 'maxSubarrayDC') {
     d.arrayText = '-2, 1, -3, 4, -1, 2, 1, -5, 4'
   }
   return d
@@ -59,6 +61,7 @@ export default function AlgoPage() {
   const [draft, setDraft] = useState<DraftState>(() => defaultsForAlgo(id ?? ''))
   const [errors, setErrors] = useState<FieldError[]>([])
   const [steps, setSteps] = useState<Step[]>([])
+  const [trace, setTrace] = useState<Trace | undefined>(undefined)
   const [runId, setRunId] = useState(0)
   const [playbackKey, setPlaybackKey] = useState(0)
   const [hasRun, setHasRun] = useState(false)
@@ -68,6 +71,7 @@ export default function AlgoPage() {
     setDraft(defaultsForAlgo(id ?? ''))
     setErrors([])
     setSteps([])
+    setTrace(undefined)
     setHasRun(false)
     setPlaybackKey((k) => k + 1)
   }, [id])
@@ -76,7 +80,7 @@ export default function AlgoPage() {
     setDraft((d) => ({ ...d, ...partial }))
   }, [])
 
-  const validateAndBuild = useCallback((): { ok: true; steps: Step[] } | { ok: false; errors: FieldError[] } => {
+  const validateAndBuild = useCallback((): { ok: true; steps: Step[]; registryInput?: unknown } | { ok: false; errors: FieldError[] } => {
     if (!algo || !id) return { ok: false, errors: [{ field: 'algo', reason: '未找到算法' }] }
     const errs: FieldError[] = []
 
@@ -92,6 +96,9 @@ export default function AlgoPage() {
       'bellmanFord',
       'floyd',
       'prim',
+      'nQueens',
+      'matrixChain',
+      'huffman',
     ].includes(id)
 
     let arr: number[] = []
@@ -122,6 +129,7 @@ export default function AlgoPage() {
       return {
         ok: true,
         steps: algo.generateSteps(arr, t.value ?? 0, draft.bsMode),
+        registryInput: { arr, target: t.value ?? 0, mode: draft.bsMode },
       }
     }
 
@@ -133,7 +141,7 @@ export default function AlgoPage() {
         errs.push({ field: 'strB', reason: `长度超过上限 ${DEMO_LIMITS.stringLen}` })
       }
       if (errs.length) return { ok: false, errors: errs }
-      return { ok: true, steps: lcs.generateSteps([], draft.strA, draft.strB) }
+      return { ok: true, steps: lcs.generateSteps([], draft.strA, draft.strB), registryInput: { x: draft.strA, y: draft.strB } }
     }
 
     if (id === 'editDistance') {
@@ -144,7 +152,7 @@ export default function AlgoPage() {
         errs.push({ field: 'editB', reason: `长度超过上限 ${DEMO_LIMITS.stringLen}` })
       }
       if (errs.length) return { ok: false, errors: errs }
-      return { ok: true, steps: editDistance.generateSteps([], draft.editA, draft.editB) }
+      return { ok: true, steps: editDistance.generateSteps([], draft.editA, draft.editB), registryInput: { a: draft.editA, b: draft.editB } }
     }
 
     if (id === 'kmp') {
@@ -155,14 +163,23 @@ export default function AlgoPage() {
         errs.push({ field: 'pattern', reason: `长度超过上限 ${DEMO_LIMITS.stringLen}` })
       }
       if (errs.length) return { ok: false, errors: errs }
-      return { ok: true, steps: kmp.generateSteps([], draft.text, draft.pattern) }
+      return { ok: true, steps: kmp.generateSteps([], draft.text, draft.pattern), registryInput: { text: draft.text, pattern: draft.pattern } }
     }
 
     if (id === 'knapsack01') {
-      return { ok: true, steps: knapsack01.generateSteps([]) }
+      return { ok: true, steps: knapsack01.generateSteps([]), registryInput: {} }
     }
     if (id === 'activitySelection') {
-      return { ok: true, steps: activitySelection.generateSteps([]) }
+      return { ok: true, steps: activitySelection.generateSteps([]), registryInput: {} }
+    }
+    if (id === 'nQueens') {
+      return { ok: true, steps: algo.generateSteps([], 4, 'all'), registryInput: { n: 4, mode: 'all' } }
+    }
+    if (id === 'matrixChain') {
+      return { ok: true, steps: algo.generateSteps([]), registryInput: {} }
+    }
+    if (id === 'huffman') {
+      return { ok: true, steps: algo.generateSteps([]), registryInput: {} }
     }
     if (
       id === 'bfs' ||
@@ -172,14 +189,14 @@ export default function AlgoPage() {
       id === 'floyd' ||
       id === 'prim'
     ) {
-      return { ok: true, steps: algo.generateSteps([]) }
+      return { ok: true, steps: algo.generateSteps([]), registryInput: {} }
     }
 
     if (errs.length) return { ok: false, errors: errs }
     if (!arr.length) {
       return { ok: false, errors: [{ field: 'array', reason: '数组不能为空' }] }
     }
-    return { ok: true, steps: algo.generateSteps(arr) }
+    return { ok: true, steps: algo.generateSteps(arr), registryInput: { arr } }
   }, [algo, id, draft])
 
   const onRestoreDefaults = () => {
@@ -195,6 +212,19 @@ export default function AlgoPage() {
     }
     setErrors([])
     setSteps(result.steps)
+    // Prefer registry Trace when typed solve is available
+    const entry = id ? getAlgo(id) : undefined
+    if (entry?.solve) {
+      try {
+        const solved = entry.solve(result.registryInput ?? {})
+        setTrace(solved.trace)
+        if (solved.trace.steps?.length) setSteps(solved.trace.steps as Step[])
+      } catch {
+        setTrace(undefined)
+      }
+    } else {
+      setTrace(undefined)
+    }
     setRunId((r) => r + 1)
     setPlaybackKey((k) => k + 1)
     setHasRun(true)
@@ -249,6 +279,9 @@ export default function AlgoPage() {
     'bellmanFord',
     'floyd',
     'prim',
+    'nQueens',
+    'matrixChain',
+    'huffman',
   ].includes(id!)
 
   return (
@@ -339,8 +372,11 @@ export default function AlgoPage() {
           id === 'kruskal' ||
           id === 'bellmanFord' ||
           id === 'floyd' ||
-          id === 'prim') && (
-          <p className="hint">本算法当前使用内置示例图/数据；点击「运行」生成步骤。</p>
+          id === 'prim' ||
+          id === 'nQueens' ||
+          id === 'matrixChain' ||
+          id === 'huffman') && (
+          <p className="hint">本算法当前使用内置示例图/数据；点击「运行」生成步骤。背包多策略见 <a href="#/teach/knapsack">教学单元</a>。</p>
         )}
 
         {errors.length > 0 && (
@@ -373,7 +409,7 @@ export default function AlgoPage() {
       </div>
 
       {hasRun ? (
-        <Visualizer key={playbackKey} steps={steps} code={algo.meta.code as string | undefined} />
+        <Visualizer key={playbackKey} steps={steps} trace={trace} code={algo.meta.code as string | undefined} />
       ) : (
         <div className="viz-empty">调整输入后点击「运行」开始可视化。</div>
       )}

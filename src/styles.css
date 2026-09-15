@@ -813,3 +813,113 @@ button.icon-btn {
   color: var(--text);
   font-family: inherit;
 }
+
+/* M1/M2: search tree + dual nav */
+.search-tree-view {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border, #333);
+  border-radius: 8px;
+  background: var(--panel, #1a1a1e);
+  max-height: 320px;
+  overflow: auto;
+}
+.st-root, .st-children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.st-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 0.15rem 0;
+}
+.st-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: #444;
+}
+.st-badge-pruned, .st-rejected { background: #6b3030; }
+.st-badge-optimal, .st-optimal { background: #2d6b3a; }
+.st-badge-feasible { background: #2d5a6b; }
+.st-badge-root { background: #4a4a6b; }
+.st-meta { font-size: 0.75rem; opacity: 0.75; }
+
+.nav-mode-toggle {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+.nav-mode-toggle button {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border, #444);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.nav-mode-toggle button.active {
+  background: var(--accent, #3b82f6);
+  border-color: transparent;
+  color: #fff;
+}
+.nav-mode-toggle.compact {
+  flex-direction: column;
+  margin: 0.25rem 0.75rem;
+}
+.nav-mod-card {
+  border: 1px solid var(--border, #333);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+.nav-mod-card.planned {
+  opacity: 0.85;
+  border-style: dashed;
+}
+.badge-planned {
+  margin-left: 0.5rem;
+  font-size: 0.7rem;
+  background: #665522;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+.chip-teach {
+  border-style: dashed !important;
+}
+.section-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.teach-section {
+  margin: 1.25rem 0;
+}
+.teach-section h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+.code-block {
+  background: #111;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  overflow: auto;
+  font-size: 0.85rem;
+}
+.nav-completion {
+  display: block;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+}
+.nav-mod-label {
+  pointer-events: none;
+  opacity: 0.95;
+}
