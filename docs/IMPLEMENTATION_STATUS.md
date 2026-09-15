@@ -1,6 +1,6 @@
 # 实施状态（algorithm-design-viz）
 
-基准 HEAD：`35709de7559ef9678bbb66ca59ffc33bf0780516`（与评审线索一致）  
+基准 HEAD：V4 基于 `dcba310`；本轮本地提交见 git log（**未 push**）  
 更新约定：未开始 / 进行中 / 已实现待验证 / 已验证 / 受阻  
 本轮默认：**不 push、不改远程设置**（需明确授权）。
 
@@ -59,7 +59,7 @@
 | M4-deploy | 与 Pages 关系 | 已实现待验证 | 见 V2：`deploy-pages.yml` 经 `workflow_run` 在 CI success 后部署（本地已改；远程待 push） |
 | M4-docs | 文档集 | 已验证 | IMPLEMENTATION_STATUS / VERIFICATION / COURSE_MAP / TRACE_PROTOCOL / CONTRIBUTING / LICENSE_NOTES / FINAL_DELIVERY + README |
 | M4-safety | 内容安全 | 已验证 | Chapter 讲义改为 React 节点渲染 `**`/`code`，**无** `dangerouslySetInnerHTML`；无用户 HTML/MD 直渲；无 markdown-it |
-| M4-E2E | Playwright | 未开始（刻意推迟） | 安装与 CI 可靠性未验证；见 VERIFICATION 手工清单 |
+| M4-E2E | Playwright | 已验证（本地） | `npm run test:e2e` + `/usr/bin/google-chrome`；独立 `e2e.yml` 不挡 Pages |
 | M4-T | 验收 | 已验证 | 本地 lint(exit 0)+84 tests+build 绿；见 V2 节 |
 
 
@@ -101,6 +101,22 @@
 
 验证：本地 `npm run test:run`（99）+ `npm run build` 绿。详见 `docs/V3_WORKBENCH.md`、`docs/CODE_COVERAGE_MATRIX.md`。
 
+
+
+## V4 Persistent workbench / stability
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| V4-A | Fail-first：Workbench 不再门禁 hasRun | 已验证 | AlgoPage + KnapsackUnit 始终挂载；e2e 覆盖 init 预览+代码面板 |
+| V4-B1 | createPreview 纯预览 | 已验证 | `src/preview/createPreview.ts`；非 generateSteps[0]；二分仅 lo/hi；DP null≠0 |
+| V4-B2 | 单列 viz + 高度链 | 已验证 | 去掉 1fr/300px 双列；code 仅 Workbench 右栏；min-height:0 / CM ~300px+ |
+| V4-C | 无抖动 + 代码滚动 | 已验证 | 固定 banner/stats 槽；nearest 跟随；仅「回到执行行」居中；不滚 window |
+| V4-D1 | 表单对齐 + 主题 | 已验证 | input-grid；取消 idle 禁用；LabTheme 首屏 localStorage；切换不 remount |
+| V4-D2 | 二分 leftmost 一致 | 已验证 | 算法+目录+anchors；[1,1,1,2]→0；TS/pseudo 分 documentId |
+| V4-E | 真浏览器测量 | 已验证 | 5 视口 rAF 采样 outer/scroll/control drift=0；见 docs/V4_STABILITY.md |
+| V4-CI | E2E 与 Pages | 已实现待验证 | `e2e.yml` 独立；ci.yml 仍为 Pages 门禁；**未 push** |
+
+验证：`npm run test:run`（116）+ `npm run build` + `npm run test:e2e`（10）绿。截图 `docs/screenshots/v4/`，轨迹 `docs/traces/v4/`。
+
 ## 拓展（规划，非本轮）
 | 项 | 状态 | 备注 |
 |----|------|------|
@@ -116,10 +132,13 @@
 - ChatGPT UI / HashRouter / vite `base: '/algorithm-design-viz/'` 保持不变
 - oxlint 有若干 React hooks **warning**（非 error）；CI lint 以 exit 0 为准
 - 可视化 step 快照开销占墙钟时间主导；实验台/本机 microbench **不是** DOM 渲染证明，亦非算法渐近优越性证明
+- V4：移动端仍可能需页面滚动才能看到完整 workbench；play 采样断言的是 scrollY **漂移**
+- Transport 仍在 Visualizer 内而非跨双栏底槽
 - **未执行 `git push`**
 
 ## 验证记录
 - `npm run lint` → exit 0（warnings only）
-- `npm run test:run` → 10 files / 92 tests passed（含 tests/v2-credibility.test.ts、tests/v2-animation.test.ts）
-- `npm run build` → tsc + vite build OK（~444 kB JS / ~34 kB CSS）
-- 本轮 **未 push**（parent 负责 push）
+- `npm run test:run` → 16 files / 116 tests passed
+- `npm run build` → tsc + vite build OK
+- `npm run test:e2e` → 10 passed（Playwright + /usr/bin/google-chrome）
+- 本轮 **未 push**

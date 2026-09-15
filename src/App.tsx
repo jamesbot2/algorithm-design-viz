@@ -8,9 +8,11 @@ import PracticePage from './pages/practice/PracticePage'
 import ExperimentPage from './pages/experiment/ExperimentPage'
 import LabKnapsackDijkstraQueens from './content/labs/LabKnapsackDijkstraQueens'
 import { MotionProvider } from './theme/MotionContext'
+import { LabThemeProvider } from './theme/LabThemeContext'
 
 export default function App() {
   return (
+    <LabThemeProvider>
     <MotionProvider>
       <HashRouter>
         <Routes>
@@ -27,5 +29,6 @@ export default function App() {
         </Routes>
       </HashRouter>
     </MotionProvider>
+    </LabThemeProvider>
   )
 }

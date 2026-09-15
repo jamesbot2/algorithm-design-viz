@@ -1272,3 +1272,224 @@ button.icon-btn {
   .topbar { display: flex; }
   .workbench-desktop-controls { display: flex; }
 }
+
+
+/* —— V4 polish: height chain, stable slots, input grid —— */
+.workbench-layout {
+  min-height: 0;
+  flex: 1 1 auto;
+  height: min(72vh, 820px);
+  max-height: none;
+}
+.workbench-panels {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+.workbench-viz-panel,
+.workbench-code-panel {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.workbench-panel-inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+.workbench-code-inner {
+  min-height: 0;
+}
+.workbench-code-panel .code-browser {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+.code-browser-cm-wrap {
+  flex: 1 1 auto;
+  min-height: 280px;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.code-browser-cm-wrap .cm-editor {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100% !important;
+}
+.code-browser-cm-wrap .cm-scroller {
+  min-height: 0;
+}
+
+.visualizer {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.viz-banner-slot {
+  min-height: 3.2rem;
+  max-height: 4.6rem;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.viz-banner-text {
+  flex: 1;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: auto;
+  max-height: 4.2rem;
+}
+.viz-body-single {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  grid-template-columns: unset;
+}
+.viz-inspector {
+  min-height: 0;
+  max-height: 180px;
+  overflow: auto;
+  border-top: 1px solid var(--border-soft);
+  padding-top: 0.35rem;
+}
+.viz-vars-stable {
+  min-height: 2.5rem;
+}
+.stats-row-fixed {
+  min-height: 1.75rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  min-width: 1.5ch;
+  display: inline-block;
+  text-align: right;
+}
+.step-counter.tabular-nums {
+  min-width: 7ch;
+}
+.scrub-preview-overlay {
+  position: absolute;
+  z-index: 20;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 4.5rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  max-width: min(90%, 420px);
+  font-size: 0.8rem;
+}
+.visualizer {
+  position: relative;
+overflow-anchor: none;
+}
+body { overflow-anchor: none; }
+
+.input-panel-v4 {
+  align-items: end;
+}
+.input-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  width: 100%;
+  align-items: end;
+}
+.input-grid .field-array {
+  flex: 2 1 280px;
+  min-width: 220px;
+}
+.input-grid .field-target {
+  flex: 0 1 120px;
+  min-width: 100px;
+  max-width: 140px;
+}
+.input-grid .field-mode {
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+.input-grid .field-graph {
+  width: 100%;
+}
+.input-panel-v4 label {
+  min-width: 0;
+}
+.input-panel-v4 input,
+.input-panel-v4 select,
+.control-row button {
+  height: 40px;
+  box-sizing: border-box;
+}
+.input-panel-v4 input,
+.input-panel-v4 select {
+  padding: 0.45rem 0.7rem;
+}
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: 40px;
+  width: 100%;
+}
+.control-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-header-compact .theory-toggle {
+  margin-top: 0.35rem;
+}
+.theory-expandable {
+  margin-top: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+}
+.debug-details {
+  width: 100%;
+  font-size: 0.78rem;
+}
+.debug-details summary {
+  cursor: pointer;
+}
+.cm-exec-gutter {
+  width: 1.1rem !important;
+  min-width: 1.1rem !important;
+}
+
+/* Avoid body overflow:hidden hack — keep page scrollable */
+html, body, #root {
+  min-height: 100%;
+}
+.algo-page, .teach-page {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}

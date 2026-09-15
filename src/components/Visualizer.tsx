@@ -299,13 +299,11 @@ export default function Visualizer({
   const previewStep = scrubPreview !== null ? steps[scrubPreview] : null
 
   const stats = step?.stats
-  const showStats =
-    stats &&
-    (stats.comparisons !== undefined || stats.swaps !== undefined || stats.writes !== undefined)
 
-  if (!steps.length) {
-    return <div className="viz-empty">暂无步骤，请调整输入后重新生成。</div>
-  }
+  const isPreview =
+    !steps.length ||
+    step?.phase === 'preview' ||
+    (steps.length === 1 && step?.id === -1 && (step?.vars as { ready?: boolean } | undefined)?.ready === true)
 
   const legendItems = [...usedRoles]
     .map((role) => ({
@@ -315,13 +313,13 @@ export default function Visualizer({
     }))
     .sort((a, b) => a.label.localeCompare(b.label, 'zh'))
 
-  const hasBoard = Boolean(step.matrices?.board)
-  const bannerKey = `${step.id}-${idx}`
+  const hasBoard = Boolean(step?.matrices?.board)
+  const displayMessage = step?.message ?? '就绪：调整输入后点击「运行」。'
 
   return (
-    <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties} data-playing={playing ? '1' : '0'} data-step-index={idx}>
-      <div key={`banner-${bannerKey}`} className="viz-banner viz-step-flash viz-banner-enter">
-        {step.message}
+    <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties} data-playing={playing ? '1' : '0'} data-step-index={idx} data-preview={isPreview ? '1' : '0'} data-testid="visualizer">
+      <div className="viz-banner viz-banner-slot" data-testid="viz-banner" role="status">
+        <div className="viz-banner-text">{displayMessage}</div>
         {staleResult && <span className="stale-result-badge">上一轮结果</span>}
       </div>
 
@@ -357,9 +355,9 @@ export default function Visualizer({
           />
         </label>
         <span className="spacer" />
-        <span className="step-counter" data-testid="step-counter">
-          {idx + 1} / {steps.length}
-          {step.phase ? ` · ${step.phase}` : ''}
+        <span className="step-counter tabular-nums" data-testid="step-counter">
+          {steps.length ? `${idx + 1} / ${steps.length}` : '— / —'}
+          {step?.phase ? ` · ${step.phase}` : ''}
         </span>
       </div>
 
@@ -368,9 +366,10 @@ export default function Visualizer({
         <input
           type="range"
           min={0}
-          max={max}
+          max={Math.max(0, max)}
           step={1}
-          value={idx}
+          value={steps.length ? idx : 0}
+          disabled={!steps.length}
           onChange={(e) => {
             setPlaying(false)
             setIdx(Number(e.target.value))
@@ -385,7 +384,7 @@ export default function Visualizer({
           aria-label="步骤进度"
           role="slider"
         />
-        <span className="scrub-pct">{Math.round(progress)}%</span>
+        <span className="scrub-pct tabular-nums">{Math.round(progress)}%</span>
       </div>
       {segments.length > 0 && (
         <div className="phase-track" aria-hidden>
@@ -410,7 +409,7 @@ export default function Visualizer({
         </div>
       )}
       {previewStep && scrubPreview !== idx && (
-        <div className="scrub-preview">
+        <div className="scrub-preview scrub-preview-overlay" data-testid="scrub-preview">
           预览 #{scrubPreview! + 1}：{previewStep.message}
         </div>
       )}
@@ -434,25 +433,17 @@ export default function Visualizer({
         </div>
       )}
 
-      {showStats && (
-        <div className="stats-row">
-          {stats.comparisons !== undefined && (
-            <span className="stat-chip">
-              比较 <strong>{stats.comparisons}</strong>
-            </span>
-          )}
-          {stats.swaps !== undefined && (
-            <span className="stat-chip">
-              交换 <strong>{stats.swaps}</strong>
-            </span>
-          )}
-          {stats.writes !== undefined && (
-            <span className="stat-chip">
-              写入 <strong>{stats.writes}</strong>
-            </span>
-          )}
-        </div>
-      )}
+      <div className="stats-row stats-row-fixed" data-testid="stats-row">
+        <span className="stat-chip">
+          比较 <strong className="tabular-nums">{stats?.comparisons ?? '—'}</strong>
+        </span>
+        <span className="stat-chip">
+          交换 <strong className="tabular-nums">{stats?.swaps ?? '—'}</strong>
+        </span>
+        <span className="stat-chip">
+          写入 <strong className="tabular-nums">{stats?.writes ?? '—'}</strong>
+        </span>
+      </div>
 
       {legendItems.length > 0 && (
         <div className="viz-legend">
@@ -465,35 +456,36 @@ export default function Visualizer({
         </div>
       )}
 
-      <div className="viz-body">
-        <div className="viz-main">
-          {step.graph && <GraphView graph={step.graph} />}
-          {step.searchTree && (
+      {/* Single column: canvas + compact inspector. Code lives in Workbench right panel only. */}
+      <div className="viz-body viz-body-single">
+        <div className="viz-main" data-testid="viz-canvas">
+          {step?.graph && <GraphView graph={step.graph} />}
+          {step?.searchTree && (
             <SearchTreeView tree={step.searchTree} linkedBoard={hasBoard} />
           )}
-          <ArraysFromStep step={step} prevStep={prevStep} scaleMaxByArray={scaleMaxByArray} />
-          <MatrixView step={step} />
+          {step && <ArraysFromStep step={step} prevStep={prevStep} scaleMaxByArray={scaleMaxByArray} />}
+          {step && <MatrixView step={step} />}
+          {!step && <div className="viz-empty soft">暂无画布内容</div>}
         </div>
-        <div className="viz-side">
-          {/* A2: no remount key — VarsPanel diffs adjacent steps */}
+        <div className="viz-inspector" data-testid="viz-inspector">
           <div className="viz-vars-stable">
-            <VarsPanel step={step} prevStep={prevStep} />
+            {step ? <VarsPanel step={step} prevStep={prevStep} /> : null}
           </div>
+          {finalAnswer !== undefined && finalAnswer !== null && (
+            <details
+              className="final-answer-panel"
+              open={answerOpen}
+              onToggle={(e) => setAnswerOpen((e.target as HTMLDetailsElement).open)}
+            >
+              <summary>最终结果（折叠）</summary>
+              <div className="final-answer-body">{finalAnswer}</div>
+            </details>
+          )}
+          {/* Legacy fallback only when codeSlot explicitly passed; Workbench owns CodeBrowser */}
           {codeSlot}
-          {!codeSlot && code && <CodePanel code={code} activeLine={step.codeLine} />}
+          {!codeSlot && code && step && <CodePanel code={code} activeLine={step.codeLine} />}
         </div>
       </div>
-
-      {finalAnswer !== undefined && finalAnswer !== null && (
-        <details
-          className="final-answer-panel"
-          open={answerOpen}
-          onToggle={(e) => setAnswerOpen((e.target as HTMLDetailsElement).open)}
-        >
-          <summary>最终结果（折叠）</summary>
-          <div className="final-answer-body">{finalAnswer}</div>
-        </details>
-      )}
 
       <p className="kbd-hint">
         快捷键：<kbd>空格</kbd> 播放/暂停 · <kbd>←</kbd> 上一步 · <kbd>→</kbd> 下一步（输入框/按钮/滑块/编辑器内不抢键）

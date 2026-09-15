@@ -19,6 +19,7 @@ import {
   type KnapsackInstance,
 } from '../../algorithms/knapsack'
 import type { Step } from '../../types/step'
+import { createKnapsackPreview } from '../../preview/createPreview'
 
 type Strategy =
   | 'bruteForce'
@@ -56,6 +57,8 @@ export default function KnapsackUnit() {
   const [summary, setSummary] = useState<string>('')
   const [hasRun, setHasRun] = useState(false)
   const [cursorIndex, setCursorIndex] = useState(0)
+  const [theoryOpen, setTheoryOpen] = useState(false)
+  const [runKey, setRunKey] = useState(0)
 
   const inst: KnapsackInstance = useMemo(() => {
     if (preset === 'greedy') return GREEDY_COUNTEREXAMPLE
@@ -64,6 +67,18 @@ export default function KnapsackUnit() {
   }, [preset])
 
   const catalog = getCatalog(STRATEGY_CATALOG[strategy])
+
+  const previewStep = useMemo(
+    () =>
+      createKnapsackPreview({
+        weights: inst.items.map((it) => it.weight),
+        values: inst.items.map((it) => it.value),
+        capacity: inst.capacity,
+      }),
+    [inst],
+  )
+
+  const displaySteps = hasRun && steps.length ? steps : [previewStep]
 
   const onRun = () => {
     let s: Step[] = []
@@ -103,106 +118,129 @@ export default function KnapsackUnit() {
     setSummary(msg)
     setHasRun(true)
     setCursorIndex(0)
+    setRunKey((k) => k + 1)
   }
 
   return (
     <div className="page teach-page">
-      <div className="page-header">
+      <div className="page-header page-header-compact">
         <Link to="/" className="back">
           ← 首页
         </Link>
         <h1>0-1 背包 · 多策略教学单元</h1>
-        <p className="subtitle">
-          统一输入：物品 id/weight/value 列表与容量 W（正整数重量、非负整数价值；W=0 与空物品合法）。
-          复杂度：伪多项式 <strong>O(nW)</strong>。切换策略会切换 CodeDocument 与轨迹。
-        </p>
+        <button
+          type="button"
+          className="ghost theory-toggle"
+          aria-expanded={theoryOpen}
+          onClick={() => setTheoryOpen((o) => !o)}
+        >
+          {theoryOpen ? '收起说明' : '展开说明 / 理论'}
+        </button>
+        {theoryOpen && (
+          <div className="theory-expandable">
+            <p className="subtitle">
+              统一输入：物品 id/weight/value 列表与容量 W（正整数重量、非负整数价值；W=0 与空物品合法）。
+              复杂度：伪多项式 <strong>O(nW)</strong>。切换策略会切换 CodeDocument 与轨迹。
+            </p>
+            <section className="teach-section">
+              <h2>问题</h2>
+              <p>每件物品至多选一次，在容量约束下最大化总价值。与分数背包（可分割）不同。</p>
+            </section>
+            <section className="teach-section">
+              <h2>状态 / 思想</h2>
+              <ul>
+                <li>DP：dp[i][w] = 前 i 件、容量 w 的最优值；一维滚动须逆序更新。</li>
+                <li>回溯 / 分支限界：搜索选或不选；B&B 用分数背包上界剪枝。</li>
+                <li>贪心按密度对 0-1 不正确（见反例）。</li>
+              </ul>
+            </section>
+          </div>
+        )}
       </div>
 
-      <section className="teach-section">
-        <h2>问题</h2>
-        <p>每件物品至多选一次，在容量约束下最大化总价值。与分数背包（可分割）不同。</p>
-      </section>
-
-      <section className="teach-section">
-        <h2>状态 / 思想</h2>
-        <ul>
-          <li>DP：dp[i][w] = 前 i 件、容量 w 的最优值；一维滚动须逆序更新。</li>
-          <li>回溯 / 分支限界：搜索选或不选；B&B 用分数背包上界剪枝。</li>
-          <li>贪心按密度对 0-1 不正确（见反例）。</li>
-        </ul>
-      </section>
-
-      <div className="input-panel">
+      <div className="input-panel input-panel-v4">
         <h3>策略与预设</h3>
-        <label>
-          策略
-          <select
-            value={strategy}
-            onChange={(e) => {
-              setStrategy(e.target.value as Strategy)
-              setHasRun(false)
-              setSteps([])
-            }}
-          >
-            {(Object.keys(STRATEGY_LABEL) as Strategy[]).map((k) => (
-              <option key={k} value={k}>
-                {STRATEGY_LABEL[k]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          输入预设
-          <select value={preset} onChange={(e) => setPreset(e.target.value as typeof preset)}>
-            <option value="default">默认 (W=8)</option>
-            <option value="greedy">贪心反例 w[10,20,30] v[60,100,120] W=50</option>
-            <option value="forward">一维正向更新反例 w=2 v=3 W=4</option>
-          </select>
-        </label>
+        <div className="input-grid">
+          <label className="field-mode">
+            策略
+            <select
+              value={strategy}
+              onChange={(e) => {
+                setStrategy(e.target.value as Strategy)
+                setHasRun(false)
+                setSteps([])
+              }}
+            >
+              {(Object.keys(STRATEGY_LABEL) as Strategy[]).map((k) => (
+                <option key={k} value={k}>
+                  {STRATEGY_LABEL[k]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field-array">
+            输入预设
+            <select value={preset} onChange={(e) => setPreset(e.target.value as typeof preset)}>
+              <option value="default">默认 (W=8)</option>
+              <option value="greedy">贪心反例 w[10,20,30] v[60,100,120] W=50</option>
+              <option value="forward">一维正向更新反例 w=2 v=3 W=4</option>
+            </select>
+          </label>
+        </div>
         <p className="hint">
           当前物品：
           {inst.items.map((it) => `${it.id}(w=${it.weight},v=${it.value})`).join(', ')}；W=
           {inst.capacity}
-          {catalog ? ` · documentId=${catalog.typescript.documentId}` : ''}
         </p>
-        <div className="input-actions">
-          <button type="button" className="primary" onClick={onRun}>
+        <div className="input-actions control-row">
+          <button type="button" className="primary" onClick={onRun} data-testid="run-btn">
             运行
           </button>
         </div>
         {summary && <p className="hint">{summary}</p>}
+        <details className="debug-details muted">
+          <summary>调试信息</summary>
+          <p className="hint">{catalog ? `documentId=${catalog.typescript.documentId}` : 'no-catalog'}</p>
+        </details>
       </div>
 
       <section className="teach-section">
         <h2>可视化</h2>
-        {hasRun ? (
-          <WorkbenchLayout
-            title={`背包 · ${STRATEGY_LABEL[strategy]}`}
-            inputSummary={`W=${inst.capacity} · n=${inst.items.length} · ${catalog?.typescript.documentId ?? 'no-catalog'}`}
-            viz={
-              <Visualizer steps={steps} onStepIndexChange={(i) => setCursorIndex(i)} />
-            }
-            code={
-              catalog ? (
-                <CodeBrowser
-                  document={catalog.typescript}
-                  execAnchorId={
-                    steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase
-                  }
-                  activeLine={steps[cursorIndex]?.codeLine}
-                  pseudocode={catalog.pseudocode?.source}
-                />
-              ) : (
-                <div className="code-stub">
-                  <div className="panel-title">策略代码（无目录）</div>
-                  <pre className="code-pre">{`// strategy: ${strategy}`}</pre>
-                </div>
-              )
-            }
-          />
-        ) : (
-          <div className="viz-empty">选择策略后点击运行。</div>
-        )}
+        <WorkbenchLayout
+          hideTitle
+          title={`背包 · ${STRATEGY_LABEL[strategy]}`}
+          inputSummary={
+            hasRun
+              ? `W=${inst.capacity} · n=${inst.items.length}`
+              : `预览 · W=${inst.capacity} · n=${inst.items.length}`
+          }
+          viz={
+            <Visualizer
+              key={hasRun ? runKey : 'preview'}
+              steps={displaySteps}
+              onStepIndexChange={hasRun ? (i) => setCursorIndex(i) : undefined}
+            />
+          }
+          code={
+            catalog ? (
+              <CodeBrowser
+                document={catalog.typescript}
+                execAnchorId={
+                  hasRun
+                    ? (steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase)
+                    : undefined
+                }
+                activeLine={hasRun ? steps[cursorIndex]?.codeLine : undefined}
+                pseudocode={catalog.pseudocode?.source}
+              />
+            ) : (
+              <div className="code-stub">
+                <div className="panel-title">策略代码（无目录）</div>
+                <pre className="code-pre">{`// strategy: ${strategy}`}</pre>
+              </div>
+            )
+          }
+        />
       </section>
 
       <section className="teach-section">

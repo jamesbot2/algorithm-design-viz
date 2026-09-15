@@ -6,6 +6,7 @@ import { RangeSetBuilder, StateEffect, StateField, type Extension } from '@codem
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { highlightSelectionMatches, searchKeymap, search } from '@codemirror/search'
 import type { CodeDocument } from '../../codeCatalog/types'
+import { useLabTheme } from '../../theme/LabThemeContext'
 
 interface Props {
   document: CodeDocument
@@ -59,11 +60,47 @@ function buildExecGutter(): Extension {
       const line = state.field(execLineField)
       if (line == null || line < 1 || line > state.doc.lines) return Decoration.none
       const info = state.doc.line(line)
-      return Decoration.set([
-        Decoration.line({ class: 'cm-exec-line' }).range(info.from),
-      ])
+      return Decoration.set([Decoration.line({ class: 'cm-exec-line' }).range(info.from)])
+    }),
+    // Reserve gutter width from init so first arrow does not shift code
+    EditorView.theme({
+      '.cm-exec-gutter': {
+        width: '1.1rem',
+        minWidth: '1.1rem',
+      },
+      '.cm-exec-arrow': {
+        display: 'inline-block',
+        width: '1rem',
+        textAlign: 'center',
+      },
     }),
   ]
+}
+
+/** Scroll only when line is near edges; use nearest. Never scroll window. */
+function scrollLineNearest(view: EditorView, line1: number) {
+  if (line1 < 1 || line1 > view.state.doc.lines) return
+  const line = view.state.doc.line(line1)
+  const block = view.lineBlockAt(line.from)
+  const scrollDOM = view.scrollDOM
+  const margin = 40
+  const top = block.top
+  const bottom = block.bottom
+  const visTop = scrollDOM.scrollTop
+  const visBottom = visTop + scrollDOM.clientHeight
+  if (top < visTop + margin) {
+    scrollDOM.scrollTop = Math.max(0, top - margin)
+  } else if (bottom > visBottom - margin) {
+    scrollDOM.scrollTop = bottom - scrollDOM.clientHeight + margin
+  }
+}
+
+function scrollLineCenter(view: EditorView, line1: number) {
+  if (line1 < 1 || line1 > view.state.doc.lines) return
+  const line = view.state.doc.line(line1)
+  const block = view.lineBlockAt(line.from)
+  const scrollDOM = view.scrollDOM
+  scrollDOM.scrollTop = Math.max(0, block.top - scrollDOM.clientHeight / 2 + block.height / 2)
 }
 
 export default function CodeBrowser({
@@ -77,6 +114,10 @@ export default function CodeBrowser({
   const [followExec, setFollowExec] = useState(true)
   const [userScrolledAway, setUserScrolledAway] = useState(false)
   const viewRef = useRef<EditorView | null>(null)
+  const programmaticScroll = useRef(false)
+  const { theme } = useLabTheme()
+
+  const cmTheme = theme === 'lab-light' ? 'light' : 'dark'
 
   const execLine1 = useMemo(() => {
     if (execAnchorId) {
@@ -98,51 +139,64 @@ export default function CodeBrowser({
       EditorView.editable.of(false),
       EditorView.lineWrapping,
       EditorView.domEventHandlers({
-        // Text selection must not change algo cursor — no-op handlers; parent owns cursor
-        mousedown: () => {
-          /* allow selection only */
-          return false
-        },
+        mousedown: () => false,
       }),
     ]
     return exts
   }, [])
 
-  const scrollToExec = useCallback(() => {
+  const markProgrammatic = useCallback(() => {
+    programmaticScroll.current = true
+    window.setTimeout(() => {
+      programmaticScroll.current = false
+    }, 80)
+  }, [])
+
+  const scrollToExecCenter = useCallback(() => {
     const view = viewRef.current
     if (!view || execLine1 == null) return
-    if (execLine1 < 1 || execLine1 > view.state.doc.lines) return
-    const line = view.state.doc.line(execLine1)
-    view.dispatch({
-      effects: [
-        setExecLine.of(execLine1),
-        EditorView.scrollIntoView(line.from, { y: 'center' }),
-      ],
-    })
+    markProgrammatic()
+    view.dispatch({ effects: setExecLine.of(execLine1) })
+    scrollLineCenter(view, execLine1)
     setUserScrolledAway(false)
     setFollowExec(true)
-  }, [execLine1])
+  }, [execLine1, markProgrammatic])
 
+  // Highlight update separate from scroll
   useEffect(() => {
     const view = viewRef.current
     if (!view) return
     view.dispatch({ effects: setExecLine.of(execLine1) })
     if (followExec && !userScrolledAway && execLine1 != null) {
-      if (execLine1 >= 1 && execLine1 <= view.state.doc.lines) {
-        const line = view.state.doc.line(execLine1)
-        view.dispatch({
-          effects: EditorView.scrollIntoView(line.from, { y: 'center' }),
-        })
-      }
+      markProgrammatic()
+      scrollLineNearest(view, execLine1)
     }
-  }, [execLine1, followExec, userScrolledAway])
+  }, [execLine1, followExec, userScrolledAway, markProgrammatic])
 
-  const onCreate = useCallback((view: EditorView) => {
-    viewRef.current = view
-    if (execLine1 != null) {
+  const onCreate = useCallback(
+    (view: EditorView) => {
+      viewRef.current = view
+      // Reserve gutter + set initial highlight without centering
       view.dispatch({ effects: setExecLine.of(execLine1) })
+      const scrollDOM = view.scrollDOM
+      const onScroll = () => {
+        if (programmaticScroll.current) return
+        if (followExec) setUserScrolledAway(true)
+      }
+      scrollDOM.addEventListener('scroll', onScroll, { passive: true })
+      ;(view as unknown as { __advScrollCleanup?: () => void }).__advScrollCleanup = () => {
+        scrollDOM.removeEventListener('scroll', onScroll)
+      }
+    },
+    [execLine1, followExec],
+  )
+
+  useEffect(() => {
+    return () => {
+      const view = viewRef.current as unknown as { __advScrollCleanup?: () => void } | null
+      view?.__advScrollCleanup?.()
     }
-  }, [execLine1])
+  }, [])
 
   const copy = async () => {
     const text = tab === 'ts' ? doc.source : (pseudocode ?? '')
@@ -158,7 +212,6 @@ export default function CodeBrowser({
       className="code-browser"
       data-testid="code-browser"
       onKeyDown={(e) => {
-        // Do not let Space/arrows bubble to Visualizer while focused in editor
         e.stopPropagation()
       }}
     >
@@ -192,11 +245,9 @@ export default function CodeBrowser({
         <button type="button" onClick={copy} title="复制">
           复制
         </button>
-        {userScrolledAway && (
-          <button type="button" className="primary" onClick={scrollToExec}>
-            回到执行行
-          </button>
-        )}
+        <button type="button" className="primary" onClick={scrollToExecCenter} title="居中到执行行">
+          回到执行行
+        </button>
         <label className="muted" style={{ fontSize: '0.72rem' }}>
           <input
             type="checkbox"
@@ -205,7 +256,6 @@ export default function CodeBrowser({
               setFollowExec(e.target.checked)
               if (e.target.checked) {
                 setUserScrolledAway(false)
-                scrollToExec()
               }
             }}
           />{' '}
@@ -213,12 +263,14 @@ export default function CodeBrowser({
         </label>
       </div>
       <div className="code-browser-meta muted">
-        {doc.title} · hash {doc.sourceHash.slice(0, 12)}…
-        {execAnchorId ? ` · ▶ ${execAnchorId}` : ''}
+        {doc.title}
+        {execAnchorId ? ` · ▶ ${execAnchorId}` : ' · ▶ —'}
       </div>
       {tab === 'ts' ? (
         <div
+          className="code-browser-cm-wrap"
           style={{ fontSize }}
+          data-testid="code-mirror-wrap"
           onWheel={() => {
             if (followExec) setUserScrolledAway(true)
           }}
@@ -226,7 +278,7 @@ export default function CodeBrowser({
           <CodeMirror
             value={doc.source}
             height="100%"
-            theme="dark"
+            theme={cmTheme}
             editable={false}
             extensions={extensions}
             onCreateEditor={onCreate}
@@ -241,10 +293,7 @@ export default function CodeBrowser({
       ) : (
         <pre className="code-pre" style={{ fontSize }}>
           {(pseudocode ?? '').split('\n').map((line, i) => (
-            <div
-              key={i}
-              className={`code-line${execLine1 === i + 1 ? ' active' : ''}`}
-            >
+            <div key={i} className={`code-line${execLine1 === i + 1 ? ' active' : ''}`}>
               <span className="ln">{i + 1}</span>
               <span className="lt">{line || ' '}</span>
             </div>

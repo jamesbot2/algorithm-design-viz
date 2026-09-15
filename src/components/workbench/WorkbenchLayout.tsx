@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import { useMotion } from '../../theme/MotionContext'
+import { useLabTheme, type LabThemeId } from '../../theme/LabThemeContext'
 
 interface Props {
   title?: string
@@ -9,11 +10,14 @@ interface Props {
   code?: ReactNode
   /** Optional bottom transport slot (Visualizer usually embeds its own) */
   transport?: ReactNode
+  /** Hide duplicate title when page header already shows it */
+  hideTitle?: boolean
 }
 
 /**
- * Shared workbench shell: title | input summary | viz ~55% + code ~45% | bottom transport.
- * Desktop shows theme/motion/focus controls (not only mobile topbar).
+ * Shared workbench shell: summary | viz ~55% + code ~45% | optional transport.
+ * Height chain uses min-height:0 so CodeMirror gets real height.
+ * Stable: callers must NOT key this on cursor/step.id.
  */
 export default function WorkbenchLayout({
   title,
@@ -21,13 +25,15 @@ export default function WorkbenchLayout({
   viz,
   code,
   transport,
+  hideTitle = false,
 }: Props) {
   const { userPref, setUserPref, density, setDensity } = useMotion()
+  const { theme, setTheme } = useLabTheme()
 
   return (
     <div className="workbench-layout" data-testid="workbench-layout">
       <div className="workbench-header">
-        {title && <h2 className="workbench-title">{title}</h2>}
+        {!hideTitle && title && <h2 className="workbench-title">{title}</h2>}
         {inputSummary && <div className="workbench-input-summary">{inputSummary}</div>}
         <span className="spacer" style={{ flex: 1 }} />
         <div className="workbench-desktop-controls" data-testid="workbench-desktop-controls">
@@ -37,10 +43,8 @@ export default function WorkbenchLayout({
             </span>
             <select
               aria-label="主题"
-              defaultValue="lab-dark"
-              onChange={(e) => {
-                document.documentElement.setAttribute('data-lab-theme', e.target.value)
-              }}
+              value={theme}
+              onChange={(e) => setTheme(e.target.value as LabThemeId)}
             >
               <option value="lab-dark">Lab 深色</option>
               <option value="lab-light">Lab 浅色</option>
@@ -78,13 +82,13 @@ export default function WorkbenchLayout({
 
       <Group orientation="horizontal" className="workbench-panels">
         <Panel defaultSize="55" minSize="30" className="workbench-viz-panel">
-          {viz}
+          <div className="workbench-panel-inner">{viz}</div>
         </Panel>
         {code !== undefined && code !== null && (
           <>
             <Separator className="workbench-resize" data-panel-resize-handle="" />
             <Panel defaultSize="45" minSize="20" className="workbench-code-panel">
-              {code}
+              <div className="workbench-panel-inner workbench-code-inner">{code}</div>
             </Panel>
           </>
         )}

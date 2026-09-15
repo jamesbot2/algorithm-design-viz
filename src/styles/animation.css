@@ -459,3 +459,18 @@
   .viz-toolbar { border-radius: 16px; }
   .arrays-panel { gap: 0.5rem; }
 }
+
+
+/* V4: banner is in-place text — do not re-enter-animate every step */
+.viz-banner-slot.viz-banner-enter,
+.viz-banner-slot {
+  animation: none !important;
+}
+/* Do not transform layout chrome (toolbar / workbench) */
+.workbench-layout,
+.workbench-header,
+.viz-toolbar,
+.input-panel,
+.control-row {
+  transform: none !important;
+}

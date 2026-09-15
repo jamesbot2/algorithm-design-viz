@@ -31,6 +31,7 @@ import { getCatalog } from '../codeCatalog'
 import * as nQueensMod from '../algorithms/nQueens'
 import * as matrixChainMod from '../algorithms/matrixChain'
 import * as huffmanMod from '../algorithms/huffman'
+import { createPreviewForAlgo } from '../preview/createPreview'
 
 const DEFAULT_ARRAY = [5, 2, 8, 1, 9, 3, 7]
 
@@ -119,7 +120,6 @@ export default function AlgoPage() {
   const [trace, setTrace] = useState<Trace | undefined>(undefined)
   const [runId, setRunId] = useState(0)
   const [runSnapshot, setRunSnapshot] = useState<RunSnapshot | null>(null)
-  const [playbackKey, setPlaybackKey] = useState(0)
   const [hasRun, setHasRun] = useState(false)
   const [sceneWarn, setSceneWarn] = useState<string | null>(null)
   /** Notify-only cursor from Visualizer — must NOT feed seekCommand */
@@ -488,8 +488,7 @@ export default function AlgoPage() {
       setCursorIndex(clamped)
       seekReqRef.current += 1
       setSeekCommand({ requestId: seekReqRef.current, target: clamped })
-      setPlaybackKey((k) => k + 1)
-      setHasRun(true)
+        setHasRun(true)
 
       // Persist scene from RunSnapshot + cursor — never live draft on cursor change
       if (isGraphAlgo(id) && snap.input) {
@@ -518,7 +517,6 @@ export default function AlgoPage() {
     setSteps([])
     setTrace(undefined)
     setHasRun(false)
-    setPlaybackKey((k) => k + 1)
     setSceneWarn(null)
     setCursorIndex(0)
     setSeekCommand(null)
@@ -575,7 +573,13 @@ export default function AlgoPage() {
   }
 
   const onRun = () => {
-    executeOnce(0)
+    setRunning(true)
+    try {
+      executeOnce(0)
+    } finally {
+      // Sync solvers finish in one tick; keep cancel meaningful only while flagged
+      setRunning(false)
+    }
   }
 
   const onCancel = () => {
@@ -611,7 +615,19 @@ export default function AlgoPage() {
     [id, runSnapshot, hasRun],
   )
 
+  const previewStep = useMemo(() => {
+    if (!id) return null
+    return createPreviewForAlgo(id, draft)
+  }, [id, draft])
+
+  const displaySteps = hasRun && steps.length ? steps : previewStep ? [previewStep] : []
+  const isPreviewMode = !(hasRun && steps.length)
+
+  const [theoryOpen, setTheoryOpen] = useState(false)
+  const [running, setRunning] = useState(false)
+
   const metaExtras = useMemo(() => {
+
     if (!algo) return null
     const m = algo.meta
     return (
@@ -658,29 +674,44 @@ export default function AlgoPage() {
 
   return (
     <div className="page algo-page">
-      <div className="page-header">
+      <div className="page-header page-header-compact">
         <Link to="/" className="back">
           ← 首页
         </Link>
         <h1>{algo.meta.title}</h1>
         <p className="complexity">复杂度：{algo.meta.complexity}</p>
-        <p className="subtitle">{algo.meta.description}</p>
-        {metaExtras}
-        {(id === 'dijkstra' || id === 'dijkstraHeap') && (
-          <p className="hint">
-            对照：
-            <Link to="/algo/dijkstra">朴素 Dijkstra</Link>
-            {' · '}
-            <Link to="/algo/dijkstraHeap">堆优化 Dijkstra</Link>
-            {' · '}
-            <Link to="/experiment">实验台</Link>
-          </p>
+        <button
+          type="button"
+          className="ghost theory-toggle"
+          aria-expanded={theoryOpen}
+          onClick={() => setTheoryOpen((o) => !o)}
+        >
+          {theoryOpen ? '收起说明' : '展开说明 / 理论'}
+        </button>
+        {theoryOpen && (
+          <div className="theory-expandable">
+            <p className="subtitle">{algo.meta.description}</p>
+            {metaExtras}
+            {(id === 'dijkstra' || id === 'dijkstraHeap') && (
+              <p className="hint">
+                对照：
+                <Link to="/algo/dijkstra">朴素 Dijkstra</Link>
+                {' · '}
+                <Link to="/algo/dijkstraHeap">堆优化 Dijkstra</Link>
+                {' · '}
+                <Link to="/experiment">实验台</Link>
+              </p>
+            )}
+          </div>
         )}
       </div>
 
-      <div className={`input-panel${errors.length ? ' has-errors shake-pending' : ''}${shakeKey > 0 && errors.length ? ' shake' : ''}`}>
+      <div
+        className={`input-panel input-panel-v4${errors.length ? ' has-errors shake-pending' : ''}${shakeKey > 0 && errors.length ? ' shake' : ''}`}
+        data-testid="input-panel"
+      >
         <h3>输入控制</h3>
-        <div className="mode-toggle">
+        <div className="mode-toggle control-row-item">
           <button
             type="button"
             className={draft.mode === 'teach' ? 'active' : ''}
@@ -708,134 +739,138 @@ export default function AlgoPage() {
           </p>
         )}
 
-        {needsArray && (
-          <label>
-            数组（逗号分隔）
-            <input value={draft.arrayText} onChange={(e) => patch({ arrayText: e.target.value })} />
-          </label>
-        )}
-        {id === 'binarySearch' && (
-          <>
-            <label>
-              目标值
-              <input value={draft.target} onChange={(e) => patch({ target: e.target.value })} />
+        <div className="input-grid" data-testid="input-grid">
+          {needsArray && (
+            <label className="field-array">
+              数组（逗号分隔）
+              <input value={draft.arrayText} onChange={(e) => patch({ arrayText: e.target.value })} />
             </label>
-            <label>
-              模式
-              <select
-                value={draft.bsMode}
-                onChange={(e) => patch({ bsMode: e.target.value as BinarySearchMode })}
-              >
-                <option value="requireSorted">要求已排序（默认，禁止静默排序）</option>
-                <option value="sortThenSearch">先排序再查找</option>
-              </select>
-            </label>
-          </>
-        )}
-        {id === 'lcs' && (
-          <>
-            <label>
-              串 X
-              <input value={draft.strA} onChange={(e) => patch({ strA: e.target.value })} />
-            </label>
-            <label>
-              串 Y
-              <input value={draft.strB} onChange={(e) => patch({ strB: e.target.value })} />
-            </label>
-          </>
-        )}
-        {id === 'editDistance' && (
-          <>
-            <label>
-              串 A
-              <input value={draft.editA} onChange={(e) => patch({ editA: e.target.value })} />
-            </label>
-            <label>
-              串 B
-              <input value={draft.editB} onChange={(e) => patch({ editB: e.target.value })} />
-            </label>
-          </>
-        )}
-        {id === 'kmp' && (
-          <>
-            <label>
-              文本
-              <input value={draft.text} onChange={(e) => patch({ text: e.target.value })} />
-            </label>
-            <label>
-              模式
-              <input value={draft.pattern} onChange={(e) => patch({ pattern: e.target.value })} />
-            </label>
-          </>
-        )}
+          )}
+          {id === 'binarySearch' && (
+            <>
+              <label className="field-target">
+                目标值
+                <input value={draft.target} onChange={(e) => patch({ target: e.target.value })} />
+              </label>
+              <label className="field-mode">
+                模式
+                <select
+                  value={draft.bsMode}
+                  onChange={(e) => patch({ bsMode: e.target.value as BinarySearchMode })}
+                >
+                  <option value="requireSorted">要求已排序（默认，禁止静默排序）</option>
+                  <option value="sortThenSearch">先排序再查找</option>
+                </select>
+              </label>
+            </>
+          )}
+          {id === 'lcs' && (
+            <>
+              <label className="field-array">
+                串 X
+                <input value={draft.strA} onChange={(e) => patch({ strA: e.target.value })} />
+              </label>
+              <label className="field-array">
+                串 Y
+                <input value={draft.strB} onChange={(e) => patch({ strB: e.target.value })} />
+              </label>
+            </>
+          )}
+          {id === 'editDistance' && (
+            <>
+              <label className="field-array">
+                串 A
+                <input value={draft.editA} onChange={(e) => patch({ editA: e.target.value })} />
+              </label>
+              <label className="field-array">
+                串 B
+                <input value={draft.editB} onChange={(e) => patch({ editB: e.target.value })} />
+              </label>
+            </>
+          )}
+          {id === 'kmp' && (
+            <>
+              <label className="field-array">
+                文本
+                <input value={draft.text} onChange={(e) => patch({ text: e.target.value })} />
+              </label>
+              <label className="field-array">
+                模式
+                <input value={draft.pattern} onChange={(e) => patch({ pattern: e.target.value })} />
+              </label>
+            </>
+          )}
 
-        {isGraphAlgo(id) && draft.graph && (
-          <GraphInput
-            key={`${id}-${runId}-draft`}
-            algoId={id}
-            value={draft.graph}
-            onChange={(g) => patch({ graph: g })}
-          />
-        )}
+          {isGraphAlgo(id) && draft.graph && (
+            <div className="field-graph">
+              <GraphInput
+                key={`${id}-draft`}
+                algoId={id}
+                value={draft.graph}
+                onChange={(g) => patch({ graph: g })}
+              />
+            </div>
+          )}
 
-        {id === 'nQueens' && (
-          <>
-            <label>
-              n
-              <input value={draft.nQueensN} onChange={(e) => patch({ nQueensN: e.target.value })} />
+          {id === 'nQueens' && (
+            <>
+              <label className="field-target">
+                n
+                <input value={draft.nQueensN} onChange={(e) => patch({ nQueensN: e.target.value })} />
+              </label>
+              <label className="field-mode">
+                模式
+                <select
+                  value={draft.nQueensMode}
+                  onChange={(e) => patch({ nQueensMode: e.target.value as 'one' | 'all' })}
+                >
+                  <option value="one">求一个解</option>
+                  <option value="all">全部解</option>
+                </select>
+              </label>
+            </>
+          )}
+          {id === 'matrixChain' && (
+            <label className="field-array">
+              维度 dims（逗号分隔）
+              <input value={draft.matrixDims} onChange={(e) => patch({ matrixDims: e.target.value })} />
             </label>
-            <label>
-              模式
-              <select
-                value={draft.nQueensMode}
-                onChange={(e) => patch({ nQueensMode: e.target.value as 'one' | 'all' })}
-              >
-                <option value="one">求一个解</option>
-                <option value="all">全部解</option>
-              </select>
-            </label>
-          </>
-        )}
-        {id === 'matrixChain' && (
-          <label>
-            维度 dims（逗号分隔）
-            <input value={draft.matrixDims} onChange={(e) => patch({ matrixDims: e.target.value })} />
-          </label>
-        )}
-        {id === 'huffman' && (
-          <>
-            <label>
-              符号
-              <input value={draft.huffmanSymbols} onChange={(e) => patch({ huffmanSymbols: e.target.value })} />
-            </label>
-            <label>
-              频率
-              <input value={draft.huffmanFreqs} onChange={(e) => patch({ huffmanFreqs: e.target.value })} />
-            </label>
-          </>
-        )}
-        {id === 'knapsack01' && (
-          <>
-            <label>
-              重量
-              <input value={draft.knapsackWeights} onChange={(e) => patch({ knapsackWeights: e.target.value })} />
-            </label>
-            <label>
-              价值
-              <input value={draft.knapsackValues} onChange={(e) => patch({ knapsackValues: e.target.value })} />
-            </label>
-            <label>
-              容量 W
-              <input value={draft.knapsackW} onChange={(e) => patch({ knapsackW: e.target.value })} />
-            </label>
-            <p className="hint">
-              多策略对比见 <Link to="/teach/knapsack">教学单元</Link>。
-            </p>
-          </>
-        )}
-        {id === 'activitySelection' && (
-          <p className="hint">本算法使用内置示例；点击「运行」生成步骤。</p>
-        )}
+          )}
+          {id === 'huffman' && (
+            <>
+              <label className="field-array">
+                符号
+                <input value={draft.huffmanSymbols} onChange={(e) => patch({ huffmanSymbols: e.target.value })} />
+              </label>
+              <label className="field-array">
+                频率
+                <input value={draft.huffmanFreqs} onChange={(e) => patch({ huffmanFreqs: e.target.value })} />
+              </label>
+            </>
+          )}
+          {id === 'knapsack01' && (
+            <>
+              <label className="field-array">
+                重量
+                <input value={draft.knapsackWeights} onChange={(e) => patch({ knapsackWeights: e.target.value })} />
+              </label>
+              <label className="field-array">
+                价值
+                <input value={draft.knapsackValues} onChange={(e) => patch({ knapsackValues: e.target.value })} />
+              </label>
+              <label className="field-target">
+                容量 W
+                <input value={draft.knapsackW} onChange={(e) => patch({ knapsackW: e.target.value })} />
+              </label>
+              <p className="hint">
+                多策略对比见 <Link to="/teach/knapsack">教学单元</Link>。
+              </p>
+            </>
+          )}
+          {id === 'activitySelection' && (
+            <p className="hint">本算法使用内置示例；点击「运行」生成步骤。</p>
+          )}
+        </div>
 
         {errors.length > 0 && (
           <ul className="input-errors" role="alert">
@@ -848,92 +883,101 @@ export default function AlgoPage() {
           </ul>
         )}
 
-        <div className="input-actions">
+        <div className="input-actions control-row" data-testid="input-actions">
           <button type="button" onClick={onRestoreDefaults}>
             恢复默认示例
           </button>
-          <button type="button" className="primary" onClick={onRun}>
+          <button type="button" className="primary" onClick={onRun} data-testid="run-btn">
             运行
           </button>
-          <button type="button" onClick={onCancel}>
+          <button type="button" onClick={onCancel} disabled={!running} title={running ? '取消当前运行' : '空闲时不可取消'}>
             取消
           </button>
           <button type="button" onClick={onResetPlayback} disabled={!hasRun}>
             重置播放
           </button>
         </div>
-        {hasRun && (
-          <p className="hint muted">
-            当前运行 #{runId}（RunSnapshot {runSnapshot?.runId ?? '—'}）· 模式 {draft.mode} · cursor={cursorIndex}
-            {draftDirty && ' · 草稿已改，显示上一轮运行'}
-          </p>
-        )}
         {hasRun && draftDirty && (
           <p className="dirty-banner" role="status">
             输入已编辑，正在显示<strong>上一轮运行</strong>的轨迹。点击「运行」以新快照重算。
           </p>
         )}
+        <details className="debug-details muted">
+          <summary>调试信息</summary>
+          <p className="hint">
+            run #{runId} · RunSnapshot {runSnapshot?.runId ?? '—'} · 模式 {draft.mode} · cursor=
+            {cursorIndex}
+            {draftDirty && ' · 草稿已改'}
+            {isPreviewMode && ' · 预览（未运行）'}
+          </p>
+        </details>
       </div>
 
-      {hasRun ? (
-        <WorkbenchLayout
-          title={algo.meta.title}
-          inputSummary={
-            draftDirty
+      <WorkbenchLayout
+        hideTitle
+        title={algo.meta.title}
+        inputSummary={
+          isPreviewMode
+            ? '预览 · 尚未运行'
+            : draftDirty
               ? '草稿已改 · 显示上一轮运行'
-              : `run #${runId} · cursor ${cursorIndex + 1}/${Math.max(steps.length, 1)}`
-          }
-          viz={
-            <>
-              {isGraphAlgo(id) && (
-                <div className={`result-panel-enter${staleResult ? ' is-stale' : ''}`}>
-                  {staleResult && <span className="stale-result-badge">上一轮结果</span>}
-                  <GraphResultPanel algoId={id} steps={steps} />
-                </div>
-              )}
-              <Visualizer
-                key={playbackKey}
-                steps={steps}
-                trace={trace}
-                seekCommand={seekCommand}
-                runId={runSnapshot?.runId ?? runId}
-                onStepIndexChange={onStepChange}
-                staleResult={staleResult || draftDirty}
-                finalAnswer={
-                  steps.length ? (
-                    <pre style={{ margin: 0, fontSize: '0.8rem' }}>
-                      {JSON.stringify(steps[steps.length - 1]?.result ?? steps[steps.length - 1]?.vars, null, 2)?.slice(0, 600)}
-                    </pre>
-                  ) : null
-                }
-              />
-            </>
-          }
-          code={(() => {
-            const catalog = id ? getCatalog(id) : null
-            if (catalog) {
-              return (
-                <CodeBrowser
-                  document={catalog.typescript}
-                  execAnchorId={
-                    steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase
-                  }
-                  activeLine={steps[cursorIndex]?.codeLine}
-                  pseudocode={catalog.pseudocode?.source}
-                />
-              )
-            }
-            return (
-              <div className="code-stub muted">
-                <div className="panel-title">参考代码</div>
-                <pre className="code-pre">{(algo.meta.code as string) || '（暂无目录文档）'}</pre>
+              : `步骤 ${cursorIndex + 1}/${Math.max(steps.length, 1)}`
+        }
+        viz={
+          <>
+            {isGraphAlgo(id) && hasRun && (
+              <div className={`result-panel-enter${staleResult ? ' is-stale' : ''}`}>
+                {staleResult && <span className="stale-result-badge">上一轮结果</span>}
+                <GraphResultPanel algoId={id} steps={steps} />
               </div>
+            )}
+            <Visualizer
+              key={hasRun ? (runSnapshot?.runId ?? runId) : 'preview'}
+              steps={displaySteps}
+              trace={hasRun ? trace : undefined}
+              seekCommand={hasRun ? seekCommand : null}
+              runId={hasRun ? (runSnapshot?.runId ?? runId) : 'preview'}
+              onStepIndexChange={hasRun ? onStepChange : undefined}
+              staleResult={hasRun && (staleResult || draftDirty)}
+              finalAnswer={
+                hasRun && steps.length ? (
+                  <pre style={{ margin: 0, fontSize: '0.8rem' }}>
+                    {JSON.stringify(
+                      steps[steps.length - 1]?.result ?? steps[steps.length - 1]?.vars,
+                      null,
+                      2,
+                    )?.slice(0, 600)}
+                  </pre>
+                ) : null
+              }
+            />
+          </>
+        }
+        code={(() => {
+          const catalog = id ? getCatalog(id) : null
+          if (catalog) {
+            return (
+              <CodeBrowser
+                document={catalog.typescript}
+                execAnchorId={
+                  isPreviewMode
+                    ? displaySteps[0]?.codeRefs?.[0]?.anchorId
+                    : (steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase)
+                }
+                activeLine={isPreviewMode ? undefined : steps[cursorIndex]?.codeLine}
+                pseudocode={catalog.pseudocode?.source}
+              />
             )
-          })()}
-        />
-      ) : (
-        <div className="viz-empty">调整输入后点击「运行」开始可视化。</div>
-      )}
+          }
+          return (
+            <div className="code-stub muted">
+              <div className="panel-title">参考代码</div>
+              <pre className="code-pre">{(algo.meta.code as string) || '（暂无目录文档）'}</pre>
+            </div>
+          )
+        })()}
+      />
     </div>
   )
+
 }

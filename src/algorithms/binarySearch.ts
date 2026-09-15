@@ -8,12 +8,13 @@ export const meta = {
   complexity: '时间 O(log n)，空间 O(1)（不含可选排序）',
   description:
     '在有序数组中通过不断折半查找目标值。默认要求输入已排序；重复值返回最左（第一次）匹配。比较次数仅计 mid 与目标的值比较。',
-  code: `lo = 0, hi = n-1
+  code: `lo = 0, hi = n-1, candidate = -1
 while lo <= hi:
   mid = (lo+hi)/2
-  if a[mid] == target: return mid
-  if a[mid] < target: lo = mid+1
-  else: hi = mid-1`,
+  if a[mid] == target: candidate = mid; hi = mid-1
+  elif a[mid] < target: lo = mid+1
+  else: hi = mid-1
+return candidate`,
   defaultTarget: 7,
   defaultArray: [1, 2, 3, 5, 7, 8, 9],
   implName: 'iterativeBinarySearch',
@@ -91,13 +92,13 @@ function searchOnSorted(
       found = mid
       snap(`命中下标 ${mid}，继续向左找更早匹配`, [mid], { lo, mid, hi, candidate: mid }, 3, {
         [mid]: 'sorted',
-      }, undefined, ref('compare'))
+      }, undefined, ref('equal'))
       hi = mid - 1
     } else if (a[mid] < target) {
-      snap(`a[mid] < target，lo ← mid+1`, [mid], { lo, mid, hi }, 4, { [mid]: 'compare' }, undefined, ref('narrow'))
+      snap(`a[mid] < target，lo ← mid+1`, [mid], { lo, mid, hi }, 4, { [mid]: 'compare' }, undefined, ref('less'))
       lo = mid + 1
     } else {
-      snap(`a[mid] > target，hi ← mid-1`, [mid], { lo, mid, hi }, 5, { [mid]: 'compare' }, undefined, ref('narrow'))
+      snap(`a[mid] > target，hi ← mid-1`, [mid], { lo, mid, hi }, 5, { [mid]: 'compare' }, undefined, ref('greater'))
       hi = mid - 1
     }
   }
@@ -113,13 +114,14 @@ function searchOnSorted(
       3,
       { [found]: 'sorted' },
       { foundIndex: found, originalIndex: orig, target, comparisons },
+      ref('found'),
     )
   } else {
     snap('未找到目标', [], { lo, hi, found: null }, 0, undefined, {
       foundIndex: null,
       target,
       comparisons,
-    })
+    }, ref('miss'))
   }
   return { steps, id, comparisons, found }
 }

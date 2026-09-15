@@ -15,7 +15,7 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['tests/**/*.{test,spec}.{ts,tsx}'],
-          exclude: ['tests/dom/**'],
+          exclude: ['tests/dom/**', 'tests/e2e/**'],
         },
       },
       {
