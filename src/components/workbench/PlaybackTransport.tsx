@@ -73,7 +73,15 @@ export default function PlaybackTransport({
   const jumps = teachableStages ?? segments.filter((s) => s.kind !== 'event')
   const primaryLabel =
     playLabel ??
-    (isPreview ? '生成并演示' : playing ? '暂停' : atEnd ? '重新播放' : idx > 0 ? '继续' : '开始演示')
+    (isPreview
+      ? '请先运行'
+      : playing
+        ? '暂停'
+        : atEnd
+          ? '重新播放'
+          : idx > 0
+            ? '继续'
+            : '开始演示')
 
   return (
     <div className="playback-transport" data-testid="playback-transport" style={style}>

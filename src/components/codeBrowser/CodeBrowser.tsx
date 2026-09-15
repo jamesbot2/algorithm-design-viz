@@ -7,6 +7,7 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { highlightSelectionMatches, searchKeymap, search } from '@codemirror/search'
 import type { CodeDocument, SourceRange } from '../../codeCatalog/types'
 import { useLabTheme } from '../../theme/LabThemeContext'
+import { useMotion } from '../../theme/MotionContext'
 import { activeCatalogDoc, resolveExecRange } from './resolveExec'
 
 export type CodeBrowserDocuments = {
@@ -167,7 +168,11 @@ export default function CodeBrowser({
   const viewRef = useRef<EditorView | null>(null)
   const pseudoPreRef = useRef<HTMLPreElement | null>(null)
   const programmaticScroll = useRef(false)
+  const scrollGen = useRef(0)
+  const pseudoScrollCleanup = useRef<(() => void) | null>(null)
   const { theme } = useLabTheme()
+  const { mode: motionMode } = useMotion()
+  const reduceMotion = motionMode === 'reduced'
 
   const cmTheme = theme === 'lab-light' ? 'light' : 'dark'
 
@@ -242,22 +247,57 @@ export default function CodeBrowser({
 
   const markProgrammatic = useCallback(() => {
     programmaticScroll.current = true
-    window.setTimeout(() => {
-      programmaticScroll.current = false
-    }, 80)
+    const gen = ++scrollGen.current
+    // Clear on next frames instead of fixed 80/120ms guess
+    const clear = () => {
+      if (scrollGen.current === gen) programmaticScroll.current = false
+    }
+    requestAnimationFrame(() => requestAnimationFrame(clear))
   }, [])
 
+  /**
+   * Local-only scroll for pseudo: mutate pre.scrollTop only.
+   * Never window / workbench outer. No unconstrained scrollIntoView.
+   */
   const scrollPseudoToLine = useCallback((line1: number, center: boolean) => {
+    pseudoScrollCleanup.current?.()
+    pseudoScrollCleanup.current = null
     const pre = pseudoPreRef.current
     if (!pre || line1 < 1) return
+    // Inactive/hidden panel: do not force-scroll ancestors
+    if (pre.closest('[hidden]')) return
+    if (pre.clientHeight <= 0) return
     const el = pre.querySelector(`[data-line="${line1}"]`) as HTMLElement | null
     if (!el) return
+
+    const margin = 12
+    const elTop = el.offsetTop
+    const elBottom = elTop + el.offsetHeight
+    const visTop = pre.scrollTop
+    const visBottom = visTop + pre.clientHeight
+
+    let target = pre.scrollTop
+    if (center) {
+      target = Math.max(0, elTop - pre.clientHeight / 2 + el.offsetHeight / 2)
+    } else {
+      // Already visible → no-op
+      if (elTop >= visTop + margin && elBottom <= visBottom - margin) return
+      if (elTop < visTop + margin) target = Math.max(0, elTop - margin)
+      else target = Math.max(0, elBottom - pre.clientHeight + margin)
+    }
+    if (Math.abs(target - pre.scrollTop) < 1) return
+
+    const gen = ++scrollGen.current
     programmaticScroll.current = true
-    el.scrollIntoView({ block: center ? 'center' : 'nearest', behavior: 'smooth' })
-    window.setTimeout(() => {
-      programmaticScroll.current = false
-    }, 120)
-  }, [])
+    // Instant scroll (honor reduced-motion — never force smooth)
+    void reduceMotion
+    pre.scrollTop = target
+    const done = () => {
+      if (scrollGen.current === gen) programmaticScroll.current = false
+    }
+    const raf = requestAnimationFrame(() => requestAnimationFrame(done))
+    pseudoScrollCleanup.current = () => cancelAnimationFrame(raf)
+  }, [reduceMotion])
 
   const canGotoExec = !unmapped && execLine1 != null
 
@@ -301,6 +341,11 @@ export default function CodeBrowser({
       view?.__advScrollCleanup?.()
       viewRef.current = null
     }
+    // Cancel stale pseudo scrolls on tab change
+    scrollGen.current += 1
+    programmaticScroll.current = false
+    pseudoScrollCleanup.current?.()
+    pseudoScrollCleanup.current = null
   }, [tab])
 
   const onCreate = useCallback(
@@ -326,6 +371,10 @@ export default function CodeBrowser({
     return () => {
       const view = viewRef.current as unknown as { __advScrollCleanup?: () => void } | null
       view?.__advScrollCleanup?.()
+      scrollGen.current += 1
+      programmaticScroll.current = false
+      pseudoScrollCleanup.current?.()
+      pseudoScrollCleanup.current = null
     }
   }, [])
 

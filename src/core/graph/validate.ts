@@ -197,3 +197,43 @@ export function floydMatrixToEdges(matrix: number[][]): { n: number; edges: Edge
   }
   return { n, edges, directed: true }
 }
+
+/**
+ * Parse a graph scalar field (n or start) from raw text.
+ * Empty/whitespace → transient (not runnable), not a snap-back value.
+ * Rejects non-finite, incomplete decimals that Number accepts oddly, Infinity, NaN text.
+ * Does NOT silently trunc; integer check is explicit.
+ */
+export type GraphFieldParse =
+  | { ok: true; value: number; transient?: false }
+  | { ok: false; reason: string; transient?: boolean; value?: undefined }
+
+export function parseGraphIntField(
+  raw: string,
+  field: 'n' | 'start',
+  opts?: { allowEmptyTransient?: boolean },
+): GraphFieldParse {
+  const allowEmpty = opts?.allowEmptyTransient !== false
+  const t = raw.trim()
+  if (t === '') {
+    if (allowEmpty) return { ok: false, reason: `请输入${field === 'n' ? '顶点数 n' : '源点'}`, transient: true }
+    return { ok: false, reason: `${field} 不能为空` }
+  }
+  // Reject explicit non-finite tokens and scientific overflow text before Number()
+  if (/^(nan|infinity|\+infinity|-infinity)$/i.test(t)) {
+    return { ok: false, reason: `${field} 须为有限整数（收到「${t}」）` }
+  }
+  // Reject trailing junk / incomplete forms like "3." or "1e" that are not strict ints
+  if (!/^[+-]?\d+$/.test(t)) {
+    // Also catch 1e309 etc — not a plain integer literal
+    return { ok: false, reason: `${field} 须为正整数的十进制写法（收到「${t}」）` }
+  }
+  const n = Number(t)
+  if (!Number.isFinite(n)) {
+    return { ok: false, reason: `${field} 非有限数字「${t}」` }
+  }
+  if (!Number.isInteger(n)) {
+    return { ok: false, reason: `${field} 须为整数（禁止截断小数）` }
+  }
+  return { ok: true, value: n }
+}

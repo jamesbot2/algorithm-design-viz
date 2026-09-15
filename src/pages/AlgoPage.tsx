@@ -3,7 +3,16 @@ import { Link, useParams } from 'react-router-dom'
 import { algorithms } from '../algorithms'
 import { getAlgo } from '../algorithms/registry'
 import type { Trace } from '../core/trace/types'
-import { createCancelFlag, runAlgoAsync, yieldToEventLoop } from '../core/runner'
+import {
+  createCancelFlag,
+  runAlgoAsync,
+  yieldToEventLoop,
+  makeRunIdentity,
+  isRunCurrent,
+  isDraftDirtyVersusSnapshot,
+  maybeAwaitSolveBarrier,
+  type RunIdentity,
+} from '../core/runner'
 import { runHeavyPreferWorker } from '../core/runner/runHeavy'
 import { pickPrimaryCodeRef, weakContextRefs } from '../utils/codeRefs'
 import FinalAnswerResult from '../components/result/FinalAnswerResult'
@@ -135,13 +144,28 @@ export default function AlgoPage() {
   const [graphValidity, setGraphValidity] = useState<GraphValidity | null>(null)
   const [graphSyncKey, setGraphSyncKey] = useState('init')
   const cancelRef = useRef(createCancelFlag())
-  const activeRunToken = useRef(0)
+  /** Monotonic generation; also invalidates prior identities. */
+  const generationRef = useRef(0)
+  const activeIdentityRef = useRef<RunIdentity | null>(null)
+  const inputRevisionRef = useRef(0)
+  const draftRef = useRef(draft)
+  draftRef.current = draft
+  const idRef = useRef(id)
+  idRef.current = id
   const [runLabel, setRunLabel] = useState<'idle' | 'running' | 'cancelled' | 'truncated'>('idle')
   const pendingAutoRun = useRef(false)
   const pendingSeek = useRef(0)
   const [chromeHost, setChromeHost] = useState<HTMLDivElement | null>(null)
 
+  const invalidateActiveRun = useCallback((reason: string) => {
+    void reason
+    cancelRef.current.cancelled = true
+    generationRef.current += 1
+    activeIdentityRef.current = null
+  }, [])
+
   const patch = useCallback((partial: Partial<DraftState>) => {
+    inputRevisionRef.current += 1
     setDraft((d) => ({ ...d, ...partial }))
     setDraftDirty(true)
   }, [])
@@ -159,14 +183,73 @@ export default function AlgoPage() {
       const g = draft.graph ?? defaultDraftFor(id)
       if (graphValidity && !graphValidity.canRun) {
         const errs: FieldError[] = []
+        if (graphValidity.nError) errs.push({ field: 'n', reason: graphValidity.nError })
+        if (graphValidity.startError) errs.push({ field: 'start', reason: graphValidity.startError })
         if (!graphValidity.parseOk) {
           errs.push({ field: 'edges', reason: graphValidity.parseError ?? '边列表解析失败' })
         }
         for (const iss of graphValidity.issues) {
+          if (errs.some((e) => e.field === iss.field && e.reason === iss.reason)) continue
           errs.push({ field: iss.field, reason: iss.reason })
         }
         if (!errs.length) errs.push({ field: 'graph', reason: '图草稿尚未通过校验' })
         return { ok: false, errors: errs }
+      }
+      // Prefer shared runnable snapshot from GraphInput validator (same as UI canRun)
+      if (graphValidity?.runnable) {
+        const runnable = graphValidity.runnable
+        const { n, edges, start, directed } = runnable
+        const inputSize = n + edges.length
+        if (id === 'bfs') {
+          const adj = edgesToAdj(edges, n, directed)
+          return {
+            ok: true,
+            registryInput: { adj, start },
+            fallbackSteps: maybeSteps(() => algo.generateSteps([], adj, start)),
+            inputSize,
+          }
+        }
+        if (id === 'floyd') {
+          const matrix = edgesToFloydMatrix(edges, n)
+          return {
+            ok: true,
+            registryInput: { matrix },
+            fallbackSteps: maybeSteps(() => algo.generateSteps([], matrix)),
+            inputSize,
+          }
+        }
+        if (id === 'kruskal') {
+          return {
+            ok: true,
+            registryInput: { edges, n },
+            fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n)),
+            inputSize,
+          }
+        }
+        if (id === 'prim') {
+          return {
+            ok: true,
+            registryInput: { edges, n, start },
+            fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n, start)),
+            inputSize,
+          }
+        }
+        if (id === 'dijkstraHeap') {
+          return {
+            ok: true,
+            registryInput: { edges, n, start },
+            fallbackSteps: maybeSteps(() =>
+              dijkstraHeap.generateSteps([], edges, n, start, { heavyTrace }),
+            ),
+            inputSize,
+          }
+        }
+        return {
+          ok: true,
+          registryInput: { edges, n, start },
+          fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n, start)),
+          inputSize,
+        }
       }
       const v = validateGraphDraft(g, algoGraphOptions(id))
       if (!v.ok) {
@@ -401,14 +484,18 @@ export default function AlgoPage() {
     }
   }, [algo, id, draft, graphValidity])
 
-  /** Single execution path: validate → run once → {result, steps/trace}. */
+  /** Single execution path: validate → run once → {result, steps/trace}. Identity captured at start. */
   const executeOnce = useCallback(
-    async (seekTo = 0): Promise<boolean> => {
+    async (seekTo = 0, opts?: { identity?: RunIdentity }): Promise<boolean> => {
+      const algoIdAtStart = id
+      if (!algoIdAtStart) return false
+
       const built = validateAndBuild()
       if (!built.ok) {
+        // Validation failures are sync — only write if still on same algo page
+        if (idRef.current !== algoIdAtStart) return false
         setErrors(built.errors)
         setShakeKey((k) => k + 1)
-        // Keep prior viz if present — mark as stale rather than silently claiming current
         if (hasRun && steps.length > 0) {
           setStaleResult(true)
         } else {
@@ -416,41 +503,77 @@ export default function AlgoPage() {
         }
         return false
       }
-      setErrors([])
-      setStaleResult(false)
 
+      const submittedDraft = draftRef.current
+      const inputSnapshot = isGraphAlgo(algoIdAtStart)
+        ? structuredClone(submittedDraft.graph)
+        : structuredClone(built.registryInput)
+      // Immutable identity at start: keep generation/runId from caller, always freeze submitted input
+      const base = opts?.identity
+      const gen = base?.generation ?? generationRef.current
+      if (generationRef.current !== gen) {
+        return false
+      }
+      const identity = makeRunIdentity({
+        generation: gen,
+        algoId: algoIdAtStart,
+        inputSnapshot,
+        inputRevision: base?.inputRevision ?? inputRevisionRef.current,
+        runId: base?.runId,
+      })
+      // Bind this attempt as active (replace-run already bumped generation in onRun)
+      activeIdentityRef.current = identity
       cancelRef.current.cancelled = false
-      const entry = id ? getAlgo(id) : undefined
+
+      const stillCurrent = () => isRunCurrent(activeIdentityRef.current, identity)
+
+      if (stillCurrent()) {
+        setErrors([])
+        setStaleResult(false)
+      }
+
+      const entry = getAlgo(algoIdAtStart)
       let outSteps: Step[] = built.fallbackSteps ?? []
       let outTrace: Trace | undefined
+      let outcomeStatus: string | undefined
 
       const budgetMax =
-        draft.mode === 'experiment'
+        submittedDraft.mode === 'experiment'
           ? DEMO_LIMITS.arrayLen * DEMO_LIMITS.arrayLen
           : DEMO_LIMITS.arrayLen * 200
 
       if (entry?.validate && entry?.solve) {
-        const thisToken = activeRunToken.current
-        const maxSteps = draft.mode === 'experiment' ? 200 : 5000
-        const heavy = id === 'nQueens' || id === 'knapsack01' || (id?.startsWith('knapsack') ?? false)
+        const maxSteps = submittedDraft.mode === 'experiment' ? 200 : 5000
+        const heavy =
+          algoIdAtStart === 'nQueens' ||
+          algoIdAtStart === 'knapsack01' ||
+          algoIdAtStart.startsWith('knapsack')
         const outcome = await runAlgoAsync({
-          algoId: id!,
+          algoId: algoIdAtStart,
           implName: entry.meta.implName,
           implVersion: entry.meta.implVersion,
           validate: entry.validate,
           solveAsync: async (input, ctx) => {
-            if (ctx.cancel.cancelled) {
+            await maybeAwaitSolveBarrier({
+              algoId: algoIdAtStart,
+              runId: identity.runId,
+              generation: identity.generation,
+            })
+            if (!stillCurrent() || ctx.cancel.cancelled) {
               return { steps: [], result: { ok: false }, status: 'cancelled' as const }
             }
             if (heavy) {
-              const preferWorker = id === 'nQueens' || id === 'knapsackBrute' || id?.includes('brute')
+              const preferWorker =
+                algoIdAtStart === 'nQueens' ||
+                algoIdAtStart === 'knapsackBrute' ||
+                algoIdAtStart.includes('brute')
               const workerReq =
-                id === 'nQueens'
+                algoIdAtStart === 'nQueens'
                   ? {
                       kind: 'nQueens' as const,
                       n: Number((input as { n?: number }).n ?? 4),
                       mode: ((input as { mode?: 'one' | 'all' }).mode ?? 'all') as 'one' | 'all',
-                      runId: `ui-${thisToken}`,
+                      runId: identity.runId,
                     }
                   : null
               const heavyOut = await runHeavyPreferWorker(
@@ -460,21 +583,21 @@ export default function AlgoPage() {
                 },
                 {
                   cancel: ctx.cancel,
-                  runId: `ui-${thisToken}`,
+                  runId: identity.runId,
                   maxSteps,
                   preferWorker: Boolean(preferWorker),
                   workerRequest: workerReq,
                 },
               )
-              if (heavyOut.status === 'cancelled' || ctx.cancel.cancelled) {
+              if (!stillCurrent() || heavyOut.status === 'cancelled' || ctx.cancel.cancelled) {
                 return { steps: heavyOut.steps, result: { ok: false }, status: 'cancelled' as const }
               }
-              let steps = heavyOut.steps
+              let hs = heavyOut.steps
               if (heavyOut.truncated) {
-                const last = steps[steps.length - 1]
+                const last = hs[hs.length - 1]
                 if (last && !String(last.message).includes('截断')) {
-                  steps = [
-                    ...steps.slice(0, -1),
+                  hs = [
+                    ...hs.slice(0, -1),
                     {
                       ...last,
                       message: `${last.message}（采样截断）`,
@@ -483,37 +606,37 @@ export default function AlgoPage() {
                   ]
                 }
               }
-              return { steps, result: { ok: true }, status: 'ok' as const }
+              return { steps: hs, result: { ok: true }, status: 'ok' as const }
             }
             await yieldToEventLoop()
-            if (ctx.cancel.cancelled) {
+            if (!stillCurrent() || ctx.cancel.cancelled) {
               return { steps: [], result: { ok: false }, status: 'cancelled' as const }
             }
             const solved = entry.solve!(input)
-            if (ctx.cancel.cancelled) {
+            if (!stillCurrent() || ctx.cancel.cancelled) {
               return {
                 steps: (solved.trace.steps as Step[]) ?? [],
                 result: solved.result,
                 status: 'cancelled' as const,
               }
             }
-            let steps = (solved.trace.steps as Step[]) ?? []
+            let ss = (solved.trace.steps as Step[]) ?? []
             let truncated = false
-            if (steps.length > maxSteps) {
-              steps = steps.slice(0, maxSteps)
+            if (ss.length > maxSteps) {
+              ss = ss.slice(0, maxSteps)
               truncated = true
             }
             if (truncated) {
-              const last = steps[steps.length - 1]
+              const last = ss[ss.length - 1]
               if (last && !String(last.message).includes('截断')) {
-                steps = [
-                  ...steps.slice(0, -1),
+                ss = [
+                  ...ss.slice(0, -1),
                   { ...last, message: `${last.message}（采样截断）`, vars: { ...last.vars, truncated: true } },
                 ]
               }
             }
             return {
-              steps,
+              steps: ss,
               result: solved.result,
               status: solved.trace.status,
             }
@@ -526,29 +649,26 @@ export default function AlgoPage() {
           },
           cancel: cancelRef.current,
           freeze: true,
-          runId: `ui-${thisToken}`,
-          isStale: (rid) => {
-            const n = Number(String(rid).replace('ui-', ''))
-            return n !== activeRunToken.current
-          },
+          runId: identity.runId,
+          isStale: () => !stillCurrent(),
         })
 
-        // Stale run — do not write back
-        if (thisToken !== activeRunToken.current) {
+        if (!stillCurrent()) {
           return false
         }
 
+        outcomeStatus = outcome.status
         if (outcome.status === 'validation_error' || outcome.status === 'budget_exceeded') {
           const msgs = (outcome.errors ?? []).map((e) =>
             'message' in e ? e.message : String(e),
           )
+          if (!stillCurrent()) return false
           setErrors(
             msgs.length
               ? msgs.map((m) => ({ field: 'run', reason: m }))
               : [{ field: 'run', reason: outcome.status }],
           )
           if (outcome.status === 'budget_exceeded' && outcome.steps?.length) {
-            // still show truncated steps — distinct from cancelled
             outSteps = outcome.steps
             outTrace = outcome.trace
             setRunLabel('truncated')
@@ -559,6 +679,7 @@ export default function AlgoPage() {
             return false
           }
         } else if (outcome.status === 'cancelled') {
+          if (!stillCurrent()) return false
           setErrors([{ field: 'run', reason: '已取消' }])
           setRunLabel('cancelled')
           outSteps = outcome.steps ?? []
@@ -568,38 +689,69 @@ export default function AlgoPage() {
           outTrace = outcome.trace
         }
       } else {
-        // Legacy path: fallbackSteps already produced once in validateAndBuild
+        await maybeAwaitSolveBarrier({
+          algoId: algoIdAtStart,
+          runId: identity.runId,
+          generation: identity.generation,
+        })
+        if (!stillCurrent()) return false
         outSteps = built.fallbackSteps ?? []
         outTrace = undefined
       }
 
-      setSteps(outSteps)
-      setTrace(outTrace)
+      if (!stillCurrent()) return false
+
       const clamped = Math.max(0, Math.min(seekTo, Math.max(0, outSteps.length - 1)))
       const nextRunNumeric = runId + 1
       const snap = freezeRunSnapshot({
-        algoId: id!,
+        algoId: algoIdAtStart,
         version: SCENE_PROTOCOL_VERSION,
-        input: isGraphAlgo(id)
-          ? structuredClone(draft.graph)
-          : structuredClone(built.registryInput),
-        params: { mode: draft.mode },
+        input: inputSnapshot,
+        params: { mode: submittedDraft.mode },
         seed: 0,
         runId: createRunId(),
       })
+
+      // Dirty = current live draft vs displayed result snapshot (not blindly false)
+      const live = draftRef.current
+      const liveSlice = isGraphAlgo(algoIdAtStart)
+        ? live.graph
+        : // rebuild comparable slice from live draft for common fields
+          (built.registryInput as object)
+      // Prefer comparing nQueens / registry against identity snapshot when user edited
+      let dirtyNow = false
+      if (algoIdAtStart === 'nQueens') {
+        dirtyNow = isDraftDirtyVersusSnapshot(
+          { n: Number(live.nQueensN), mode: live.nQueensMode },
+          identity.inputSnapshot,
+        )
+        // Also treat text drift (n=9 typed) vs snapshot n=8
+        if (!dirtyNow) {
+          dirtyNow = String(live.nQueensN) !== String((identity.inputSnapshot as { n?: number })?.n)
+        }
+      } else if (isGraphAlgo(algoIdAtStart)) {
+        dirtyNow = isDraftDirtyVersusSnapshot(live.graph, identity.inputSnapshot)
+      } else {
+        dirtyNow = inputRevisionRef.current !== identity.inputRevision
+      }
+      void liveSlice
+      void outcomeStatus
+
+      setSteps(outSteps)
+      setTrace(outTrace)
       setRunSnapshot(snap)
       setRunId(nextRunNumeric)
-      setDraftDirty(false)
+      setDraftDirty(dirtyNow)
       setCursorIndex(clamped)
       seekReqRef.current += 1
       setSeekCommand({ requestId: seekReqRef.current, target: clamped })
-        setHasRun(true)
+      setHasRun(true)
 
       // Persist scene from RunSnapshot + cursor — never live draft on cursor change
-      if (isGraphAlgo(id) && snap.input) {
+      if (isGraphAlgo(algoIdAtStart) && snap.input) {
         const frag = sceneToHashFragment({
           version: SCENE_PROTOCOL_VERSION,
-          algoId: id,
+          algoId: algoIdAtStart,
           input: snap.input,
           params: snap.params,
           seed: snap.seed,
@@ -607,17 +759,24 @@ export default function AlgoPage() {
           runSnapshot: { ...snap },
         })
         if (frag && frag.length < 1800) {
-          const base = window.location.hash.split('?')[0] || `#/algo/${id}`
+          const base = window.location.hash.split('?')[0] || `#/algo/${algoIdAtStart}`
           window.history.replaceState(null, '', `${base}?${frag}`)
         }
       }
       return true
     },
-    [validateAndBuild, id, draft, hasRun, steps.length, runId],
+    [validateAndBuild, id, hasRun, steps.length, runId],
   )
 
   useEffect(() => {
+    // Invalidate / cancel any in-flight work from previous algo (same component instance)
+    invalidateActiveRun('algoId-change')
+    cancelRef.current = createCancelFlag()
+    setRunning(false)
+    setRunLabel('idle')
+
     setDraft(defaultDraft(id ?? ''))
+    inputRevisionRef.current = 0
     setErrors([])
     setSteps([])
     setTrace(undefined)
@@ -640,7 +799,7 @@ export default function AlgoPage() {
     }
     if (loaded.scene.algoId !== id) return
 
-    // Restore input then auto-run + seek
+    // Restore input then auto-run + seek (same identity path as run button)
     if (isGraphAlgo(id) && loaded.scene.input && typeof loaded.scene.input === 'object') {
       const g = loaded.scene.input as Partial<GraphDraft>
       if (typeof g.n === 'number' && Array.isArray(g.edges)) {
@@ -660,18 +819,57 @@ export default function AlgoPage() {
         setSceneWarn('场景 input 结构非法：缺少 n/edges')
       }
     }
-  }, [id])
+  }, [id, invalidateActiveRun])
 
-  // After draft restored from scene, run once and seek
+  // After draft restored from scene, run once and seek via same onRun identity path
   useEffect(() => {
     if (!pendingAutoRun.current) return
     if (!id || !algo) return
     pendingAutoRun.current = false
-    void executeOnce(pendingSeek.current)
+    const seekTo = pendingSeek.current
+    void (async () => {
+      cancelRef.current.cancelled = true
+      const gen = ++generationRef.current
+      cancelRef.current = createCancelFlag()
+      activeIdentityRef.current = null
+      const seedIdentity = makeRunIdentity({
+        generation: gen,
+        algoId: id,
+        inputSnapshot: null,
+        inputRevision: inputRevisionRef.current,
+      })
+      setRunning(true)
+      setRunLabel('running')
+      try {
+        await yieldToEventLoop()
+        if (generationRef.current !== gen) return
+        const ok = await executeOnce(seekTo, { identity: seedIdentity })
+        if (generationRef.current !== gen) return
+        if (cancelRef.current.cancelled) {
+          setRunLabel('cancelled')
+          setErrors([{ field: 'run', reason: '已取消' }])
+          return
+        }
+        if (ok !== false) setRunLabel('idle')
+      } finally {
+        if (generationRef.current === gen) {
+          setRunning(false)
+          setRunLabel((lab) => (lab === 'running' ? 'idle' : lab))
+        }
+      }
+    })()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional after scene draft restore
   }, [draft.graph, id])
 
+  // Unmount: invalidate so late resolve/reject/finally cannot write
+  useEffect(() => {
+    return () => {
+      invalidateActiveRun('unmount')
+    }
+  }, [invalidateActiveRun])
+
   const onRestoreDefaults = () => {
+    inputRevisionRef.current += 1
     setDraft(defaultDraft(id ?? ''))
     setErrors([])
     setSceneWarn(null)
@@ -681,22 +879,32 @@ export default function AlgoPage() {
 
   const onRun = () => {
     void (async () => {
-      const token = ++activeRunToken.current
+      // Replace-run: cancel prior work and bump generation so old identities fail stillCurrent
+      cancelRef.current.cancelled = true
+      const gen = ++generationRef.current
       cancelRef.current = createCancelFlag()
+      activeIdentityRef.current = null
+      const algoIdAtStart = id
+      if (!algoIdAtStart) return
+      const seedIdentity = makeRunIdentity({
+        generation: gen,
+        algoId: algoIdAtStart,
+        inputSnapshot: null,
+        inputRevision: inputRevisionRef.current,
+      })
       setRunning(true)
       setRunLabel('running')
       try {
         await yieldToEventLoop()
-        if (cancelRef.current.cancelled || token !== activeRunToken.current) {
-          if (token === activeRunToken.current) {
+        if (generationRef.current !== gen || cancelRef.current.cancelled) {
+          if (generationRef.current === gen) {
             setRunLabel('cancelled')
             setErrors([{ field: 'run', reason: '已取消' }])
           }
           return
         }
-        const ok = await executeOnce(0)
-        // Heavy path: if still running flag and sync finished, mark truncated from errors
-        if (token !== activeRunToken.current) return // stale — no write-back
+        const ok = await executeOnce(0, { identity: seedIdentity })
+        if (generationRef.current !== gen) return
         if (cancelRef.current.cancelled) {
           setRunLabel('cancelled')
           setErrors([{ field: 'run', reason: '已取消' }])
@@ -704,11 +912,11 @@ export default function AlgoPage() {
         }
         if (ok === false) {
           /* validation errors already set */
-        } else {
+        } else if (generationRef.current === gen) {
           setRunLabel('idle')
         }
       } finally {
-        if (token === activeRunToken.current) {
+        if (generationRef.current === gen) {
           setRunning(false)
           setRunLabel((lab) => (lab === 'running' ? 'idle' : lab))
         }
@@ -718,6 +926,7 @@ export default function AlgoPage() {
 
   const onCancel = () => {
     cancelRef.current.cancelled = true
+    // Keep identity so UI can show cancelled for *this* run; do not bump generation
     setRunLabel('cancelled')
   }
 

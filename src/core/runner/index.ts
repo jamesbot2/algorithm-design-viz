@@ -5,3 +5,19 @@ export { runAlgoAsync, yieldToEventLoop } from './asyncRun'
 export type { RunAlgoAsyncOptions, AsyncRunMeta } from './asyncRun'
 
 export { runHeavyPreferWorker, runHeavyCancelable, createHeavyWorker } from './runHeavy'
+
+export {
+  makeRunIdentity,
+  isRunCurrent,
+  isDraftDirtyVersusSnapshot,
+  createRunIdString,
+  type RunIdentity,
+  type ActiveRunSlot,
+} from './runIdentity'
+export {
+  installSolveBarrier,
+  clearSolveBarrier,
+  maybeAwaitSolveBarrier,
+  createDeferred,
+  type SolveBarrierContext,
+} from './solveBarrier'

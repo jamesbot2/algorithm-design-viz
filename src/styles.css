@@ -1673,10 +1673,7 @@ html, body, #root {
   flex: 0 0 auto;
 }
 
-/* Narrow workbench tabs (UI-03) */
-.workbench-layout[data-layout="tabs"] .workbench-panels {
-  display: none;
-}
+/* Narrow workbench tabs (UI-03 / V7-R4): SAME panel tree, visibility only — no remount */
 .workbench-tabs {
   display: none;
   gap: 0.35rem;
@@ -1686,21 +1683,35 @@ html, body, #root {
   display: flex;
   flex-wrap: wrap;
 }
-.workbench-tab-panels {
-  display: none;
+.workbench-layout[data-layout="tabs"] .workbench-panels-stable {
   flex: 1 1 auto;
   min-height: 280px;
-  min-width: 0;
 }
-.workbench-layout[data-layout="tabs"] .workbench-tab-panels {
-  display: flex;
-  flex-direction: column;
+.workbench-layout[data-layout="tabs"] .workbench-resize {
+  display: none !important;
 }
-.workbench-tab-panel {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
+.workbench-layout[data-layout="tabs"] .workbench-viz-panel[data-tab-active="0"],
+.workbench-layout[data-layout="tabs"] .workbench-code-panel[data-tab-active="0"],
+.workbench-layout[data-layout="tabs"] .workbench-inspector-panel[data-tab-active="0"] {
+  /* Panel chrome stays mounted; inner uses hidden attribute */
+  flex-grow: 0 !important;
+  flex-basis: 0 !important;
+  min-width: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  border: none !important;
 }
+.workbench-layout[data-layout="tabs"] .workbench-viz-panel[data-tab-active="1"],
+.workbench-layout[data-layout="tabs"] .workbench-code-panel[data-tab-active="1"],
+.workbench-layout[data-layout="tabs"] .workbench-inspector-panel[data-tab-active="1"] {
+  flex-grow: 1 !important;
+  flex-basis: 100% !important;
+  min-width: 100% !important;
+  width: 100% !important;
+}
+.workbench-tab-panels { display: none; } /* legacy unused */
+.workbench-tab-panel { display: none; }
 
 
 /* UI-07: desktop collapse vs mobile drawer */
