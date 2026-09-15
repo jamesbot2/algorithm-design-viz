@@ -81,6 +81,26 @@
 | M4-ux | 交互抛光 | 已验证 | 非法输入 shake+红边；上一轮结果徽章；Vars 强调；memo 视图；投影密度 |
 | M5-docs | 动画文档 | 已验证 | docs/V2_ANIMATION.md；本表与 VERIFICATION 已更新 |
 
+
+
+## V3 Workbench / Credible playback
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| A1 | 光标反馈暂停修复 | 已验证 | Visualizer 拥有 idx/playing；`seekCommand` 仅外部 seek；`onStepIndexChange` 只通知；`tests/dom/playback-no-autopause` happy-dom |
+| A2 | VarsPanel 不 remount | 已验证 | 去掉 vars-flashKey；与相邻步 diff，仅变更 chip 闪烁 |
+| A3 | 显式 arrayOps | 已验证 | Step.arrayOps；bubble/insertion/quick/merge 发真实 ops；禁止 highlights≥2 推断 swap；稳定 elementIds |
+| A4 | RunSnapshot 场景 | 已验证 | 不可变 RunSnapshot；分享=快照+cursor；脏横幅；cursor 不写 draft.graph |
+| A5 | 阶段轴+键盘 | 已验证 | phase 段而非每 compare；快捷键不抢输入/按钮/滑块/CM/分隔条；最终结果折叠面板 |
+| B1 | Dijkstra 代码目录 | 已验证 | `src/codeCatalog/dijkstra`：完整 TS、伪代码、anchors、SourceRange(1-based)、sourceHash；steps 发 codeRefs |
+| B2 | CodeBrowser | 已验证 | @uiw/react-codemirror；只读、gutter 执行箭头、高亮、搜索、复制、字号、跟随执行 |
+| B3 | Dijkstra AlgoPage 接线 | 已验证 | 运行后 viz∥code；cursor 同步图/变量/代码箭头 |
+| C1 | WorkbenchLayout | 已验证 | react-resizable-panels；~55/45；桌面主题/动效/焦点控件；AlgoPage+KnapsackUnit |
+| C2 | Lab theme tokens | 进行中 | data-lab-theme 渐进迁移；语义色保留 |
+| D | 更多目录/抛光 | 未开始 | 见 V3_WORKBENCH.md |
+| E | E2E / 远程 CI | 未开始 | **未 push** |
+
+验证：本地 `npm run test:run`（99）+ `npm run build` 绿。详见 `docs/V3_WORKBENCH.md`、`docs/CODE_COVERAGE_MATRIX.md`。
+
 ## 拓展（规划，非本轮）
 | 项 | 状态 | 备注 |
 |----|------|------|

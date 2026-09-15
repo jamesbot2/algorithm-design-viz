@@ -175,6 +175,18 @@ export default function Layout() {
           </button>
           <span className="topbar-title">{title}</span>
           <span className="spacer" style={{ flex: 1 }} />
+          <label className="topbar-motion desktop-only-controls" title="Lab 主题">
+            <span className="muted" style={{ fontSize: '0.72rem', marginRight: 4 }}>主题</span>
+            <select
+              aria-label="主题"
+              defaultValue="legacy"
+              onChange={(e) => document.documentElement.setAttribute('data-lab-theme', e.target.value)}
+            >
+              <option value="legacy">经典</option>
+              <option value="lab-dark">Lab 深色</option>
+              <option value="lab-light">Lab 浅色</option>
+            </select>
+          </label>
           <label className="topbar-motion" title="动画模式：跟随系统 / 减弱 / 标准">
             <span className="muted" style={{ fontSize: '0.72rem', marginRight: 4 }}>动效</span>
             <select

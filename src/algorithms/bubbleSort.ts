@@ -1,4 +1,4 @@
-import type { HighlightRole, Step } from '../types/step'
+import type { ArrayOp, HighlightRole, Step } from '../types/step'
 
 export const meta = {
   id: 'bubbleSort',
@@ -11,7 +11,7 @@ export const meta = {
       swap(a[j], a[j+1])`,
 
   implName: 'bubbleSortAdjacent',
-  implVersion: '1.0.1',
+  implVersion: '1.0.2',
   timeComplexity: '最坏/平均 O(n²)，最好 O(n)（本实现无提前退出则为 O(n²)）',
   spaceComplexity: 'O(1)',
   spaceNotes: '原地交换。',
@@ -21,6 +21,7 @@ export const meta = {
 
 export function generateSteps(input: number[]): Step[] {
   const a = [...input]
+  const elementIds = input.map((_, i) => `b${i}`)
   const steps: Step[] = []
   let id = 0
   let comparisons = 0
@@ -33,6 +34,8 @@ export function generateSteps(input: number[]): Step[] {
     codeLine?: number,
     roles?: Record<number, HighlightRole>,
     pointers?: Record<string, number>,
+    arrayOps?: ArrayOp[],
+    phase?: string,
   ): void => {
     const sortedRoles: Record<number, HighlightRole> = { ...(roles ?? {}) }
     const iVar = typeof vars.i === 'number' ? vars.i : -1
@@ -44,9 +47,12 @@ export function generateSteps(input: number[]): Step[] {
     steps.push({
       id: id++,
       message,
+      phase,
       highlights: { a: highlights },
       roles: Object.keys(sortedRoles).length ? { a: sortedRoles } : undefined,
       arrays: { a: [...a] },
+      elementIds: { a: [...elementIds] },
+      arrayOps: arrayOps?.length ? { a: arrayOps } : undefined,
       vars: { n: a.length, ...vars },
       pointers: pointers ?? (typeof vars.i === 'number' || typeof vars.j === 'number'
         ? {
@@ -59,10 +65,10 @@ export function generateSteps(input: number[]): Step[] {
     })
   }
 
-  snap('开始冒泡排序', [], { i: null, j: null }, 0)
+  snap('开始冒泡排序', [], { i: null, j: null }, 0, undefined, undefined, undefined, 'init')
   const n = a.length
   for (let i = 0; i < n - 1; i++) {
-    snap(`外层循环 i = ${i}，已排好区间 [${n - i}, ${n - 1}]`, [], { i, j: null }, 1, undefined, { i })
+    snap(`外层循环 i = ${i}，已排好区间 [${n - i}, ${n - 1}]`, [], { i, j: null }, 1, undefined, { i }, undefined, 'outer')
     for (let j = 0; j < n - 1 - i; j++) {
       comparisons++
       snap(
@@ -72,9 +78,12 @@ export function generateSteps(input: number[]): Step[] {
         2,
         { [j]: 'compare', [j + 1]: 'compare' },
         { i, j },
+        [{ type: 'compare', indices: [j, j + 1], elementIds: [elementIds[j]!, elementIds[j + 1]!] }],
+        'compare',
       )
-      if (a[j] > a[j + 1]) {
-        ;[a[j], a[j + 1]] = [a[j + 1], a[j]]
+      if (a[j]! > a[j + 1]!) {
+        ;[a[j], a[j + 1]] = [a[j + 1]!, a[j]!]
+        ;[elementIds[j], elementIds[j + 1]] = [elementIds[j + 1]!, elementIds[j]!]
         swaps++
         snap(
           `交换：a[${j}] ↔ a[${j + 1}]`,
@@ -83,6 +92,8 @@ export function generateSteps(input: number[]): Step[] {
           3,
           { [j]: 'swap', [j + 1]: 'swap' },
           { i, j },
+          [{ type: 'swap', indices: [j, j + 1], elementIds: [elementIds[j]!, elementIds[j + 1]!] }],
+          'swap',
         )
       } else {
         snap(
@@ -92,12 +103,14 @@ export function generateSteps(input: number[]): Step[] {
           2,
           { [j]: 'compare', [j + 1]: 'compare' },
           { i, j },
+          [{ type: 'compare', indices: [j, j + 1], elementIds: [elementIds[j]!, elementIds[j + 1]!] }],
+          'compare',
         )
       }
     }
   }
   const allSorted: Record<number, HighlightRole> = {}
   for (let s = 0; s < n; s++) allSorted[s] = 'sorted'
-  snap('排序完成', [], { i: null, j: null }, 0, allSorted)
+  snap('排序完成', [], { i: null, j: null }, 0, allSorted, undefined, undefined, 'done')
   return steps
 }

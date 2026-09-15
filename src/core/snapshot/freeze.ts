@@ -75,6 +75,24 @@ export function copyStepArrays(step: Step): Step {
       ? Object.fromEntries(Object.entries(step.roles).map(([k, v]) => [k, { ...v }]))
       : undefined,
     stats: step.stats ? { ...step.stats } : undefined,
+    arrayOps: step.arrayOps
+      ? Object.fromEntries(
+          Object.entries(step.arrayOps).map(([k, ops]) => [
+            k,
+            ops.map((o) => ({
+              ...o,
+              indices: [...o.indices],
+              elementIds: o.elementIds ? [...o.elementIds] : undefined,
+            })),
+          ]),
+        )
+      : undefined,
+    elementIds: step.elementIds
+      ? Object.fromEntries(Object.entries(step.elementIds).map(([k, v]) => [k, [...v]]))
+      : undefined,
+    codeRefs: step.codeRefs
+      ? step.codeRefs.map((r) => ({ ...r }))
+      : undefined,
   }
 }
 

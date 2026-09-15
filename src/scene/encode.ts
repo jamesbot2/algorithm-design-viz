@@ -43,6 +43,9 @@ export function validateScene(raw: unknown):
       params: r.params,
       seed: r.seed,
       stepIndex: typeof r.stepIndex === 'number' ? r.stepIndex : 0,
+      runSnapshot: r.runSnapshot,
+      sourceHash: typeof r.sourceHash === 'string' ? r.sourceHash : undefined,
+      draftOnly: r.draftOnly === true,
     },
     versionMismatch: false,
   }

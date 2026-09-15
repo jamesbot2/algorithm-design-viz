@@ -1,4 +1,4 @@
-import type { HighlightRole, Step } from '../types/step'
+import type { ArrayOp, HighlightRole, Step } from '../types/step'
 
 export const meta = {
   id: 'quickSort',
@@ -11,7 +11,7 @@ export const meta = {
   quickSort(a, L, p-1)
   quickSort(a, p+1, R)`,
   implName: 'quickSortLomuto',
-  implVersion: '1.1.0',
+  implVersion: '1.1.1',
   timeComplexity: '平均 O(n log n)，最坏 O(n²)',
   spaceComplexity: '平均 O(log n) 递归栈，最坏 O(n)；非整体 O(1)',
   spaceNotes: '数组原地；额外空间主要来自递归调用栈，不可标为整体 O(1)。',
@@ -21,6 +21,7 @@ export const meta = {
 
 export function generateSteps(input: number[]): Step[] {
   const a = [...input]
+  const elementIds = input.map((_, i) => `q${i}`)
   const steps: Step[] = []
   let id = 0
   let comparisons = 0
@@ -33,6 +34,8 @@ export function generateSteps(input: number[]): Step[] {
     codeLine?: number,
     roles?: Record<number, HighlightRole>,
     pointers?: Record<string, number>,
+    arrayOps?: ArrayOp[],
+    phase?: string,
   ) => {
     const ptrs: Record<string, number> = { ...(pointers ?? {}) }
     for (const k of ['L', 'R', 'i', 'j', 'p', 'mid'] as const) {
@@ -43,9 +46,12 @@ export function generateSteps(input: number[]): Step[] {
     steps.push({
       id: id++,
       message,
+      phase,
       highlights: { a: highlights },
       roles: roles ? { a: roles } : undefined,
       arrays: { a: [...a] },
+      elementIds: { a: [...elementIds] },
+      arrayOps: arrayOps?.length ? { a: arrayOps } : undefined,
       vars,
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
       stats: { comparisons, swaps },
@@ -53,8 +59,13 @@ export function generateSteps(input: number[]): Step[] {
     })
   }
 
+  function swapAt(i: number, j: number) {
+    ;[a[i], a[j]] = [a[j]!, a[i]!]
+    ;[elementIds[i], elementIds[j]] = [elementIds[j]!, elementIds[i]!]
+  }
+
   function partition(L: number, R: number): number {
-    const pivot = a[R]
+    const pivot = a[R]!
     snap(
       `选取枢轴 pivot = a[${R}] = ${pivot}`,
       [R],
@@ -62,6 +73,8 @@ export function generateSteps(input: number[]): Step[] {
       2,
       { [R]: 'pivot' },
       { L, R },
+      [{ type: 'compare', indices: [R], elementIds: [elementIds[R]!] }],
+      'partition',
     )
     let i = L - 1
     for (let j = L; j < R; j++) {
@@ -73,10 +86,12 @@ export function generateSteps(input: number[]): Step[] {
         2,
         { [j]: 'compare', [R]: 'pivot' },
         { L, R, ...(i >= 0 ? { i } : {}), j },
+        [{ type: 'compare', indices: [j, R], elementIds: [elementIds[j]!, elementIds[R]!] }],
+        'partition',
       )
-      if (a[j] <= pivot) {
+      if (a[j]! <= pivot) {
         i++
-        ;[a[i], a[j]] = [a[j], a[i]]
+        swapAt(i, j)
         swaps++
         snap(
           `a[${j}] ≤ pivot，交换 a[${i}] ↔ a[${j}]`,
@@ -85,10 +100,12 @@ export function generateSteps(input: number[]): Step[] {
           2,
           { [i]: 'swap', [j]: 'swap', [R]: 'pivot' },
           { L, R, i, j },
+          [{ type: 'swap', indices: [i, j], elementIds: [elementIds[i]!, elementIds[j]!] }],
+          'partition',
         )
       }
     }
-    ;[a[i + 1], a[R]] = [a[R], a[i + 1]]
+    swapAt(i + 1, R)
     swaps++
     const p = i + 1
     snap(
@@ -98,13 +115,15 @@ export function generateSteps(input: number[]): Step[] {
       2,
       { [p]: 'pivot' },
       { L, R, p },
+      [{ type: 'swap', indices: [p, R], elementIds: [elementIds[p]!, elementIds[R]!] }],
+      'partition',
     )
     return p
   }
 
   function sort(L: number, R: number) {
     if (L >= R) {
-      snap(`区间 [${L},${R}] 无需划分`, L === R ? [L] : [], { L, R }, 1, L === R ? { [L]: 'sorted' } : undefined, { L, R })
+      snap(`区间 [${L},${R}] 无需划分`, L === R ? [L] : [], { L, R }, 1, L === R ? { [L]: 'sorted' } : undefined, { L, R }, undefined, 'recurse')
       return
     }
     snap(
@@ -114,16 +133,18 @@ export function generateSteps(input: number[]): Step[] {
       2,
       undefined,
       { L, R },
+      undefined,
+      'recurse',
     )
     const p = partition(L, R)
     sort(L, p - 1)
     sort(p + 1, R)
   }
 
-  snap('开始快速排序', [], {}, 0)
+  snap('开始快速排序', [], {}, 0, undefined, undefined, undefined, 'init')
   sort(0, a.length - 1)
   const allSorted: Record<number, HighlightRole> = {}
   for (let s = 0; s < a.length; s++) allSorted[s] = 'sorted'
-  snap('排序完成', [], {}, 0, allSorted)
+  snap('排序完成', [], {}, 0, allSorted, undefined, undefined, 'done')
   return steps
 }

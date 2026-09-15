@@ -1,32 +1,34 @@
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useMemo } from 'react'
 import type { Step } from '../types/step'
 
-function VarsPanel({ step }: { step: Step }) {
+function serialize(v: string | number | boolean | null | undefined): string {
+  if (v === null || v === undefined) return 'null'
+  return String(v)
+}
+
+/** Diff vars from adjacent step; flash only changed chips. No ancestor remount. */
+function VarsPanel({ step, prevStep }: { step: Step; prevStep?: Step }) {
   const vars = step.vars ?? {}
   const entries = Object.entries(vars)
-  const prevRef = useRef<Record<string, string>>({})
-  const [flash, setFlash] = useState<Set<string>>(new Set())
 
-  useEffect(() => {
-    const next: Record<string, string> = {}
-    const changed = new Set<string>()
-    for (const [k, v] of Object.entries(vars)) {
-      const s = v === null || v === undefined ? 'null' : String(v)
-      next[k] = s
-      if (prevRef.current[k] !== undefined && prevRef.current[k] !== s) {
-        changed.add(k)
-      }
+  const changed = useMemo(() => {
+    const prev = prevStep?.vars ?? {}
+    const set = new Set<string>()
+    for (const [k, v] of Object.entries(step.vars ?? {})) {
+      if (serialize(prev[k]) !== serialize(v)) set.add(k)
     }
-    // Detect removed keys softly — no thrash for identical snapshots
-    prevRef.current = next
-    if (changed.size === 0) return
-    setFlash(changed)
-    const t = window.setTimeout(() => setFlash(new Set()), 480)
-    return () => window.clearTimeout(t)
-  }, [vars, step.id])
+    return set
+  }, [step.vars, step.id, prevStep?.vars, prevStep?.id])
+
+  // Separate current-step vars from terminal result (final answer lives elsewhere)
+  const hasInlineResult =
+    step.result !== undefined &&
+    step.result !== null &&
+    step.phase !== 'done' &&
+    !step.message?.includes('完成')
 
   return (
-    <div className="vars-panel">
+    <div className="vars-panel" data-testid="vars-panel">
       <div className="panel-title">变量</div>
       {entries.length === 0 ? (
         <div className="vars-empty">暂无变量</div>
@@ -35,18 +37,19 @@ function VarsPanel({ step }: { step: Step }) {
           {entries.map(([k, v]) => (
             <div
               key={k}
-              className={`var-chip${flash.has(k) ? ' flash' : ''}`}
-              data-changed={flash.has(k) ? '1' : undefined}
+              className={`var-chip${changed.has(k) ? ' flash' : ''}`}
+              data-changed={changed.has(k) ? '1' : undefined}
+              data-var={k}
             >
               <span className="var-key">{k}</span>
-              <span className="var-val">{v === null || v === undefined ? 'null' : String(v)}</span>
+              <span className="var-val">{serialize(v)}</span>
             </div>
           ))}
         </div>
       )}
-      {step.result !== undefined && step.result !== null && (
+      {hasInlineResult && (
         <div className="result-panel-enter" style={{ marginTop: '0.65rem' }}>
-          <div className="panel-title">结果快照</div>
+          <div className="panel-title">中间结果</div>
           <pre className="result-snap muted" style={{ fontSize: '0.72rem', margin: 0, whiteSpace: 'pre-wrap' }}>
             {typeof step.result === 'object'
               ? JSON.stringify(step.result, null, 0).slice(0, 280)

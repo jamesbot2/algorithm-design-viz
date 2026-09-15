@@ -23,6 +23,11 @@ import { defaultDraftFor } from '../core/graph/presets'
 import { algoGraphOptions, edgesToAdj, edgesToFloydMatrix, validateGraphDraft } from '../core/graph/validate'
 import { loadSceneFromHash, sceneToHashFragment } from '../scene/encode'
 import { SCENE_PROTOCOL_VERSION } from '../scene/types'
+import { createRunId, freezeRunSnapshot, type RunSnapshot } from '../core/runSnapshot'
+import type { SeekCommand } from '../components/Visualizer'
+import WorkbenchLayout from '../components/workbench/WorkbenchLayout'
+import CodeBrowser from '../components/codeBrowser/CodeBrowser'
+import { getDijkstraCatalog } from '../codeCatalog'
 
 const DEFAULT_ARRAY = [5, 2, 8, 1, 9, 3, 7]
 
@@ -94,17 +99,24 @@ export default function AlgoPage() {
   const [steps, setSteps] = useState<Step[]>([])
   const [trace, setTrace] = useState<Trace | undefined>(undefined)
   const [runId, setRunId] = useState(0)
+  const [runSnapshot, setRunSnapshot] = useState<RunSnapshot | null>(null)
   const [playbackKey, setPlaybackKey] = useState(0)
   const [hasRun, setHasRun] = useState(false)
   const [sceneWarn, setSceneWarn] = useState<string | null>(null)
-  const [seekStepIndex, setSeekStepIndex] = useState(0)
+  /** Notify-only cursor from Visualizer — must NOT feed seekCommand */
+  const [cursorIndex, setCursorIndex] = useState(0)
+  const [seekCommand, setSeekCommand] = useState<SeekCommand | null>(null)
+  const seekReqRef = useRef(0)
   const [staleResult, setStaleResult] = useState(false)
   const [shakeKey, setShakeKey] = useState(0)
+  const [draftDirty, setDraftDirty] = useState(false)
   const cancelRef = useRef(createCancelFlag())
   const pendingAutoRun = useRef(false)
+  const pendingSeek = useRef(0)
 
   const patch = useCallback((partial: Partial<DraftState>) => {
     setDraft((d) => ({ ...d, ...partial }))
+    setDraftDirty(true)
   }, [])
 
   /** Validate draft once → registry input. Steps generated at most once in executeOnce. */
@@ -413,20 +425,36 @@ export default function AlgoPage() {
       setSteps(outSteps)
       setTrace(outTrace)
       const clamped = Math.max(0, Math.min(seekTo, Math.max(0, outSteps.length - 1)))
-      setSeekStepIndex(clamped)
-      setRunId((r) => r + 1)
+      const nextRunNumeric = runId + 1
+      const snap = freezeRunSnapshot({
+        algoId: id!,
+        version: SCENE_PROTOCOL_VERSION,
+        input: isGraphAlgo(id)
+          ? structuredClone(draft.graph)
+          : structuredClone(built.registryInput),
+        params: { mode: draft.mode },
+        seed: 0,
+        runId: createRunId(),
+      })
+      setRunSnapshot(snap)
+      setRunId(nextRunNumeric)
+      setDraftDirty(false)
+      setCursorIndex(clamped)
+      seekReqRef.current += 1
+      setSeekCommand({ requestId: seekReqRef.current, target: clamped })
       setPlaybackKey((k) => k + 1)
       setHasRun(true)
 
-      // Persist scene (incl. stepIndex) for graph algos when small enough
-      if (isGraphAlgo(id) && draft.graph) {
+      // Persist scene from RunSnapshot + cursor — never live draft on cursor change
+      if (isGraphAlgo(id) && snap.input) {
         const frag = sceneToHashFragment({
           version: SCENE_PROTOCOL_VERSION,
           algoId: id,
-          input: draft.graph,
-          params: { mode: draft.mode },
-          seed: 0,
+          input: snap.input,
+          params: snap.params,
+          seed: snap.seed,
           stepIndex: clamped,
+          runSnapshot: { ...snap },
         })
         if (frag && frag.length < 1800) {
           const base = window.location.hash.split('?')[0] || `#/algo/${id}`
@@ -435,7 +463,7 @@ export default function AlgoPage() {
       }
       return true
     },
-    [validateAndBuild, id, draft, hasRun, steps.length],
+    [validateAndBuild, id, draft, hasRun, steps.length, runId],
   )
 
   useEffect(() => {
@@ -446,9 +474,13 @@ export default function AlgoPage() {
     setHasRun(false)
     setPlaybackKey((k) => k + 1)
     setSceneWarn(null)
-    setSeekStepIndex(0)
+    setCursorIndex(0)
+    setSeekCommand(null)
+    setRunSnapshot(null)
+    setDraftDirty(false)
     setStaleResult(false)
     pendingAutoRun.current = false
+    pendingSeek.current = 0
 
     const loaded = loadSceneFromHash(window.location.hash)
     if (!loaded.ok) {
@@ -473,7 +505,7 @@ export default function AlgoPage() {
           },
           mode: loaded.scene.params?.mode === 'experiment' ? 'experiment' : 'teach',
         }))
-        setSeekStepIndex(loaded.scene.stepIndex ?? 0)
+        pendingSeek.current = loaded.scene.stepIndex ?? 0
         pendingAutoRun.current = true
       } else {
         setSceneWarn('场景 input 结构非法：缺少 n/edges')
@@ -486,7 +518,7 @@ export default function AlgoPage() {
     if (!pendingAutoRun.current) return
     if (!id || !algo) return
     pendingAutoRun.current = false
-    executeOnce(seekStepIndex)
+    executeOnce(pendingSeek.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional after scene draft restore
   }, [draft.graph, id])
 
@@ -505,21 +537,24 @@ export default function AlgoPage() {
   }
 
   const onResetPlayback = () => {
-    setSeekStepIndex(0)
-    setPlaybackKey((k) => k + 1)
+    seekReqRef.current += 1
+    setSeekCommand({ requestId: seekReqRef.current, target: 0 })
+    setCursorIndex(0)
   }
 
+  /** Notify-only: update cursor + scene from snapshot — do NOT set seekCommand */
   const onStepChange = useCallback(
     (idx: number) => {
-      setSeekStepIndex(idx)
-      if (isGraphAlgo(id) && draft.graph && hasRun) {
+      setCursorIndex(idx)
+      if (isGraphAlgo(id) && runSnapshot && hasRun) {
         const frag = sceneToHashFragment({
           version: SCENE_PROTOCOL_VERSION,
           algoId: id!,
-          input: draft.graph,
-          params: { mode: draft.mode },
-          seed: 0,
+          input: runSnapshot.input,
+          params: runSnapshot.params,
+          seed: runSnapshot.seed,
           stepIndex: idx,
+          runSnapshot: { ...runSnapshot },
         })
         if (frag && frag.length < 1800) {
           const base = window.location.hash.split('?')[0] || `#/algo/${id}`
@@ -527,7 +562,7 @@ export default function AlgoPage() {
         }
       }
     },
-    [id, draft.graph, draft.mode, hasRun],
+    [id, runSnapshot, hasRun],
   )
 
   const metaExtras = useMemo(() => {
@@ -735,29 +770,69 @@ export default function AlgoPage() {
         </div>
         {hasRun && (
           <p className="hint muted">
-            当前运行 #{runId}（已快照输入）· 模式 {draft.mode} · stepIndex={seekStepIndex}
+            当前运行 #{runId}（RunSnapshot {runSnapshot?.runId ?? '—'}）· 模式 {draft.mode} · cursor={cursorIndex}
+            {draftDirty && ' · 草稿已改，显示上一轮运行'}
+          </p>
+        )}
+        {hasRun && draftDirty && (
+          <p className="dirty-banner" role="status">
+            输入已编辑，正在显示<strong>上一轮运行</strong>的轨迹。点击「运行」以新快照重算。
           </p>
         )}
       </div>
 
       {hasRun ? (
-        <>
-          {isGraphAlgo(id) && (
-            <div className={`result-panel-enter${staleResult ? ' is-stale' : ''}`}>
-              {staleResult && <span className="stale-result-badge">上一轮结果</span>}
-              <GraphResultPanel algoId={id} steps={steps} />
-            </div>
-          )}
-          <Visualizer
-            key={playbackKey}
-            steps={steps}
-            trace={trace}
-            code={algo.meta.code as string | undefined}
-            initialStepIndex={seekStepIndex}
-            onStepIndexChange={onStepChange}
-            staleResult={staleResult}
-          />
-        </>
+        <WorkbenchLayout
+          title={algo.meta.title}
+          inputSummary={
+            draftDirty
+              ? '草稿已改 · 显示上一轮运行'
+              : `run #${runId} · cursor ${cursorIndex + 1}/${Math.max(steps.length, 1)}`
+          }
+          viz={
+            <>
+              {isGraphAlgo(id) && (
+                <div className={`result-panel-enter${staleResult ? ' is-stale' : ''}`}>
+                  {staleResult && <span className="stale-result-badge">上一轮结果</span>}
+                  <GraphResultPanel algoId={id} steps={steps} />
+                </div>
+              )}
+              <Visualizer
+                key={playbackKey}
+                steps={steps}
+                trace={trace}
+                seekCommand={seekCommand}
+                runId={runSnapshot?.runId ?? runId}
+                onStepIndexChange={onStepChange}
+                staleResult={staleResult || draftDirty}
+                finalAnswer={
+                  steps.length ? (
+                    <pre style={{ margin: 0, fontSize: '0.8rem' }}>
+                      {JSON.stringify(steps[steps.length - 1]?.result ?? steps[steps.length - 1]?.vars, null, 2)?.slice(0, 600)}
+                    </pre>
+                  ) : null
+                }
+              />
+            </>
+          }
+          code={
+            id === 'dijkstra' ? (
+              <CodeBrowser
+                document={getDijkstraCatalog().typescript}
+                execAnchorId={
+                  steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase
+                }
+                activeLine={steps[cursorIndex]?.codeLine}
+                pseudocode={getDijkstraCatalog().pseudocode.source}
+              />
+            ) : (
+              <div className="code-stub muted">
+                <div className="panel-title">参考代码</div>
+                <pre className="code-pre">{(algo.meta.code as string) || '（暂无目录文档）'}</pre>
+              </div>
+            )
+          }
+        />
       ) : (
         <div className="viz-empty">调整输入后点击「运行」开始可视化。</div>
       )}

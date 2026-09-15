@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { EdgeRole, HighlightRole, Step } from '../types/step'
 import type { Trace } from '../core/trace/types'
 import { ArraysFromStep } from './ArrayView'
@@ -11,15 +11,25 @@ import { SEMANTIC_ROLE_LABELS } from '../theme/semanticColors'
 import { motionCssVars, speedFeelMultiplier } from '../theme/motion'
 import { useMotion } from '../theme/MotionContext'
 
+/** Parent sends this only on scene load / new run / explicit external seek — never from onStepIndexChange. */
+export type SeekCommand = { requestId: number | string; target: number }
+
 interface Props {
   steps?: Step[]
   trace?: Trace
   code?: string
-  /** Seek to this step on mount / when steps identity changes */
+  /** @deprecated Prefer seekCommand; kept for one-shot mount only */
   initialStepIndex?: number
+  /** Explicit seek — Visualizer owns idx/playing; parent must not mirror cursor back here */
+  seekCommand?: SeekCommand | null
+  /** New runId/traceId resets player once (idx=0, playing=false) */
+  runId?: string | number
   onStepIndexChange?: (index: number) => void
-  /** When true, show「上一轮结果」badge (stale after failed re-run) */
   staleResult?: boolean
+  /** Optional interactive code browser slot (Phase B) */
+  codeSlot?: ReactNode
+  /** Final-answer panel content (collapsed by default) */
+  finalAnswer?: ReactNode
 }
 
 type LegendRole = HighlightRole | EdgeRole | 'frontier' | 'settled' | 'pruned' | 'optimal' | 'error'
@@ -59,13 +69,17 @@ function collectUsedRoles(steps: Step[]): Set<LegendRole> {
         for (const r of Object.values(map)) used.add(r)
       }
     }
-    if (s.highlights) {
-      for (const idxs of Object.values(s.highlights)) {
-        if (idxs.length) {
-          used.add('compare')
-          if (idxs.length > 1) used.add('swap')
-          if (idxs.length > 2) used.add('focus')
+    if (s.arrayOps) {
+      for (const ops of Object.values(s.arrayOps)) {
+        for (const op of ops) {
+          if (op.type === 'compare') used.add('compare')
+          else if (op.type === 'swap') used.add('swap')
+          else used.add('update')
         }
+      }
+    } else if (s.highlights) {
+      for (const idxs of Object.values(s.highlights)) {
+        if (idxs.length) used.add('compare')
       }
     }
     if (s.matrixTargets) {
@@ -101,15 +115,20 @@ function collectUsedRoles(steps: Step[]): Set<LegendRole> {
   return used
 }
 
-function phaseMarkers(steps: Step[]): { index: number; phase: string }[] {
-  const out: { index: number; phase: string }[] = []
-  let last = ''
+/** Collapse consecutive identical phases into segments (not a marker per compare). */
+function phaseSegments(steps: Step[]): { start: number; end: number; phase: string }[] {
+  const out: { start: number; end: number; phase: string }[] = []
+  let cur: { start: number; end: number; phase: string } | null = null
   steps.forEach((s, i) => {
-    if (s.phase && s.phase !== last) {
-      out.push({ index: i, phase: s.phase })
-      last = s.phase
+    if (!s.phase) return
+    if (cur && cur.phase === s.phase) {
+      cur.end = i
+    } else {
+      if (cur) out.push(cur)
+      cur = { start: i, end: i, phase: s.phase }
     }
   })
+  if (cur) out.push(cur)
   return out
 }
 
@@ -128,42 +147,69 @@ function computeScaleMax(steps: Step[]): Record<string, number> {
   return max
 }
 
+function shouldIgnoreKeyboard(e: KeyboardEvent): boolean {
+  const t = e.target as HTMLElement | null
+  if (!t) return false
+  if (t.isContentEditable) return true
+  const tag = t.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON') return true
+  if (
+    t.closest(
+      'input, textarea, select, button, [contenteditable="true"], [role="slider"], [role="separator"], [data-panel-resize-handle], .cm-editor, .cm-content, .code-browser, .WorkbenchLayout',
+    )
+  ) {
+    // Allow Space/arrows on the visualizer's own transport buttons via explicit handling;
+    // but do not steal from other buttons / editors / sliders / separators.
+    if (t.closest('.viz-toolbar, .scrub-row, .phase-jump, .phase-track')) return false
+    if (tag === 'BUTTON' || t.closest('button')) return true
+    if (t.closest('.cm-editor, .cm-content, .code-browser')) return true
+    if (t.closest('[role="slider"], input[type="range"]')) return true
+    if (t.closest('[role="separator"], [data-panel-resize-handle]')) return true
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true
+    if (t.isContentEditable || t.closest('[contenteditable="true"]')) return true
+  }
+  return false
+}
+
 export default function Visualizer({
   steps: stepsProp,
   trace,
   code,
   initialStepIndex = 0,
+  seekCommand = null,
+  runId,
   onStepIndexChange,
   staleResult = false,
+  codeSlot,
+  finalAnswer,
 }: Props) {
   const steps = useMemo(() => resolveSteps(stepsProp, trace), [stepsProp, trace])
   const clamp = (i: number, len: number) => Math.max(0, Math.min(i, Math.max(0, len - 1)))
   const [idx, setIdx] = useState(() => clamp(initialStepIndex, steps.length))
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(600)
-  const [flashKey, setFlashKey] = useState(0)
   const [scrubPreview, setScrubPreview] = useState<number | null>(null)
   const [playPulse, setPlayPulse] = useState(false)
+  const [answerOpen, setAnswerOpen] = useState(false)
   const timer = useRef<number | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
+  const lastSeekReq = useRef<string | number | null>(null)
+  const lastRunId = useRef<string | number | undefined>(undefined)
   const { mode } = useMotion()
 
   const step = steps[idx] ?? steps[0]
+  const prevStep = idx > 0 ? steps[idx - 1] : undefined
   const max = Math.max(0, steps.length - 1)
   const usedRoles = useMemo(() => collectUsedRoles(steps), [steps])
-  const markers = useMemo(() => phaseMarkers(steps), [steps])
+  const segments = useMemo(() => phaseSegments(steps), [steps])
   const scaleMaxByArray = useMemo(() => computeScaleMax(steps), [steps])
 
   const effectiveInterval = useMemo(() => {
-    // Speed feel: not only raw interval — compress/expand slightly via motion multiplier inverse
     const feel = speedFeelMultiplier(speed)
     return Math.max(80, Math.round(speed / Math.max(0.5, 2 - feel)))
   }, [speed])
 
-  const speedVars = useMemo(
-    () => motionCssVars(mode, speed),
-    [mode, speed],
-  )
+  const speedVars = useMemo(() => motionCssVars(mode, speed), [mode, speed])
 
   const clear = useCallback(() => {
     if (timer.current !== null) {
@@ -187,20 +233,28 @@ export default function Visualizer({
     return clear
   }, [playing, effectiveInterval, max, clear])
 
+  // New runId resets player once — does not pause on every parent re-render
   useEffect(() => {
-    const next = clamp(initialStepIndex, steps.length)
-    setIdx(next)
+    if (runId === undefined) return
+    if (lastRunId.current === runId) return
+    lastRunId.current = runId
+    setIdx(0)
     setPlaying(false)
-    setFlashKey((k) => k + 1)
-  }, [steps, initialStepIndex])
+  }, [runId])
 
+  // Explicit seek only when requestId changes
+  useEffect(() => {
+    if (!seekCommand) return
+    if (lastSeekReq.current === seekCommand.requestId) return
+    lastSeekReq.current = seekCommand.requestId
+    setIdx(clamp(seekCommand.target, steps.length))
+    setPlaying(false)
+  }, [seekCommand, steps.length])
+
+  // Notify-only — must NOT feed back into seek/init in parent
   useEffect(() => {
     onStepIndexChange?.(idx)
   }, [idx, onStepIndexChange])
-
-  useEffect(() => {
-    setFlashKey((k) => k + 1)
-  }, [idx])
 
   const goPrev = useCallback(() => {
     setPlaying(false)
@@ -225,8 +279,7 @@ export default function Visualizer({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      if (shouldIgnoreKeyboard(e)) return
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault()
         togglePlay()
@@ -263,10 +316,11 @@ export default function Visualizer({
     .sort((a, b) => a.label.localeCompare(b.label, 'zh'))
 
   const hasBoard = Boolean(step.matrices?.board)
+  const bannerKey = `${step.id}-${idx}`
 
   return (
-    <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties}>
-      <div key={`banner-${flashKey}`} className="viz-banner viz-step-flash viz-banner-enter">
+    <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties} data-playing={playing ? '1' : '0'} data-step-index={idx}>
+      <div key={`banner-${bannerKey}`} className="viz-banner viz-step-flash viz-banner-enter">
         {step.message}
         {staleResult && <span className="stale-result-badge">上一轮结果</span>}
       </div>
@@ -283,6 +337,7 @@ export default function Visualizer({
           className={`primary play-btn tactile${playing ? ' is-playing' : ''}${playPulse ? ' pulse' : ''}`}
           onClick={togglePlay}
           title="播放/暂停 (空格)"
+          data-testid="play-btn"
         >
           {playing ? '暂停' : '播放'}
         </button>
@@ -302,7 +357,7 @@ export default function Visualizer({
           />
         </label>
         <span className="spacer" />
-        <span className="step-counter">
+        <span className="step-counter" data-testid="step-counter">
           {idx + 1} / {steps.length}
           {step.phase ? ` · ${step.phase}` : ''}
         </span>
@@ -328,25 +383,30 @@ export default function Visualizer({
           onMouseUp={() => setScrubPreview(null)}
           onTouchEnd={() => setScrubPreview(null)}
           aria-label="步骤进度"
+          role="slider"
         />
         <span className="scrub-pct">{Math.round(progress)}%</span>
       </div>
-      {markers.length > 0 && (
+      {segments.length > 0 && (
         <div className="phase-track" aria-hidden>
-          {markers.map((m) => (
-            <button
-              key={`${m.phase}-${m.index}`}
-              type="button"
-              className="phase-marker"
-              style={{ left: `${max === 0 ? 0 : (m.index / max) * 100}%` }}
-              data-phase={m.phase}
-              title={m.phase}
-              onClick={() => {
-                setPlaying(false)
-                setIdx(m.index)
-              }}
-            />
-          ))}
+          {segments.map((seg) => {
+            const left = max === 0 ? 0 : (seg.start / max) * 100
+            const width = max === 0 ? 100 : ((seg.end - seg.start + 1) / max) * 100
+            return (
+              <button
+                key={`${seg.phase}-${seg.start}`}
+                type="button"
+                className="phase-segment"
+                style={{ left: `${left}%`, width: `${Math.max(width, 1.5)}%` }}
+                data-phase={seg.phase}
+                title={`${seg.phase} (#${seg.start + 1}–${seg.end + 1})`}
+                onClick={() => {
+                  setPlaying(false)
+                  setIdx(seg.start)
+                }}
+              />
+            )
+          })}
         </div>
       )}
       {previewStep && scrubPreview !== idx && (
@@ -355,20 +415,20 @@ export default function Visualizer({
         </div>
       )}
 
-      {markers.length > 0 && (
+      {segments.length > 0 && (
         <div className="phase-jump">
           <span className="muted">阶段跳转：</span>
-          {markers.map((m) => (
+          {segments.map((seg) => (
             <button
-              key={`btn-${m.phase}-${m.index}`}
+              key={`btn-${seg.phase}-${seg.start}`}
               type="button"
-              className={step.phase === m.phase && idx >= m.index ? 'active' : ''}
+              className={idx >= seg.start && idx <= seg.end ? 'active' : ''}
               onClick={() => {
                 setPlaying(false)
-                setIdx(m.index)
+                setIdx(seg.start)
               }}
             >
-              {m.phase}
+              {seg.phase}
             </button>
           ))}
         </div>
@@ -411,19 +471,32 @@ export default function Visualizer({
           {step.searchTree && (
             <SearchTreeView tree={step.searchTree} linkedBoard={hasBoard} />
           )}
-          <ArraysFromStep step={step} scaleMaxByArray={scaleMaxByArray} />
+          <ArraysFromStep step={step} prevStep={prevStep} scaleMaxByArray={scaleMaxByArray} />
           <MatrixView step={step} />
         </div>
         <div className="viz-side">
-          <div key={`vars-${flashKey}`} className="viz-vars-flash">
-            <VarsPanel step={step} />
+          {/* A2: no remount key — VarsPanel diffs adjacent steps */}
+          <div className="viz-vars-stable">
+            <VarsPanel step={step} prevStep={prevStep} />
           </div>
-          {code && <CodePanel code={code} activeLine={step.codeLine} />}
+          {codeSlot}
+          {!codeSlot && code && <CodePanel code={code} activeLine={step.codeLine} />}
         </div>
       </div>
 
+      {finalAnswer !== undefined && finalAnswer !== null && (
+        <details
+          className="final-answer-panel"
+          open={answerOpen}
+          onToggle={(e) => setAnswerOpen((e.target as HTMLDetailsElement).open)}
+        >
+          <summary>最终结果（折叠）</summary>
+          <div className="final-answer-body">{finalAnswer}</div>
+        </details>
+      )}
+
       <p className="kbd-hint">
-        快捷键：<kbd>空格</kbd> 播放/暂停 · <kbd>←</kbd> 上一步 · <kbd>→</kbd> 下一步
+        快捷键：<kbd>空格</kbd> 播放/暂停 · <kbd>←</kbd> 上一步 · <kbd>→</kbd> 下一步（输入框/按钮/滑块/编辑器内不抢键）
       </p>
     </div>
   )

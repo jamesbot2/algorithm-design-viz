@@ -1113,3 +1113,162 @@ button.icon-btn {
 }
 .hl-update { /* alias */ }
 .arrays-panel { display: flex; flex-direction: column; gap: 0.75rem; }
+
+/* —— V3 Workbench / Lab theme (gradual migration) —— */
+:root, [data-lab-theme="lab-dark"] {
+  --lab-bg: #0F1117;
+  --lab-surface: #161b22;
+  --lab-accent: #5B8DEF;
+}
+[data-lab-theme="lab-light"] {
+  --lab-bg: #F6F8FC;
+  --lab-surface: #ffffff;
+  --lab-accent: #5B8DEF;
+  --bg: var(--lab-bg);
+  --bg-elev: var(--lab-surface);
+  --text: #1a1d27;
+  --muted: #5c6578;
+  --accent: var(--lab-accent);
+}
+[data-lab-theme="lab-dark"] .workbench-layout {
+  --wb-bg: var(--lab-bg);
+}
+.workbench-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 420px;
+  background: var(--lab-bg, transparent);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  border: 1px solid var(--border-soft);
+}
+.workbench-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+.workbench-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.workbench-input-summary {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.workbench-desktop-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.workbench-panels {
+  flex: 1;
+  min-height: 360px;
+  width: 100%;
+}
+.workbench-viz-panel, .workbench-code-panel {
+  overflow: auto;
+  min-width: 0;
+}
+.workbench-resize {
+  width: 6px;
+  margin: 0 4px;
+  border-radius: 4px;
+  background: var(--border-soft);
+  cursor: col-resize;
+}
+.workbench-resize:hover, .workbench-resize[data-resize-handle-active] {
+  background: var(--lab-accent, var(--accent));
+}
+.workbench-code-panel {
+  background: var(--bg-elev);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  padding: 0.35rem;
+}
+.dirty-banner {
+  background: rgba(227, 179, 65, 0.15);
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  color: var(--warn);
+  font-size: 0.85rem;
+}
+.phase-segment {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border: none;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--lab-accent, var(--accent)) 35%, transparent);
+  padding: 0;
+  min-width: 4px;
+  cursor: pointer;
+}
+.phase-segment:hover {
+  background: color-mix(in srgb, var(--lab-accent, var(--accent)) 55%, transparent);
+}
+.phase-track {
+  position: relative;
+  height: 10px;
+  margin: 0.15rem 0 0.35rem;
+  background: var(--bg-soft);
+  border-radius: 4px;
+}
+.final-answer-panel {
+  margin-top: 0.75rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.65rem;
+  background: var(--bg-elev);
+}
+.final-answer-panel summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.code-browser {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 320px;
+}
+.code-browser-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+.code-tabs button.active {
+  background: var(--lab-accent, var(--accent));
+  color: #fff;
+  border-color: transparent;
+}
+.code-browser-meta {
+  font-size: 0.72rem;
+  margin-bottom: 0.25rem;
+}
+.cm-exec-arrow {
+  color: var(--lab-accent, var(--accent));
+  font-size: 0.7rem;
+  line-height: 1;
+}
+.cm-exec-line {
+  background: color-mix(in srgb, var(--lab-accent, var(--accent)) 18%, transparent) !important;
+}
+.anim-swap-geo {
+  z-index: 2;
+}
+.code-stub .code-pre {
+  font-size: 0.78rem;
+  max-height: 420px;
+  overflow: auto;
+}
+
+/* Ensure desktop topbar controls stay visible (not mobile-only) */
+@media (min-width: 961px) {
+  .topbar { display: flex; }
+  .workbench-desktop-controls { display: flex; }
+}

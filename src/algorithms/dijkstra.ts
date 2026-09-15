@@ -20,7 +20,7 @@ while 有未确定顶点:
   defaultN: 6,
   defaultStart: 0,
   implName: 'naiveDijkstraScan',
-  implVersion: '1.1.0',
+  implVersion: '1.2.0',
   timeComplexity: 'O(V² + E)',
   spaceComplexity: 'O(V + E)',
   spaceNotes:
@@ -65,6 +65,9 @@ export function generateSteps(
   const accepted = new Set<string>()
   const edgeRoles: Record<string, EdgeRole> = {}
 
+  const DOC = 'dijkstra.naive.ts'
+  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+
   const snap = (
     message: string,
     hn: number[] = [],
@@ -72,6 +75,7 @@ export function generateSteps(
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
     phase?: string,
+    codeRefs?: { documentId: string; anchorId: string }[],
   ) => {
     const roles: Record<string, EdgeRole> = { ...edgeRoles }
     for (const eid of accepted) roles[eid] = roles[eid] ?? 'accepted'
@@ -80,10 +84,19 @@ export function generateSteps(
       ...(checking ? [checking] : []),
     ]
     if (checking) roles[checking] = 'checking'
+    const nodeRoles: Record<string, import('../types/step').NodeRole> = {}
+    for (let i = 0; i < n; i++) {
+      if (done[i]) nodeRoles[String(i)] = 'settled'
+    }
+    if (hn.length) {
+      for (const x of hn) nodeRoles[String(x)] = nodeRoles[String(x)] ?? 'current'
+    }
+    nodeRoles[String(start)] = nodeRoles[String(start)] ?? 'source'
     steps.push({
       id: id++,
       message,
       phase,
+      codeRefs,
       arrays: {
         dist: dist.map((d) => (d === Infinity ? '∞' : d)),
         done: done.map((d) => (d ? 1 : 0)),
@@ -97,12 +110,13 @@ export function generateSteps(
         highlightNodes: hn,
         highlightEdgeIds,
         edgeRoles: roles,
+        nodeRoles,
       },
       result,
     })
   }
 
-  snap(`初始化：dist[${start}]=0，其余 ∞`, [start], undefined, { start }, undefined, 'init')
+  snap(`初始化：dist[${start}]=0，其余 ∞`, [start], undefined, { start }, undefined, 'init', ref('init'))
   for (let iter = 0; iter < n; iter++) {
     let u = -1
     let best = Infinity
@@ -114,7 +128,7 @@ export function generateSteps(
     }
     if (u < 0 || best === Infinity) break
     done[u] = true
-    snap(`选定顶点 ${u}（dist=${dist[u]}）`, [u], undefined, { u, dist_u: dist[u] }, undefined, 'extract')
+    snap(`选定顶点 ${u}（dist=${dist[u]}）`, [u], undefined, { u, dist_u: dist[u] }, undefined, 'extract', ref('selectMin'))
     for (const { v, w, id: eid } of adj[u]) {
       snap(`松弛边 ${u}→${v} (w=${w})`, [u, v], eid, {
         u,
@@ -122,13 +136,13 @@ export function generateSteps(
         w,
         dist_u: dist[u],
         dist_v: dist[v] === Infinity ? '∞' : dist[v],
-      })
+      }, undefined, 'relax', ref('relax.condition'))
       if (dist[u] + w < dist[v]) {
         dist[v] = dist[u] + w
         parent[v] = u
         accepted.add(eid)
         edgeRoles[eid] = 'accepted'
-        snap(`更新 dist[${v}] = ${dist[v]}`, [v], eid, { u, v, newDist: dist[v] }, undefined, 'relax')
+        snap(`更新 dist[${v}] = ${dist[v]}`, [v], eid, { u, v, newDist: dist[v] }, undefined, 'relax', ref('relax.update'))
       }
     }
   }

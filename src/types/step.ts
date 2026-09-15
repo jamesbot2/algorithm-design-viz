@@ -59,6 +59,17 @@ export interface StepRanges {
   best?: [number, number]
 }
 
+
+/** Explicit array geometry op — do not infer swap from highlights.length >= 2 */
+export type ArrayOpType = 'compare' | 'swap' | 'move' | 'copy' | 'write'
+
+export interface ArrayOp {
+  type: ArrayOpType
+  indices: number[]
+  /** Stable identity for duplicate values across swaps */
+  elementIds?: string[]
+}
+
 export interface Step {
   id: number
   message: string
@@ -92,7 +103,18 @@ export interface Step {
   searchTree?: SearchTreeNode
   /** Optional coarse phase marker for stage jump (init/extract/relax/done/…) */
   phase?: string
-  /** Kadane-style current / best windows (inclusive indices) */
+  /**
+   * Explicit array ops keyed by array name. Prefer over inferring swap from highlights.
+   * When a swap op is present, ArrayView animates real geometry swap; compare only highlights.
+   */
+  arrayOps?: Record<string, ArrayOp[]>
+  /**
+   * Stable element ids per array (same length as arrays[name]) for duplicate-value identity.
+   * When omitted, ArrayView synthesizes ids from run+index.
+   */
+  elementIds?: Record<string, string[]>
+  /** Code catalog refs emitted by generators at real ops — no message-to-line guessing */
+  codeRefs?: { documentId: string; anchorId: string }[]
   ranges?: StepRanges
   /**
    * Optional row/col/item labels for matrix teaching sync

@@ -1,4 +1,4 @@
-import type { HighlightRole, Step } from '../types/step'
+import type { ArrayOp, HighlightRole, Step } from '../types/step'
 
 export const meta = {
   id: 'insertionSort',
@@ -14,7 +14,7 @@ export const meta = {
   a[j+1] = key`,
 
   implName: 'insertionSort',
-  implVersion: '1.0.1',
+  implVersion: '1.0.2',
   timeComplexity: '最坏 O(n²)，最好 O(n)',
   spaceComplexity: 'O(1)',
   spaceNotes: '原地。',
@@ -24,6 +24,7 @@ export const meta = {
 
 export function generateSteps(input: number[]): Step[] {
   const a = [...input]
+  const elementIds = input.map((_, i) => `ins${i}`)
   const steps: Step[] = []
   let id = 0
   let comparisons = 0
@@ -36,6 +37,8 @@ export function generateSteps(input: number[]): Step[] {
     codeLine?: number,
     roles?: Record<number, HighlightRole>,
     pointers?: Record<string, number>,
+    arrayOps?: ArrayOp[],
+    phase?: string,
   ) => {
     const sortedRoles: Record<number, HighlightRole> = { ...(roles ?? {}) }
     const iVar = typeof vars.i === 'number' ? vars.i : -1
@@ -53,9 +56,12 @@ export function generateSteps(input: number[]): Step[] {
     steps.push({
       id: id++,
       message,
+      phase,
       highlights: { a: highlights },
       roles: Object.keys(sortedRoles).length ? { a: sortedRoles } : undefined,
       arrays: { a: [...a] },
+      elementIds: { a: [...elementIds] },
+      arrayOps: arrayOps?.length ? { a: arrayOps } : undefined,
       vars: { n: a.length, ...vars },
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
       stats: { comparisons, writes, swaps: 0 },
@@ -63,12 +69,13 @@ export function generateSteps(input: number[]): Step[] {
     })
   }
 
-  snap('开始插入排序', [], {}, 0)
+  snap('开始插入排序', [], {}, 0, undefined, undefined, undefined, 'init')
   for (let i = 1; i < a.length; i++) {
-    const key = a[i]
+    const key = a[i]!
+    const keyId = elementIds[i]!
     let j = i - 1
-    snap(`取出 key = a[${i}] = ${key}`, [i], { i, j, key }, 1, { [i]: 'read' }, { i, j })
-    while (j >= 0 && a[j] > key) {
+    snap(`取出 key = a[${i}] = ${key}`, [i], { i, j, key }, 1, { [i]: 'read' }, { i, j }, [{ type: 'compare', indices: [i], elementIds: [keyId] }], 'insert')
+    while (j >= 0 && a[j]! > key) {
       comparisons++
       snap(
         `a[${j}]=${a[j]} > key=${key}，右移`,
@@ -77,8 +84,11 @@ export function generateSteps(input: number[]): Step[] {
         3,
         { [j]: 'compare', [j + 1]: 'swap' },
         { i, j },
+        [{ type: 'compare', indices: [j], elementIds: [elementIds[j]!] }],
+        'shift',
       )
-      a[j + 1] = a[j]
+      a[j + 1] = a[j]!
+      elementIds[j + 1] = elementIds[j]!
       writes++
       snap(
         `a[${j + 1}] ← ${a[j + 1]}`,
@@ -87,11 +97,14 @@ export function generateSteps(input: number[]): Step[] {
         4,
         { [j + 1]: 'swap' },
         { i, j },
+        [{ type: 'move', indices: [j, j + 1], elementIds: [elementIds[j + 1]!] }],
+        'shift',
       )
       j--
     }
     if (j >= 0) comparisons++
     a[j + 1] = key
+    elementIds[j + 1] = keyId
     writes++
     snap(
       `插入 key 到位置 ${j + 1}`,
@@ -100,10 +113,12 @@ export function generateSteps(input: number[]): Step[] {
       5,
       { [j + 1]: 'focus' },
       { i, ...(j >= 0 ? { j } : {}) },
+      [{ type: 'write', indices: [j + 1], elementIds: [keyId] }],
+      'insert',
     )
   }
   const allSorted: Record<number, HighlightRole> = {}
   for (let s = 0; s < a.length; s++) allSorted[s] = 'sorted'
-  snap('排序完成', [], {}, 0, allSorted)
+  snap('排序完成', [], {}, 0, allSorted, undefined, undefined, 'done')
   return steps
 }

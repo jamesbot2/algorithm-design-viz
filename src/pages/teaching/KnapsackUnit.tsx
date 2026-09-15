@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Visualizer from '../../components/Visualizer'
+import WorkbenchLayout from '../../components/workbench/WorkbenchLayout'
 import {
   DEFAULT_INSTANCE,
   FORWARD_UPDATE_COUNTEREXAMPLE,
@@ -173,7 +174,23 @@ export default function KnapsackUnit() {
       <section className="teach-section">
         <h2>可视化</h2>
         {hasRun ? (
-          <Visualizer steps={steps} code={undefined} />
+          <WorkbenchLayout
+            title={`背包 · ${STRATEGY_LABEL[strategy]}`}
+            inputSummary={`W=${inst.capacity} · n=${inst.items.length}`}
+            viz={<Visualizer steps={steps} />}
+            code={
+              <div className="code-stub">
+                <div className="panel-title">策略代码（骨架）</div>
+                <pre className="code-pre">{`// strategy: ${strategy}
+for i = 1..n:
+  for w = 0..W:
+    dp[i][w] = dp[i-1][w]
+    if w >= wt[i]:
+      dp[i][w] = max(dp[i][w], dp[i-1][w-wt[i]] + val[i])
+# 一维正确写法：for w = W..wt 逆序`}</pre>
+              </div>
+            }
+          />
         ) : (
           <div className="viz-empty">选择策略后点击运行。</div>
         )}
