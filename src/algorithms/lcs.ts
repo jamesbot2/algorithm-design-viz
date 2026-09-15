@@ -12,7 +12,7 @@ else: dp[i][j]=max(dp[i-1][j], dp[i][j-1])
   defaultX: 'ABCBDAB',
   defaultY: 'BDCABA',
   implName: 'lcsDP2D',
-  implVersion: '1.3.0',
+  implVersion: '1.4.0',
   timeComplexity: 'O(mn)',
   spaceComplexity: 'O(mn)',
   spaceNotes: 'dp[m+1][n+1]。',
@@ -56,6 +56,8 @@ export function lcsPath(X: string, Y: string, dp: number[][]): [number, number][
   return path
 }
 
+type CodeRef = { documentId: string; anchorId: string; role?: 'primary' | 'context' | 'condition' }
+
 export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaultY): Step[] {
   const m = X.length
   const n = Y.length
@@ -63,7 +65,11 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
   const steps: Step[] = []
   let id = 0
   const DOC = 'lcs.ts'
-  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+  const primary = (anchorId: string): CodeRef[] => [{ documentId: DOC, anchorId, role: 'primary' }]
+  const withContext = (prim: string, ...ctx: string[]): CodeRef[] => [
+    { documentId: DOC, anchorId: prim, role: 'primary' },
+    ...ctx.map((anchorId) => ({ documentId: DOC, anchorId, role: 'context' as const })),
+  ]
 
   const snap = (
     message: string,
@@ -77,7 +83,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
     },
     result?: unknown,
     phase?: string,
-    codeRefs?: { documentId: string; anchorId: string }[],
+    codeRefs?: CodeRef[],
   ) => {
     const arrayPointers: Record<string, Record<string, number>> = {}
     if (typeof vars.i === 'number' && (vars.i as number) > 0) {
@@ -101,14 +107,37 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
     })
   }
 
-  snap(`计算 LCS("${X}", "${Y}")`, { m, n }, 0, undefined, undefined, 'init', ref('init'))
+  snap(`计算 LCS("${X}", "${Y}")`, { m, n }, 0, undefined, undefined, 'init', primary('init'))
   for (let i = 0; i <= m; i++) dp[i]![0] = 0
   for (let j = 0; j <= n; j++) dp[0]![j] = 0
 
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
-      if (X[i - 1] === Y[j - 1]) {
+      // Micro-step 1: compare characters (no write yet)
+      const match = X[i - 1] === Y[j - 1]
+      snap(
+        `比较 X[${i - 1}]='${X[i - 1]}' 与 Y[${j - 1}]='${Y[j - 1]}' → ${match ? '相等' : '不等'}`,
+        { i, j, match },
+        0,
+        {
+          current: [i, j],
+          reads: match
+            ? [
+                [i - 1, j - 1],
+              ]
+            : [
+                [i - 1, j],
+                [i, j - 1],
+              ],
+        },
+        undefined,
+        'compare',
+        primary('compareChars'),
+      )
+
+      if (match) {
         dp[i]![j] = dp[i - 1]![j - 1]! + 1
+        // Micro-step 2: diagonal write — primary is takeDiagonal/write
         snap(
           `X[${i - 1}]='${X[i - 1]}' == Y[${j - 1}]='${Y[j - 1]}' → dp[${i}][${j}]=${dp[i]![j]}`,
           { i, j, match: true },
@@ -120,7 +149,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
           },
           undefined,
           'fill',
-          [...ref('compareChars'), ...ref('takeDiagonal')],
+          withContext('takeDiagonal', 'compareChars'),
         )
       } else {
         dp[i]![j] = Math.max(dp[i - 1]![j]!, dp[i]![j - 1]!)
@@ -138,13 +167,12 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
           },
           undefined,
           'fill',
-          [...ref('compareChars'), ...ref('dpFill')],
+          withContext('dpFill', 'compareChars'),
         )
       }
     }
   }
 
-  // Reconstruct as playable later phase
   let i = m
   let j = n
   const chars: string[] = []
@@ -156,7 +184,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
     { current: [i, j], path: [...pathSoFar] },
     undefined,
     'reconstruct',
-    ref('reconstruct'),
+    primary('reconstruct'),
   )
   while (i > 0 && j > 0) {
     if (X[i - 1] === Y[j - 1]) {
@@ -172,7 +200,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
         { current: [i, j], path: [...pathSoFar], writes: [[i + 1, j + 1]] },
         undefined,
         'reconstruct',
-        ref('reconstruct'),
+        primary('reconstruct'),
       )
     } else if (dp[i - 1]![j]! >= dp[i]![j - 1]!) {
       i--
@@ -184,7 +212,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
         { current: [i, j], path: [...pathSoFar] },
         undefined,
         'reconstruct',
-        ref('reconstructMove'),
+        primary('reconstructMove'),
       )
     } else {
       j--
@@ -196,7 +224,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
         { current: [i, j], path: [...pathSoFar] },
         undefined,
         'reconstruct',
-        ref('reconstructMove'),
+        primary('reconstructMove'),
       )
     }
   }
@@ -209,7 +237,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
     { current: [m, n], path },
     { ok: true, length: dp[m]![n], lcs: lcsStr },
     'done',
-    ref('reconstruct'),
+    primary('reconstruct'),
   )
   return steps
 }

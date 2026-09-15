@@ -195,6 +195,7 @@ export default function Visualizer({
   const rootRef = useRef<HTMLDivElement>(null)
   const lastSeekReq = useRef<string | number | null>(null)
   const lastRunId = useRef<string | number | undefined>(undefined)
+  const [snapSwap, setSnapSwap] = useState(false)
   const { mode } = useMotion()
 
   const step = steps[idx] ?? steps[0]
@@ -242,13 +243,16 @@ export default function Visualizer({
     setPlaying(false)
   }, [runId])
 
-  // Explicit seek only when requestId changes
+  // Explicit seek only when requestId changes — snap geometry (no FLIP residue)
   useEffect(() => {
     if (!seekCommand) return
     if (lastSeekReq.current === seekCommand.requestId) return
     lastSeekReq.current = seekCommand.requestId
+    setSnapSwap(true)
     setIdx(clamp(seekCommand.target, steps.length))
     setPlaying(false)
+    const t = window.setTimeout(() => setSnapSwap(false), 50)
+    return () => window.clearTimeout(t)
   }, [seekCommand, steps.length])
 
   // Notify-only — must NOT feed back into seek/init in parent
@@ -463,7 +467,7 @@ export default function Visualizer({
           {step?.searchTree && (
             <SearchTreeView tree={step.searchTree} linkedBoard={hasBoard} />
           )}
-          {step && <ArraysFromStep step={step} prevStep={prevStep} scaleMaxByArray={scaleMaxByArray} />}
+          {step && <ArraysFromStep step={step} prevStep={prevStep} scaleMaxByArray={scaleMaxByArray} snapSwap={snapSwap} />}
           {step && <MatrixView step={step} />}
           {!step && <div className="viz-empty soft">暂无画布内容</div>}
         </div>

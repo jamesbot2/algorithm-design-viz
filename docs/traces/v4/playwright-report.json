@@ -4,9 +4,7 @@
       "/home/box/.local/node-v24.20.0-linux-x64/bin/node",
       "/workspace/algorithm-design-viz/node_modules/.bin/playwright",
       "test",
-      "tests/e2e/v4-stability.spec.ts",
-      "-g",
-      "empty exec"
+      "tests/e2e/v5-r1-r4.spec.ts"
     ],
     "configFile": "/workspace/algorithm-design-viz/playwright.config.ts",
     "rootDir": "/workspace/algorithm-design-viz/tests/e2e",
@@ -73,20 +71,20 @@
   },
   "suites": [
     {
-      "title": "v4-stability.spec.ts",
-      "file": "v4-stability.spec.ts",
+      "title": "v5-r1-r4.spec.ts",
+      "file": "v5-r1-r4.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "V4 A — fail-first gates (must pass after fix)",
-          "file": "v4-stability.spec.ts",
-          "line": 101,
+          "title": "V5 R1 tab switch + R4 swap settle",
+          "file": "v5-r1-r4.spec.ts",
+          "line": 5,
           "column": 6,
           "specs": [
             {
-              "title": "binarySearch init without Run: array preview + code panel + empty exec arrow",
+              "title": "R1 binarySearch tab switch uses that doc anchors",
               "ok": true,
               "tags": [],
               "tests": [
@@ -101,12 +99,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 799,
+                      "duration": 1286,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T10:14:16.590Z",
+                      "startTime": "2026-09-15T12:02:29.169Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -114,9 +112,43 @@
                   "status": "expected"
                 }
               ],
-              "id": "d0125f66806f65818517-c93dfe5ff305b94c0f7d",
-              "file": "v4-stability.spec.ts",
-              "line": 104,
+              "id": "e02e8a85606d82fc5e36-840600790aaddfa73c6b",
+              "file": "v5-r1-r4.spec.ts",
+              "line": 6,
+              "column": 3
+            },
+            {
+              "title": "R4 quickSort swap settles to transform none",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1770,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-15T12:02:30.687Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e02e8a85606d82fc5e36-86eb475272e66a3977ef",
+              "file": "v5-r1-r4.spec.ts",
+              "line": 31,
               "column": 3
             }
           ]
@@ -126,9 +158,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-15T10:14:15.194Z",
-    "duration": 2509.4550000000004,
-    "expected": 1,
+    "startTime": "2026-09-15T12:02:27.798Z",
+    "duration": 4798.066000000001,
+    "expected": 2,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

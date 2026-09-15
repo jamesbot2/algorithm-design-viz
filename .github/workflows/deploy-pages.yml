@@ -1,7 +1,5 @@
-# Deploy only after CI succeeds on main (workflow_run), or manual dispatch.
-# Honesty: Pages deploy is gated on the CI workflow named "CI" completing successfully
-# for the same commit on main. PRs do not deploy. workflow_dispatch still builds locally
-# in this workflow (no CI wait) for emergency publishes.
+# Deploy only after CI succeeds on main (workflow_run), or manual dispatch
+# that verifies CI green on the SAME SHA.
 name: Deploy to GitHub Pages
 
 on:
@@ -15,25 +13,54 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
+  # Manual dispatch must prove CI already passed on this exact SHA.
+  # (Documented alternative would be skipping this gate — we implement the check.)
+  ci-gate:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful CI on same SHA
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.sha;
+            const { owner, repo } = context.repo;
+            const workflows = await github.rest.actions.listWorkflowRuns({
+              owner, repo, workflow_id: 'ci.yml', per_page: 50,
+            });
+            const hit = (workflows.data.workflow_runs || []).find(
+              (r) => r.head_sha === sha && r.conclusion === 'success' && r.status === 'completed'
+            );
+            if (!hit) {
+              core.setFailed(
+                `workflow_dispatch deploy blocked: no successful CI run for SHA ${sha}. ` +
+                `Run CI on this commit first, then dispatch Pages.`
+              );
+            } else {
+              core.info(`CI gate OK: run ${hit.id} succeeded for ${sha}`);
+            }
+
   build:
-    # Only deploy when CI succeeded (or manual dispatch).
+    needs: [ci-gate]
     if: >
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push')
+      always() && (
+        (github.event_name == 'workflow_run' &&
+         github.event.workflow_run.conclusion == 'success' &&
+         github.event.workflow_run.event == 'push') ||
+        (github.event_name == 'workflow_dispatch' && needs.ci-gate.result == 'success')
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # For workflow_run, check out the commit CI actually tested
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup Node
@@ -55,6 +82,7 @@ jobs:
 
   deploy:
     needs: build
+    if: needs.build.result == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -1119,6 +1119,23 @@ button.icon-btn {
   --lab-bg: #0F1117;
   --lab-surface: #161b22;
   --lab-accent: #5B8DEF;
+  --border: #30363d;
+  --border-soft: #21262d;
+  --sem-compare: #f59e0b;
+  --sem-swap: #ef4444;
+  --sem-focus: #3b82f6;
+  --sem-update: #f97316;
+  --sem-accepted: #22c55e;
+  --sem-rejected: #f87171;
+  --sem-pruned: #94a3b8;
+  --sem-optimal: #eab308;
+  --sem-sorted: #22c55e;
+  --sem-pivot: #a855f7;
+  --sem-read: #06b6d4;
+  --sem-done: #22c55e;
+  --sem-error: #ef4444;
+  --sem-frontier: #38bdf8;
+  --sem-settled: #64748b;
 }
 [data-lab-theme="lab-light"] {
   --lab-bg: #F6F8FC;
@@ -1129,6 +1146,24 @@ button.icon-btn {
   --text: #1a1d27;
   --muted: #5c6578;
   --accent: var(--lab-accent);
+  --border: #d0d7e2;
+  --border-soft: #e2e8f0;
+  --danger: #dc2626;
+  --sem-compare: #d97706;
+  --sem-swap: #dc2626;
+  --sem-focus: #2563eb;
+  --sem-update: #ea580c;
+  --sem-accepted: #16a34a;
+  --sem-rejected: #ef4444;
+  --sem-pruned: #64748b;
+  --sem-optimal: #ca8a04;
+  --sem-sorted: #16a34a;
+  --sem-pivot: #9333ea;
+  --sem-read: #0891b2;
+  --sem-done: #16a34a;
+  --sem-error: #dc2626;
+  --sem-frontier: #0284c7;
+  --sem-settled: #475569;
 }
 [data-lab-theme="lab-dark"] .workbench-layout {
   --wb-bg: var(--lab-bg);
@@ -1493,3 +1528,42 @@ html, body, #root {
   flex-direction: column;
   gap: 0.75rem;
 }
+
+
+/* V5 R4 FLIP layers — translate lives here; pulse/scale on .bar/.cell */
+.bar-flip-layer,
+.cell-flip-layer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+  transform: none;
+}
+.cell-slot {
+  display: inline-flex;
+  vertical-align: top;
+}
+.code-unmapped-banner {
+  padding: 0.35rem 0.6rem;
+  margin: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--sem-error, #ef4444) 18%, transparent);
+  color: var(--text, inherit);
+  font-size: 0.82rem;
+}
+.code-line.context .lt {
+  opacity: 0.85;
+  background: color-mix(in srgb, var(--sem-read, #64748b) 14%, transparent);
+}
+.workbench-inspector {
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border, #333);
+}
+.final-answer-human {
+  white-space: pre-wrap;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+.run-status-cancelled { color: var(--sem-error, #ef4444); }
+.run-status-truncated { color: var(--sem-focus, #f59e0b); }

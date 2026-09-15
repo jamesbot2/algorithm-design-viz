@@ -42,6 +42,22 @@ export function getLCSCatalog(): {
     }
   },
   {
+    "id": "write",
+    "label": "写入 dp（对角）",
+    "range": {
+      "startLine": 11,
+      "endLine": 11
+    }
+  },
+  {
+    "id": "dpWrite",
+    "label": "写入 dp",
+    "range": {
+      "startLine": 11,
+      "endLine": 11
+    }
+  },
+  {
     "id": "dpFill",
     "label": "取 max 填表",
     "range": {
@@ -68,7 +84,7 @@ export function getLCSCatalog(): {
 ],
   }
   const pseudocode: CodeDocument | undefined = {
-    documentId: "lcs.ts",
+    documentId: "lcs.pseudo",
     language: 'pseudocode',
     title: "LCS (TypeScript)（伪代码）",
     source: "init dp[*][0]=dp[0][*]=0\nfor i,j:\n  if X[i-1]==Y[j-1]: diagonal\n  else: max\nreconstruct from (m,n)",

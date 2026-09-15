@@ -2,20 +2,34 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { EditorView, Decoration, gutter, GutterMarker, keymap } from '@codemirror/view'
-import { RangeSetBuilder, StateEffect, StateField, type Extension } from '@codemirror/state'
+import { RangeSetBuilder, StateEffect, StateField, type Extension, type Range } from '@codemirror/state'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { highlightSelectionMatches, searchKeymap, search } from '@codemirror/search'
-import type { CodeDocument } from '../../codeCatalog/types'
+import type { CodeDocument, SourceRange } from '../../codeCatalog/types'
 import { useLabTheme } from '../../theme/LabThemeContext'
+import { activeCatalogDoc, resolveExecRange } from './resolveExec'
+
+export type CodeBrowserDocuments = {
+  typescript: CodeDocument
+  pseudocode?: CodeDocument
+}
 
 interface Props {
-  document: CodeDocument
-  /** Anchor id from step.codeRefs — drives exec arrow */
+  /** Preferred: full catalog docs so each tab resolves its own anchors */
+  documents?: CodeBrowserDocuments
+  /** @deprecated single-doc fallback */
+  document?: CodeDocument
+  /** Anchor id from step primary codeRef — drives exec arrow */
   execAnchorId?: string
-  /** Fallback 0-based line when no anchor */
+  /** Additional weak-highlight anchor ids (context/condition) */
+  contextAnchorIds?: string[]
+  /** Fallback 0-based line when no anchor (legacy) */
   activeLine?: number
+  /** @deprecated use documents.pseudocode */
   pseudocode?: string
   onTabChange?: (tab: 'ts' | 'pseudo') => void
+  /** When true, show unmapped teaching banner instead of faking activeLine */
+  unmapped?: boolean
 }
 
 class ExecMarker extends GutterMarker {
@@ -30,6 +44,7 @@ class ExecMarker extends GutterMarker {
 
 const execMarker = new ExecMarker()
 const setExecLine = StateEffect.define<number | null>()
+const setContextLines = StateEffect.define<number[]>()
 
 const execLineField = StateField.define<number | null>({
   create: () => null,
@@ -41,9 +56,20 @@ const execLineField = StateField.define<number | null>({
   },
 })
 
+const contextLinesField = StateField.define<number[]>({
+  create: () => [],
+  update(value, tr) {
+    for (const e of tr.effects) {
+      if (e.is(setContextLines)) return e.value
+    }
+    return value
+  },
+})
+
 function buildExecGutter(): Extension {
   return [
     execLineField,
+    contextLinesField,
     gutter({
       class: 'cm-exec-gutter',
       markers: (view) => {
@@ -56,13 +82,23 @@ function buildExecGutter(): Extension {
         return builder.finish()
       },
     }),
-    EditorView.decorations.compute([execLineField], (state) => {
+    EditorView.decorations.compute([execLineField, contextLinesField], (state) => {
       const line = state.field(execLineField)
-      if (line == null || line < 1 || line > state.doc.lines) return Decoration.none
-      const info = state.doc.line(line)
-      return Decoration.set([Decoration.line({ class: 'cm-exec-line' }).range(info.from)])
+      const ctx = state.field(contextLinesField)
+      const ranges: Range<Decoration>[] = []
+      if (line != null && line >= 1 && line <= state.doc.lines) {
+        const info = state.doc.line(line)
+        ranges.push(Decoration.line({ class: 'cm-exec-line' }).range(info.from))
+      }
+      for (const cl of ctx) {
+        if (cl === line) continue
+        if (cl >= 1 && cl <= state.doc.lines) {
+          const info = state.doc.line(cl)
+          ranges.push(Decoration.line({ class: 'cm-context-line' }).range(info.from))
+        }
+      }
+      return ranges.length ? Decoration.set(ranges, true) : Decoration.none
     }),
-    // Reserve gutter width from init so first arrow does not shift code
     EditorView.theme({
       '.cm-exec-gutter': {
         width: '1.1rem',
@@ -73,11 +109,13 @@ function buildExecGutter(): Extension {
         width: '1rem',
         textAlign: 'center',
       },
+      '.cm-context-line': {
+        backgroundColor: 'color-mix(in srgb, var(--sem-read, #64748b) 18%, transparent)',
+      },
     }),
   ]
 }
 
-/** Scroll only when line is near edges; use nearest. Never scroll window. */
 function scrollLineNearest(view: EditorView, line1: number) {
   if (line1 < 1 || line1 > view.state.doc.lines) return
   const line = view.state.doc.line(line1)
@@ -103,11 +141,22 @@ function scrollLineCenter(view: EditorView, line1: number) {
   scrollDOM.scrollTop = Math.max(0, block.top - scrollDOM.clientHeight / 2 + block.height / 2)
 }
 
+function rangeLines(range: SourceRange | null): number[] {
+  if (!range) return []
+  const out: number[] = []
+  for (let L = range.startLine; L <= range.endLine; L++) out.push(L)
+  return out
+}
+
 export default function CodeBrowser({
-  document: doc,
+  documents,
+  document: legacyDoc,
   execAnchorId,
+  contextAnchorIds = [],
   activeLine,
   pseudocode,
+  onTabChange,
+  unmapped = false,
 }: Props) {
   const [tab, setTab] = useState<'ts' | 'pseudo'>('ts')
   const [fontSize, setFontSize] = useState(13)
@@ -119,14 +168,57 @@ export default function CodeBrowser({
 
   const cmTheme = theme === 'lab-light' ? 'light' : 'dark'
 
-  const execLine1 = useMemo(() => {
-    if (execAnchorId) {
-      const a = doc.anchors.find((x) => x.id === execAnchorId)
-      if (a) return a.range.startLine
+  const docs: CodeBrowserDocuments | null = useMemo(() => {
+    if (documents) return documents
+    if (legacyDoc) {
+      const pseudoDoc: CodeDocument | undefined =
+        legacyDoc && pseudocode
+          ? {
+              documentId: `${legacyDoc.documentId}.pseudo-legacy`,
+              language: 'pseudocode',
+              title: `${legacyDoc.title}（伪代码）`,
+              source: pseudocode,
+              sourceHash: 'legacy',
+              anchors: [], // no anchors → must not fake TS lines
+            }
+          : undefined
+      return { typescript: legacyDoc, pseudocode: pseudoDoc }
     }
-    if (typeof activeLine === 'number' && activeLine >= 0) return activeLine + 1
     return null
-  }, [execAnchorId, doc.anchors, activeLine])
+  }, [documents, legacyDoc, pseudocode])
+
+  const activeDoc = useMemo(() => {
+    if (!docs) return null
+    return activeCatalogDoc(docs, tab)
+  }, [docs, tab])
+
+  const execRange = useMemo(() => {
+    if (unmapped) return null
+    return resolveExecRange(activeDoc, execAnchorId)
+  }, [activeDoc, execAnchorId, unmapped])
+
+  const execLine1 = useMemo(() => {
+    if (execRange) return execRange.startLine
+    // Only allow activeLine fallback on TS tab when no anchor (legacy generators)
+    if (tab === 'ts' && typeof activeLine === 'number' && activeLine >= 0 && !execAnchorId) {
+      return activeLine + 1
+    }
+    return null
+  }, [execRange, activeLine, tab, execAnchorId])
+
+  const contextLines = useMemo(() => {
+    if (!activeDoc || unmapped) return [] as number[]
+    const lines: number[] = []
+    for (const id of contextAnchorIds) {
+      const r = resolveExecRange(activeDoc, id)
+      lines.push(...rangeLines(r))
+    }
+    // Also highlight full primary range weakly beyond start line
+    if (execRange && execRange.endLine > execRange.startLine) {
+      for (let L = execRange.startLine + 1; L <= execRange.endLine; L++) lines.push(L)
+    }
+    return [...new Set(lines)]
+  }, [activeDoc, contextAnchorIds, execRange, unmapped])
 
   const extensions = useMemo(() => {
     const exts: Extension[] = [
@@ -156,28 +248,32 @@ export default function CodeBrowser({
     const view = viewRef.current
     if (!view || execLine1 == null) return
     markProgrammatic()
-    view.dispatch({ effects: setExecLine.of(execLine1) })
+    view.dispatch({
+      effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
+    })
     scrollLineCenter(view, execLine1)
     setUserScrolledAway(false)
     setFollowExec(true)
-  }, [execLine1, markProgrammatic])
+  }, [execLine1, contextLines, markProgrammatic])
 
-  // Highlight update separate from scroll
   useEffect(() => {
     const view = viewRef.current
     if (!view) return
-    view.dispatch({ effects: setExecLine.of(execLine1) })
+    view.dispatch({
+      effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
+    })
     if (followExec && !userScrolledAway && execLine1 != null) {
       markProgrammatic()
       scrollLineNearest(view, execLine1)
     }
-  }, [execLine1, followExec, userScrolledAway, markProgrammatic])
+  }, [execLine1, contextLines, followExec, userScrolledAway, markProgrammatic])
 
   const onCreate = useCallback(
     (view: EditorView) => {
       viewRef.current = view
-      // Reserve gutter + set initial highlight without centering
-      view.dispatch({ effects: setExecLine.of(execLine1) })
+      view.dispatch({
+        effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
+      })
       const scrollDOM = view.scrollDOM
       const onScroll = () => {
         if (programmaticScroll.current) return
@@ -188,7 +284,7 @@ export default function CodeBrowser({
         scrollDOM.removeEventListener('scroll', onScroll)
       }
     },
-    [execLine1, followExec],
+    [execLine1, contextLines, followExec],
   )
 
   useEffect(() => {
@@ -198,8 +294,14 @@ export default function CodeBrowser({
     }
   }, [])
 
+  const changeTab = (t: 'ts' | 'pseudo') => {
+    setTab(t)
+    onTabChange?.(t)
+    setUserScrolledAway(false)
+  }
+
   const copy = async () => {
-    const text = tab === 'ts' ? doc.source : (pseudocode ?? '')
+    const text = activeDoc?.source ?? ''
     try {
       await navigator.clipboard.writeText(text)
     } catch {
@@ -207,24 +309,39 @@ export default function CodeBrowser({
     }
   }
 
+  if (!docs || !activeDoc) {
+    return <div className="code-browser muted">（无代码文档）</div>
+  }
+
+  const showPseudo = Boolean(docs.pseudocode)
+  const source = activeDoc.source
+
   return (
     <div
       className="code-browser"
       data-testid="code-browser"
+      data-active-doc={activeDoc.documentId}
+      data-tab={tab}
       onKeyDown={(e) => {
         e.stopPropagation()
       }}
     >
       <div className="code-browser-toolbar">
         <div className="code-tabs">
-          <button type="button" className={tab === 'ts' ? 'active' : ''} onClick={() => setTab('ts')}>
+          <button
+            type="button"
+            className={tab === 'ts' ? 'active' : ''}
+            data-testid="tab-ts"
+            onClick={() => changeTab('ts')}
+          >
             TypeScript
           </button>
-          {pseudocode && (
+          {showPseudo && (
             <button
               type="button"
               className={tab === 'pseudo' ? 'active' : ''}
-              onClick={() => setTab('pseudo')}
+              data-testid="tab-pseudo"
+              onClick={() => changeTab('pseudo')}
             >
               伪代码
             </button>
@@ -263,20 +380,30 @@ export default function CodeBrowser({
         </label>
       </div>
       <div className="code-browser-meta muted">
-        {doc.title}
-        {execAnchorId ? ` · ▶ ${execAnchorId}` : ' · ▶ —'}
+        {activeDoc.title}
+        {unmapped
+          ? ' · ▶ 未映射'
+          : execAnchorId
+            ? ` · ▶ ${execAnchorId} @${activeDoc.documentId}:${execLine1 ?? '—'}`
+            : ' · ▶ —'}
       </div>
+      {unmapped && (
+        <div className="code-unmapped-banner" data-testid="code-unmapped" role="status">
+          此教学事件未映射
+        </div>
+      )}
       {tab === 'ts' ? (
         <div
           className="code-browser-cm-wrap"
           style={{ fontSize }}
           data-testid="code-mirror-wrap"
+          data-exec-line={execLine1 ?? ''}
           onWheel={() => {
             if (followExec) setUserScrolledAway(true)
           }}
         >
           <CodeMirror
-            value={doc.source}
+            value={source}
             height="100%"
             theme={cmTheme}
             editable={false}
@@ -291,13 +418,27 @@ export default function CodeBrowser({
           />
         </div>
       ) : (
-        <pre className="code-pre" style={{ fontSize }}>
-          {(pseudocode ?? '').split('\n').map((line, i) => (
-            <div key={i} className={`code-line${execLine1 === i + 1 ? ' active' : ''}`}>
-              <span className="ln">{i + 1}</span>
-              <span className="lt">{line || ' '}</span>
-            </div>
-          ))}
+        <pre
+          className="code-pre"
+          style={{ fontSize }}
+          data-testid="pseudo-pre"
+          data-exec-line={execLine1 ?? ''}
+        >
+          {source.split('\n').map((line, i) => {
+            const ln = i + 1
+            const isExec = !unmapped && execLine1 === ln
+            const isCtx = !unmapped && contextLines.includes(ln) && !isExec
+            return (
+              <div
+                key={i}
+                className={`code-line${isExec ? ' active' : ''}${isCtx ? ' context' : ''}`}
+                data-line={ln}
+              >
+                <span className="ln">{ln}</span>
+                <span className="lt">{line || ' '}</span>
+              </div>
+            )
+          })}
         </pre>
       )}
     </div>

@@ -116,7 +116,12 @@ export interface Step {
    */
   elementIds?: Record<string, string[]>
   /** Code catalog refs emitted by generators at real ops — no message-to-line guessing */
-  codeRefs?: { documentId: string; anchorId: string }[]
+  codeRefs?: {
+    documentId: string
+    anchorId: string
+    /** primary drives exec arrow; context/condition get weak highlight */
+    role?: 'primary' | 'context' | 'condition'
+  }[]
   ranges?: StepRanges
   /**
    * Optional row/col/item labels for matrix teaching sync

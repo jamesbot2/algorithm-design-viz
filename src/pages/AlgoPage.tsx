@@ -3,7 +3,10 @@ import { Link, useParams } from 'react-router-dom'
 import { algorithms } from '../algorithms'
 import { getAlgo } from '../algorithms/registry'
 import type { Trace } from '../core/trace/types'
-import { runAlgo, createCancelFlag } from '../core/runner'
+import { createCancelFlag, runAlgoAsync, yieldToEventLoop } from '../core/runner'
+import { runSyncGeneratorCancelable } from '../core/runner/chunkedSolve'
+import { pickPrimaryCodeRef, weakContextRefs } from '../utils/codeRefs'
+import { formatFinalAnswer } from '../utils/formatAnswer'
 import Visualizer from '../components/Visualizer'
 import GraphInput from '../components/graph/GraphInput'
 import GraphResultPanel from '../components/graph/GraphResultPanel'
@@ -130,6 +133,8 @@ export default function AlgoPage() {
   const [shakeKey, setShakeKey] = useState(0)
   const [draftDirty, setDraftDirty] = useState(false)
   const cancelRef = useRef(createCancelFlag())
+  const activeRunToken = useRef(0)
+  const [runLabel, setRunLabel] = useState<'idle' | 'running' | 'cancelled' | 'truncated'>('idle')
   const pendingAutoRun = useRef(false)
   const pendingSeek = useRef(0)
 
@@ -384,7 +389,7 @@ export default function AlgoPage() {
 
   /** Single execution path: validate → run once → {result, steps/trace}. */
   const executeOnce = useCallback(
-    (seekTo = 0) => {
+    async (seekTo = 0): Promise<boolean> => {
       const built = validateAndBuild()
       if (!built.ok) {
         setErrors(built.errors)
@@ -411,29 +416,97 @@ export default function AlgoPage() {
           : DEMO_LIMITS.arrayLen * 200
 
       if (entry?.validate && entry?.solve) {
-        // Prefer runAlgo: validate + solve once (no double generateSteps + solve)
-        const outcome = runAlgo({
+        const thisToken = activeRunToken.current
+        const maxSteps = draft.mode === 'experiment' ? 200 : 5000
+        const heavy = id === 'nQueens' || id === 'knapsack01' || (id?.startsWith('knapsack') ?? false)
+        const outcome = await runAlgoAsync({
           algoId: id!,
           implName: entry.meta.implName,
           implVersion: entry.meta.implVersion,
           validate: entry.validate,
-          solve: (input, _ctx) => {
+          solveAsync: async (input, ctx) => {
+            if (ctx.cancel.cancelled) {
+              return { steps: [], result: { ok: false }, status: 'cancelled' as const }
+            }
+            if (heavy) {
+              const chunked = await runSyncGeneratorCancelable(
+                () => {
+                  const solved = entry.solve!(input)
+                  return (solved.trace.steps as Step[]) ?? []
+                },
+                { cancel: ctx.cancel, budget: { maxSteps }, chunkEvery: heavy ? 8 : 32 },
+              )
+              if (chunked.status === 'cancelled' || ctx.cancel.cancelled) {
+                return { steps: chunked.steps, result: { ok: false }, status: 'cancelled' as const }
+              }
+              let steps = chunked.steps
+              if (chunked.truncated) {
+                const last = steps[steps.length - 1]
+                if (last && !String(last.message).includes('截断')) {
+                  steps = [
+                    ...steps.slice(0, -1),
+                    {
+                      ...last,
+                      message: `${last.message}（采样截断）`,
+                      vars: { ...last.vars, truncated: true },
+                    },
+                  ]
+                }
+              }
+              return { steps, result: { ok: true }, status: 'ok' as const }
+            }
+            await yieldToEventLoop()
+            if (ctx.cancel.cancelled) {
+              return { steps: [], result: { ok: false }, status: 'cancelled' as const }
+            }
             const solved = entry.solve!(input)
+            if (ctx.cancel.cancelled) {
+              return {
+                steps: (solved.trace.steps as Step[]) ?? [],
+                result: solved.result,
+                status: 'cancelled' as const,
+              }
+            }
+            let steps = (solved.trace.steps as Step[]) ?? []
+            let truncated = false
+            if (steps.length > maxSteps) {
+              steps = steps.slice(0, maxSteps)
+              truncated = true
+            }
+            if (truncated) {
+              const last = steps[steps.length - 1]
+              if (last && !String(last.message).includes('截断')) {
+                steps = [
+                  ...steps.slice(0, -1),
+                  { ...last, message: `${last.message}（采样截断）`, vars: { ...last.vars, truncated: true } },
+                ]
+              }
+            }
             return {
-              steps: (solved.trace.steps as Step[]) ?? [],
+              steps,
               result: solved.result,
               status: solved.trace.status,
             }
           },
           rawInput: built.registryInput,
           budget: {
-            maxSteps: draft.mode === 'experiment' ? 200 : 5000,
+            maxSteps,
             maxInputSize: budgetMax,
             inputSize: built.inputSize,
           },
           cancel: cancelRef.current,
           freeze: true,
+          runId: `ui-${thisToken}`,
+          isStale: (rid) => {
+            const n = Number(String(rid).replace('ui-', ''))
+            return n !== activeRunToken.current
+          },
         })
+
+        // Stale run — do not write back
+        if (thisToken !== activeRunToken.current) {
+          return false
+        }
 
         if (outcome.status === 'validation_error' || outcome.status === 'budget_exceeded') {
           const msgs = (outcome.errors ?? []).map((e) =>
@@ -445,9 +518,10 @@ export default function AlgoPage() {
               : [{ field: 'run', reason: outcome.status }],
           )
           if (outcome.status === 'budget_exceeded' && outcome.steps?.length) {
-            // still show truncated steps
+            // still show truncated steps — distinct from cancelled
             outSteps = outcome.steps
             outTrace = outcome.trace
+            setRunLabel('truncated')
           } else if (outcome.status === 'validation_error') {
             setShakeKey((k) => k + 1)
             if (hasRun && steps.length > 0) setStaleResult(true)
@@ -456,6 +530,7 @@ export default function AlgoPage() {
           }
         } else if (outcome.status === 'cancelled') {
           setErrors([{ field: 'run', reason: '已取消' }])
+          setRunLabel('cancelled')
           outSteps = outcome.steps ?? []
           outTrace = outcome.trace
         } else {
@@ -562,7 +637,7 @@ export default function AlgoPage() {
     if (!pendingAutoRun.current) return
     if (!id || !algo) return
     pendingAutoRun.current = false
-    executeOnce(pendingSeek.current)
+    void executeOnce(pendingSeek.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional after scene draft restore
   }, [draft.graph, id])
 
@@ -573,17 +648,45 @@ export default function AlgoPage() {
   }
 
   const onRun = () => {
-    setRunning(true)
-    try {
-      executeOnce(0)
-    } finally {
-      // Sync solvers finish in one tick; keep cancel meaningful only while flagged
-      setRunning(false)
-    }
+    void (async () => {
+      const token = ++activeRunToken.current
+      cancelRef.current = createCancelFlag()
+      setRunning(true)
+      setRunLabel('running')
+      try {
+        await yieldToEventLoop()
+        if (cancelRef.current.cancelled || token !== activeRunToken.current) {
+          if (token === activeRunToken.current) {
+            setRunLabel('cancelled')
+            setErrors([{ field: 'run', reason: '已取消' }])
+          }
+          return
+        }
+        const ok = await executeOnce(0)
+        // Heavy path: if still running flag and sync finished, mark truncated from errors
+        if (token !== activeRunToken.current) return // stale — no write-back
+        if (cancelRef.current.cancelled) {
+          setRunLabel('cancelled')
+          setErrors([{ field: 'run', reason: '已取消' }])
+          return
+        }
+        if (ok === false) {
+          /* validation errors already set */
+        } else {
+          setRunLabel('idle')
+        }
+      } finally {
+        if (token === activeRunToken.current) {
+          setRunning(false)
+          setRunLabel((lab) => (lab === 'running' ? 'idle' : lab))
+        }
+      }
+    })()
   }
 
   const onCancel = () => {
     cancelRef.current.cancelled = true
+    setRunLabel('cancelled')
   }
 
   const onResetPlayback = () => {
@@ -890,9 +993,22 @@ export default function AlgoPage() {
           <button type="button" className="primary" onClick={onRun} data-testid="run-btn">
             运行
           </button>
-          <button type="button" onClick={onCancel} disabled={!running} title={running ? '取消当前运行' : '空闲时不可取消'}>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={!running}
+            data-testid="cancel-btn"
+            title={running ? '取消当前运行' : '空闲时不可取消'}
+          >
             取消
           </button>
+          {running && <span className="muted" data-testid="run-status">运行中…</span>}
+          {!running && runLabel === 'cancelled' && (
+            <span className="run-status-cancelled" data-testid="run-status">已取消</span>
+          )}
+          {!running && runLabel === 'truncated' && (
+            <span className="run-status-truncated" data-testid="run-status">采样截断</span>
+          )}
           <button type="button" onClick={onResetPlayback} disabled={!hasRun}>
             重置播放
           </button>
@@ -923,6 +1039,26 @@ export default function AlgoPage() {
               ? '草稿已改 · 显示上一轮运行'
               : `步骤 ${cursorIndex + 1}/${Math.max(steps.length, 1)}`
         }
+        transport={
+          hasRun && steps[cursorIndex] ? (
+            <div className="workbench-inspector" data-testid="workbench-inspector">
+              <strong>检查器</strong>
+              <span className="muted"> · {steps[cursorIndex]?.message}</span>
+              {steps[cursorIndex]?.frameId && (
+                <span className="muted"> · frame {steps[cursorIndex]?.frameId}</span>
+              )}
+              {steps[cursorIndex]?.vars && (
+                <div className="muted" style={{ marginTop: 4 }}>
+                  vars:{' '}
+                  {Object.entries(steps[cursorIndex]!.vars!)
+                    .slice(0, 8)
+                    .map(([k, v]) => `${k}=${String(v)}`)
+                    .join(' · ')}
+                </div>
+              )}
+            </div>
+          ) : null
+        }
         viz={
           <>
             {isGraphAlgo(id) && hasRun && (
@@ -941,13 +1077,18 @@ export default function AlgoPage() {
               staleResult={hasRun && (staleResult || draftDirty)}
               finalAnswer={
                 hasRun && steps.length ? (
-                  <pre style={{ margin: 0, fontSize: '0.8rem' }}>
-                    {JSON.stringify(
-                      steps[steps.length - 1]?.result ?? steps[steps.length - 1]?.vars,
-                      null,
-                      2,
-                    )?.slice(0, 600)}
-                  </pre>
+                  <div className="final-answer-human" data-testid="final-answer">
+                    {formatFinalAnswer(
+                      steps[steps.length - 1]?.result,
+                      steps[steps.length - 1]?.vars,
+                    )}
+                    {runLabel === 'cancelled' && (
+                      <div className="run-status-cancelled">状态：已取消</div>
+                    )}
+                    {runLabel === 'truncated' && (
+                      <div className="run-status-truncated">状态：采样截断</div>
+                    )}
+                  </div>
                 ) : null
               }
             />
@@ -956,16 +1097,22 @@ export default function AlgoPage() {
         code={(() => {
           const catalog = id ? getCatalog(id) : null
           if (catalog) {
+            const step = isPreviewMode ? undefined : steps[cursorIndex]
+            const primary = pickPrimaryCodeRef(step)
+            const contexts = weakContextRefs(step)
+            const unmapped =
+              !isPreviewMode &&
+              !!step &&
+              !primary &&
+              !step.codeLine &&
+              step.phase !== 'preview'
             return (
               <CodeBrowser
-                document={catalog.typescript}
-                execAnchorId={
-                  isPreviewMode
-                    ? undefined
-                    : (steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase)
-                }
-                activeLine={isPreviewMode ? undefined : steps[cursorIndex]?.codeLine}
-                pseudocode={catalog.pseudocode?.source}
+                documents={catalog}
+                execAnchorId={isPreviewMode ? undefined : primary?.anchorId}
+                contextAnchorIds={contexts.map((c) => c.anchorId)}
+                activeLine={isPreviewMode ? undefined : step?.codeLine}
+                unmapped={unmapped}
               />
             )
           }

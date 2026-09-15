@@ -224,14 +224,13 @@ export default function KnapsackUnit() {
           code={
             catalog ? (
               <CodeBrowser
-                document={catalog.typescript}
+                documents={catalog}
                 execAnchorId={
                   hasRun
                     ? (steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase)
                     : undefined
                 }
                 activeLine={hasRun ? steps[cursorIndex]?.codeLine : undefined}
-                pseudocode={catalog.pseudocode?.source}
               />
             ) : (
               <div className="code-stub">

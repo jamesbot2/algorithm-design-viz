@@ -1,6 +1,16 @@
-import { memo, useMemo, useState, type CSSProperties } from 'react'
+import {
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react'
 import type { ArrayOp, HighlightRole, Step, StepRanges } from '../types/step'
 import { deriveArrayPointers } from '../types/step'
+import { useMotion } from '../theme/MotionContext'
+import { resolveDuration } from '../theme/motion'
 
 interface Props {
   name: string
@@ -15,6 +25,8 @@ interface Props {
   elementIds?: string[]
   prevValues?: (number | string)[]
   prevElementIds?: string[]
+  /** When true, skip FLIP (seek jump / non-adjacent snap) */
+  snapSwap?: boolean
 }
 
 const ROLE_CLASS: Record<HighlightRole, string> = {
@@ -51,7 +63,6 @@ function roleForIndex(
   }
   const hi = highlights.indexOf(i)
   if (hi < 0) return null
-  // Legacy soft hint — never treat length>=2 as swap
   return LEGACY_ORDER[0]!
 }
 
@@ -77,7 +88,6 @@ function rangeStyle(
 
 function resolveIds(values: (number | string)[], elementIds?: string[]): string[] {
   if (elementIds && elementIds.length === values.length) return elementIds
-  // Stable synthetic ids by first-seen slot; callers should pass real ids for duplicates
   return values.map((_, i) => `el-${i}`)
 }
 
@@ -94,12 +104,15 @@ function ArrayView({
   elementIds,
   prevValues,
   prevElementIds,
+  snapSwap = false,
 }: Props) {
   const numeric = values.every((v) => typeof v === 'number' && Number.isFinite(v as number))
   const suitable = barSuitable(values)
   const [mode, setMode] = useState<'bars' | 'cells'>(
     defaultMode ?? (suitable ? 'bars' : 'cells'),
   )
+  const { mode: motionMode } = useMotion()
+  const swapMs = resolveDuration(280, motionMode, 600)
 
   const nums = useMemo(
     () => (numeric ? (values as number[]) : values.map(() => 1)),
@@ -140,16 +153,122 @@ function ArrayView({
     return null
   }, [arrayOps, roles])
 
-  const swapDxMap = useMemo(() => {
-    const map = new Map<number, number>()
-    if (!swapPair || !prevValues || prevValues.length !== values.length) return map
+  const slotRefs = useRef<Map<number, HTMLElement | null>>(new Map())
+  const layerRefs = useRef<Map<string, HTMLElement | null>>(new Map())
+  const prevCenters = useRef<Map<string, number>>(new Map())
+  const animToken = useRef(0)
+
+  // Clear transforms on cancel / remount / non-swap
+  const clearTransforms = () => {
+    for (const el of layerRefs.current.values()) {
+      if (!el) continue
+      el.style.transition = 'none'
+      el.style.transform = 'none'
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      animToken.current += 1
+      clearTransforms()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useLayoutEffect(() => {
+    const token = ++animToken.current
+    const layers = layerRefs.current
+    const slots = slotRefs.current
+
+    // Measure current slot centers
+    const slotCenter = (i: number) => {
+      const el = slots.get(i)
+      if (!el) return null
+      const r = el.getBoundingClientRect()
+      return r.left + r.width / 2
+    }
+
+    const shouldFlip =
+      swapPair !== null &&
+      !snapSwap &&
+      prevValues &&
+      prevValues.length === values.length &&
+      motionMode !== 'reduced' &&
+      swapMs > 0
+
+    if (!shouldFlip || !swapPair) {
+      clearTransforms()
+      // Record centers for next time
+      for (let i = 0; i < values.length; i++) {
+        const c = slotCenter(i)
+        const id = ids[i]
+        if (c != null && id) prevCenters.current.set(id, c)
+      }
+      return
+    }
+
     const [i, j] = swapPair
-    // Approximate geometry swap: nudge toward each other's previous slot
-    const gap = Math.abs(j - i) * 28
-    map.set(i, j > i ? gap : -gap)
-    map.set(j, i > j ? gap : -gap)
-    return map
-  }, [swapPair, prevValues, values.length])
+    const adjacent = Math.abs(j - i) === 1
+    // Seek / non-adjacent: snap (no residual translate)
+    if (!adjacent && snapSwap) {
+      clearTransforms()
+      return
+    }
+
+    // FLIP: elements now sit in new slots; invert from previous centers
+    const idAt = (idx: number) => ids[idx]!
+    const targets = [i, j]
+
+    for (const idx of targets) {
+      const id = idAt(idx)
+      const layer = layers.get(id)
+      const newCenter = slotCenter(idx)
+      const oldCenter = prevCenters.current.get(id)
+      if (!layer || newCenter == null || oldCenter == null) continue
+      const dx = oldCenter - newCenter
+      layer.style.transition = 'none'
+      layer.style.transform = `translateX(${dx}px)`
+    }
+
+    // Force reflow
+    void document.body.offsetHeight
+
+    requestAnimationFrame(() => {
+      if (animToken.current !== token) return
+      for (const idx of targets) {
+        const id = idAt(idx)
+        const layer = layers.get(id)
+        if (!layer) continue
+        layer.style.transition = `transform ${swapMs}ms ease`
+        layer.style.transform = 'translateX(0px)'
+      }
+      window.setTimeout(() => {
+        if (animToken.current !== token) return
+        for (const idx of targets) {
+          const id = idAt(idx)
+          const layer = layers.get(id)
+          if (!layer) continue
+          layer.style.transition = 'none'
+          layer.style.transform = 'none'
+        }
+        // Update prev centers after settle
+        for (let k = 0; k < values.length; k++) {
+          const c = slotCenter(k)
+          const id = ids[k]
+          if (c != null && id) prevCenters.current.set(id, c)
+        }
+      }, swapMs + 20)
+    })
+  }, [
+    values,
+    ids,
+    swapPair,
+    snapSwap,
+    prevValues,
+    prevElementIds,
+    motionMode,
+    swapMs,
+  ])
 
   const curBand = rangeStyle(ranges?.current, values.length)
   const bestBand = rangeStyle(ranges?.best, values.length)
@@ -191,24 +310,35 @@ function ArrayView({
             const ptrs = pointersByIndex.get(i) ?? []
             const neg = n < 0
             const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
-            const dx = swapDxMap.get(i) ?? 0
+            const eid = ids[i]!
             return (
-              <div key={ids[i]} className={`bar-col${neg ? ' neg' : ' pos'}`} data-el-id={ids[i]}>
+              <div
+                key={eid}
+                className={`bar-col${neg ? ' neg' : ' pos'}`}
+                data-el-id={eid}
+                data-slot-index={i}
+                ref={(el) => {
+                  slotRefs.current.set(i, el)
+                }}
+              >
+                {/* Outer slot is stable geometry; inner flip layer translates; pulse on deepest */}
                 <div
-                  className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${neg ? ' bar-neg' : ''}${
-                    isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
-                  }`}
-                  style={
-                    {
-                      height: `${h}px`,
-                      ['--swap-dx' as string]: `${dx}px`,
-                      transform: isSwap ? `translateX(${dx}px)` : undefined,
-                      transition: isSwap ? 'transform var(--motion-swap, 280ms) ease' : undefined,
-                    } as CSSProperties
-                  }
-                  title={`[${i}] = ${v}`}
+                  className="bar-flip-layer"
+                  data-flip-layer
+                  ref={(el) => {
+                    layerRefs.current.set(eid, el)
+                  }}
+                  style={{ transform: 'none' } as CSSProperties}
                 >
-                  <span className="bar-val">{String(v)}</span>
+                  <div
+                    className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${neg ? ' bar-neg' : ''}${
+                      isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
+                    }`}
+                    style={{ height: `${h}px` }}
+                    title={`[${i}] = ${v}`}
+                  >
+                    <span className="bar-val">{String(v)}</span>
+                  </div>
                 </div>
                 <span className="bar-idx">{i}</span>
                 <div className="pointer-row">
@@ -228,16 +358,34 @@ function ArrayView({
             {values.map((v, i) => {
               const role = roleForIndex(i, highlights, roles, arrayOps)
               const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
+              const eid = ids[i]!
               return (
                 <div
-                  key={ids[i]}
-                  className={`cell${role ? ` ${ROLE_CLASS[role]}` : ''}${
-                    isSwap ? ' anim-swap-geo' : ''
-                  }`}
-                  data-el-id={ids[i]}
+                  key={eid}
+                  className="cell-slot"
+                  data-el-id={eid}
+                  data-slot-index={i}
+                  ref={(el) => {
+                    slotRefs.current.set(i, el)
+                  }}
                 >
-                  <span className="cell-idx">{i}</span>
-                  <span className="cell-val">{String(v)}</span>
+                  <div
+                    className="cell-flip-layer"
+                    data-flip-layer
+                    ref={(el) => {
+                      layerRefs.current.set(eid, el)
+                    }}
+                    style={{ transform: 'none' }}
+                  >
+                    <div
+                      className={`cell${role ? ` ${ROLE_CLASS[role]}` : ''}${
+                        isSwap ? ' anim-swap-geo' : ''
+                      }`}
+                    >
+                      <span className="cell-idx">{i}</span>
+                      <span className="cell-val">{String(v)}</span>
+                    </div>
+                  </div>
                 </div>
               )
             })}
@@ -268,8 +416,6 @@ function ArrayView({
           )}
         </p>
       )}
-      {/* silence unused */}
-      {prevElementIds ? null : null}
     </div>
   )
 }
@@ -280,10 +426,12 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   step,
   prevStep,
   scaleMaxByArray,
+  snapSwap,
 }: {
   step: Step
   prevStep?: Step
   scaleMaxByArray?: Record<string, number>
+  snapSwap?: boolean
 }) {
   if (!step.arrays) return null
   return (
@@ -302,6 +450,7 @@ export const ArraysFromStep = memo(function ArraysFromStep({
           elementIds={step.elementIds?.[name]}
           prevValues={prevStep?.arrays?.[name]}
           prevElementIds={prevStep?.elementIds?.[name]}
+          snapSwap={snapSwap}
         />
       ))}
     </div>
