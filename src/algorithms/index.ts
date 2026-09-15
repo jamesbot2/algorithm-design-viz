@@ -20,9 +20,18 @@ import * as prim from './prim'
 export interface AlgoMeta {
   id: string
   title: string
+  /** Short display string (kept for UI); prefer timeComplexity/spaceComplexity fields */
   complexity: string
   description: string
   code?: string
+  implName?: string
+  implVersion?: string
+  timeComplexity?: string
+  spaceComplexity?: string
+  spaceNotes?: string
+  inputAssumptions?: string
+  /** What comparisons / swaps / writes mean for this implementation */
+  statDefinitions?: string
   [key: string]: unknown
 }
 

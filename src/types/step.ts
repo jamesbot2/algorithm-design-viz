@@ -1,13 +1,22 @@
+export type EdgeRole = 'checking' | 'accepted' | 'rejected' | 'tree' | 'path' | 'relaxing'
+
+export interface GraphEdge {
+  /** Stable unique id for this edge instance (directed opposite edges differ). */
+  id: string
+  from: string | number
+  to: string | number
+  weight?: number
+  directed?: boolean
+}
+
 export interface GraphState {
   nodes: { id: string | number; label?: string; x?: number; y?: number }[]
-  edges: {
-    from: string | number
-    to: string | number
-    weight?: number
-    directed?: boolean
-  }[]
+  edges: GraphEdge[]
   highlightNodes?: (string | number)[]
+  /** @deprecated Prefer highlightEdgeIds + edgeRoles */
   highlightEdges?: [string | number, string | number][]
+  highlightEdgeIds?: string[]
+  edgeRoles?: Record<string, EdgeRole>
 }
 
 /** Visual role for an array index highlight */
@@ -17,6 +26,13 @@ export interface StepStats {
   comparisons?: number
   swaps?: number
   writes?: number
+}
+
+export interface MatrixTarget {
+  current?: [number, number]
+  reads?: [number, number][]
+  writes?: [number, number][]
+  path?: [number, number][]
 }
 
 export interface Step {
@@ -29,12 +45,25 @@ export interface Step {
   arrays?: Record<string, number[] | string[]>
   matrices?: Record<string, (number | string | null)[][]>
   vars?: Record<string, string | number | boolean | null>
-  /** Named index pointers shown under bars (i, j, mid, lo, hi, …) */
+  /** Named index pointers shown under bars (i, j, mid, lo, hi, …) — legacy global */
   pointers?: Record<string, number>
+  /**
+   * Pointers scoped per array name → pointerName → index.
+   * Preferred over global `pointers` when multiple arrays are shown.
+   * Indexing is 0-based everywhere in viz unless a view explicitly labels otherwise.
+   */
+  arrayPointers?: Record<string, Record<string, number>>
+  /**
+   * Matrix cell highlights keyed by matrix name.
+   * Prefer this over inferring from vars.i / vars.j (0 is a valid index).
+   */
+  matrixTargets?: Record<string, MatrixTarget>
   /** Cumulative operation counters when the generator tracks them */
   stats?: StepStats
   codeLine?: number
   graph?: GraphState
+  /** Structured result on terminal / summary steps when practical */
+  result?: unknown
 }
 
 /** Common var names that usually mean array indices */
@@ -42,7 +71,7 @@ export const INDEX_VAR_NAMES = [
   'i', 'j', 'k', 'mid', 'lo', 'hi', 'L', 'R', 'p', 'left', 'right', 'low', 'high', 'start', 'end',
 ] as const
 
-/** Derive pointers from step.pointers or numeric index-like vars */
+/** Derive pointers from step.pointers or numeric index-like vars (legacy global) */
 export function derivePointers(step: Step): Record<string, number> {
   if (step.pointers && Object.keys(step.pointers).length > 0) {
     return { ...step.pointers }
@@ -56,4 +85,19 @@ export function derivePointers(step: Step): Record<string, number> {
     }
   }
   return out
+}
+
+/**
+ * Resolve pointers for a specific array.
+ * Prefer arrayPointers[arrayName]; fall back to global pointers only when
+ * there is a single array or the array is named "a".
+ */
+export function deriveArrayPointers(step: Step, arrayName: string): Record<string, number> {
+  const scoped = step.arrayPointers?.[arrayName]
+  if (scoped && Object.keys(scoped).length > 0) return { ...scoped }
+  const arrayNames = step.arrays ? Object.keys(step.arrays) : []
+  if (arrayNames.length <= 1 || arrayName === 'a') {
+    return derivePointers(step)
+  }
+  return {}
 }

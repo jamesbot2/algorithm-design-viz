@@ -12,6 +12,14 @@ export const meta = {
     a[j+1] = a[j]
     j--
   a[j+1] = key`,
+
+  implName: 'insertionSort',
+  implVersion: '1.0.1',
+  timeComplexity: '最坏 O(n²)，最好 O(n)',
+  spaceComplexity: 'O(1)',
+  spaceNotes: '原地。',
+  inputAssumptions: '任意数值数组。',
+  statDefinitions: 'comparisons=插入探测比较；writes/swaps 依实现计入 swaps。',
 }
 
 export function generateSteps(input: number[]): Step[] {

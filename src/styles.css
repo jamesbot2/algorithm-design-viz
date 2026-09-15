@@ -763,3 +763,53 @@ button.icon-btn {
   .main { padding: 1rem 1rem 2.5rem; }
   .viz-toolbar { border-radius: 16px; }
 }
+
+
+/* —— M0 additions —— */
+.input-errors {
+  list-style: none;
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: var(--radius-sm);
+  color: #fecaca;
+  font-size: 0.9rem;
+}
+.input-errors li + li { margin-top: 0.35rem; }
+.input-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.meta-extras { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); }
+.meta-line { margin: 0.2rem 0; }
+.meta-note { margin: 0.25rem 0; font-size: 0.82rem; color: var(--muted-2); }
+.muted { color: var(--muted-2); }
+.matrix-index-hint { margin-left: 0.5rem; font-size: 0.75rem; color: var(--muted-2); font-weight: 400; }
+.matrix-note { font-size: 0.78rem; color: var(--muted-2); margin: 0.4rem 0 0; }
+.matrix-col-h, .matrix-row-h, .matrix-corner {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted-2);
+  font-weight: 500;
+  padding: 0.15rem 0.35rem;
+}
+.matrix-table td.hl-swap { background: rgba(239, 68, 68, 0.28); border-color: var(--danger); }
+.matrix-table td.hl-sorted { background: rgba(16, 163, 127, 0.22); border-color: var(--good); }
+.edge.checking { stroke: var(--warn); stroke-width: 3; }
+.edge.accepted, .edge.tree { stroke: var(--good); stroke-width: 3; }
+.edge.rejected { stroke: var(--danger); stroke-width: 2; stroke-dasharray: 4 3; }
+.edge.path, .edge.relaxing { stroke: var(--info); stroke-width: 3; }
+.input-panel select {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+}

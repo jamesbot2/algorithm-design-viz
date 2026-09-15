@@ -1,10 +1,12 @@
-import type { Step } from '../types/step'
+import type { EdgeRole, Step } from '../types/step'
+import { directedEdgeId } from '../utils/edgeId'
+import { layoutGraph } from '../utils/layoutGraph'
 
 export const meta = {
   id: 'bellmanFord',
   title: 'Bellman-Ford 最短路',
   complexity: '时间 O(VE)，空间 O(V)',
-  description: '可处理负权边：对所有边松弛 |V|-1 轮，再检测负环。',
+  description: '可处理负权边：对所有边松弛 |V|-1 轮，再检测从源可达的负环。',
   code: `dist[s]=0
 for i = 1..V-1:
   for each edge (u,v,w):
@@ -16,14 +18,13 @@ for i = 1..V-1:
   ] as [number, number, number][],
   defaultN: 5,
   defaultStart: 0,
-}
-
-const POS: Record<number, { x: number; y: number }> = {
-  0: { x: 100, y: 60 },
-  1: { x: 300, y: 40 },
-  2: { x: 100, y: 200 },
-  3: { x: 300, y: 200 },
-  4: { x: 420, y: 120 },
+  implName: 'bellmanFordClassic',
+  implVersion: '1.1.0',
+  timeComplexity: 'O(VE)',
+  spaceComplexity: 'O(V)',
+  spaceNotes: 'dist[V]；边表 O(E)。',
+  inputAssumptions: '有向边可负权；仅报告从源可达负环；负环时 dist 不可当作有效最短路。',
+  statDefinitions: '不累计 comparisons。',
 }
 
 export function generateSteps(
@@ -34,11 +35,28 @@ export function generateSteps(
 ): Step[] {
   const dist = Array(n).fill(Infinity)
   dist[start] = 0
-  const edges = edgeList.map(([u, v, w]) => ({ from: u, to: v, weight: w, directed: true }))
+  const edges = edgeList.map(([u, v, w]) => ({
+    id: directedEdgeId(u, v),
+    from: u,
+    to: v,
+    weight: w,
+    directed: true as const,
+  }))
+  const nodes = layoutGraph(n)
   const steps: Step[] = []
   let id = 0
+  const edgeRoles: Record<string, EdgeRole> = {}
 
-  const snap = (message: string, he: [number, number][] = [], hn: number[] = [], vars: Record<string, string | number | boolean | null> = {}) => {
+  const snap = (
+    message: string,
+    checking?: string,
+    hn: number[] = [],
+    vars: Record<string, string | number | boolean | null> = {},
+    result?: unknown,
+  ) => {
+    const roles = { ...edgeRoles }
+    const highlightEdgeIds = checking ? [checking] : []
+    if (checking) roles[checking] = 'checking'
     steps.push({
       id: id++,
       message,
@@ -46,37 +64,73 @@ export function generateSteps(
       highlights: { dist: hn },
       vars,
       graph: {
-        nodes: Array.from({ length: n }, (_, i) => ({ id: i, label: String(i), ...POS[i] })),
+        nodes,
         edges,
         highlightNodes: hn,
-        highlightEdges: he,
+        highlightEdgeIds,
+        edgeRoles: roles,
       },
+      result,
     })
   }
 
-  snap(`初始化 dist[${start}]=0`, [], [start], { start })
+  snap(`初始化 dist[${start}]=0`, undefined, [start], { start })
   for (let i = 1; i <= n - 1; i++) {
-    snap(`第 ${i} 轮松弛`, [], [], { round: i })
+    snap(`第 ${i} 轮松弛`, undefined, [], { round: i })
     for (const [u, v, w] of edgeList) {
-      snap(`边 ${u}→${v} (w=${w})`, [[u, v]], [u, v], {
-        u, v, w,
+      const eid = directedEdgeId(u, v)
+      snap(`边 ${u}→${v} (w=${w})`, eid, [u, v], {
+        u,
+        v,
+        w,
         dist_u: dist[u] === Infinity ? '∞' : dist[u],
         dist_v: dist[v] === Infinity ? '∞' : dist[v],
       })
       if (dist[u] !== Infinity && dist[u] + w < dist[v]) {
         dist[v] = dist[u] + w
-        snap(`更新 dist[${v}] = ${dist[v]}`, [[u, v]], [v], { v, newDist: dist[v] })
+        edgeRoles[eid] = 'relaxing'
+        snap(`更新 dist[${v}] = ${dist[v]}`, eid, [v], { v, newDist: dist[v] })
       }
     }
   }
-  let neg = false
+
+  let negEdge: [number, number, number] | null = null
   for (const [u, v, w] of edgeList) {
     if (dist[u] !== Infinity && dist[u] + w < dist[v]) {
-      neg = true
-      snap(`检测到负环：边 ${u}→${v} 仍可松弛`, [[u, v]], [u, v], { negativeCycle: true })
+      negEdge = [u, v, w]
       break
     }
   }
-  if (!neg) snap('无负环，算法结束', [], [], { dist: dist.map((d) => (d === Infinity ? '∞' : d)).join(',') })
+
+  if (negEdge) {
+    const [u, v, w] = negEdge
+    const eid = directedEdgeId(u, v)
+    edgeRoles[eid] = 'rejected'
+    snap(
+      `检测到从源可达负环：边 ${u}→${v} (w=${w}) 在第 V 轮仍可松弛。距离数组已不可信，不作为有效最短路输出。`,
+      eid,
+      [u, v],
+      { negativeCycle: true, u, v, w },
+      {
+        ok: false,
+        error: 'negative_cycle_reachable',
+        edge: negEdge,
+        distCorrupted: true,
+        note: '勿将当前 dist 当作最短路',
+      },
+    )
+  } else {
+    snap(
+      '无可达负环，算法结束',
+      undefined,
+      [],
+      { dist: dist.map((d) => (d === Infinity ? '∞' : d)).join(',') },
+      {
+        ok: true,
+        dist: dist.map((d) => (d === Infinity ? null : d)),
+        negativeCycle: false,
+      },
+    )
+  }
   return steps
 }

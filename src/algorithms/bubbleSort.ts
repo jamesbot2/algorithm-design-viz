@@ -9,6 +9,14 @@ export const meta = {
   for j = 0 to n-2-i
     if a[j] > a[j+1]
       swap(a[j], a[j+1])`,
+
+  implName: 'bubbleSortAdjacent',
+  implVersion: '1.0.1',
+  timeComplexity: '最坏/平均 O(n²)，最好 O(n)（本实现无提前退出则为 O(n²)）',
+  spaceComplexity: 'O(1)',
+  spaceNotes: '原地交换。',
+  inputAssumptions: '任意数值数组。',
+  statDefinitions: 'comparisons=相邻比较；swaps=交换次数。',
 }
 
 export function generateSteps(input: number[]): Step[] {

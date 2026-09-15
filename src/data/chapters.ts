@@ -203,7 +203,7 @@ export const chapters: Chapter[] = [
       {
         id: 'sp',
         title: '最短路径',
-        content: `- **Dijkstra**：非负权，优先队列松弛
+        content: `- **Dijkstra**：非负权单源最短路。本站演示为**朴素 O(V²+E)**（每轮扫描选最小 dist）；堆优化可达 O((V+E) log V)
 - **Bellman-Ford**：可负权，检测负环，O(VE)
 - **Floyd-Warshall**：全源，O(n³)，基于中转点 DP
 - **差分约束**：可建模为 Bellman-Ford`,
@@ -256,7 +256,7 @@ export const chapters: Chapter[] = [
       {
         id: 'kmp',
         title: 'KMP',
-        content: `朴素匹配最坏 O(nm)。KMP 预处理模式串的 **next/π 数组**（最长真前后缀），匹配失配时模式串右移到 next 指引位置，总时间 O(n+m)。`,
+        content: `朴素匹配最坏 O(nm)。KMP 预处理模式串的 **next/π 数组**（π[i] = p[0..i] 最长真前后缀长度），匹配失配时模式串右移到 next 指引位置，总时间 O(n+m)。本站索引为 JS 字符串码元下标；空模式约定匹配位置 0。`,
       },
       {
         id: 'rk',

@@ -1,10 +1,13 @@
-import type { Step } from '../types/step'
+import type { EdgeRole, Step } from '../types/step'
+import { undirectedEdgeId } from '../utils/edgeId'
+import { layoutGraph } from '../utils/layoutGraph'
 
 export const meta = {
   id: 'prim',
   title: 'Prim 最小生成树',
-  complexity: '时间 O(V²) 或 O(E log V)，空间 O(V)',
-  description: '从起点生长：每次加入连接树内与树外的最小权边。',
+  complexity: '时间 O(V²)，空间 O(V+E)',
+  description:
+    '从起点生长：每轮 O(V) 选 key 最小未加入顶点（稠密图朴素实现，非二叉堆）。不连通则仅覆盖可达分量。',
   code: `key[s]=0; 其余=∞
 while 有未加入顶点:
   u = key 最小未加入者
@@ -16,14 +19,13 @@ while 有未加入顶点:
   ] as [number, number, number][],
   defaultN: 5,
   defaultStart: 0,
-}
-
-const POS: Record<number, { x: number; y: number }> = {
-  0: { x: 100, y: 80 },
-  1: { x: 260, y: 40 },
-  2: { x: 400, y: 100 },
-  3: { x: 140, y: 220 },
-  4: { x: 320, y: 220 },
+  implName: 'primDenseScan',
+  implVersion: '1.1.0',
+  timeComplexity: 'O(V² + E)（每轮扫 V 选点 + 邻接更新）',
+  spaceComplexity: 'O(V + E)',
+  spaceNotes: 'key/parent/inMST；邻接表。非堆优化版。',
+  inputAssumptions: '无向非负权；若从 start 不可达全部顶点，报告部分树/森林而非 MST 成功。',
+  statDefinitions: '不累计 comparisons。',
 }
 
 export function generateSteps(
@@ -32,10 +34,11 @@ export function generateSteps(
   n = meta.defaultN,
   start = meta.defaultStart,
 ): Step[] {
-  const adj: { v: number; w: number }[][] = Array.from({ length: n }, () => [])
+  const adj: { v: number; w: number; id: string }[][] = Array.from({ length: n }, () => [])
   for (const [u, v, w] of edgeList) {
-    adj[u].push({ v, w })
-    adj[v].push({ v: u, w })
+    const eid = undirectedEdgeId(u, v)
+    adj[u].push({ v, w, id: eid })
+    adj[v].push({ v: u, w, id: eid })
   }
   const key = Array(n).fill(Infinity)
   const parent = Array(n).fill(-1)
@@ -43,11 +46,27 @@ export function generateSteps(
   key[start] = 0
   const steps: Step[] = []
   let id = 0
-  const allEdges = edgeList.map(([u, v, w]) => ({ from: u, to: v, weight: w }))
+  const nodes = layoutGraph(n)
+  const allEdges = edgeList.map(([u, v, w]) => ({
+    id: undirectedEdgeId(u, v),
+    from: u,
+    to: v,
+    weight: w,
+  }))
+  const treeEdges = new Set<string>()
+  const edgeRoles: Record<string, EdgeRole> = {}
 
-  const snap = (message: string, hn: number[] = [], he: [number, number][] = [], vars: Record<string, string | number | boolean | null> = {}) => {
-    const mstEdges: [number, number][] = []
-    for (let i = 0; i < n; i++) if (parent[i] >= 0 && inMST[i]) mstEdges.push([parent[i], i])
+  const snap = (
+    message: string,
+    hn: number[] = [],
+    checking?: string,
+    vars: Record<string, string | number | boolean | null> = {},
+    result?: unknown,
+  ) => {
+    const roles = { ...edgeRoles }
+    for (const e of treeEdges) roles[e] = 'tree'
+    const highlightEdgeIds = [...Array.from(treeEdges), ...(checking ? [checking] : [])]
+    if (checking) roles[checking] = treeEdges.has(checking) ? 'tree' : 'checking'
     steps.push({
       id: id++,
       message,
@@ -59,30 +78,65 @@ export function generateSteps(
       highlights: { key: hn },
       vars,
       graph: {
-        nodes: Array.from({ length: n }, (_, i) => ({ id: i, label: String(i), ...POS[i] })),
+        nodes,
         edges: allEdges,
         highlightNodes: hn,
-        highlightEdges: he.length ? he : mstEdges,
+        highlightEdgeIds,
+        edgeRoles: roles,
       },
+      result,
     })
   }
 
-  snap(`从顶点 ${start} 开始`, [start], [], { start })
+  snap(`从顶点 ${start} 开始`, [start], undefined, { start })
+  let added = 0
   for (let iter = 0; iter < n; iter++) {
-    let u = -1, best = Infinity
-    for (let i = 0; i < n; i++) if (!inMST[i] && key[i] < best) { best = key[i]; u = i }
-    if (u < 0) break
+    let u = -1
+    let best = Infinity
+    for (let i = 0; i < n; i++) {
+      if (!inMST[i] && key[i] < best) {
+        best = key[i]
+        u = i
+      }
+    }
+    if (u < 0 || best === Infinity) break
     inMST[u] = true
-    snap(`加入顶点 ${u}（key=${key[u]}）`, [u], parent[u] >= 0 ? [[parent[u], u]] : [], { u })
-    for (const { v, w } of adj[u]) {
-      snap(`检查边 ${u}-${v} (w=${w})`, [u, v], [[u, v]], { u, v, w, key_v: key[v] === Infinity ? '∞' : key[v] })
+    added++
+    const treeEid = parent[u] >= 0 ? undirectedEdgeId(parent[u], u) : undefined
+    if (treeEid) {
+      treeEdges.add(treeEid)
+      edgeRoles[treeEid] = 'tree'
+    }
+    snap(`加入顶点 ${u}（key=${key[u]}）`, [u], treeEid, { u })
+    for (const { v, w, id: eid } of adj[u]) {
+      snap(`检查边 ${u}-${v} (w=${w})`, [u, v], eid, {
+        u,
+        v,
+        w,
+        key_v: key[v] === Infinity ? '∞' : key[v],
+      })
       if (!inMST[v] && w < key[v]) {
         key[v] = w
         parent[v] = u
-        snap(`更新 key[${v}]=${w}, parent[${v}]=${u}`, [v], [[u, v]], { v, key: w })
+        snap(`更新 key[${v}]=${w}, parent[${v}]=${u}`, [v], eid, { v, key: w })
       }
     }
   }
-  snap('Prim 完成', [], [], {})
+  const connected = added === n
+  if (connected) {
+    snap('Prim 完成：得到生成树', [], undefined, { spanning: true }, {
+      ok: true,
+      kind: 'mst',
+      vertices: added,
+    })
+  } else {
+    snap(
+      `图从 ${start} 不连通：仅覆盖 ${added}/${n} 个顶点，无生成树（得到部分树/森林分量）。`,
+      [],
+      undefined,
+      { spanning: false, covered: added },
+      { ok: true, kind: 'partial', covered: added, n },
+    )
+  }
   return steps
 }

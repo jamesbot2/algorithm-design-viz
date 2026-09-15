@@ -4,8 +4,9 @@ export const meta = {
   id: 'kmp',
   title: 'KMP 字符串匹配',
   complexity: '时间 O(n+m)，空间 O(m)',
-  description: '预处理模式串 next/π 数组，匹配失败时利用已匹配信息跳转。',
-  code: `建 next[]
+  description:
+    '预处理模式串 π（next）数组：π[i] = 模式 p[0..i] 的最长真前后缀长度。匹配失败时利用 π 跳转。索引为 JS 字符串码元（UTF-16 code unit）下标。空模式约定：在位置 0 匹配成功（空串是任何串的前缀）。',
+  code: `建 π/next[]
 i=j=0
 while i < n:
   if t[i]==p[j]: i++; j++
@@ -13,6 +14,14 @@ while i < n:
   else: i++`,
   defaultText: 'ABABCABABABD',
   defaultPattern: 'ABABD',
+  implName: 'kmpPi',
+  implVersion: '1.1.0',
+  timeComplexity: 'O(n+m)',
+  spaceComplexity: 'O(m)',
+  spaceNotes: 'π/next 长度 m；匹配阶段 O(1) 额外。',
+  inputAssumptions:
+    'π[i]=p[0..i] 最长真前后缀长度；空 pattern → 命中 [0]；索引为 code-unit（非码点）。',
+  statDefinitions: '不累计 comparisons。',
 }
 
 export function generateSteps(
@@ -20,28 +29,50 @@ export function generateSteps(
   text = meta.defaultText,
   pattern = meta.defaultPattern,
 ): Step[] {
-  const t = text, p = pattern
+  const t = text
+  const p = pattern
   const m = p.length
   const next = Array(m).fill(0)
   const steps: Step[] = []
   let id = 0
 
-  const snap = (message: string, ht: number[] = [], hp: number[] = [], vars: Record<string, string | number | boolean | null> = {}) => {
+  const snap = (
+    message: string,
+    ht: number[] = [],
+    hp: number[] = [],
+    vars: Record<string, string | number | boolean | null> = {},
+    result?: unknown,
+  ) => {
+    const arrayPointers: Record<string, Record<string, number>> = {}
+    if (ht.length === 1) arrayPointers.text = { i: ht[0]! }
+    if (hp.length >= 1) arrayPointers.pattern = { j: hp[0]! }
     steps.push({
       id: id++,
       message,
       arrays: {
         text: t.split(''),
         pattern: p.split(''),
-        next: [...next],
+        next: m ? [...next] : [],
       },
       highlights: { text: ht, pattern: hp, next: [] },
+      arrayPointers,
       vars,
+      result,
     })
   }
 
-  snap('构建 next 数组（最长真前后缀）', [], [], { phase: 'prefix' })
-  let len = 0, i = 1
+  if (m === 0) {
+    snap('空模式：约定在下标 0 匹配（空串为任意串前缀）', [], [], { phase: 'empty' }, {
+      ok: true,
+      hits: [0],
+      convention: 'empty_pattern_matches_at_0',
+    })
+    return steps
+  }
+
+  snap('构建 π/next 数组（最长真前后缀长度）', [], [], { phase: 'prefix' })
+  let len = 0
+  let i = 1
   while (i < m) {
     snap(`比较 p[${i}]='${p[i]}' 与 p[${len}]='${p[len]}'`, [], [i, len], { i, len })
     if (p[i] === p[len]) {
@@ -51,16 +82,17 @@ export function generateSteps(
       i++
     } else if (len > 0) {
       len = next[len - 1]
-      snap(`失配，len ← next[${len}]... 回退`, [], [i], { i, len })
+      snap(`失配，len ← next[...] 回退到 ${len}`, [], [i], { i, len })
     } else {
       next[i] = 0
       snap(`next[${i}]=0`, [], [i], { i })
       i++
     }
   }
-  snap(`next = [${next.join(',')}]`, [], [], { phase: 'match' })
+  snap(`π/next = [${next.join(',')}]`, [], [], { phase: 'match' })
 
-  let ti = 0, pj = 0
+  let ti = 0
+  let pj = 0
   const hits: number[] = []
   while (ti < t.length) {
     snap(`比较 t[${ti}]='${t[ti]}' 与 p[${pj}]='${p[pj]}'`, [ti], [pj], { ti, pj })
@@ -69,7 +101,12 @@ export function generateSteps(
       pj++
       if (pj === m) {
         hits.push(ti - m)
-        snap(`匹配成功！起点 ${ti - m}`, Array.from({ length: m }, (_, k) => ti - m + k), Array.from({ length: m }, (_, k) => k), { hit: ti - m })
+        snap(
+          `匹配成功！起点 ${ti - m}`,
+          Array.from({ length: m }, (_, k) => ti - m + k),
+          Array.from({ length: m }, (_, k) => k),
+          { hit: ti - m },
+        )
         pj = next[pj - 1]
       }
     } else if (pj > 0) {
@@ -77,9 +114,15 @@ export function generateSteps(
       snap(`失配，模式串跳转 j ← ${pj}`, [ti], [pj], { ti, pj })
     } else {
       ti++
-      snap('失配且 j=0，文本前进', [ti], [], { ti, pj })
+      snap('失配且 j=0，文本前进', [ti < t.length ? ti : t.length - 1], [], { ti, pj })
     }
   }
-  snap(hits.length ? `完成，命中位置: [${hits.join(',')}]` : '完成，无匹配', [], [], { hits: hits.join(',') || '无' })
+  snap(
+    hits.length ? `完成，命中位置: [${hits.join(',')}]` : '完成，无匹配',
+    [],
+    [],
+    { hits: hits.join(',') || '无' },
+    { ok: true, hits, pi: [...next] },
+  )
   return steps
 }

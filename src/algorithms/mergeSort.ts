@@ -11,6 +11,14 @@ export const meta = {
   mergeSort(a, L, mid)
   mergeSort(a, mid+1, R)
   merge(a, L, mid, R)`,
+
+  implName: 'mergeSortTopDown',
+  implVersion: '1.0.1',
+  timeComplexity: 'Θ(n log n)',
+  spaceComplexity: 'O(n) 辅助数组 + O(log n) 栈',
+  spaceNotes: '合并需要 O(n) 临时空间。',
+  inputAssumptions: '任意数值数组。',
+  statDefinitions: 'comparisons=归并比较；writes=写入结果次数（若统计）。',
 }
 
 export function generateSteps(input: number[]): Step[] {

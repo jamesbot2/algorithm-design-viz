@@ -3,13 +3,20 @@ import type { HighlightRole, Step } from '../types/step'
 export const meta = {
   id: 'quickSort',
   title: '快速排序',
-  complexity: '平均 O(n log n)，最坏 O(n²)，空间 O(log n)',
-  description: '选取枢轴划分，使左侧 ≤ 枢轴 ≤ 右侧，再递归两侧。',
+  complexity: '平均 O(n log n)，最坏 O(n²)；辅助空间平均 O(log n)（递归栈，非 O(1)）',
+  description: '选取枢轴划分，使左侧 ≤ 枢轴 ≤ 右侧，再递归两侧。本实现原地交换 + 递归，整体空间含调用栈。',
   code: `quickSort(a, L, R):
   if L >= R: return
   p = partition(a, L, R)
   quickSort(a, L, p-1)
   quickSort(a, p+1, R)`,
+  implName: 'quickSortLomuto',
+  implVersion: '1.1.0',
+  timeComplexity: '平均 O(n log n)，最坏 O(n²)',
+  spaceComplexity: '平均 O(log n) 递归栈，最坏 O(n)；非整体 O(1)',
+  spaceNotes: '数组原地；额外空间主要来自递归调用栈，不可标为整体 O(1)。',
+  inputAssumptions: '任意可比较数值；枢轴取区间右端（Lomuto）。',
+  statDefinitions: 'comparisons = 与 pivot 的元素比较；swaps = 元素交换次数（含枢轴就位）。',
 }
 
 export function generateSteps(input: number[]): Step[] {

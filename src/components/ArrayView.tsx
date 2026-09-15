@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { HighlightRole, Step } from '../types/step'
-import { derivePointers } from '../types/step'
+import { deriveArrayPointers } from '../types/step'
 
 interface Props {
   name: string
@@ -94,7 +94,7 @@ export default function ArrayView({
         <div className="bars-wrap">
           {values.map((v, i) => {
             const role = roleForIndex(i, highlights, roles)
-            const h = minH + (Math.abs(nums[i]) / max) * (maxH - minH)
+            const h = minH + (Math.abs(nums[i]!) / max) * (maxH - minH)
             const ptrs = pointersByIndex.get(i) ?? []
             return (
               <div key={i} className="bar-col">
@@ -147,7 +147,6 @@ export default function ArrayView({
 
 export function ArraysFromStep({ step }: { step: Step }) {
   if (!step.arrays) return null
-  const pointers = derivePointers(step)
   return (
     <div className="arrays-panel">
       {Object.entries(step.arrays).map(([name, values]) => (
@@ -157,7 +156,7 @@ export function ArraysFromStep({ step }: { step: Step }) {
           values={values}
           highlights={step.highlights?.[name] ?? []}
           roles={step.roles?.[name]}
-          pointers={pointers}
+          pointers={deriveArrayPointers(step, name)}
         />
       ))}
     </div>

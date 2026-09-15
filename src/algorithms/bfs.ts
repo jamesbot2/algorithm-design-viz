@@ -1,10 +1,12 @@
-import type { Step } from '../types/step'
+import type { EdgeRole, Step } from '../types/step'
+import { undirectedEdgeId } from '../utils/edgeId'
+import { layoutGraph } from '../utils/layoutGraph'
 
 export const meta = {
   id: 'bfs',
   title: '广度优先搜索 (BFS)',
   complexity: '时间 O(V+E)，空间 O(V)',
-  description: '从源点层层扩展，使用队列保证先访问近邻。',
+  description: '从源点层层扩展，使用队列保证先访问近邻。无向图邻接表实现。',
   code: `queue ← [s]; visited[s]=true
 while queue not empty:
   u = dequeue()
@@ -20,15 +22,13 @@ while queue not empty:
     5: [2, 4],
   } as Record<number, number[]>,
   defaultStart: 0,
-}
-
-const POS: Record<number, { x: number; y: number }> = {
-  0: { x: 200, y: 40 },
-  1: { x: 80, y: 120 },
-  2: { x: 320, y: 120 },
-  3: { x: 40, y: 220 },
-  4: { x: 160, y: 220 },
-  5: { x: 320, y: 220 },
+  implName: 'bfsQueueAdj',
+  implVersion: '1.1.0',
+  timeComplexity: 'O(V+E)',
+  spaceComplexity: 'O(V)',
+  spaceNotes: 'visited + queue + order；邻接表另计。可视化树边累加保留。',
+  inputAssumptions: '默认无向图；邻接表可含双向边。',
+  statDefinitions: '不累计 comparisons。',
 }
 
 export function generateSteps(
@@ -36,62 +36,92 @@ export function generateSteps(
   adj = meta.defaultAdj,
   start = meta.defaultStart,
 ): Step[] {
-  const nodes = Object.keys(adj).map(Number)
-  const edges: { from: number; to: number; directed?: boolean }[] = []
+  const nodesIdx = Object.keys(adj).map(Number).sort((a, b) => a - b)
+  const n = nodesIdx.length
+  const layout = layoutGraph(n)
+  const nodePos = new Map(nodesIdx.map((id, i) => [id, layout[i]!]))
+
+  const edges: { id: string; from: number; to: number }[] = []
   const seenE = new Set<string>()
-  for (const u of nodes) {
+  for (const u of nodesIdx) {
     for (const v of adj[u] || []) {
-      const key = u < v ? `${u}-${v}` : `${v}-${u}`
-      if (!seenE.has(key)) {
-        seenE.add(key)
-        edges.push({ from: u, to: v })
+      const eid = undirectedEdgeId(u, v)
+      if (!seenE.has(eid)) {
+        seenE.add(eid)
+        edges.push({ id: eid, from: u, to: v })
       }
     }
   }
-  const visited: boolean[] = nodes.map(() => false)
+
+  const visited: boolean[] = Array(Math.max(...nodesIdx, 0) + 1).fill(false)
   const order: number[] = []
   const queue: number[] = []
   const steps: Step[] = []
   let id = 0
+  const treeEdges = new Set<string>()
+  const edgeRoles: Record<string, EdgeRole> = {}
 
-  const graph = (hn: number[] = [], he: [number, number][] = []) => ({
-    nodes: nodes.map((n) => ({ id: n, label: String(n), ...POS[n] })),
-    edges,
-    highlightNodes: hn,
-    highlightEdges: he,
-  })
-
-  const snap = (message: string, hn: number[] = [], he: [number, number][] = [], vars: Record<string, string | number | boolean | null> = {}) => {
+  const snap = (
+    message: string,
+    hn: number[] = [],
+    checking?: string,
+    vars: Record<string, string | number | boolean | null> = {},
+    result?: unknown,
+  ) => {
+    const roles = { ...edgeRoles }
+    for (const e of treeEdges) roles[e] = 'tree'
+    const highlightEdgeIds = [...Array.from(treeEdges), ...(checking ? [checking] : [])]
+    if (checking) roles[checking] = checking && treeEdges.has(checking) ? 'tree' : 'checking'
     steps.push({
       id: id++,
       message,
       arrays: {
-        visited: visited.map((v) => (v ? 1 : 0)),
+        visited: nodesIdx.map((i) => (visited[i] ? 1 : 0)),
         queue: [...queue],
         order: [...order],
       },
-      highlights: { visited: hn, queue: queue.map((_, i) => i) },
+      highlights: { visited: hn },
       vars,
-      graph: graph(hn, he),
+      graph: {
+        nodes: nodesIdx.map((nid) => ({
+          id: nid,
+          label: String(nid),
+          x: nodePos.get(nid)?.x,
+          y: nodePos.get(nid)?.y,
+        })),
+        edges,
+        highlightNodes: hn,
+        highlightEdgeIds,
+        edgeRoles: roles,
+      },
+      result,
     })
   }
 
   queue.push(start)
   visited[start] = true
-  snap(`入队起点 ${start}`, [start], [], { start, front: start })
+  snap(`入队起点 ${start}`, [start], undefined, { start, front: start })
   while (queue.length) {
     const u = queue.shift()!
     order.push(u)
-    snap(`出队访问 ${u}`, [u], [], { u, queueSize: queue.length })
+    snap(`出队访问 ${u}`, [u], undefined, { u, queueSize: queue.length })
     for (const v of adj[u] || []) {
-      snap(`检查边 ${u}→${v}`, [u, v], [[u, v]], { u, v, visited_v: visited[v] })
+      const eid = undirectedEdgeId(u, v)
+      snap(`检查边 ${u}-${v}`, [u, v], eid, { u, v, visited_v: visited[v] })
       if (!visited[v]) {
         visited[v] = true
         queue.push(v)
-        snap(`发现 ${v}，入队`, [v], [[u, v]], { u, v })
+        treeEdges.add(eid)
+        edgeRoles[eid] = 'tree'
+        snap(`发现 ${v}，入队`, [v], eid, { u, v })
+      } else {
+        edgeRoles[eid] = edgeRoles[eid] ?? 'rejected'
       }
     }
   }
-  snap(`BFS 完成，顺序: [${order.join(',')}]`, order, [], { order: order.join(',') })
+  snap(`BFS 完成，顺序: [${order.join(',')}]`, order, undefined, { order: order.join(',') }, {
+    ok: true,
+    order: [...order],
+  })
   return steps
 }

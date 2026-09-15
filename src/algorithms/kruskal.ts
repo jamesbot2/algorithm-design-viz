@@ -1,10 +1,12 @@
-import type { Step } from '../types/step'
+import type { EdgeRole, Step } from '../types/step'
+import { undirectedEdgeId } from '../utils/edgeId'
+import { layoutGraph } from '../utils/layoutGraph'
 
 export const meta = {
   id: 'kruskal',
   title: 'Kruskal 最小生成树',
   complexity: '时间 O(E log E)，空间 O(V)',
-  description: '按边权升序，用并查集跳过成环边，加入不连通的边。',
+  description: '按边权升序，用并查集跳过成环边。若图不连通则得到最小生成森林（非单棵 MST）。',
   code: `按权排序边
 for e in edges:
   if find(u)!=find(v):
@@ -14,14 +16,13 @@ for e in edges:
     [2, 3, 4], [2, 4, 5], [3, 4, 7],
   ] as [number, number, number][],
   defaultN: 5,
-}
-
-const POS: Record<number, { x: number; y: number }> = {
-  0: { x: 80, y: 80 },
-  1: { x: 280, y: 40 },
-  2: { x: 200, y: 160 },
-  3: { x: 360, y: 140 },
-  4: { x: 120, y: 240 },
+  implName: 'kruskalUnionFind',
+  implVersion: '1.1.0',
+  timeComplexity: 'O(E log E)（排序主导；并查集近乎 O(E α(V))）',
+  spaceComplexity: 'O(V)',
+  spaceNotes: 'parent[V]；边表排序可用原地或副本。',
+  inputAssumptions: '无向加权图；不连通时报告森林而非「MST 成功」。',
+  statDefinitions: '不累计 comparisons。',
 }
 
 export function generateSteps(
@@ -31,13 +32,39 @@ export function generateSteps(
 ): Step[] {
   const parent = Array.from({ length: n }, (_, i) => i)
   const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])))
-  const edges = [...edgeList].sort((a, b) => a[2] - b[2])
+  const edgesSorted = [...edgeList].sort((a, b) => a[2] - b[2])
   const mst: [number, number, number][] = []
   const steps: Step[] = []
   let id = 0
-  const allEdges = edgeList.map(([u, v, w]) => ({ from: u, to: v, weight: w }))
+  const nodes = layoutGraph(n)
+  const allEdges = edgeList.map(([u, v, w]) => ({
+    id: undirectedEdgeId(u, v),
+    from: u,
+    to: v,
+    weight: w,
+  }))
+  const accepted = new Set<string>()
+  const rejected = new Set<string>()
+  const edgeRoles: Record<string, EdgeRole> = {}
 
-  const snap = (message: string, he: [number, number][] = [], vars: Record<string, string | number | boolean | null> = {}) => {
+  const snap = (
+    message: string,
+    checking?: string,
+    vars: Record<string, string | number | boolean | null> = {},
+    result?: unknown,
+  ) => {
+    const roles = { ...edgeRoles }
+    for (const e of accepted) roles[e] = 'accepted'
+    for (const e of rejected) roles[e] = 'rejected'
+    const highlightEdgeIds = [
+      ...Array.from(accepted),
+      ...(checking ? [checking] : []),
+    ]
+    if (checking) roles[checking] = accepted.has(checking)
+      ? 'accepted'
+      : rejected.has(checking)
+        ? 'rejected'
+        : 'checking'
     steps.push({
       id: id++,
       message,
@@ -47,26 +74,55 @@ export function generateSteps(
       },
       vars,
       graph: {
-        nodes: Array.from({ length: n }, (_, i) => ({ id: i, label: String(i), ...POS[i] })),
+        nodes,
         edges: allEdges,
         highlightNodes: [],
-        highlightEdges: he.length ? he : mst.map(([u, v]) => [u, v] as [number, number]),
+        highlightEdgeIds,
+        edgeRoles: roles,
       },
+      result,
     })
   }
 
-  snap('边按权升序排序', [], { edges: edges.map(([u, v, w]) => `${u}-${v}:${w}`).join(', ') })
-  for (const [u, v, w] of edges) {
-    const pu = find(u), pv = find(v)
-    snap(`考察边 ${u}-${v} (w=${w})，根 ${pu} vs ${pv}`, [[u, v]], { u, v, w, pu, pv })
+  snap('边按权升序排序', undefined, {
+    edges: edgesSorted.map(([u, v, w]) => `${u}-${v}:${w}`).join(', '),
+  })
+  for (const [u, v, w] of edgesSorted) {
+    const eid = undirectedEdgeId(u, v)
+    const pu = find(u)
+    const pv = find(v)
+    snap(`考察边 ${u}-${v} (w=${w})，根 ${pu} vs ${pv}`, eid, { u, v, w, pu, pv })
     if (pu !== pv) {
       parent[pu] = pv
       mst.push([u, v, w])
-      snap(`加入 MST，union(${pu},${pv})`, [[u, v]], { mstSize: mst.length, cost: mst.reduce((s, e) => s + e[2], 0) })
+      accepted.add(eid)
+      edgeRoles[eid] = 'accepted'
+      snap(`加入树/森林，union(${pu},${pv})`, eid, {
+        mstSize: mst.length,
+        cost: mst.reduce((s, e) => s + e[2], 0),
+      })
     } else {
-      snap(`成环，跳过`, [[u, v]], { skipped: `${u}-${v}` })
+      rejected.add(eid)
+      edgeRoles[eid] = 'rejected'
+      snap(`成环，跳过`, eid, { skipped: `${u}-${v}` })
     }
   }
-  snap(`完成，总权 = ${mst.reduce((s, e) => s + e[2], 0)}`, mst.map(([u, v]) => [u, v]), { answer: mst.reduce((s, e) => s + e[2], 0) })
+  const cost = mst.reduce((s, e) => s + e[2], 0)
+  const isTree = mst.length === n - 1
+  if (isTree) {
+    snap(`完成：最小生成树，总权 = ${cost}`, undefined, { answer: cost, spanning: true }, {
+      ok: true,
+      kind: 'mst',
+      edges: mst,
+      cost,
+    })
+  } else {
+    snap(
+      `图不连通：得到最小生成森林（${mst.length} 条边，期望 MST 为 ${n - 1} 条）。总权 = ${cost}。并非单棵生成树。`,
+      undefined,
+      { answer: cost, spanning: false, forestEdges: mst.length },
+      { ok: true, kind: 'forest', edges: mst, cost, expectedTreeEdges: n - 1 },
+    )
+  }
   return steps
 }

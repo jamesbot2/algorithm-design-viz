@@ -1,13 +1,16 @@
-import type { Step } from '../types/step'
+import type { EdgeRole, Step } from '../types/step'
+import { directedEdgeId } from '../utils/edgeId'
+import { layoutGraph } from '../utils/layoutGraph'
 
 export const meta = {
   id: 'dijkstra',
-  title: 'Dijkstra 最短路',
-  complexity: '时间 O((V+E) log V)，空间 O(V)',
-  description: '非负权图单源最短路：每次取出当前距离最小的未确定顶点。',
+  title: '朴素 Dijkstra',
+  complexity: '时间 O(V² + E)，空间 O(V + E)',
+  description:
+    '非负权图单源最短路（邻接表 + 每轮扫描选最小 dist，非堆优化）。负权边会被拒绝。',
   code: `dist[s]=0; others=∞
 while 有未确定顶点:
-  u = 未确定中 dist 最小者
+  u = 未确定中 dist 最小者   // O(V) 扫描
   标记 u 已确定
   松弛 u 的出边`,
   defaultEdges: [
@@ -16,15 +19,14 @@ while 有未确定顶点:
   ] as [number, number, number][],
   defaultN: 6,
   defaultStart: 0,
-}
-
-const POS: Record<number, { x: number; y: number }> = {
-  0: { x: 60, y: 130 },
-  1: { x: 180, y: 50 },
-  2: { x: 180, y: 210 },
-  3: { x: 320, y: 50 },
-  4: { x: 320, y: 210 },
-  5: { x: 440, y: 130 },
+  implName: 'naiveDijkstraScan',
+  implVersion: '1.1.0',
+  timeComplexity: 'O(V² + E)',
+  spaceComplexity: 'O(V + E)',
+  spaceNotes:
+    '算法：dist[V]、done[V]、邻接表 O(V+E)。可视化另存图快照，不计入算法空间。',
+  inputAssumptions: '边权须 ≥ 0；有向边；不可达顶点 dist 保持 ∞。',
+  statDefinitions: '本实现不累计 comparisons/swaps。',
 }
 
 export function generateSteps(
@@ -33,17 +35,48 @@ export function generateSteps(
   n = meta.defaultN,
   start = meta.defaultStart,
 ): Step[] {
-  const adj: { v: number; w: number }[][] = Array.from({ length: n }, () => [])
-  const edges = edgeList.map(([u, v, w]) => ({ from: u, to: v, weight: w, directed: true }))
-  for (const [u, v, w] of edgeList) adj[u].push({ v, w })
+  const steps: Step[] = []
+  let id = 0
+
+  const neg = edgeList.find(([, , w]) => w < 0)
+  if (neg) {
+    steps.push({
+      id: id++,
+      message: `拒绝执行：边 ${neg[0]}→${neg[1]} 权 ${neg[2]} < 0。Dijkstra 要求非负权，请改用 Bellman-Ford。`,
+      vars: { error: 'negative_weight', u: neg[0], v: neg[1], w: neg[2] },
+      result: { ok: false, error: 'negative_weight', edge: neg },
+    })
+    return steps
+  }
+
+  const adj: { v: number; w: number; id: string }[][] = Array.from({ length: n }, () => [])
+  const edges = edgeList.map(([u, v, w]) => {
+    const eid = directedEdgeId(u, v)
+    adj[u].push({ v, w, id: eid })
+    return { id: eid, from: u, to: v, weight: w, directed: true as const }
+  })
+  const nodes = layoutGraph(n)
 
   const dist = Array(n).fill(Infinity)
   const done = Array(n).fill(false)
   dist[start] = 0
-  const steps: Step[] = []
-  let id = 0
+  const accepted = new Set<string>()
+  const edgeRoles: Record<string, EdgeRole> = {}
 
-  const snap = (message: string, hn: number[] = [], he: [number, number][] = [], vars: Record<string, string | number | boolean | null> = {}) => {
+  const snap = (
+    message: string,
+    hn: number[] = [],
+    checking?: string,
+    vars: Record<string, string | number | boolean | null> = {},
+    result?: unknown,
+  ) => {
+    const roles: Record<string, EdgeRole> = { ...edgeRoles }
+    for (const eid of accepted) roles[eid] = roles[eid] ?? 'accepted'
+    const highlightEdgeIds = [
+      ...Array.from(accepted),
+      ...(checking ? [checking] : []),
+    ]
+    if (checking) roles[checking] = 'checking'
     steps.push({
       id: id++,
       message,
@@ -54,34 +87,52 @@ export function generateSteps(
       highlights: { dist: hn },
       vars,
       graph: {
-        nodes: Array.from({ length: n }, (_, i) => ({ id: i, label: `${i}`, ...POS[i] })),
+        nodes,
         edges,
         highlightNodes: hn,
-        highlightEdges: he,
+        highlightEdgeIds,
+        edgeRoles: roles,
       },
+      result,
     })
   }
 
-  snap(`初始化：dist[${start}]=0，其余 ∞`, [start], [], { start })
+  snap(`初始化：dist[${start}]=0，其余 ∞`, [start], undefined, { start })
   for (let iter = 0; iter < n; iter++) {
-    let u = -1, best = Infinity
+    let u = -1
+    let best = Infinity
     for (let i = 0; i < n; i++) {
       if (!done[i] && dist[i] < best) {
         best = dist[i]
         u = i
       }
     }
-    if (u < 0) break
+    if (u < 0 || best === Infinity) break
     done[u] = true
-    snap(`选定顶点 ${u}（dist=${dist[u]}）`, [u], [], { u, dist_u: dist[u] })
-    for (const { v, w } of adj[u]) {
-      snap(`松弛边 ${u}→${v} (w=${w})`, [u, v], [[u, v]], { u, v, w, dist_u: dist[u], dist_v: dist[v] === Infinity ? '∞' : dist[v] })
+    snap(`选定顶点 ${u}（dist=${dist[u]}）`, [u], undefined, { u, dist_u: dist[u] })
+    for (const { v, w, id: eid } of adj[u]) {
+      snap(`松弛边 ${u}→${v} (w=${w})`, [u, v], eid, {
+        u,
+        v,
+        w,
+        dist_u: dist[u],
+        dist_v: dist[v] === Infinity ? '∞' : dist[v],
+      })
       if (dist[u] + w < dist[v]) {
         dist[v] = dist[u] + w
-        snap(`更新 dist[${v}] = ${dist[v]}`, [v], [[u, v]], { u, v, newDist: dist[v] })
+        accepted.add(eid)
+        edgeRoles[eid] = 'accepted'
+        snap(`更新 dist[${v}] = ${dist[v]}`, [v], eid, { u, v, newDist: dist[v] })
       }
     }
   }
-  snap('Dijkstra 完成', [], [], { dist: dist.map((d) => (d === Infinity ? '∞' : d)).join(',') })
+  const distOut = dist.map((d) => (d === Infinity ? null : d))
+  snap(
+    '朴素 Dijkstra 完成',
+    [],
+    undefined,
+    { dist: dist.map((d) => (d === Infinity ? '∞' : d)).join(',') },
+    { ok: true, dist: distOut, impl: 'naiveDijkstraScan' },
+  )
   return steps
 }
