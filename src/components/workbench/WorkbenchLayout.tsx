@@ -113,18 +113,32 @@ export default function WorkbenchLayout({
         </Group>
       ) : (
         <div className="workbench-tab-panels">
-          {tab === 'demo' && (
-            <div className="workbench-tab-panel" role="tabpanel">
-              {viz}
-            </div>
-          )}
-          {tab === 'code' && hasCode && (
-            <div className="workbench-tab-panel" role="tabpanel">
+          {/* Keep panels mounted to preserve playback/code state across tab switches (UI-03) */}
+          <div
+            className="workbench-tab-panel"
+            role="tabpanel"
+            hidden={tab !== 'demo'}
+            data-active={tab === 'demo' ? '1' : '0'}
+          >
+            {viz}
+          </div>
+          {hasCode && (
+            <div
+              className="workbench-tab-panel"
+              role="tabpanel"
+              hidden={tab !== 'code'}
+              data-active={tab === 'code' ? '1' : '0'}
+            >
               {code}
             </div>
           )}
-          {tab === 'inspector' && inspector != null && (
-            <div className="workbench-tab-panel" role="tabpanel">
+          {inspector != null && (
+            <div
+              className="workbench-tab-panel"
+              role="tabpanel"
+              hidden={tab !== 'inspector'}
+              data-active={tab === 'inspector' ? '1' : '0'}
+            >
               {inspector}
             </div>
           )}

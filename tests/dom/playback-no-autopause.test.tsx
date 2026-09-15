@@ -63,7 +63,8 @@ describe('A1 credible playback — no auto-pause from cursor feedback', () => {
     )
 
     const play = screen.getByTestId('play-btn')
-    expect(play.textContent).toMatch(/播放/)
+    // V6 UI-10: idle primary is「开始演示」; keep pause assertion
+    expect(play.textContent).toMatch(/开始演示|播放|继续/)
     fireEvent.click(play)
     expect(play.textContent).toMatch(/暂停/)
     expect(document.querySelector('.visualizer')?.getAttribute('data-playing')).toBe('1')

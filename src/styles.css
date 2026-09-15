@@ -1326,13 +1326,13 @@ button.icon-btn {
 }
 
 
-/* —— V6 height chain: one flex column, no fighting min(72vh,820px) —— */
+/* —— V6 height chain: viewport-budgeted shell, panels flex within —— */
 .workbench-layout {
-  min-height: 0;
+  /* Stable outer height (V4 gate) without nested min(72vh) + 100% fight */
+  --wb-chrome: 14rem; /* topbar + page header + compact input approx */
   flex: 1 1 auto;
-  /* Prefer remaining viewport after topbar (~3.5rem) + page chrome; allow grow */
-  height: auto;
-  min-height: min(520px, 70dvh);
+  height: clamp(420px, calc(100dvh - var(--wb-chrome)), 880px);
+  min-height: 0;
   max-height: none;
   display: flex;
   flex-direction: column;
@@ -1341,8 +1341,7 @@ button.icon-btn {
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
-  /* do NOT force height:100% on every nested layer */
-  height: auto;
+  height: auto; /* Group fills via flex, not forced 100% cascade */
 }
 .workbench-viz-panel,
 .workbench-code-panel {
@@ -1747,3 +1746,10 @@ html, body, #root {
 .practice-feedback.is-stale { opacity: 0.85; }
 .practice-meta { margin: 0 0 0.5rem; color: var(--muted); }
 .practice-progress-summary { margin: 0.35rem 0; padding-left: 1.2rem; }
+
+.playback-transport .play-btn {
+  min-width: 7.5rem;
+}
+.playback-transport .phase-jump {
+  min-height: 2rem;
+}
