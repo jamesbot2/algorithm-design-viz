@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { Step } from '../types/step'
+import type { HighlightRole, Step } from '../types/step'
 import type { Trace } from '../core/trace/types'
 import { ArraysFromStep } from './ArrayView'
 import MatrixView from './MatrixView'
@@ -9,16 +9,80 @@ import GraphView from './GraphView'
 import SearchTreeView from './search/SearchTreeView'
 
 interface Props {
-  /** Legacy: raw step list */
   steps?: Step[]
-  /** M1: Trace protocol (preferred when available) */
   trace?: Trace
   code?: string
 }
 
+const ROLE_LABELS: { role: HighlightRole; label: string; cls: string }[] = [
+  { role: 'compare', label: '比较', cls: 'compare' },
+  { role: 'swap', label: '交换/更新', cls: 'swap' },
+  { role: 'focus', label: '当前焦点', cls: 'focus' },
+  { role: 'sorted', label: '已排序/路径', cls: 'sorted' },
+  { role: 'pivot', label: '枢轴', cls: 'pivot' },
+  { role: 'read', label: '读取', cls: 'read' },
+  { role: 'done', label: '完成', cls: 'sorted' },
+]
+
 function resolveSteps(steps?: Step[], trace?: Trace): Step[] {
   if (trace?.steps?.length) return trace.steps as Step[]
   return steps ?? []
+}
+
+function collectUsedRoles(steps: Step[]): Set<HighlightRole> {
+  const used = new Set<HighlightRole>()
+  for (const s of steps) {
+    if (s.roles) {
+      for (const map of Object.values(s.roles)) {
+        for (const r of Object.values(map)) used.add(r)
+      }
+    }
+    if (s.highlights) {
+      for (const idxs of Object.values(s.highlights)) {
+        if (idxs.length) {
+          used.add('compare')
+          if (idxs.length > 1) used.add('swap')
+          if (idxs.length > 2) used.add('focus')
+        }
+      }
+    }
+    if (s.matrixTargets) {
+      for (const t of Object.values(s.matrixTargets)) {
+        if (t.current) used.add('focus')
+        if (t.writes?.length) used.add('swap')
+        if (t.reads?.length) used.add('read')
+        if (t.path?.length) used.add('sorted')
+      }
+    }
+  }
+  return used
+}
+
+function phaseMarkers(steps: Step[]): { index: number; phase: string }[] {
+  const out: { index: number; phase: string }[] = []
+  let last = ''
+  steps.forEach((s, i) => {
+    if (s.phase && s.phase !== last) {
+      out.push({ index: i, phase: s.phase })
+      last = s.phase
+    }
+  })
+  return out
+}
+
+function computeScaleMax(steps: Step[]): Record<string, number> {
+  const max: Record<string, number> = {}
+  for (const s of steps) {
+    if (!s.arrays) continue
+    for (const [name, vals] of Object.entries(s.arrays)) {
+      for (const v of vals) {
+        if (typeof v === 'number' && Number.isFinite(v)) {
+          max[name] = Math.max(max[name] ?? 1, Math.abs(v))
+        }
+      }
+    }
+  }
+  return max
 }
 
 export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
@@ -31,6 +95,9 @@ export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
 
   const step = steps[idx] ?? steps[0]
   const max = Math.max(0, steps.length - 1)
+  const usedRoles = useMemo(() => collectUsedRoles(steps), [steps])
+  const markers = useMemo(() => phaseMarkers(steps), [steps])
+  const scaleMaxByArray = useMemo(() => computeScaleMax(steps), [steps])
 
   const clear = useCallback(() => {
     if (timer.current !== null) {
@@ -108,6 +175,8 @@ export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
     return <div className="viz-empty">暂无步骤，请调整输入后重新生成。</div>
   }
 
+  const legendItems = ROLE_LABELS.filter((r) => usedRoles.has(r.role))
+
   return (
     <div className="visualizer" ref={rootRef}>
       <div className="viz-banner">{step.message}</div>
@@ -140,6 +209,7 @@ export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
         <span className="spacer" />
         <span className="step-counter">
           {idx + 1} / {steps.length}
+          {step.phase ? ` · ${step.phase}` : ''}
         </span>
       </div>
 
@@ -159,6 +229,25 @@ export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
         />
         <span className="scrub-pct">{Math.round(progress)}%</span>
       </div>
+
+      {markers.length > 0 && (
+        <div className="phase-jump">
+          <span className="muted">阶段跳转：</span>
+          {markers.map((m) => (
+            <button
+              key={`${m.phase}-${m.index}`}
+              type="button"
+              className={step.phase === m.phase && idx >= m.index ? 'active' : ''}
+              onClick={() => {
+                setPlaying(false)
+                setIdx(m.index)
+              }}
+            >
+              {m.phase}
+            </button>
+          ))}
+        </div>
+      )}
 
       {showStats && (
         <div className="stats-row">
@@ -180,38 +269,22 @@ export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
         </div>
       )}
 
-      <div className="viz-legend">
-        <span>
-          <i className="dot compare" />
-          比较
-        </span>
-        <span>
-          <i className="dot swap" />
-          交换/更新
-        </span>
-        <span>
-          <i className="dot focus" />
-          当前焦点
-        </span>
-        <span>
-          <i className="dot sorted" />
-          已排序
-        </span>
-        <span>
-          <i className="dot pivot" />
-          枢轴
-        </span>
-        <span>
-          <i className="dot read" />
-          读取
-        </span>
-      </div>
+      {legendItems.length > 0 && (
+        <div className="viz-legend">
+          {legendItems.map((r) => (
+            <span key={r.role}>
+              <i className={`dot ${r.cls}`} />
+              {r.label}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="viz-body">
         <div className="viz-main">
           {step.graph && <GraphView graph={step.graph} />}
-      {step.searchTree && <SearchTreeView tree={step.searchTree} />}
-          <ArraysFromStep step={step} />
+          {step.searchTree && <SearchTreeView tree={step.searchTree} />}
+          <ArraysFromStep step={step} scaleMaxByArray={scaleMaxByArray} />
           <MatrixView step={step} />
         </div>
         <div className="viz-side">

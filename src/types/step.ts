@@ -66,6 +66,8 @@ export interface Step {
   result?: unknown
   /** Optional backtracking / branch-and-bound search tree snapshot */
   searchTree?: SearchTreeNode
+  /** Optional coarse phase marker for stage jump (init/extract/relax/done/…) */
+  phase?: string
 }
 
 export interface SearchTreeNode {

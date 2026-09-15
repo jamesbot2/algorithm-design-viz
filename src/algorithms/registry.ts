@@ -6,6 +6,7 @@ import { algorithms as legacyAlgorithms, type AlgoModule, type AlgoMeta } from '
 import * as knapsack01 from './knapsack01'
 import * as lcs from './lcs'
 import * as dijkstra from './dijkstra'
+import * as dijkstraHeap from './dijkstraHeap'
 import * as kadane from './kadane'
 import * as binarySearch from './binarySearch'
 import type { BinarySearchMode } from './binarySearch'
@@ -232,6 +233,50 @@ const dijkstraTyped: RegistryEntry = {
     const steps = dijkstra.generateSteps([], edges, n, start)
     return {
       trace: wrapLegacySteps('dijkstra', dijkstra.meta as AlgoMeta, steps, v.value),
+      result: steps[steps.length - 1]?.result,
+    }
+  },
+}
+
+
+const dijkstraHeapTyped: RegistryEntry = {
+  id: 'dijkstraHeap',
+  meta: dijkstraHeap.meta as AlgoMeta,
+  generateSteps: dijkstraHeap.generateSteps as AlgoModule['generateSteps'],
+  validate(raw: unknown): ValidateResult<DijkstraInput> {
+    const r = (raw ?? {}) as Partial<DijkstraInput>
+    const edges = r.edges ?? dijkstraHeap.meta.defaultEdges
+    const n = r.n ?? dijkstraHeap.meta.defaultN
+    const start = r.start ?? dijkstraHeap.meta.defaultStart
+    if (!Array.isArray(edges)) {
+      return { ok: false, issues: [{ field: 'edges', reason: '须为数组' }] }
+    }
+    if (typeof n !== 'number' || n <= 0) {
+      return { ok: false, issues: [{ field: 'n', reason: '须为正整数' }] }
+    }
+    if (typeof start !== 'number' || start < 0 || start >= n) {
+      return { ok: false, issues: [{ field: 'start', reason: '起点越界' }] }
+    }
+    for (const e of edges) {
+      if (!Array.isArray(e) || e.length < 3) {
+        return { ok: false, issues: [{ field: 'edges', reason: '边格式须为 [u,v,w]' }] }
+      }
+      if (e[2]! < 0) {
+        return {
+          ok: false,
+          issues: [{ field: 'edges', reason: `负权边 ${e[0]}→${e[1]} 权 ${e[2]}` }],
+        }
+      }
+    }
+    return { ok: true, value: { edges: edges as [number, number, number][], n, start } }
+  },
+  solve(input: unknown) {
+    const v = this.validate!(input)
+    if (!v.ok) return validationFail('dijkstraHeap', v.issues)
+    const { edges, n, start } = v.value as DijkstraInput
+    const steps = dijkstraHeap.generateSteps([], edges, n, start)
+    return {
+      trace: wrapLegacySteps('dijkstraHeap', dijkstraHeap.meta as AlgoMeta, steps, v.value),
       result: steps[steps.length - 1]?.result,
     }
   },
@@ -576,6 +621,7 @@ const typedEntries: Record<string, RegistryEntry> = {
   knapsack01: knapsackTyped,
   lcs: lcsTyped,
   dijkstra: dijkstraTyped,
+  dijkstraHeap: dijkstraHeapTyped,
   kadane: kadaneTyped,
   binarySearch: binarySearchTyped,
   kmp: kmpTyped,

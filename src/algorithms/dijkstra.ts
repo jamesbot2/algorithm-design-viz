@@ -44,6 +44,7 @@ export function generateSteps(
       id: id++,
       message: `拒绝执行：边 ${neg[0]}→${neg[1]} 权 ${neg[2]} < 0。Dijkstra 要求非负权，请改用 Bellman-Ford。`,
       vars: { error: 'negative_weight', u: neg[0], v: neg[1], w: neg[2] },
+      phase: 'error',
       result: { ok: false, error: 'negative_weight', edge: neg },
     })
     return steps
@@ -59,6 +60,7 @@ export function generateSteps(
 
   const dist = Array(n).fill(Infinity)
   const done = Array(n).fill(false)
+  const parent = Array(n).fill(-1)
   dist[start] = 0
   const accepted = new Set<string>()
   const edgeRoles: Record<string, EdgeRole> = {}
@@ -69,6 +71,7 @@ export function generateSteps(
     checking?: string,
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
+    phase?: string,
   ) => {
     const roles: Record<string, EdgeRole> = { ...edgeRoles }
     for (const eid of accepted) roles[eid] = roles[eid] ?? 'accepted'
@@ -80,9 +83,11 @@ export function generateSteps(
     steps.push({
       id: id++,
       message,
+      phase,
       arrays: {
         dist: dist.map((d) => (d === Infinity ? '∞' : d)),
         done: done.map((d) => (d ? 1 : 0)),
+        parent: parent.map((p) => (p < 0 ? '-' : p)),
       },
       highlights: { dist: hn },
       vars,
@@ -97,7 +102,7 @@ export function generateSteps(
     })
   }
 
-  snap(`初始化：dist[${start}]=0，其余 ∞`, [start], undefined, { start })
+  snap(`初始化：dist[${start}]=0，其余 ∞`, [start], undefined, { start }, undefined, 'init')
   for (let iter = 0; iter < n; iter++) {
     let u = -1
     let best = Infinity
@@ -109,7 +114,7 @@ export function generateSteps(
     }
     if (u < 0 || best === Infinity) break
     done[u] = true
-    snap(`选定顶点 ${u}（dist=${dist[u]}）`, [u], undefined, { u, dist_u: dist[u] })
+    snap(`选定顶点 ${u}（dist=${dist[u]}）`, [u], undefined, { u, dist_u: dist[u] }, undefined, 'extract')
     for (const { v, w, id: eid } of adj[u]) {
       snap(`松弛边 ${u}→${v} (w=${w})`, [u, v], eid, {
         u,
@@ -120,9 +125,10 @@ export function generateSteps(
       })
       if (dist[u] + w < dist[v]) {
         dist[v] = dist[u] + w
+        parent[v] = u
         accepted.add(eid)
         edgeRoles[eid] = 'accepted'
-        snap(`更新 dist[${v}] = ${dist[v]}`, [v], eid, { u, v, newDist: dist[v] })
+        snap(`更新 dist[${v}] = ${dist[v]}`, [v], eid, { u, v, newDist: dist[v] }, undefined, 'relax')
       }
     }
   }
@@ -132,7 +138,64 @@ export function generateSteps(
     [],
     undefined,
     { dist: dist.map((d) => (d === Infinity ? '∞' : d)).join(',') },
-    { ok: true, dist: distOut, impl: 'naiveDijkstraScan' },
+    { ok: true, dist: distOut, parent: [...parent], impl: 'naiveDijkstraScan', start },
+    'done',
   )
   return steps
+}
+
+/** Pure naive Dijkstra for experiments / heap compare. */
+export function solveDijkstraNaive(
+  edgeList: [number, number, number][],
+  n: number,
+  start: number,
+): { ok: boolean; error?: string; dist: (number | null)[]; parent: number[]; scans: number } {
+  const neg = edgeList.find(([, , w]) => w < 0)
+  if (neg) return { ok: false, error: 'negative_weight', dist: [], parent: [], scans: 0 }
+  const adj: { v: number; w: number }[][] = Array.from({ length: n }, () => [])
+  for (const [u, v, w] of edgeList) adj[u]!.push({ v, w })
+  const dist = Array(n).fill(Infinity)
+  const done = Array(n).fill(false)
+  const parent = Array(n).fill(-1)
+  dist[start] = 0
+  let scans = 0
+  for (let iter = 0; iter < n; iter++) {
+    let u = -1
+    let best = Infinity
+    for (let i = 0; i < n; i++) {
+      scans++
+      if (!done[i] && dist[i] < best) {
+        best = dist[i]
+        u = i
+      }
+    }
+    if (u < 0 || best === Infinity) break
+    done[u] = true
+    for (const { v, w } of adj[u]!) {
+      if (dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w
+        parent[v] = u
+      }
+    }
+  }
+  return {
+    ok: true,
+    dist: dist.map((d) => (d === Infinity ? null : d)),
+    parent,
+    scans,
+  }
+}
+
+export function reconstructPath(parent: number[], target: number): number[] {
+  if (target < 0 || target >= parent.length) return []
+  const path: number[] = []
+  let cur = target
+  let guard = 0
+  while (cur !== -1 && guard++ < parent.length + 2) {
+    path.push(cur)
+    if (parent[cur] === -1) break
+    cur = parent[cur]!
+  }
+  path.reverse()
+  return path
 }

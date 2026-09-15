@@ -34,6 +34,7 @@ export function generateSteps(
   start = meta.defaultStart,
 ): Step[] {
   const dist = Array(n).fill(Infinity)
+  const parent = Array(n).fill(-1)
   dist[start] = 0
   const edges = edgeList.map(([u, v, w]) => ({
     id: directedEdgeId(u, v),
@@ -88,6 +89,7 @@ export function generateSteps(
       })
       if (dist[u] !== Infinity && dist[u] + w < dist[v]) {
         dist[v] = dist[u] + w
+        parent[v] = u
         edgeRoles[eid] = 'relaxing'
         snap(`更新 dist[${v}] = ${dist[v]}`, eid, [v], { v, newDist: dist[v] })
       }
@@ -128,6 +130,8 @@ export function generateSteps(
       {
         ok: true,
         dist: dist.map((d) => (d === Infinity ? null : d)),
+        parent: [...parent],
+        start,
         negativeCycle: false,
       },
     )

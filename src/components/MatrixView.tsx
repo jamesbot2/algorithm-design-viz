@@ -3,7 +3,12 @@ import type { Step } from '../types/step'
 function cellClass(
   i: number,
   j: number,
-  target?: { current?: [number, number]; reads?: [number, number][]; writes?: [number, number][]; path?: [number, number][] },
+  target?: {
+    current?: [number, number]
+    reads?: [number, number][]
+    writes?: [number, number][]
+    path?: [number, number][]
+  },
 ): string {
   if (!target) return ''
   const eq = (p?: [number, number]) => p !== undefined && p[0] === i && p[1] === j
@@ -23,7 +28,6 @@ export default function MatrixView({ step }: { step: Step }) {
         const target = step.matrixTargets?.[name]
         const rows = mat.length
         const cols = mat[0]?.length ?? 0
-        // Row/col labels: 0-based indices. Knapsack etc. may use row 0 as empty-set sentinel — still labeled 0.
         return (
           <div key={name} className="matrix-view">
             <div className="array-label">
@@ -31,12 +35,12 @@ export default function MatrixView({ step }: { step: Step }) {
               <span className="matrix-index-hint">（下标 0-based）</span>
             </div>
             <div className="matrix-scroll">
-              <table className="matrix-table">
+              <table className="matrix-table sticky-labels">
                 <thead>
                   <tr>
-                    <th className="matrix-corner" />
+                    <th className="matrix-corner sticky-corner" />
                     {Array.from({ length: cols }, (_, j) => (
-                      <th key={j} className="matrix-col-h">
+                      <th key={j} className="matrix-col-h sticky-top">
                         {j}
                       </th>
                     ))}
@@ -45,9 +49,8 @@ export default function MatrixView({ step }: { step: Step }) {
                 <tbody>
                   {mat.map((row, i) => (
                     <tr key={i}>
-                      <th className="matrix-row-h">{i}</th>
+                      <th className="matrix-row-h sticky-left">{i}</th>
                       {row.map((cell, j) => {
-                        // Never truthy-check 0 — 0 is a valid DP / distance value
                         const display =
                           cell === null || cell === undefined ? '·' : String(cell)
                         return (

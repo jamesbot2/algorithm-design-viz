@@ -39,21 +39,34 @@
 | M2-teach | 教学页结构 | 已实现待验证 | 背包单元含 problem/state/idea/viz/correctness/complexity/edges/code/practice stub；新算法走 AlgoPage meta |
 | M2-T | 测试 | 已验证 | knapsack 一致、nqueens、matrixChain、huffman、maxsub、LCS |
 
-## M3–M4 / 拓展（本轮不做，仅记状态）
+## M3 图编辑 / 练习 / 实验 / 分享
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| M3-graph | 自定义图编辑器 | 已验证 | `GraphInput`：n/边表/有向/源点/预设；`validateGraphDraft` 校验端点、方向、权与算法约定；`layoutGraph`；AlgoPage 接入 bfs/dijkstra/dijkstraHeap/kruskal/prim/bellmanFord/floyd |
+| M3-result | 结果 UX | 已验证 | 最短路：目标点 → 路径+代价（parent）；MST：选中边、总权、连通？；BF/BFS 补 parent/dist |
+| M3-heap | 堆 Dijkstra | 已验证 | `dijkstraHeap` 懒删除二叉堆；过滤陈旧项；与朴素对照页+实验台；共享图 dist 一致测试 |
+| M3-views | 视图抛光 | 已验证 | ArrayView 有符号柱+稳定 scale；非适合默认单元格；MatrixView 滚动+sticky 标签；图例仅当前轨迹用到的 role；`phase` 阶段跳转 |
+| M3-practice | 练习三判定 | 已验证 | `/practice`：预测下一步 / 解释选择 / 构造反例；覆盖背包、LCS、Dijkstra、N皇后、贪心vsDP；多解裁判（LCS/等长最短路/交替MST/等值背包集）；seed 可复现；localStorage 进度+导出/确认清空 |
+| M3-modes | 教学 vs 实验 | 已验证 | AlgoPage 模式切换；`/experiment`：最大子数组 / 背包策略 / 朴素vs堆 Dijkstra；计数器导出 CSV/JSON；指数规模封顶；声明非 DOM 计时证明 |
+| M3-scene | 场景分享+本地学习 | 已验证 | Scene：algoId/version/input/params/seed/stepIndex；短 URL hash；JSON 导入导出；版本不符警告；localStorage 进度/错题/书签；标明非 LMS |
+| M3-ref | 参考代码+讲义 | 已验证 | 伪代码+C++：背包 DP2D / 朴素 Dijkstra / N皇后；`/lab/core`；C++ 标注 CI 不执行 |
+| M3-T | 测试 | 已验证 | graph validate、heap vs naive、practice judges、scene roundtrip、experiment export；既有测试保持绿 |
+
+## M4 / 拓展（本轮不做，仅记状态）
 | 项 | 状态 | 备注 |
 |----|------|------|
-| M3 图编辑 / 练习平台 / 分享 | 未开始 | 练习仅为 stub |
 | M4 CI | 未开始 | |
+| Playwright E2E | 记入 M4 | 本轮未加，避免拖慢 CI；可选轻量 |
 | Edmonds-Karp / Strassen / 最近点对 | 拓展规划 | 见 curriculum `EXTENDED_PLANNED` |
 
 ## 缺口 / 已知限制
-- 多数算法 AlgoPage 仍用内置示例输入（图/背包等），完整可编辑图编辑器属 M3
-- 练习平台未建（practice 标志均为 false）
-- 背包教学页策略可视化粒度不一（dp2d 步多，brute/greedy 为摘要步）
-- markdown-it 内容渲染未引入（讲义仍为 chapters.ts 字符串；教学页为 TSX）
+- 教学页（非 AlgoPage）部分算法仍用内置示例参数编辑器较简（nQueens/matrixChain/huffman/背包 AlgoPage）
+- Floyd 结果面板未做 i→j 点选路径重建（矩阵视图为主）
+- 练习题库为静态+种子抽样，题量有限；可继续扩充
+- markdown-it 讲义渲染未引入（讲义仍为 chapters.ts / lab TSX）
 - ChatGPT UI / HashRouter / vite `base: '/algorithm-design-viz/'` 保持不变
+- **未执行 `git push`**
 
 ## 验证记录
-- `npm run test:run` → 6 files / 44 tests passed
+- `npm run test:run` → 8 files / 64 tests passed
 - `npm run build` → tsc + vite build OK
-- **未执行 `git push`**

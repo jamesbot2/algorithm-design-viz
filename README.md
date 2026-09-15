@@ -26,7 +26,7 @@ npm run test:run
 - 纯静态部署，`base: '/algorithm-design-viz/'`
 - UI：深色 ChatGPT 风格侧栏布局
 
-## 当前已实现（M0 + M1 起步）
+## 当前已实现（M0–M3）
 
 - 多章节理论文案 + 算法页可视化（排序 / 二分 / DP / 图 / KMP 等）
 - **运行流**：草稿输入 → 校验 →「运行」快照生成步骤；「恢复默认示例」「重置播放」
@@ -37,14 +37,15 @@ npm run test:run
 - **边界语义**：负权/负环、MST 森林、Kadane 空数组、KMP 空模式等
 - **M1 起步**：`src/core/trace/types.ts`、`src/algorithms/registry.ts`；knapsack01 / lcs / dijkstra 的 typed validate/solve（旧 `generateSteps` 仍可用）
 
-## 尚未完成（M2–M4）
+- **M2**：双导航、背包多策略教学单元、N皇后/矩阵链/Huffman/最大子数组等
+- **M3**：图编辑器、堆 Dijkstra、练习台三判定、实验台导出、场景 hash 分享、本地进度、参考代码讲义
+
+## 尚未完成
 
 | 阶段 | 内容 |
 |------|------|
-| M1 余下 | 其余算法全面迁入 typed 模块；Visualizer 消费 Trace |
-| M2 | 课程核心样板（背包等教学路径）、练习题 |
-| M3 | 图编辑器、实验模式、分享链接 |
-| M4 | CI 门禁、完整验收清单、文档收尾 |
+| M4 | CI 门禁、Playwright E2E、完整验收清单 |
+| 拓展 | Edmonds-Karp / Strassen / 最近点对（规划） |
 
 详见 `docs/IMPLEMENTATION_STATUS.md`、`docs/VERIFICATION.md`。
 

@@ -16,8 +16,8 @@ npm run build
 ### `npm run test:run`
 
 ```
-Test Files  6 passed (6)
-     Tests  44 passed (44)
+Test Files  8 passed (8)
+     Tests  64 passed (64)
 ```
 
 Suites:
@@ -27,12 +27,14 @@ Suites:
 - `tests/m1-registry.test.ts` — typed registry (priority algos), freeze immutability, ∞ encoding, runner budget/cancel/validation
 - `tests/m2-knapsack.test.ts` — strategy agreement, forward反例 6vs3, greedy 160vs220, dp2d reconstruct
 - `tests/m2-algos.test.ts` — nQueens counts (+ n=8→92), matrixChain 4500, huffman WPL, max-subarray 6, LCS/edit reconstruct
+- `tests/m3-graph.test.ts` — graph validate (direction/weights/bounds), dijkstraHeap vs naive dist agree, stale filter, registry
+- `tests/m3-practice-scene-exp.test.ts` — LCS/knapsack/path/MST multi-answer judges, seeded pick, scene roundtrip + version mismatch, experiment CSV/JSON shape
 
 ### `npm run build`
 
 ```
 tsc -b && vite build → success
-dist/assets/index-*.js ~371 kB
+dist/assets/index-*.js ~419 kB
 ```
 
 ### Preserved
@@ -40,9 +42,8 @@ dist/assets/index-*.js ~371 kB
 - ChatGPT-style UI, HashRouter, vite `base: '/algorithm-design-viz/'`
 - Local commits only — **no `git push`**
 
-### Not run / out of scope this turn
+### Not run / deferred to M4
 
-- Browser E2E / Playwright
-- M3 graph editor / exercises platform / share
-- M4 CI
-- Edmonds-Karp / Strassen / closest pair (listed as 拓展规划)
+- Browser E2E / Playwright（刻意未加，避免拖 CI）
+- M4 CI workflow hardening
+- Edmonds-Karp / Strassen / closest pair（拓展规划）

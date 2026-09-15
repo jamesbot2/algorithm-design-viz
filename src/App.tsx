@@ -4,6 +4,9 @@ import Home from './pages/Home'
 import Chapter from './pages/Chapter'
 import AlgoPage from './pages/AlgoPage'
 import KnapsackUnit from './pages/teaching/KnapsackUnit'
+import PracticePage from './pages/practice/PracticePage'
+import ExperimentPage from './pages/experiment/ExperimentPage'
+import LabKnapsackDijkstraQueens from './content/labs/LabKnapsackDijkstraQueens'
 
 export default function App() {
   return (
@@ -14,6 +17,9 @@ export default function App() {
           <Route path="chapter/:id" element={<Chapter />} />
           <Route path="algo/:id" element={<AlgoPage />} />
           <Route path="teach/knapsack" element={<KnapsackUnit />} />
+          <Route path="practice" element={<PracticePage />} />
+          <Route path="experiment" element={<ExperimentPage />} />
+          <Route path="lab/core" element={<LabKnapsackDijkstraQueens />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

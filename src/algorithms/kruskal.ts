@@ -114,14 +114,28 @@ export function generateSteps(
       ok: true,
       kind: 'mst',
       edges: mst,
+      mst,
       cost,
+      totalWeight: cost,
+      connected: true,
+      isTree: true,
     })
   } else {
     snap(
       `图不连通：得到最小生成森林（${mst.length} 条边，期望 MST 为 ${n - 1} 条）。总权 = ${cost}。并非单棵生成树。`,
       undefined,
       { answer: cost, spanning: false, forestEdges: mst.length },
-      { ok: true, kind: 'forest', edges: mst, cost, expectedTreeEdges: n - 1 },
+      {
+        ok: true,
+        kind: 'forest',
+        edges: mst,
+        mst,
+        cost,
+        totalWeight: cost,
+        expectedTreeEdges: n - 1,
+        connected: false,
+        isTree: false,
+      },
     )
   }
   return steps

@@ -122,20 +122,40 @@ export function generateSteps(
       }
     }
   }
+  const mstEdges: [number, number, number][] = []
+  for (let v = 0; v < n; v++) {
+    if (parent[v] >= 0 && inMST[v]) mstEdges.push([parent[v], v, key[v] === Infinity ? 0 : key[v]])
+  }
+  const totalWeight = mstEdges.reduce((s, e) => s + e[2], 0)
   const connected = added === n
   if (connected) {
-    snap('Prim 完成：得到生成树', [], undefined, { spanning: true }, {
+    snap('Prim 完成：得到生成树', [], undefined, { spanning: true, totalWeight }, {
       ok: true,
       kind: 'mst',
       vertices: added,
+      edges: mstEdges,
+      cost: totalWeight,
+      totalWeight,
+      connected: true,
+      isTree: true,
     })
   } else {
     snap(
       `图从 ${start} 不连通：仅覆盖 ${added}/${n} 个顶点，无生成树（得到部分树/森林分量）。`,
       [],
       undefined,
-      { spanning: false, covered: added },
-      { ok: true, kind: 'partial', covered: added, n },
+      { spanning: false, covered: added, totalWeight },
+      {
+        ok: true,
+        kind: 'partial',
+        covered: added,
+        n,
+        edges: mstEdges,
+        cost: totalWeight,
+        totalWeight,
+        connected: false,
+        isTree: false,
+      },
     )
   }
   return steps

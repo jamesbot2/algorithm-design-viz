@@ -923,3 +923,155 @@ button.icon-btn {
   pointer-events: none;
   opacity: 0.95;
 }
+
+/* —— M3 polish —— */
+.bars-wrap.signed {
+  position: relative;
+  align-items: center;
+  min-height: 200px;
+}
+.bars-wrap.signed .bar-baseline {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--border);
+  pointer-events: none;
+}
+.bar-col.neg .bar {
+  align-self: start;
+  margin-top: 50%;
+  transform: translateY(0);
+  border-radius: 0 0 6px 6px;
+}
+.bar-col.pos .bar {
+  align-self: end;
+  margin-bottom: 50%;
+}
+.bars-wrap.signed .bar-col {
+  justify-content: center;
+  min-height: 200px;
+}
+.bar.bar-neg {
+  background: rgba(239, 68, 68, 0.35);
+}
+
+.matrix-table.sticky-labels .sticky-top {
+  position: sticky;
+  top: 0;
+  background: #1a1a1a;
+  z-index: 2;
+}
+.matrix-table.sticky-labels .sticky-left {
+  position: sticky;
+  left: 0;
+  background: #1a1a1a;
+  z-index: 1;
+}
+.matrix-table.sticky-labels .sticky-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  background: #1a1a1a;
+}
+.matrix-scroll {
+  max-height: 420px;
+  overflow: auto;
+}
+
+.phase-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+.phase-jump button {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+}
+.phase-jump button.active {
+  border-color: var(--good);
+  color: var(--good);
+}
+
+.graph-input textarea {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.5rem;
+}
+.graph-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 0.5rem;
+}
+.graph-input-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+.graph-result-panel, .practice-card {
+  background: #1a1a1a;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+.mst-edge-list {
+  columns: 2;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+.mode-toggle {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--bg-soft);
+  border-radius: 8px;
+  padding: 2px;
+  margin-bottom: 0.5rem;
+}
+.mode-toggle button.active {
+  background: var(--good);
+  color: #0b0b0b;
+}
+.practice-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+.practice-feedback {
+  margin-top: 0.75rem;
+  padding: 0.65rem;
+  border-left: 3px solid var(--good);
+  background: rgba(16, 163, 127, 0.08);
+}
+.code-block {
+  background: #111;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 0.75rem;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  white-space: pre-wrap;
+}
+.lab-section {
+  margin-bottom: 1.5rem;
+}

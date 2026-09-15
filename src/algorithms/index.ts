@@ -11,6 +11,7 @@ import * as editDistance from './editDistance'
 import * as activitySelection from './activitySelection'
 import * as bfs from './bfs'
 import * as dijkstra from './dijkstra'
+import * as dijkstraHeap from './dijkstraHeap'
 import * as kruskal from './kruskal'
 import * as bellmanFord from './bellmanFord'
 import * as floyd from './floyd'
@@ -58,6 +59,7 @@ export const algorithms: Record<string, AlgoModule> = {
   activitySelection: activitySelection as AlgoModule,
   bfs: bfs as AlgoModule,
   dijkstra: dijkstra as AlgoModule,
+  dijkstraHeap: dijkstraHeap as AlgoModule,
   kruskal: kruskal as AlgoModule,
   bellmanFord: bellmanFord as AlgoModule,
   floyd: floyd as AlgoModule,

@@ -54,6 +54,8 @@ export function generateSteps(
   }
 
   const visited: boolean[] = Array(Math.max(...nodesIdx, 0) + 1).fill(false)
+  const parent: number[] = Array(Math.max(...nodesIdx, 0) + 1).fill(-1)
+  const distArr: number[] = Array(Math.max(...nodesIdx, 0) + 1).fill(Infinity)
   const order: number[] = []
   const queue: number[] = []
   const steps: Step[] = []
@@ -100,6 +102,7 @@ export function generateSteps(
 
   queue.push(start)
   visited[start] = true
+  distArr[start] = 0
   snap(`入队起点 ${start}`, [start], undefined, { start, front: start })
   while (queue.length) {
     const u = queue.shift()!
@@ -110,6 +113,8 @@ export function generateSteps(
       snap(`检查边 ${u}-${v}`, [u, v], eid, { u, v, visited_v: visited[v] })
       if (!visited[v]) {
         visited[v] = true
+        parent[v] = u
+        distArr[v] = distArr[u] + 1
         queue.push(v)
         treeEdges.add(eid)
         edgeRoles[eid] = 'tree'
@@ -122,6 +127,9 @@ export function generateSteps(
   snap(`BFS 完成，顺序: [${order.join(',')}]`, order, undefined, { order: order.join(',') }, {
     ok: true,
     order: [...order],
+    parent: parent.map((x) => x),
+    dist: distArr.map((d) => (d === Infinity ? null : d)),
+    start,
   })
   return steps
 }

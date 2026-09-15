@@ -145,6 +145,18 @@ export default function Layout() {
             <span className="nav-dot" />
             <span className="nav-item-label">全部算法</span>
           </NavLink>
+          <NavLink to="/practice" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileOpen(false)}>
+            <span className="nav-dot" />
+            <span className="nav-item-label">练习台</span>
+          </NavLink>
+          <NavLink to="/experiment" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileOpen(false)}>
+            <span className="nav-dot" />
+            <span className="nav-item-label">实验台</span>
+          </NavLink>
+          <NavLink to="/lab/core" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileOpen(false)}>
+            <span className="nav-dot" />
+            <span className="nav-item-label">实验讲义</span>
+          </NavLink>
         </nav>
         <footer className="side-foot">GitHub Pages · 本地可视化</footer>
       </aside>
