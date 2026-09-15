@@ -6,9 +6,9 @@ export default defineConfig({
   plugins: [react()],
   base: '/algorithm-design-viz/',
   test: {
-    environment: 'jsdom',
+    // Unit/algorithm tests need no DOM; jsdom+undici breaks on Node 20 in CI.
+    environment: 'node',
     globals: true,
-    setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.{test,spec}.{ts,tsx}'],
   },
 })
