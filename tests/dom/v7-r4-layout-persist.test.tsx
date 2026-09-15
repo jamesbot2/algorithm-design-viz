@@ -4,7 +4,7 @@
  */
 import { describe, expect, it, afterEach } from 'vitest'
 import { cleanup, render, screen, fireEvent, act } from '@testing-library/react'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import WorkbenchLayout from '../../src/components/workbench/WorkbenchLayout'
 
 let mountCount = 0
@@ -13,11 +13,11 @@ function SessionProbe({ label }: { label: string }) {
   const [n, setN] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(600)
-  const id = useRef(`sess-${++mountCount}`)
+  const [mountId] = useState(() => `sess-${++mountCount}`)
   return (
     <div
       data-testid={`probe-${label}`}
-      data-mount-id={id.current}
+      data-mount-id={mountId}
       data-playing={playing ? '1' : '0'}
       data-speed={speed}
     >

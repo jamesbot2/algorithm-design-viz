@@ -2,7 +2,7 @@
  * V7 R1 — AlgoPage async run identity with controllable solve barrier.
  * @vitest-environment happy-dom
  */
-import { describe, expect, it, afterEach, vi } from 'vitest'
+import { describe, expect, it, afterEach } from 'vitest'
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../../src/App'
