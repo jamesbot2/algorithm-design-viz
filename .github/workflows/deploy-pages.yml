@@ -23,10 +23,10 @@ jobs:
   # Manual dispatch must prove CI already passed on this exact SHA.
   # (Documented alternative would be skipping this gate — we implement the check.)
   ci-gate:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - name: Require successful CI on same SHA
+      - name: Require successful CI on same SHA (dispatch only)
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/github-script@v7
         with:
           script: |
@@ -46,6 +46,9 @@ jobs:
             } else {
               core.info(`CI gate OK: run ${hit.id} succeeded for ${sha}`);
             }
+      - name: workflow_run path
+        if: github.event_name != 'workflow_dispatch'
+        run: echo "CI already gated this workflow_run; ci-gate is a no-op success."
 
   build:
     needs: [ci-gate]
@@ -82,7 +85,7 @@ jobs:
 
   deploy:
     needs: build
-    if: needs.build.result == 'success'
+    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
