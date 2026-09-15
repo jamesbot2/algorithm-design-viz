@@ -351,38 +351,7 @@
   opacity: 0.9;
   transition: opacity var(--motion-fast);
 }
-.phase-track {
-  position: relative;
-  height: 6px;
-  margin: 0.15rem 0 0.65rem;
-  background: #2a2a2a;
-  border-radius: 999px;
-  overflow: visible;
-}
-.phase-track .phase-marker {
-  position: absolute;
-  top: -4px;
-  width: 2px;
-  height: 14px;
-  background: var(--sem-focus);
-  border-radius: 1px;
-  transform: translateX(-50%);
-  cursor: pointer;
-}
-.phase-track .phase-marker:hover::after,
-.phase-track .phase-marker:focus-visible::after {
-  content: attr(data-phase);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-size: 0.65rem;
-  padding: 0.1rem 0.35rem;
-  background: #333;
-  border-radius: 4px;
-  color: #eee;
-}
+/* phase-track layout/theme owned by styles.css (UI-08) */
 .legend-dot {
   display: inline-block;
   width: 9px;
@@ -466,11 +435,28 @@
 .viz-banner-slot {
   animation: none !important;
 }
-/* Do not transform layout chrome (toolbar / workbench) */
+/* Stable layout shell — do not transform chrome.
+   Shake applies to .input-panel-shake-inner only (UI-08). */
 .workbench-layout,
 .workbench-header,
 .viz-toolbar,
-.input-panel,
 .control-row {
   transform: none !important;
+}
+.input-panel {
+  /* shell stays put; inner may shake */
+  transform: none;
+}
+.input-panel.shake .input-panel-shake-inner,
+.input-panel-shake-inner.shake {
+  animation: input-shake var(--motion-slow) var(--ease-emphasized);
+}
+.input-panel.shake {
+  /* no transform on shell — preserves layout; visual shake via inner if present */
+  animation: none;
+}
+.input-panel.shake:not(:has(.input-panel-shake-inner)) {
+  /* fallback: allow shell shake when no inner wrapper */
+  animation: input-shake var(--motion-slow) var(--ease-emphasized);
+  transform: none; /* overridden during keyframes */
 }

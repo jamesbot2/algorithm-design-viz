@@ -8,7 +8,7 @@ import { runHeavyPreferWorker } from '../core/runner/runHeavy'
 import { pickPrimaryCodeRef, weakContextRefs } from '../utils/codeRefs'
 import FinalAnswerResult from '../components/result/FinalAnswerResult'
 import Visualizer from '../components/Visualizer'
-import GraphInput from '../components/graph/GraphInput'
+import GraphInput, { type GraphValidity } from '../components/graph/GraphInput'
 import GraphResultPanel from '../components/graph/GraphResultPanel'
 import * as binarySearch from '../algorithms/binarySearch'
 import type { BinarySearchMode } from '../algorithms/binarySearch'
@@ -132,6 +132,8 @@ export default function AlgoPage() {
   const [staleResult, setStaleResult] = useState(false)
   const [shakeKey, setShakeKey] = useState(0)
   const [draftDirty, setDraftDirty] = useState(false)
+  const [graphValidity, setGraphValidity] = useState<GraphValidity | null>(null)
+  const [graphSyncKey, setGraphSyncKey] = useState('init')
   const cancelRef = useRef(createCancelFlag())
   const activeRunToken = useRef(0)
   const [runLabel, setRunLabel] = useState<'idle' | 'running' | 'cancelled' | 'truncated'>('idle')
@@ -155,6 +157,17 @@ export default function AlgoPage() {
 
     if (isGraphAlgo(id)) {
       const g = draft.graph ?? defaultDraftFor(id)
+      if (graphValidity && !graphValidity.canRun) {
+        const errs: FieldError[] = []
+        if (!graphValidity.parseOk) {
+          errs.push({ field: 'edges', reason: graphValidity.parseError ?? '边列表解析失败' })
+        }
+        for (const iss of graphValidity.issues) {
+          errs.push({ field: iss.field, reason: iss.reason })
+        }
+        if (!errs.length) errs.push({ field: 'graph', reason: '图草稿尚未通过校验' })
+        return { ok: false, errors: errs }
+      }
       const v = validateGraphDraft(g, algoGraphOptions(id))
       if (!v.ok) {
         return {
@@ -386,7 +399,7 @@ export default function AlgoPage() {
       fallbackSteps: maybeSteps(() => algo.generateSteps(arr)),
       inputSize: arr.length,
     }
-  }, [algo, id, draft])
+  }, [algo, id, draft, graphValidity])
 
   /** Single execution path: validate → run once → {result, steps/trace}. */
   const executeOnce = useCallback(
@@ -662,6 +675,8 @@ export default function AlgoPage() {
     setDraft(defaultDraft(id ?? ''))
     setErrors([])
     setSceneWarn(null)
+    setGraphSyncKey(`restore-${Date.now()}`)
+    setDraftDirty(true)
   }
 
   const onRun = () => {
@@ -924,10 +939,11 @@ export default function AlgoPage() {
           {isGraphAlgo(id) && draft.graph && (
             <div className="field-graph">
               <GraphInput
-                key={`${id}-draft`}
                 algoId={id}
                 value={draft.graph}
+                syncKey={`${id}-${graphSyncKey}`}
                 onChange={(g) => patch({ graph: g })}
+                onValidityChange={setGraphValidity}
               />
             </div>
           )}

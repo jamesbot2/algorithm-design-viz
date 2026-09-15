@@ -6,7 +6,6 @@ import { reconstructPath as reconstructHeap } from '../../algorithms/dijkstraHea
 interface Props {
   algoId: string
   steps: Step[]
-  onHighlightPath?: (nodes: number[], edgeHint?: string[]) => void
 }
 
 function lastResult(steps: Step[]): Record<string, unknown> | null {
@@ -25,7 +24,7 @@ export default function GraphResultPanel({ algoId, steps }: Props) {
     if (result && result.ok === false) {
       return (
         <div className="graph-result-panel">
-          <h4>结果</h4>
+          <h4>最终结果</h4>
           <p className="input-errors">算法未成功：{String(result.error ?? 'error')}</p>
         </div>
       )
@@ -56,7 +55,7 @@ export default function GraphResultPanel({ algoId, steps }: Props) {
 
     return (
       <div className="graph-result-panel">
-        <h4>最短路查询</h4>
+        <h4>最终结果 · 最短路查询</h4>
         <label>
           目标顶点
           <input
@@ -64,7 +63,13 @@ export default function GraphResultPanel({ algoId, steps }: Props) {
             min={0}
             max={Math.max(0, n - 1)}
             value={target}
-            onChange={(e) => setTarget(Number(e.target.value) || 0)}
+            onChange={(e) => {
+              const raw = e.target.value
+              if (raw.trim() === '') return
+              const n = Number(raw)
+              if (!Number.isFinite(n) || !Number.isInteger(n)) return
+              setTarget(n)
+            }}
           />
         </label>
         <p>
