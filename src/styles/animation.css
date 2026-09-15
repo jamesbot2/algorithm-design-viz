@@ -1,27 +1,58 @@
-/* Motion + semantic tokens (M2 start). prefers-reduced-motion respected. */
+/* Unified motion + semantic tokens (M2). Honors prefers-reduced-motion + .motion-reduced. */
 
 :root {
   --motion-fast: 120ms;
   --motion-normal: 220ms;
   --motion-slow: 360ms;
   --motion-step: 180ms;
+  --motion-pulse: 600ms;
+  --motion-settle: 420ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.3, 0, 1, 1);
   --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-springy: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sem-compare: #f59e0b;
+  --sem-swap: #ef4444;
+  --sem-focus: #3b82f6;
+  --sem-update: #f97316;
+  --sem-accepted: #22c55e;
+  --sem-rejected: #f87171;
+  --sem-pruned: #94a3b8;
+  --sem-optimal: #eab308;
+  --sem-sorted: #22c55e;
+  --sem-pivot: #a855f7;
+  --sem-read: #06b6d4;
+  --sem-done: #22c55e;
+  --sem-error: #ef4444;
+  --sem-frontier: #38bdf8;
+  --sem-settled: #64748b;
   --sem-banner-flash: rgba(59, 130, 246, 0.18);
   --sem-vars-flash: rgba(34, 197, 94, 0.12);
 }
 
-@keyframes viz-banner-flash {
-  from {
-    background-color: var(--sem-banner-flash);
-  }
-  to {
-    background-color: transparent;
-  }
+.motion-root {
+  min-height: 100%;
+}
+.motion-root.density-projection {
+  --viz-font-scale: 1.12;
+  font-size: 1.05em;
+}
+.motion-root.density-projection .cell,
+.motion-root.density-projection .bar-val,
+.motion-root.density-projection .node-label {
+  font-size: 1.05em;
 }
 
+/* —— Banner / vars —— */
+@keyframes viz-banner-flash {
+  from { background-color: var(--sem-banner-flash); }
+  to { background-color: transparent; }
+}
+@keyframes viz-banner-crossfade {
+  from { opacity: 0.35; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @keyframes viz-vars-flash {
   from {
     box-shadow: inset 0 0 0 1px var(--sem-vars-flash);
@@ -36,22 +67,395 @@
 .viz-step-flash {
   animation: viz-banner-flash var(--motion-step) var(--ease-exit);
 }
-
+.viz-banner-enter {
+  animation: viz-banner-crossfade var(--motion-normal) var(--ease-enter);
+}
 .viz-vars-flash {
   border-radius: 8px;
   animation: viz-vars-flash var(--motion-normal) var(--ease-standard);
 }
 
+/* —— Array —— */
+@keyframes arr-compare-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; filter: brightness(1); }
+  50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--sem-compare) 45%, transparent); filter: brightness(1.12); }
+}
+@keyframes arr-update-settle {
+  0% { transform: scale(1.08); filter: brightness(1.25); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@keyframes arr-swap-nudge {
+  0% { transform: translateX(0); }
+  40% { transform: translateX(var(--swap-dx, 6px)); }
+  100% { transform: translateX(0); }
+}
+
+.bar.hl-compare,
+.cell.hl-compare {
+  animation: arr-compare-pulse var(--motion-pulse) var(--ease-standard) infinite;
+}
+.bar.hl-swap,
+.cell.hl-swap,
+.bar.hl-update,
+.cell.hl-update {
+  animation: arr-update-settle var(--motion-settle) var(--ease-emphasized);
+}
+.bar.anim-swap-nudge,
+.cell.anim-swap-nudge {
+  animation: arr-swap-nudge var(--motion-normal) var(--ease-springy);
+}
+.bar,
+.cell {
+  transition:
+    height var(--motion-normal) var(--ease-standard),
+    background var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-normal) var(--ease-standard),
+    box-shadow var(--motion-normal) var(--ease-standard);
+}
+.ptr-tag {
+  transition: transform var(--motion-normal) var(--ease-emphasized), opacity var(--motion-fast) ease;
+}
+.range-band {
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0.22;
+  transition: left var(--motion-normal) var(--ease-standard), width var(--motion-normal) var(--ease-standard), opacity var(--motion-fast);
+}
+.range-band.current { background: var(--sem-focus); }
+.range-band.best { background: var(--sem-optimal); opacity: 0.28; }
+
+/* —— Matrix —— */
+@keyframes mat-write-flash {
+  0% { background-color: color-mix(in srgb, var(--sem-update) 55%, #222); transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes mat-read-glow {
+  0%, 100% { box-shadow: inset 0 0 0 0 transparent; }
+  50% { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--sem-read) 50%, transparent); }
+}
+@keyframes mat-path-flow {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+  100% { filter: brightness(1); }
+}
+.matrix-table td.hl-swap,
+.matrix-table td.hl-write {
+  animation: mat-write-flash var(--motion-settle) var(--ease-emphasized);
+  background: color-mix(in srgb, var(--sem-update) 35%, #222);
+  border-color: var(--sem-update);
+}
+.matrix-table td.hl-read {
+  animation: mat-read-glow var(--motion-pulse) var(--ease-standard) 2;
+  background: color-mix(in srgb, var(--sem-read) 28%, #222);
+}
+.matrix-table td.hl-sorted,
+.matrix-table td.hl-path {
+  animation: mat-path-flow var(--motion-slow) var(--ease-standard) 1;
+  background: color-mix(in srgb, var(--sem-accepted) 28%, #222);
+}
+.matrix-table td.hl-focus {
+  background: color-mix(in srgb, var(--sem-focus) 40%, #222);
+  box-shadow: inset 0 0 0 1px var(--sem-focus);
+}
+.matrix-label-sync {
+  color: var(--sem-focus);
+  font-weight: 700;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--sem-focus) 40%, transparent);
+}
+.matrix-anti-example td {
+  outline: 1px dashed color-mix(in srgb, var(--sem-error) 50%, transparent);
+}
+.matrix-anti-banner {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  margin-bottom: 0.45rem;
+}
+
+/* —— Graph —— */
+@keyframes node-select-pulse {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50% { filter: drop-shadow(0 0 6px var(--sem-focus)); }
+}
+@keyframes edge-scan {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes edge-reject-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+@keyframes neg-cycle-warn {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.graph-svg .node {
+  transition: fill var(--motion-fast), stroke var(--motion-fast), transform var(--motion-normal) var(--ease-emphasized);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.graph-svg .node.hot,
+.graph-svg .node.role-current {
+  fill: color-mix(in srgb, var(--sem-focus) 45%, #2a2a2a);
+  stroke: var(--sem-focus);
+  animation: node-select-pulse var(--motion-pulse) ease infinite;
+}
+.graph-svg .node.role-frontier {
+  fill: color-mix(in srgb, var(--sem-frontier) 40%, #2a2a2a);
+  stroke: var(--sem-frontier);
+}
+.graph-svg .node.role-settled {
+  fill: color-mix(in srgb, var(--sem-settled) 35%, #2a2a2a);
+  stroke: var(--sem-settled);
+}
+.graph-svg .node.role-neg-cycle {
+  fill: color-mix(in srgb, var(--sem-error) 45%, #2a2a2a);
+  stroke: var(--sem-error);
+  animation: neg-cycle-warn var(--motion-pulse) ease infinite;
+}
+.graph-svg .edge {
+  transition: stroke var(--motion-fast), stroke-width var(--motion-fast);
+}
+.graph-svg .edge.checking,
+.graph-svg .edge.relaxing {
+  stroke-dasharray: 8 6;
+  stroke-dashoffset: 28;
+  animation: edge-scan var(--motion-slow) linear infinite;
+}
+.graph-svg .edge.accepted,
+.graph-svg .edge.tree {
+  stroke: var(--sem-accepted);
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--sem-accepted) 50%, transparent));
+}
+.graph-svg .edge.rejected {
+  stroke: var(--sem-rejected);
+  stroke-dasharray: 4 3;
+  animation: edge-reject-shake var(--motion-fast) ease 2;
+}
+.graph-svg .edge.path {
+  stroke: var(--sem-focus);
+  stroke-width: 3.5;
+}
+.graph-neg-warning {
+  margin: 0.35rem 0 0;
+  padding: 0.4rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #fecaca;
+  font-size: 0.8rem;
+  animation: neg-cycle-warn var(--motion-pulse) ease infinite;
+}
+
+/* —— Search tree —— */
+@keyframes st-enter {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes st-prune {
+  to { opacity: 0.35; transform: scale(0.92); }
+}
+.st-node {
+  animation: st-enter var(--motion-normal) var(--ease-enter);
+  transition: opacity var(--motion-normal), transform var(--motion-normal);
+}
+.st-node.st-pruned,
+.st-node.st-rejected {
+  animation: st-prune var(--motion-slow) var(--ease-exit) forwards;
+}
+.st-node.st-exploring > .st-label {
+  outline: 1px solid color-mix(in srgb, var(--sem-focus) 55%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--sem-focus) 12%, transparent);
+}
+.st-node.st-optimal > .st-label {
+  background: color-mix(in srgb, var(--sem-optimal) 18%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sem-optimal) 40%, transparent);
+}
+.st-node.st-feasible > .st-label {
+  background: color-mix(in srgb, var(--sem-accepted) 14%, transparent);
+}
+.st-node.on-path > .st-label {
+  border-left: 3px solid var(--sem-focus);
+  padding-left: 0.35rem;
+}
+.st-badge-exploring { background: var(--sem-focus); }
+.st-badge-pruned { background: var(--sem-pruned); color: #111; }
+.st-badge-rejected { background: var(--sem-rejected); }
+.st-badge-feasible { background: var(--sem-accepted); color: #111; }
+.st-badge-optimal { background: var(--sem-optimal); color: #111; }
+.st-badge-root { background: var(--sem-pivot); }
+.board-tree-link {
+  font-size: 0.75rem;
+  color: var(--muted-2);
+  margin: 0.25rem 0 0.5rem;
+}
+
+/* —— Interaction polish —— */
+@keyframes input-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+@keyframes error-fade-in {
+  from { opacity: 0; max-height: 0; margin-top: 0; padding-top: 0; padding-bottom: 0; }
+  to { opacity: 1; max-height: 200px; }
+}
+.input-panel.has-errors {
+  border-color: var(--sem-error);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sem-error) 35%, transparent);
+  transition: border-color var(--motion-normal), box-shadow var(--motion-normal);
+}
+.input-panel.shake {
+  animation: input-shake var(--motion-slow) var(--ease-emphasized);
+}
+.input-errors {
+  animation: error-fade-in var(--motion-normal) var(--ease-enter);
+}
+.play-btn.tactile:active {
+  transform: scale(0.96);
+}
+.play-btn.is-playing {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sem-accepted) 40%, transparent);
+}
+.result-panel-enter {
+  animation: viz-banner-crossfade var(--motion-normal) var(--ease-enter);
+}
+.stale-result-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  color: #cbd5e1;
+  vertical-align: middle;
+}
+.scrub-preview {
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-height: 1.2rem;
+  margin: -0.25rem 0 0.5rem;
+  opacity: 0.9;
+  transition: opacity var(--motion-fast);
+}
+.phase-track {
+  position: relative;
+  height: 6px;
+  margin: 0.15rem 0 0.65rem;
+  background: #2a2a2a;
+  border-radius: 999px;
+  overflow: visible;
+}
+.phase-track .phase-marker {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 14px;
+  background: var(--sem-focus);
+  border-radius: 1px;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+.phase-track .phase-marker:hover::after,
+.phase-track .phase-marker:focus-visible::after {
+  content: attr(data-phase);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.35rem;
+  background: #333;
+  border-radius: 4px;
+  color: #eee;
+}
+.legend-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+  vertical-align: middle;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  :root {
+  :root, .motion-root {
     --motion-fast: 0ms;
     --motion-normal: 0ms;
     --motion-slow: 0ms;
     --motion-step: 0ms;
+    --motion-pulse: 0ms;
+    --motion-settle: 0ms;
   }
-
   .viz-step-flash,
-  .viz-vars-flash {
+  .viz-banner-enter,
+  .viz-vars-flash,
+  .bar.hl-compare,
+  .cell.hl-compare,
+  .bar.hl-swap,
+  .cell.hl-swap,
+  .matrix-table td.hl-swap,
+  .matrix-table td.hl-read,
+  .matrix-table td.hl-sorted,
+  .graph-svg .node.hot,
+  .graph-svg .edge.checking,
+  .graph-svg .edge.relaxing,
+  .graph-svg .edge.rejected,
+  .graph-neg-warning,
+  .st-node,
+  .input-panel.shake,
+  .input-errors,
+  .result-panel-enter {
     animation: none !important;
   }
+}
+
+.motion-reduced {
+  --motion-fast: 0ms;
+  --motion-normal: 0ms;
+  --motion-slow: 0ms;
+  --motion-step: 0ms;
+  --motion-pulse: 0ms;
+  --motion-settle: 0ms;
+}
+.motion-reduced .viz-step-flash,
+.motion-reduced .viz-banner-enter,
+.motion-reduced .viz-vars-flash,
+.motion-reduced .bar.hl-compare,
+.motion-reduced .cell.hl-compare,
+.motion-reduced .bar.hl-swap,
+.motion-reduced .cell.hl-swap,
+.motion-reduced .matrix-table td.hl-swap,
+.motion-reduced .matrix-table td.hl-read,
+.motion-reduced .matrix-table td.hl-sorted,
+.motion-reduced .graph-svg .node.hot,
+.motion-reduced .graph-svg .edge.checking,
+.motion-reduced .graph-svg .edge.relaxing,
+.motion-reduced .graph-svg .edge.rejected,
+.motion-reduced .graph-neg-warning,
+.motion-reduced .st-node,
+.motion-reduced .input-panel.shake,
+.motion-reduced .input-errors,
+.motion-reduced .result-panel-enter {
+  animation: none !important;
+}
+
+@media (max-width: 960px) {
+  .viz-body { grid-template-columns: 1fr; }
+  .viz-toolbar { border-radius: 16px; }
+  .arrays-panel { gap: 0.5rem; }
 }

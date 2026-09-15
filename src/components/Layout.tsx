@@ -3,11 +3,13 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { chapters } from '../data/chapters'
 import { algorithms } from '../algorithms'
 import { byDesignThought, byProblemType, completionLabel } from '../data/curriculum'
+import { useMotion } from '../theme/MotionContext'
 
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [navMode, setNavMode] = useState<'design' | 'problem'>('design')
+  const { userPref, setUserPref, density, setDensity } = useMotion()
   const location = useLocation()
   const navModules = useMemo(
     () => (navMode === 'design' ? byDesignThought.modules : byProblemType.modules),
@@ -172,6 +174,31 @@ export default function Layout() {
             ☰
           </button>
           <span className="topbar-title">{title}</span>
+          <span className="spacer" style={{ flex: 1 }} />
+          <label className="topbar-motion" title="动画模式：跟随系统 / 减弱 / 标准">
+            <span className="muted" style={{ fontSize: '0.72rem', marginRight: 4 }}>动效</span>
+            <select
+              aria-label="动画模式"
+              value={userPref === null ? 'system' : userPref}
+              onChange={(e) => {
+                const v = e.target.value
+                setUserPref(v === 'system' ? null : (v as 'standard' | 'reduced'))
+              }}
+            >
+              <option value="system">跟随系统</option>
+              <option value="standard">标准</option>
+              <option value="reduced">减弱</option>
+            </select>
+          </label>
+          <button
+            type="button"
+            className="ghost icon-btn"
+            title={density === 'projection' ? '切换普通密度' : '投影友好密度'}
+            aria-label="投影密度"
+            onClick={() => setDensity(density === 'projection' ? 'normal' : 'projection')}
+          >
+            {density === 'projection' ? '密' : '投'}
+          </button>
         </header>
         <main className={`main${isAlgo ? ' wide' : ''}`}>
           <Outlet />

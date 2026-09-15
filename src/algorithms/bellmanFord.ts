@@ -54,6 +54,7 @@ export function generateSteps(
     hn: number[] = [],
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
+    opts?: { warning?: string; nodeRoles?: Record<string, 'current' | 'frontier' | 'settled' | 'source' | 'target' | 'neg-cycle'> },
   ) => {
     const roles = { ...edgeRoles }
     const highlightEdgeIds = checking ? [checking] : []
@@ -70,6 +71,8 @@ export function generateSteps(
         highlightNodes: hn,
         highlightEdgeIds,
         edgeRoles: roles,
+        warning: opts?.warning,
+        nodeRoles: opts?.nodeRoles,
       },
       result,
     })
@@ -119,6 +122,10 @@ export function generateSteps(
         edge: negEdge,
         distCorrupted: true,
         note: '勿将当前 dist 当作最短路',
+      },
+      {
+        warning: 'negative_cycle',
+        nodeRoles: { [String(u)]: 'neg-cycle', [String(v)]: 'neg-cycle' },
       },
     )
   } else {

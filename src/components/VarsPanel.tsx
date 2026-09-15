@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import type { Step } from '../types/step'
 
-export default function VarsPanel({ step }: { step: Step }) {
+function VarsPanel({ step }: { step: Step }) {
   const vars = step.vars ?? {}
   const entries = Object.entries(vars)
   const prevRef = useRef<Record<string, string>>({})
@@ -17,10 +17,11 @@ export default function VarsPanel({ step }: { step: Step }) {
         changed.add(k)
       }
     }
+    // Detect removed keys softly — no thrash for identical snapshots
     prevRef.current = next
     if (changed.size === 0) return
     setFlash(changed)
-    const t = window.setTimeout(() => setFlash(new Set()), 550)
+    const t = window.setTimeout(() => setFlash(new Set()), 480)
     return () => window.clearTimeout(t)
   }, [vars, step.id])
 
@@ -32,13 +33,29 @@ export default function VarsPanel({ step }: { step: Step }) {
       ) : (
         <div className="vars-grid">
           {entries.map(([k, v]) => (
-            <div key={k} className={`var-chip${flash.has(k) ? ' flash' : ''}`}>
+            <div
+              key={k}
+              className={`var-chip${flash.has(k) ? ' flash' : ''}`}
+              data-changed={flash.has(k) ? '1' : undefined}
+            >
               <span className="var-key">{k}</span>
               <span className="var-val">{v === null || v === undefined ? 'null' : String(v)}</span>
             </div>
           ))}
         </div>
       )}
+      {step.result !== undefined && step.result !== null && (
+        <div className="result-panel-enter" style={{ marginTop: '0.65rem' }}>
+          <div className="panel-title">结果快照</div>
+          <pre className="result-snap muted" style={{ fontSize: '0.72rem', margin: 0, whiteSpace: 'pre-wrap' }}>
+            {typeof step.result === 'object'
+              ? JSON.stringify(step.result, null, 0).slice(0, 280)
+              : String(step.result)}
+          </pre>
+        </div>
+      )}
     </div>
   )
 }
+
+export default memo(VarsPanel)

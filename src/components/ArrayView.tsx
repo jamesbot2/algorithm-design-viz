@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import type { HighlightRole, Step } from '../types/step'
+import { memo, useMemo, useState, type CSSProperties } from 'react'
+import type { HighlightRole, Step, StepRanges } from '../types/step'
 import { deriveArrayPointers } from '../types/step'
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
   defaultMode?: 'bars' | 'cells'
   /** Stable scale across a run (max abs from full trace) */
   scaleMax?: number
+  ranges?: StepRanges
 }
 
 const ROLE_CLASS: Record<HighlightRole, string> = {
@@ -21,6 +22,11 @@ const ROLE_CLASS: Record<HighlightRole, string> = {
   read: 'hl-read',
   focus: 'hl-focus',
   done: 'hl-done',
+  update: 'hl-swap',
+  accepted: 'hl-sorted',
+  rejected: 'hl-swap',
+  pruned: 'hl-read',
+  optimal: 'hl-sorted',
 }
 
 const LEGACY_ORDER: HighlightRole[] = ['compare', 'swap', 'focus', 'done']
@@ -39,12 +45,24 @@ function roleForIndex(
 function barSuitable(values: (number | string)[]): boolean {
   if (!values.length) return false
   if (!values.every((v) => typeof v === 'number' && Number.isFinite(v as number))) return false
-  // Too many cells → prefer cells
   if (values.length > 24) return false
   return true
 }
 
-export default function ArrayView({
+function rangeStyle(
+  range: [number, number] | undefined,
+  n: number,
+): { left: string; width: string } | null {
+  if (!range || n <= 0) return null
+  const lo = Math.max(0, Math.min(range[0], range[1]))
+  const hi = Math.min(n - 1, Math.max(range[0], range[1]))
+  if (hi < lo) return null
+  const leftPct = (lo / n) * 100
+  const widthPct = ((hi - lo + 1) / n) * 100
+  return { left: `${leftPct}%`, width: `${widthPct}%` }
+}
+
+function ArrayView({
   name,
   values,
   highlights = [],
@@ -52,6 +70,7 @@ export default function ArrayView({
   pointers = {},
   defaultMode,
   scaleMax,
+  ranges,
 }: Props) {
   const numeric = values.every((v) => typeof v === 'number' && Number.isFinite(v as number))
   const suitable = barSuitable(values)
@@ -82,6 +101,23 @@ export default function ArrayView({
     return map
   }, [pointers, values.length])
 
+  const swapPair = useMemo(() => {
+    const swapIdxs: number[] = []
+    if (roles) {
+      for (const [k, r] of Object.entries(roles)) {
+        if (r === 'swap') swapIdxs.push(Number(k))
+      }
+    }
+    if (swapIdxs.length < 2 && highlights.length >= 2) {
+      return [highlights[0]!, highlights[1]!] as [number, number]
+    }
+    if (swapIdxs.length >= 2) return [swapIdxs[0]!, swapIdxs[1]!] as [number, number]
+    return null
+  }, [roles, highlights])
+
+  const curBand = rangeStyle(ranges?.current, values.length)
+  const bestBand = rangeStyle(ranges?.best, values.length)
+
   return (
     <div className="array-view">
       <div className="array-label">
@@ -108,7 +144,9 @@ export default function ArrayView({
       </div>
 
       {mode === 'bars' && numeric ? (
-        <div className={`bars-wrap${hasNegative ? ' signed' : ''}`}>
+        <div className={`bars-wrap${hasNegative ? ' signed' : ''}`} style={{ position: 'relative' }}>
+          {bestBand && <div className="range-band best" style={bestBand} title="最优窗口" />}
+          {curBand && <div className="range-band current" style={curBand} title="当前窗口" />}
           {hasNegative && <div className="bar-baseline" aria-hidden />}
           {values.map((v, i) => {
             const role = roleForIndex(i, highlights, roles)
@@ -116,11 +154,28 @@ export default function ArrayView({
             const h = minH + (Math.abs(n) / max) * (maxH - minH)
             const ptrs = pointersByIndex.get(i) ?? []
             const neg = n < 0
+            const isSwap =
+              role === 'swap' || (swapPair !== null && (i === swapPair[0] || i === swapPair[1]))
+            const swapDx =
+              isSwap && swapPair
+                ? i === swapPair[0]
+                  ? 8
+                  : i === swapPair[1]
+                    ? -8
+                    : 0
+                : 0
             return (
               <div key={i} className={`bar-col${neg ? ' neg' : ' pos'}`}>
                 <div
-                  className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${neg ? ' bar-neg' : ''}`}
-                  style={{ height: `${h}px` }}
+                  className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${neg ? ' bar-neg' : ''}${
+                    isSwap ? ' anim-swap-nudge' : ''
+                  }`}
+                  style={
+                    {
+                      height: `${h}px`,
+                      ['--swap-dx' as string]: `${swapDx}px`,
+                    } as CSSProperties
+                  }
                   title={`[${i}] = ${v}`}
                 >
                   <span className="bar-val">{String(v)}</span>
@@ -142,8 +197,14 @@ export default function ArrayView({
           <div className="array-cells">
             {values.map((v, i) => {
               const role = roleForIndex(i, highlights, roles)
+              const isSwap = role === 'swap'
               return (
-                <div key={i} className={`cell${role ? ` ${ROLE_CLASS[role]}` : ''}`}>
+                <div
+                  key={i}
+                  className={`cell${role ? ` ${ROLE_CLASS[role]}` : ''}${
+                    isSwap ? ' anim-swap-nudge' : ''
+                  }`}
+                >
                   <span className="cell-idx">{i}</span>
                   <span className="cell-val">{String(v)}</span>
                 </div>
@@ -161,11 +222,28 @@ export default function ArrayView({
           )}
         </>
       )}
+      {(ranges?.current || ranges?.best) && (
+        <p className="matrix-note">
+          {ranges.current && (
+            <>
+              当前窗口 [{ranges.current[0]},{ranges.current[1]}]
+            </>
+          )}
+          {ranges.current && ranges.best && ' · '}
+          {ranges.best && (
+            <>
+              最优窗口 [{ranges.best[0]},{ranges.best[1]}]
+            </>
+          )}
+        </p>
+      )}
     </div>
   )
 }
 
-export function ArraysFromStep({
+export default memo(ArrayView)
+
+export const ArraysFromStep = memo(function ArraysFromStep({
   step,
   scaleMaxByArray,
 }: {
@@ -184,8 +262,9 @@ export function ArraysFromStep({
           roles={step.roles?.[name]}
           pointers={deriveArrayPointers(step, name)}
           scaleMax={scaleMaxByArray?.[name]}
+          ranges={name === 'a' || Object.keys(step.arrays!).length === 1 ? step.ranges : undefined}
         />
       ))}
     </div>
   )
-}
+})

@@ -98,6 +98,8 @@ export default function AlgoPage() {
   const [hasRun, setHasRun] = useState(false)
   const [sceneWarn, setSceneWarn] = useState<string | null>(null)
   const [seekStepIndex, setSeekStepIndex] = useState(0)
+  const [staleResult, setStaleResult] = useState(false)
+  const [shakeKey, setShakeKey] = useState(0)
   const cancelRef = useRef(createCancelFlag())
   const pendingAutoRun = useRef(false)
 
@@ -328,10 +330,17 @@ export default function AlgoPage() {
       const built = validateAndBuild()
       if (!built.ok) {
         setErrors(built.errors)
-        setHasRun(false)
+        setShakeKey((k) => k + 1)
+        // Keep prior viz if present — mark as stale rather than silently claiming current
+        if (hasRun && steps.length > 0) {
+          setStaleResult(true)
+        } else {
+          setHasRun(false)
+        }
         return false
       }
       setErrors([])
+      setStaleResult(false)
 
       cancelRef.current.cancelled = false
       const entry = id ? getAlgo(id) : undefined
@@ -382,7 +391,9 @@ export default function AlgoPage() {
             outSteps = outcome.steps
             outTrace = outcome.trace
           } else if (outcome.status === 'validation_error') {
-            setHasRun(false)
+            setShakeKey((k) => k + 1)
+            if (hasRun && steps.length > 0) setStaleResult(true)
+            else setHasRun(false)
             return false
           }
         } else if (outcome.status === 'cancelled') {
@@ -424,7 +435,7 @@ export default function AlgoPage() {
       }
       return true
     },
-    [validateAndBuild, id, draft],
+    [validateAndBuild, id, draft, hasRun, steps.length],
   )
 
   useEffect(() => {
@@ -436,6 +447,7 @@ export default function AlgoPage() {
     setPlaybackKey((k) => k + 1)
     setSceneWarn(null)
     setSeekStepIndex(0)
+    setStaleResult(false)
     pendingAutoRun.current = false
 
     const loaded = loadSceneFromHash(window.location.hash)
@@ -585,7 +597,7 @@ export default function AlgoPage() {
         )}
       </div>
 
-      <div className="input-panel">
+      <div className={`input-panel${errors.length ? ' has-errors shake-pending' : ''}${shakeKey > 0 && errors.length ? ' shake' : ''}`}>
         <h3>输入控制</h3>
         <div className="mode-toggle">
           <button
@@ -730,7 +742,12 @@ export default function AlgoPage() {
 
       {hasRun ? (
         <>
-          {isGraphAlgo(id) && <GraphResultPanel algoId={id} steps={steps} />}
+          {isGraphAlgo(id) && (
+            <div className={`result-panel-enter${staleResult ? ' is-stale' : ''}`}>
+              {staleResult && <span className="stale-result-badge">上一轮结果</span>}
+              <GraphResultPanel algoId={id} steps={steps} />
+            </div>
+          )}
           <Visualizer
             key={playbackKey}
             steps={steps}
@@ -738,6 +755,7 @@ export default function AlgoPage() {
             code={algo.meta.code as string | undefined}
             initialStepIndex={seekStepIndex}
             onStepIndexChange={onStepChange}
+            staleResult={staleResult}
           />
         </>
       ) : (

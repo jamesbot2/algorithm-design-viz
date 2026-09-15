@@ -29,6 +29,7 @@ export function generateSteps(input: number[]): Step[] {
     vars: Record<string, string | number | boolean | null> = {},
     codeLine?: number,
     result?: unknown,
+    ranges?: { current?: [number, number]; best?: [number, number] },
   ) => {
     steps.push({
       id: id++,
@@ -40,6 +41,7 @@ export function generateSteps(input: number[]): Step[] {
       vars,
       codeLine,
       result,
+      ranges,
     })
   }
   if (a.length === 0) {
@@ -56,16 +58,16 @@ export function generateSteps(input: number[]): Step[] {
   let bestL = 0
   let bestR = 0
   let curL = 0
-  snap(`初始化 best = cur = a[0] = ${a[0]}`, [0], { best, cur, bestL, bestR }, 0)
+  snap(`初始化 best = cur = a[0] = ${a[0]}`, [0], { best, cur, bestL, bestR }, 0, undefined, { current: [0, 0], best: [0, 0] })
   for (let i = 1; i < a.length; i++) {
-    snap(`考察 a[${i}] = ${a[i]}`, [i], { i, best, cur, curL }, 1)
+    snap(`考察 a[${i}] = ${a[i]}`, [i], { i, best, cur, curL }, 1, undefined, { current: [curL, i - 1 >= curL ? i - 1 : curL], best: [bestL, bestR] })
     if (cur + a[i] < a[i]) {
       cur = a[i]
       curL = i
-      snap(`重新开始：cur ← a[${i}] = ${cur}`, [i], { i, best, cur, curL }, 2)
+      snap(`重新开始：cur ← a[${i}] = ${cur}`, [i], { i, best, cur, curL }, 2, undefined, { current: [curL, i], best: [bestL, bestR] })
     } else {
       cur = cur + a[i]
-      snap(`延伸：cur ← cur + a[${i}] = ${cur}`, [i], { i, best, cur, curL }, 2)
+      snap(`延伸：cur ← cur + a[${i}] = ${cur}`, [i], { i, best, cur, curL }, 2, undefined, { current: [curL, i], best: [bestL, bestR] })
     }
     if (cur > best) {
       best = cur
@@ -76,6 +78,8 @@ export function generateSteps(input: number[]): Step[] {
         Array.from({ length: bestR - bestL + 1 }, (_, k) => bestL + k),
         { i, best, cur, bestL, bestR },
         3,
+        undefined,
+        { current: [curL, i], best: [bestL, bestR] },
       )
     }
   }
@@ -85,6 +89,7 @@ export function generateSteps(input: number[]): Step[] {
     { best, bestL, bestR },
     0,
     { ok: true, hasSubarray: true, best, range: [bestL, bestR] },
+    { current: [bestL, bestR], best: [bestL, bestR] },
   )
   return steps
 }

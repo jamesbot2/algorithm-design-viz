@@ -73,7 +73,13 @@
 | M1-single-run | 单次执行路径 | 已验证 | AlgoPage：校验 → runAlgo/solve 一次 → {result,steps/trace}；有 registry 时不预生成 fallback；预算+取消 |
 | M1-scene-seek | 场景 stepIndex 恢复 | 已验证 | 持久化 stepIndex；加载后重跑并 seek；版本不匹配/结构非法/过大 → 明确报错、无静默回退 |
 | M1-deploy-gate | Pages 依赖 CI | 已实现待验证 | deploy-pages.yml 用 workflow_run（CI success on main）；workflow_dispatch 可手动；未 push |
-| M2-motion | 动效 token 起步 | 进行中 | theme/motion.ts、semanticColors.ts、styles/animation.css；prefers-reduced-motion；Visualizer banner/vars 轻闪；视图级动画未铺完 |
+| M2-motion | 统一动效系统 | 已验证 | motion/semantic tokens；MotionContext（系统+用户减弱）；banner 交叉淡入；scrub 预览；阶段轴标记；speed-feel；图例按实际 role |
+| M3-array | ArrayView 动效 | 已验证 | compare pulse；swap nudge；update settle；ranges 色带；Kadane/maxSub DC 接线 |
+| M3-matrix | MatrixView 动效 | 已验证 | 强写/弱读/路径；labelHints 同步；antiExample 横幅（背包正向反例） |
+| M3-graph | GraphView 动效 | 已验证 | 节点 pulse/frontier/settled；边 scan/accept/reject；BF 负环 warning |
+| M3-tree | SearchTreeView 动效 | 已验证 | enter/path/prune；可行 vs 最优；棋盘联动提示 |
+| M4-ux | 交互抛光 | 已验证 | 非法输入 shake+红边；上一轮结果徽章；Vars 强调；memo 视图；投影密度 |
+| M5-docs | 动画文档 | 已验证 | docs/V2_ANIMATION.md；本表与 VERIFICATION 已更新 |
 
 ## 拓展（规划，非本轮）
 | 项 | 状态 | 备注 |
@@ -81,7 +87,7 @@
 | Edmonds-Karp / Strassen / 最近点对 | 拓展规划 | `EXTENDED_PLANNED` in curriculum |
 
 ## 缺口 / 已知限制
-- V2 M2：各视图（Array/Matrix/Graph/SearchTree）步进过渡动画尚未全面接线，仅 banner/vars flash
+- 数组交换仅为 CSS nudge，未做完整 FLIP 位移动画
 - deploy-pages 的 workflow_run 门禁需 push 后在 GitHub Actions 实跑确认
 - 教学页（非 AlgoPage）部分算法仍用内置示例参数编辑器较简（nQueens/matrixChain/huffman/背包 AlgoPage）
 - Floyd 结果面板未做 i→j 点选路径重建（矩阵视图为主）
@@ -94,6 +100,6 @@
 
 ## 验证记录
 - `npm run lint` → exit 0（warnings only）
-- `npm run test:run` → 9 files / 84 tests passed（含 tests/v2-credibility.test.ts）
-- `npm run build` → tsc + vite build OK（~432 kB JS）
+- `npm run test:run` → 10 files / 92 tests passed（含 tests/v2-credibility.test.ts、tests/v2-animation.test.ts）
+- `npm run build` → tsc + vite build OK（~444 kB JS / ~34 kB CSS）
 - 本轮 **未 push**（parent 负责 push）

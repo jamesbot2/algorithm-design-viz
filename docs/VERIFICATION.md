@@ -15,6 +15,19 @@ npm run build
 
 `npm ci` 在本环境未强制重装（已有 `node_modules` + 一致 `package-lock.json` lockfileVersion 3）；CI 工作流使用 `npm ci`。
 
+## V2 Animation（本轮追加）
+
+Date: 2026-09-15（M2 finish + M3 + M4）
+
+```bash
+npm run lint      # exit 0
+npm run test:run  # 10 files / 92 tests
+npm run build     # OK
+```
+
+新增：`tests/v2-animation.test.ts`（tokens、Kadane ranges、BF neg-cycle warning）。  
+动效细节见 `docs/V2_ANIMATION.md`。deploy-pages 仍 gated on CI `workflow_run`（未 push）。
+
 ## Results
 
 ### `npm run lint`

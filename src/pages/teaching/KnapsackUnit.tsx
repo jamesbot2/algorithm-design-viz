@@ -66,6 +66,17 @@ export default function KnapsackUnit() {
             label: '反例',
           },
           result: { correct, wrong },
+          labelHints: {
+            antiExample: true,
+            antiNote: '正向更新把 0-1 背包算成可重复选取，结果不可信',
+          },
+          matrices: {
+            compare: [
+              ['正确一维', String(correct.maxValue)],
+              ['正向反例', String(wrong.maxValue)],
+            ],
+          },
+          matrixTargets: { compare: { writes: [[1, 1]], reads: [[0, 1]] } },
         },
       ]
     } else if (strategy === 'backtracking') {

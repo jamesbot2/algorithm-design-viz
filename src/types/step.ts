@@ -1,5 +1,7 @@
 export type EdgeRole = 'checking' | 'accepted' | 'rejected' | 'tree' | 'path' | 'relaxing'
 
+export type NodeRole = 'current' | 'frontier' | 'settled' | 'source' | 'target' | 'neg-cycle'
+
 export interface GraphEdge {
   /** Stable unique id for this edge instance (directed opposite edges differ). */
   id: string
@@ -17,10 +19,26 @@ export interface GraphState {
   highlightEdges?: [string | number, string | number][]
   highlightEdgeIds?: string[]
   edgeRoles?: Record<string, EdgeRole>
+  /** Optional per-node visual roles (frontier / settled / …) */
+  nodeRoles?: Record<string, NodeRole>
+  /** Soft warning overlay e.g. negative_cycle — does not imply a valid SP */
+  warning?: 'negative_cycle' | string
 }
 
 /** Visual role for an array index highlight */
-export type HighlightRole = 'compare' | 'swap' | 'sorted' | 'pivot' | 'read' | 'focus' | 'done'
+export type HighlightRole =
+  | 'compare'
+  | 'swap'
+  | 'sorted'
+  | 'pivot'
+  | 'read'
+  | 'focus'
+  | 'done'
+  | 'update'
+  | 'accepted'
+  | 'rejected'
+  | 'pruned'
+  | 'optimal'
 
 export interface StepStats {
   comparisons?: number
@@ -33,6 +51,12 @@ export interface MatrixTarget {
   reads?: [number, number][]
   writes?: [number, number][]
   path?: [number, number][]
+}
+
+/** Inclusive index ranges for window algorithms (Kadane / max-subarray). */
+export interface StepRanges {
+  current?: [number, number]
+  best?: [number, number]
 }
 
 export interface Step {
@@ -68,6 +92,20 @@ export interface Step {
   searchTree?: SearchTreeNode
   /** Optional coarse phase marker for stage jump (init/extract/relax/done/…) */
   phase?: string
+  /** Kadane-style current / best windows (inclusive indices) */
+  ranges?: StepRanges
+  /**
+   * Optional row/col/item labels for matrix teaching sync
+   * (e.g. knapsack items, LCS characters).
+   */
+  labelHints?: {
+    rows?: string[]
+    cols?: string[]
+    items?: string[]
+    /** Mark matrix as anti-example (wrong algorithm demo) */
+    antiExample?: boolean
+    antiNote?: string
+  }
 }
 
 export interface SearchTreeNode {

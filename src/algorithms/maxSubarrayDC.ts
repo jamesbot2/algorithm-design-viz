@@ -57,6 +57,7 @@ export function solveMaxSubarrayDC(a: number[]): {
     highlights: number[] = [],
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
+    ranges?: { current?: [number, number]; best?: [number, number] },
   ) => {
     steps.push({
       id: id++,
@@ -69,6 +70,7 @@ export function solveMaxSubarrayDC(a: number[]): {
           : undefined,
       vars,
       result,
+      ranges,
     })
   }
 
@@ -111,11 +113,11 @@ export function solveMaxSubarrayDC(a: number[]): {
     hi: number,
   ): { sum: number; left: number; right: number } {
     if (lo === hi) {
-      snap(`叶子 [${lo},${hi}] = ${a[lo]}`, [lo], { lo, hi, mid: lo })
+      snap(`叶子 [${lo},${hi}] = ${a[lo]}`, [lo], { lo, hi, mid: lo }, undefined, { current: [lo, hi] })
       return { sum: a[lo]!, left: lo, right: hi }
     }
     const mid = Math.floor((lo + hi) / 2)
-    snap(`分解 [${lo},${hi}] mid=${mid}`, [], { lo, hi, mid })
+    snap(`分解 [${lo},${hi}] mid=${mid}`, [], { lo, hi, mid }, undefined, { current: [lo, hi] })
     const L = maxSub(lo, mid)
     const R = maxSub(mid + 1, hi)
     const C = crossing(lo, mid, hi)
@@ -123,6 +125,8 @@ export function solveMaxSubarrayDC(a: number[]): {
       `合并 [${lo},${hi}]：左=${L.sum} 右=${R.sum} 跨=${C.sum}`,
       Array.from({ length: hi - lo + 1 }, (_, i) => lo + i),
       { lo, hi, mid, leftSum: L.sum, rightSum: R.sum, crossSum: C.sum },
+      undefined,
+      { current: [lo, hi], best: [C.left, C.right] },
     )
     if (L.sum >= R.sum && L.sum >= C.sum) return L
     if (R.sum >= L.sum && R.sum >= C.sum) return R
@@ -142,6 +146,7 @@ export function solveMaxSubarrayDC(a: number[]): {
     Array.from({ length: ans.right - ans.left + 1 }, (_, i) => ans.left + i),
     { answer: ans.sum },
     result,
+    { current: [ans.left, ans.right], best: [ans.left, ans.right] },
   )
   return { result, steps }
 }
