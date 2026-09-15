@@ -18,7 +18,7 @@
 ## M1 类型化模块与轨迹
 | ID | 项 | 状态 | 备注 |
 |----|----|------|------|
-| M1-01 | 剩余算法 typed 适配 | 已验证 | registry validate+solve：kadane/binarySearch/kmp/editDistance/kruskal/prim/bellmanFord/floyd/bfs/sorts/activitySelection + 原有 knapsack01/lcs/dijkstra；另含 nQueens/matrixChain/huffman/maxSubarrayDC |
+| M1-01 | 剩余算法 typed 适配 | 已验证 | registry validate+solve：kadane/binarySearch/kmp/editDistance/kruskal/prim/bellmanFord/floyd/bfs/sorts/activitySelection + 原有 knapsack01/lcs/dijkstra；另含 nQueens/matrixChain/huffman/maxSubarrayDC / dijkstraHeap |
 | M1-02 | Trace 演进 | 已验证 | Visualizer 接受 `steps?: Step[]` 或 `trace?: Trace`；AlgoPage 有 registry.solve 时写入 Trace |
 | M1-03 | Runner | 已验证 | `src/core/runner/`：`runAlgo` + size budget + cancel flag + `RunOutcome` |
 | M1-04 | Snapshot 不可变 | 已验证 | `freezeSteps` / `copyStepArrays` / `deepFreeze` |
@@ -52,21 +52,32 @@
 | M3-ref | 参考代码+讲义 | 已验证 | 伪代码+C++：背包 DP2D / 朴素 Dijkstra / N皇后；`/lab/core`；C++ 标注 CI 不执行 |
 | M3-T | 测试 | 已验证 | graph validate、heap vs naive、practice judges、scene roundtrip、experiment export；既有测试保持绿 |
 
-## M4 / 拓展（本轮不做，仅记状态）
+## M4 CI / 文档 / 验收
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| M4-CI | GitHub Actions CI | 已验证（本地工作流文件） | `.github/workflows/ci.yml`：PR + push→main；`npm ci` / lint / `test:run` / build。未 push，远程尚未跑过 |
+| M4-deploy | 与 Pages 关系 | 已文档化 | **未改** `deploy-pages.yml`：仍在 push→main 时独立 build+deploy。CI 与 Pages **并行、互不依赖**（不改远程环境设置的前提下最稳妥）。Pages 上内容可能落后于本地 commits，直至授权 push |
+| M4-docs | 文档集 | 已验证 | IMPLEMENTATION_STATUS / VERIFICATION / COURSE_MAP / TRACE_PROTOCOL / CONTRIBUTING / LICENSE_NOTES / FINAL_DELIVERY + README |
+| M4-safety | 内容安全 | 已验证 | Chapter 讲义改为 React 节点渲染 `**`/`code`，**无** `dangerouslySetInnerHTML`；无用户 HTML/MD 直渲；无 markdown-it |
+| M4-E2E | Playwright | 未开始（刻意推迟） | 安装与 CI 可靠性未验证；见 VERIFICATION 手工清单 |
+| M4-T | 验收 | 已验证 | 本地 lint(exit 0)+64 tests+build 绿；见 VERIFICATION / FINAL_DELIVERY |
+
+## 拓展（规划，非本轮）
 | 项 | 状态 | 备注 |
 |----|------|------|
-| M4 CI | 未开始 | |
-| Playwright E2E | 记入 M4 | 本轮未加，避免拖慢 CI；可选轻量 |
-| Edmonds-Karp / Strassen / 最近点对 | 拓展规划 | 见 curriculum `EXTENDED_PLANNED` |
+| Edmonds-Karp / Strassen / 最近点对 | 拓展规划 | `EXTENDED_PLANNED` in curriculum |
 
 ## 缺口 / 已知限制
 - 教学页（非 AlgoPage）部分算法仍用内置示例参数编辑器较简（nQueens/matrixChain/huffman/背包 AlgoPage）
 - Floyd 结果面板未做 i→j 点选路径重建（矩阵视图为主）
 - 练习题库为静态+种子抽样，题量有限；可继续扩充
-- markdown-it 讲义渲染未引入（讲义仍为 chapters.ts / lab TSX）
+- markdown-it 讲义渲染未引入（讲义仍为 chapters.ts / lab TSX；Chapter 仅支持粗体与行内代码）
 - ChatGPT UI / HashRouter / vite `base: '/algorithm-design-viz/'` 保持不变
+- oxlint 有若干 React hooks **warning**（非 error）；CI lint 以 exit 0 为准
+- 可视化 step 快照开销占墙钟时间主导；实验台/本机 microbench **不是** DOM 渲染证明，亦非算法渐近优越性证明
 - **未执行 `git push`**
 
 ## 验证记录
+- `npm run lint` → exit 0（warnings only）
 - `npm run test:run` → 8 files / 64 tests passed
-- `npm run build` → tsc + vite build OK
+- `npm run build` → tsc + vite build OK（~419 kB JS）
