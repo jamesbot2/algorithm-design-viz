@@ -1,4 +1,4 @@
-import type { Step } from '../types/step'
+import type { HighlightRole, Step } from '../types/step'
 
 export const meta = {
   id: 'binarySearch',
@@ -18,23 +18,47 @@ export function generateSteps(input: number[], target = 7): Step[] {
   const a = [...input].sort((x, y) => x - y)
   const steps: Step[] = []
   let id = 0
-  const snap = (message: string, highlights: number[] = [], vars: Record<string, string | number | boolean | null> = {}, codeLine?: number) => {
-    steps.push({ id: id++, message, highlights: { a: highlights }, arrays: { a: [...a] }, vars: { target, ...vars }, codeLine })
+  let comparisons = 0
+
+  const snap = (
+    message: string,
+    highlights: number[] = [],
+    vars: Record<string, string | number | boolean | null> = {},
+    codeLine?: number,
+    roles?: Record<number, HighlightRole>,
+  ) => {
+    const pointers: Record<string, number> = {}
+    for (const k of ['lo', 'mid', 'hi'] as const) {
+      if (typeof vars[k] === 'number' && (vars[k] as number) >= 0) pointers[k] = vars[k] as number
+    }
+    steps.push({
+      id: id++,
+      message,
+      highlights: { a: highlights },
+      roles: roles ? { a: roles } : undefined,
+      arrays: { a: [...a] },
+      vars: { target, ...vars },
+      pointers: Object.keys(pointers).length ? pointers : undefined,
+      stats: { comparisons },
+      codeLine,
+    })
   }
+
   let lo = 0, hi = a.length - 1
   snap(`有序数组上二分查找 target=${target}`, [], { lo, hi }, 0)
   while (lo <= hi) {
     const mid = Math.floor((lo + hi) / 2)
-    snap(`mid = ${mid}，a[mid]=${a[mid]}`, [mid], { lo, mid, hi }, 2)
+    comparisons++
+    snap(`mid = ${mid}，a[mid]=${a[mid]}`, [mid], { lo, mid, hi }, 2, { [mid]: 'focus' })
     if (a[mid] === target) {
-      snap(`找到！下标 ${mid}`, [mid], { lo, mid, hi, found: mid }, 3)
+      snap(`找到！下标 ${mid}`, [mid], { lo, mid, hi, found: mid }, 3, { [mid]: 'sorted' })
       return steps
     }
     if (a[mid] < target) {
-      snap(`a[mid] < target，lo ← mid+1`, [mid], { lo, mid, hi }, 4)
+      snap(`a[mid] < target，lo ← mid+1`, [mid], { lo, mid, hi }, 4, { [mid]: 'compare' })
       lo = mid + 1
     } else {
-      snap(`a[mid] > target，hi ← mid-1`, [mid], { lo, mid, hi }, 5)
+      snap(`a[mid] > target，hi ← mid-1`, [mid], { lo, mid, hi }, 5, { [mid]: 'compare' })
       hi = mid - 1
     }
   }

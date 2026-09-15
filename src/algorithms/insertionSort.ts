@@ -1,4 +1,4 @@
-import type { Step } from '../types/step'
+import type { HighlightRole, Step } from '../types/step'
 
 export const meta = {
   id: 'insertionSort',
@@ -18,23 +18,84 @@ export function generateSteps(input: number[]): Step[] {
   const a = [...input]
   const steps: Step[] = []
   let id = 0
-  const snap = (message: string, highlights: number[] = [], vars: Record<string, string | number | boolean | null> = {}, codeLine?: number) => {
-    steps.push({ id: id++, message, highlights: { a: highlights }, arrays: { a: [...a] }, vars: { n: a.length, ...vars }, codeLine })
+  let comparisons = 0
+  let writes = 0
+
+  const snap = (
+    message: string,
+    highlights: number[] = [],
+    vars: Record<string, string | number | boolean | null> = {},
+    codeLine?: number,
+    roles?: Record<number, HighlightRole>,
+    pointers?: Record<string, number>,
+  ) => {
+    const sortedRoles: Record<number, HighlightRole> = { ...(roles ?? {}) }
+    const iVar = typeof vars.i === 'number' ? vars.i : -1
+    if (iVar >= 1) {
+      for (let s = 0; s < iVar; s++) {
+        if (!(s in sortedRoles)) sortedRoles[s] = 'sorted'
+      }
+    }
+    const ptrs =
+      pointers ??
+      {
+        ...(typeof vars.i === 'number' && vars.i >= 0 ? { i: vars.i as number } : {}),
+        ...(typeof vars.j === 'number' && (vars.j as number) >= 0 ? { j: vars.j as number } : {}),
+      }
+    steps.push({
+      id: id++,
+      message,
+      highlights: { a: highlights },
+      roles: Object.keys(sortedRoles).length ? { a: sortedRoles } : undefined,
+      arrays: { a: [...a] },
+      vars: { n: a.length, ...vars },
+      pointers: Object.keys(ptrs).length ? ptrs : undefined,
+      stats: { comparisons, writes, swaps: 0 },
+      codeLine,
+    })
   }
+
   snap('开始插入排序', [], {}, 0)
   for (let i = 1; i < a.length; i++) {
     const key = a[i]
     let j = i - 1
-    snap(`取出 key = a[${i}] = ${key}`, [i], { i, j, key }, 1)
+    snap(`取出 key = a[${i}] = ${key}`, [i], { i, j, key }, 1, { [i]: 'read' }, { i, j })
     while (j >= 0 && a[j] > key) {
-      snap(`a[${j}]=${a[j]} > key=${key}，右移`, [j, j + 1], { i, j, key }, 3)
+      comparisons++
+      snap(
+        `a[${j}]=${a[j]} > key=${key}，右移`,
+        [j, j + 1],
+        { i, j, key },
+        3,
+        { [j]: 'compare', [j + 1]: 'swap' },
+        { i, j },
+      )
       a[j + 1] = a[j]
-      snap(`a[${j + 1}] ← ${a[j]}`, [j + 1], { i, j, key }, 4)
+      writes++
+      snap(
+        `a[${j + 1}] ← ${a[j + 1]}`,
+        [j + 1],
+        { i, j, key },
+        4,
+        { [j + 1]: 'swap' },
+        { i, j },
+      )
       j--
     }
+    if (j >= 0) comparisons++
     a[j + 1] = key
-    snap(`插入 key 到位置 ${j + 1}`, [j + 1], { i, j, key }, 5)
+    writes++
+    snap(
+      `插入 key 到位置 ${j + 1}`,
+      [j + 1],
+      { i, j, key },
+      5,
+      { [j + 1]: 'focus' },
+      { i, ...(j >= 0 ? { j } : {}) },
+    )
   }
-  snap('排序完成', [], {}, 0)
+  const allSorted: Record<number, HighlightRole> = {}
+  for (let s = 0; s < a.length; s++) allSorted[s] = 'sorted'
+  snap('排序完成', [], {}, 0, allSorted)
   return steps
 }

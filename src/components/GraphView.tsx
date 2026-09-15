@@ -11,7 +11,7 @@ export default function GraphView({ graph }: { graph: GraphState }) {
       <svg viewBox={`0 0 ${w} ${h}`} className="graph-svg">
         <defs>
           <marker id="arrow" markerWidth="8" markerHeight="8" refX="18" refY="3" orient="auto">
-            <path d="M0,0 L6,3 L0,6 Z" fill="#7aa2f7" />
+            <path d="M0,0 L6,3 L0,6 Z" fill="#10a37f" />
           </marker>
         </defs>
         {graph.edges.map((e, i) => {

@@ -10,7 +10,7 @@ export default function Home() {
         <h1>用可视化理解每一个步骤</h1>
         <p className="hero-desc">
           覆盖复杂度分析、分治、动态规划、贪心、图算法、网络流、字符串与复杂性理论。
-          每个可视化器展示数组 / 矩阵 / 图状态与变量面板，支持逐步回放。
+          每个可视化器展示数组 / 矩阵 / 图状态与变量面板，支持逐步回放、进度拖拽与键盘控制。
         </p>
       </header>
 
@@ -22,7 +22,9 @@ export default function Home() {
               <span className="card-num">{String(i + 1).padStart(2, '0')}</span>
               <h3>{ch.title}</h3>
               <p>{ch.subtitle}</p>
-              <span className="card-meta">{ch.sections.length} 节 · {ch.algos.length} 个可视化</span>
+              <span className="card-meta">
+                {ch.sections.length} 节 · {ch.algos.length} 个可视化
+              </span>
             </Link>
           ))}
         </div>

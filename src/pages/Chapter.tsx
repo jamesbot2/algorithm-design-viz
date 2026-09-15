@@ -33,7 +33,9 @@ export default function Chapter() {
   return (
     <div className="page chapter-page">
       <div className="page-header">
-        <Link to="/" className="back">← 首页</Link>
+        <Link to="/" className="back">
+          ← 首页
+        </Link>
         <h1>{ch.title}</h1>
         <p className="subtitle">{ch.subtitle}</p>
       </div>

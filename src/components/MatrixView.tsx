@@ -17,12 +17,12 @@ export default function MatrixView({ step }: { step: Step }) {
                 {mat.map((row, i) => (
                   <tr key={i}>
                     {row.map((cell, j) => {
-                      const focus =
-                        (i === focusI && j === focusJ) ||
-                        (i === focusK) ||
-                        (j === focusK && focusK >= 0 && focusI < 0)
+                      let cls = ''
+                      if (i === focusI && j === focusJ) cls = 'hl-focus'
+                      else if (focusK >= 0 && (i === focusK || j === focusK) && focusI < 0) cls = 'hl-read'
+                      else if (i === focusI && focusJ < 0) cls = 'hl-compare'
                       return (
-                        <td key={j} className={focus ? 'hl-focus' : ''}>
+                        <td key={j} className={cls}>
                           {cell === null || cell === undefined ? '·' : String(cell)}
                         </td>
                       )
