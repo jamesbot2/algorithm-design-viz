@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Visualizer from '../../components/Visualizer'
 import WorkbenchLayout from '../../components/workbench/WorkbenchLayout'
@@ -20,6 +20,7 @@ import {
 } from '../../algorithms/knapsack'
 import type { Step } from '../../types/step'
 import { createKnapsackPreview } from '../../preview/createPreview'
+import { pickPrimaryCodeRef, weakContextRefs } from '../../utils/codeRefs'
 
 type Strategy =
   | 'bruteForce'
@@ -50,17 +51,25 @@ const STRATEGY_CATALOG: Record<Strategy, string> = {
   greedy: 'knapsack.greedy',
 }
 
+type RunSnapshotLocal = {
+  strategy: Strategy
+  preset: 'default' | 'greedy' | 'forward'
+  inst: KnapsackInstance
+  steps: Step[]
+  summary: string
+  runKey: number
+}
+
 export default function KnapsackUnit() {
   const [strategy, setStrategy] = useState<Strategy>('dp2d')
   const [preset, setPreset] = useState<'default' | 'greedy' | 'forward'>('default')
-  const [steps, setSteps] = useState<Step[]>([])
-  const [summary, setSummary] = useState<string>('')
-  const [hasRun, setHasRun] = useState(false)
+  const [runSnap, setRunSnap] = useState<RunSnapshotLocal | null>(null)
   const [cursorIndex, setCursorIndex] = useState(0)
   const [theoryOpen, setTheoryOpen] = useState(false)
-  const [runKey, setRunKey] = useState(0)
+  const [chromeHost, setChromeHost] = useState<HTMLDivElement | null>(null)
+  const runKeyRef = useRef(0)
 
-  const inst: KnapsackInstance = useMemo(() => {
+  const draftInst: KnapsackInstance = useMemo(() => {
     if (preset === 'greedy') return GREEDY_COUNTEREXAMPLE
     if (preset === 'forward') return FORWARD_UPDATE_COUNTEREXAMPLE
     return DEFAULT_INSTANCE
@@ -71,16 +80,25 @@ export default function KnapsackUnit() {
   const previewStep = useMemo(
     () =>
       createKnapsackPreview({
-        weights: inst.items.map((it) => it.weight),
-        values: inst.items.map((it) => it.value),
-        capacity: inst.capacity,
+        weights: draftInst.items.map((it) => it.weight),
+        values: draftInst.items.map((it) => it.value),
+        capacity: draftInst.capacity,
       }),
-    [inst],
+    [draftInst],
   )
 
-  const displaySteps = hasRun && steps.length ? steps : [previewStep]
+  const draftMatchesRun =
+    runSnap != null && runSnap.strategy === strategy && runSnap.preset === preset
+  const dirty = runSnap != null && !draftMatchesRun
+  const hasRun = runSnap != null
+
+  // Display: when dirty, keep old trace but mark stale; summary from snapshot
+  const displaySteps = hasRun && runSnap.steps.length ? runSnap.steps : [previewStep]
+  const summary = runSnap?.summary ?? ''
+  const snapInst = runSnap?.inst
 
   const onRun = () => {
+    const inst = draftInst
     let s: Step[] = []
     let msg = ''
     if (strategy === 'bruteForce') {
@@ -114,12 +132,28 @@ export default function KnapsackUnit() {
       msg = `0-1 贪心=${g.maxValue}；分数贪心≈${f.value}；最优(暴力)=${opt.maxValue}。反例预设期望 160 vs 220。`
       s = g.steps
     }
-    setSteps(s)
-    setSummary(msg)
-    setHasRun(true)
+    runKeyRef.current += 1
+    setRunSnap({
+      strategy,
+      preset,
+      inst: structuredClone(inst),
+      steps: s,
+      summary: msg,
+      runKey: runKeyRef.current,
+    })
     setCursorIndex(0)
-    setRunKey((k) => k + 1)
   }
+
+  const onStrategyChange = (next: Strategy) => {
+    setStrategy(next)
+    // Clear old result when strategy changes — new code must not pair with old summary
+    setRunSnap(null)
+    setCursorIndex(0)
+  }
+
+  const step = hasRun ? runSnap!.steps[cursorIndex] : undefined
+  const primary = step ? pickPrimaryCodeRef(step) : undefined
+  const contexts = step ? weakContextRefs(step) : []
 
   return (
     <div className="page teach-page">
@@ -165,11 +199,8 @@ export default function KnapsackUnit() {
             策略
             <select
               value={strategy}
-              onChange={(e) => {
-                setStrategy(e.target.value as Strategy)
-                setHasRun(false)
-                setSteps([])
-              }}
+              onChange={(e) => onStrategyChange(e.target.value as Strategy)}
+              data-testid="knapsack-strategy"
             >
               {(Object.keys(STRATEGY_LABEL) as Strategy[]).map((k) => (
                 <option key={k} value={k}>
@@ -180,24 +211,38 @@ export default function KnapsackUnit() {
           </label>
           <label className="field-array">
             输入预设
-            <select value={preset} onChange={(e) => setPreset(e.target.value as typeof preset)}>
+            <select
+              value={preset}
+              onChange={(e) => setPreset(e.target.value as typeof preset)}
+              data-testid="knapsack-preset"
+            >
               <option value="default">默认 (W=8)</option>
               <option value="greedy">贪心反例 w[10,20,30] v[60,100,120] W=50</option>
               <option value="forward">一维正向更新反例 w=2 v=3 W=4</option>
             </select>
           </label>
         </div>
-        <p className="hint">
-          当前物品：
-          {inst.items.map((it) => `${it.id}(w=${it.weight},v=${it.value})`).join(', ')}；W=
-          {inst.capacity}
+        <p className="hint" data-testid="knapsack-draft-summary">
+          草稿物品：
+          {draftInst.items.map((it) => `${it.id}(w=${it.weight},v=${it.value})`).join(', ')}；W=
+          {draftInst.capacity}
         </p>
+        {dirty && snapInst && (
+          <p className="dirty-banner" role="status" data-testid="knapsack-dirty-banner">
+            草稿已改（W={draftInst.capacity}），下方轨迹仍属上一轮运行（W={snapInst.capacity}）。请重新运行。
+          </p>
+        )}
         <div className="input-actions control-row">
           <button type="button" className="primary" onClick={onRun} data-testid="run-btn">
             运行
           </button>
         </div>
-        {summary && <p className="hint">{summary}</p>}
+        {summary && (
+          <p className="hint" data-testid="knapsack-run-summary">
+            {dirty ? '上一轮结果：' : ''}
+            {summary}
+          </p>
+        )}
         <details className="debug-details muted">
           <summary>调试信息</summary>
           <p className="hint">{catalog ? `documentId=${catalog.typescript.documentId}` : 'no-catalog'}</p>
@@ -210,14 +255,20 @@ export default function KnapsackUnit() {
           hideTitle
           title={`背包 · ${STRATEGY_LABEL[strategy]}`}
           inputSummary={
-            hasRun
-              ? `W=${inst.capacity} · n=${inst.items.length}`
-              : `预览 · W=${inst.capacity} · n=${inst.items.length}`
+            hasRun && snapInst
+              ? dirty
+                ? `上一轮 W=${snapInst.capacity} · n=${snapInst.items.length}（草稿 W=${draftInst.capacity} 待运行）`
+                : `W=${snapInst.capacity} · n=${snapInst.items.length}`
+              : `预览 · W=${draftInst.capacity} · n=${draftInst.items.length}`
           }
           viz={
             <Visualizer
-              key={hasRun ? runKey : 'preview'}
+              key={hasRun ? runSnap!.runKey : 'preview'}
               steps={displaySteps}
+              runId={hasRun ? runSnap!.runKey : 'preview'}
+              staleResult={dirty}
+              chromePlacement="workbench"
+              externalChromeHost={chromeHost}
               onStepIndexChange={hasRun ? (i) => setCursorIndex(i) : undefined}
             />
           }
@@ -225,12 +276,9 @@ export default function KnapsackUnit() {
             catalog ? (
               <CodeBrowser
                 documents={catalog}
-                execAnchorId={
-                  hasRun
-                    ? (steps[cursorIndex]?.codeRefs?.[0]?.anchorId ?? steps[cursorIndex]?.phase)
-                    : undefined
-                }
-                activeLine={hasRun ? steps[cursorIndex]?.codeLine : undefined}
+                execAnchorId={hasRun && !dirty ? primary?.anchorId : undefined}
+                contextAnchorIds={hasRun && !dirty ? contexts.map((c) => c.anchorId) : []}
+                activeLine={hasRun && !dirty ? step?.codeLine : undefined}
               />
             ) : (
               <div className="code-stub">
@@ -239,6 +287,7 @@ export default function KnapsackUnit() {
               </div>
             )
           }
+          transport={<div ref={setChromeHost} className="workbench-chrome-host" data-testid="knapsack-chrome-host" />}
         />
       </section>
 

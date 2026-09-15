@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { chapters } from '../data/chapters'
 import { algorithms } from '../algorithms'
@@ -7,32 +7,63 @@ import { useMotion } from '../theme/MotionContext'
 import { useLabTheme, type LabThemeId } from '../theme/LabThemeContext'
 
 export default function Layout() {
-  const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false)
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [navMode, setNavMode] = useState<'design' | 'problem'>('design')
+  const [algoFilter, setAlgoFilter] = useState('')
   const { userPref, setUserPref, density, setDensity } = useMotion()
   const { theme, setTheme } = useLabTheme()
   const location = useLocation()
+  const menuBtnRef = useRef<HTMLButtonElement>(null)
+  const drawerCloseRef = useRef<HTMLButtonElement>(null)
   const navModules = useMemo(
     () => (navMode === 'design' ? byDesignThought.modules : byProblemType.modules),
     [navMode],
   )
 
   useEffect(() => {
-    setMobileOpen(false)
+    setMobileDrawerOpen(false)
   }, [location.pathname])
 
   useEffect(() => {
+    const mq = window.matchMedia('(max-width: 960px)')
+    const apply = () => setIsMobile(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileOpen(false)
+      if (e.key === 'Escape') setMobileDrawerOpen(false)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  useEffect(() => {
+    if (mobileDrawerOpen) {
+      drawerCloseRef.current?.focus()
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileDrawerOpen])
+
   const isAlgo = location.pathname.startsWith('/algo/')
+  const isTeach = location.pathname.startsWith('/teach/')
+  const isWide = isAlgo || isTeach || location.pathname.startsWith('/practice') || location.pathname.startsWith('/experiment')
+
   const title = (() => {
     if (location.pathname === '/' || location.pathname === '') return '全部算法'
+    if (location.pathname.startsWith('/teach/knapsack')) return '背包多策略教学'
+    if (location.pathname.startsWith('/practice')) return '练习台'
+    if (location.pathname.startsWith('/experiment')) return '实验台'
+    if (location.pathname.startsWith('/lab/')) return '实验讲义'
     const chMatch = location.pathname.match(/\/chapter\/([^/]+)/)
     if (chMatch) return chapters.find((c) => c.id === chMatch[1])?.title ?? '章节'
     const aMatch = location.pathname.match(/\/algo\/([^/]+)/)
@@ -40,24 +71,57 @@ export default function Layout() {
     return '算法设计与分析'
   })()
 
+  const filterLower = algoFilter.trim().toLowerCase()
+  const matchFilter = (label: string) =>
+    !filterLower || label.toLowerCase().includes(filterLower)
+
   const sidebarCls = [
     'sidebar',
-    collapsed ? 'collapsed' : '',
-    mobileOpen ? 'open' : '',
+    desktopCollapsed ? 'collapsed' : '',
+    mobileDrawerOpen ? 'open' : '',
   ]
     .filter(Boolean)
     .join(' ')
 
+  const renderAlgoLinks = (aids: string[]) =>
+    aids.map((aid) => {
+      const a = algorithms[aid]
+      if (!a) return null
+      if (!matchFilter(a.meta.title)) return null
+      return (
+        <NavLink
+          key={aid}
+          to={`/algo/${aid}`}
+          className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')}
+          onClick={() => setMobileDrawerOpen(false)}
+          title={a.meta.title}
+        >
+          {a.meta.title}
+        </NavLink>
+      )
+    })
+
+  /** Catalog always rendered in DOM for mobile drawer; desktopCollapsed only hides labels on desktop */
+  const showExpandedLabels = !desktopCollapsed || mobileDrawerOpen
+
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-desktop-collapsed={desktopCollapsed ? '1' : '0'} data-mobile-drawer={mobileDrawerOpen ? '1' : '0'}>
       <div
-        className={`sidebar-backdrop${mobileOpen ? ' visible' : ''}`}
-        onClick={() => setMobileOpen(false)}
-        aria-hidden={!mobileOpen}
+        className={`sidebar-backdrop${mobileDrawerOpen ? ' visible' : ''}`}
+        onClick={() => {
+          setMobileDrawerOpen(false)
+          menuBtnRef.current?.focus()
+        }}
+        aria-hidden={!mobileDrawerOpen}
       />
-      <aside className={sidebarCls}>
+      <aside
+        className={sidebarCls}
+        id="app-sidebar"
+        aria-hidden={false}
+        data-testid="app-sidebar"
+      >
         <div className="sidebar-top">
-          <Link to="/" className="brand" onClick={() => setMobileOpen(false)}>
+          <Link to="/" className="brand" onClick={() => setMobileDrawerOpen(false)}>
             <span className="brand-mark">Σ</span>
             <span className="brand-text">
               <strong>算法设计与分析</strong>
@@ -66,46 +130,77 @@ export default function Layout() {
           </Link>
           <button
             type="button"
-            className="ghost icon-btn sidebar-toggle"
-            title={collapsed ? '展开侧栏' : '折叠侧栏'}
-            aria-label={collapsed ? '展开侧栏' : '折叠侧栏'}
-            onClick={() => setCollapsed((c) => !c)}
+            className="ghost icon-btn sidebar-toggle desktop-collapse-btn"
+            title={desktopCollapsed ? '展开侧栏' : '折叠侧栏'}
+            aria-label={desktopCollapsed ? '展开侧栏' : '折叠侧栏'}
+            data-testid="desktop-collapse-btn"
+            onClick={() => setDesktopCollapsed((c) => !c)}
           >
-            {collapsed ? '»' : '«'}
+            {desktopCollapsed ? '»' : '«'}
+          </button>
+          <button
+            type="button"
+            className="ghost icon-btn mobile-drawer-close"
+            ref={drawerCloseRef}
+            aria-label="关闭菜单"
+            data-testid="mobile-drawer-close"
+            onClick={() => {
+              setMobileDrawerOpen(false)
+              menuBtnRef.current?.focus()
+            }}
+          >
+            ×
           </button>
         </div>
 
-        <nav className="nav-scroll">
+        <nav
+          className="nav-scroll"
+          data-testid="nav-scroll"
+          // Closed mobile drawer must not be tab-focusable (UI-07)
+          inert={isMobile && !mobileDrawerOpen ? true : undefined}
+        >
           <div className="nav-group">导航视图</div>
+          {showExpandedLabels && (
+            <label className="nav-search">
+              <span className="sr-only">搜索算法</span>
+              <input
+                type="search"
+                placeholder="搜索算法…"
+                value={algoFilter}
+                onChange={(e) => setAlgoFilter(e.target.value)}
+                aria-label="搜索算法"
+                data-testid="algo-search"
+              />
+            </label>
+          )}
           <div className="nav-mode-toggle compact">
             <button type="button" className={navMode === 'design' ? 'active' : ''} onClick={() => setNavMode('design')}>按设计思想</button>
             <button type="button" className={navMode === 'problem' ? 'active' : ''} onClick={() => setNavMode('problem')}>按问题类型</button>
           </div>
           {navModules.map((m) => (
             <div key={m.id}>
-              <div className="nav-item nav-mod-label">
-                <span className="nav-dot" />
+              <div className="nav-item nav-mod-label" title={m.title}>
+                <span className="nav-dot" aria-hidden />
                 <span className="nav-item-label">{m.title}{m.planned ? ' · 规划' : ''}</span>
               </div>
-              {!collapsed && (
-                <div className="nav-algos">
+              {/* Always keep catalog links for mobile drawer; desktopCollapsed only affects label CSS */}
+              <div className={`nav-algos${desktopCollapsed && !mobileDrawerOpen ? ' nav-algos-compact' : ''}`}>
+                {showExpandedLabels && (
                   <span className="nav-completion muted">{completionLabel(m.completion)}</span>
-                  {m.items.map((aid) => {
-                    const a = algorithms[aid]
-                    if (!a) return null
-                    return (
-                      <NavLink key={aid} to={`/algo/${aid}`} className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')} onClick={() => setMobileOpen(false)}>
-                        {a.meta.title}
-                      </NavLink>
-                    )
-                  })}
-                  {(m.id === 'knapsack-family' || m.id === 'dp' || m.id === 'backtrack') && (
-                    <NavLink to="/teach/knapsack" className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')} onClick={() => setMobileOpen(false)}>
+                )}
+                {renderAlgoLinks(m.items)}
+                {(m.id === 'knapsack-family' || m.id === 'dp' || m.id === 'backtrack') &&
+                  matchFilter('背包多策略') && (
+                    <NavLink
+                      to="/teach/knapsack"
+                      className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')}
+                      onClick={() => setMobileDrawerOpen(false)}
+                      title="背包多策略"
+                    >
                       背包多策略
                     </NavLink>
                   )}
-                </div>
-              )}
+              </div>
             </div>
           ))}
           <div className="nav-group">章节讲义</div>
@@ -114,29 +209,15 @@ export default function Layout() {
               <NavLink
                 to={`/chapter/${ch.id}`}
                 className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-                onClick={() => setMobileOpen(false)}
+                onClick={() => setMobileDrawerOpen(false)}
+                title={ch.title}
               >
-                <span className="nav-dot" />
+                <span className="nav-dot" aria-hidden />
                 <span className="nav-item-label">{ch.title}</span>
               </NavLink>
-              {!collapsed && ch.algos.length > 0 && (
-                <div className="nav-algos">
-                  {ch.algos.map((aid) => {
-                    const a = algorithms[aid]
-                    if (!a) return null
-                    return (
-                      <NavLink
-                        key={aid}
-                        to={`/algo/${aid}`}
-                        className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')}
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {a.meta.title}
-                      </NavLink>
-                    )
-                  })}
-                </div>
-              )}
+              <div className={`nav-algos${desktopCollapsed && !mobileDrawerOpen ? ' nav-algos-compact' : ''}`}>
+                {renderAlgoLinks(ch.algos)}
+              </div>
             </div>
           ))}
           <div className="nav-group">导航</div>
@@ -144,21 +225,22 @@ export default function Layout() {
             to="/"
             end
             className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-            onClick={() => setMobileOpen(false)}
+            onClick={() => setMobileDrawerOpen(false)}
+            title="全部算法"
           >
-            <span className="nav-dot" />
+            <span className="nav-dot" aria-hidden />
             <span className="nav-item-label">全部算法</span>
           </NavLink>
-          <NavLink to="/practice" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileOpen(false)}>
-            <span className="nav-dot" />
+          <NavLink to="/practice" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileDrawerOpen(false)} title="练习台">
+            <span className="nav-dot" aria-hidden />
             <span className="nav-item-label">练习台</span>
           </NavLink>
-          <NavLink to="/experiment" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileOpen(false)}>
-            <span className="nav-dot" />
+          <NavLink to="/experiment" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileDrawerOpen(false)} title="实验台">
+            <span className="nav-dot" aria-hidden />
             <span className="nav-item-label">实验台</span>
           </NavLink>
-          <NavLink to="/lab/core" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileOpen(false)}>
-            <span className="nav-dot" />
+          <NavLink to="/lab/core" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={() => setMobileDrawerOpen(false)} title="实验讲义">
+            <span className="nav-dot" aria-hidden />
             <span className="nav-item-label">实验讲义</span>
           </NavLink>
         </nav>
@@ -170,8 +252,15 @@ export default function Layout() {
           <button
             type="button"
             className="ghost icon-btn"
-            aria-label="打开菜单"
-            onClick={() => setMobileOpen(true)}
+            aria-label={mobileDrawerOpen ? '关闭菜单' : '打开菜单'}
+            aria-expanded={mobileDrawerOpen}
+            aria-controls="app-sidebar"
+            data-testid="menu-btn"
+            ref={menuBtnRef}
+            onClick={() => {
+              if (isMobile) setMobileDrawerOpen((o) => !o)
+              else setDesktopCollapsed((c) => !c)
+            }}
           >
             ☰
           </button>
@@ -214,7 +303,7 @@ export default function Layout() {
             {density === 'projection' ? '密' : '投'}
           </button>
         </header>
-        <main className={`main${isAlgo ? ' wide' : ''}`}>
+        <main className={`main${isWide ? ' wide' : ''}`}>
           <Outlet />
         </main>
       </div>

@@ -12,6 +12,7 @@ import { SEMANTIC_ROLE_LABELS } from '../theme/semanticColors'
 import { motionCssVars, speedFeelMultiplier } from '../theme/motion'
 import { useMotion } from '../theme/MotionContext'
 import PlaybackTransport from './workbench/PlaybackTransport'
+import { segmentGeometry, teachableStages } from '../utils/teachableStages'
 
 /** Parent sends this only on scene load / new run / explicit external seek — never from onStepIndexChange. */
 export type SeekCommand = { requestId: number | string; target: number }
@@ -124,23 +125,6 @@ function collectUsedRoles(steps: Step[]): Set<LegendRole> {
   return used
 }
 
-/** Collapse consecutive identical phases into segments (not a marker per compare). */
-function phaseSegments(steps: Step[]): { start: number; end: number; phase: string }[] {
-  const out: { start: number; end: number; phase: string }[] = []
-  let cur: { start: number; end: number; phase: string } | null = null
-  steps.forEach((s, i) => {
-    if (!s.phase) return
-    if (cur && cur.phase === s.phase) {
-      cur.end = i
-    } else {
-      if (cur) out.push(cur)
-      cur = { start: i, end: i, phase: s.phase }
-    }
-  })
-  if (cur) out.push(cur)
-  return out
-}
-
 function computeScaleMax(steps: Step[]): Record<string, number> {
   const max: Record<string, number> = {}
   for (const s of steps) {
@@ -213,7 +197,14 @@ export default function Visualizer({
   const prevStep = idx > 0 ? steps[idx - 1] : undefined
   const max = Math.max(0, steps.length - 1)
   const usedRoles = useMemo(() => collectUsedRoles(steps), [steps])
-  const segments = useMemo(() => phaseSegments(steps), [steps])
+  const stageInfo = useMemo(() => teachableStages(steps, 8), [steps])
+  const segments = useMemo(() => {
+    const n = steps.length
+    return stageInfo.all.map((s) => {
+      const g = segmentGeometry(s.start, s.end, n)
+      return { ...s, leftPct: g.leftPct, widthPct: g.widthPct }
+    })
+  }, [steps, stageInfo])
   const scaleMaxByArray = useMemo(() => computeScaleMax(steps), [steps])
 
   const effectiveInterval = useMemo(() => {
@@ -339,6 +330,7 @@ export default function Visualizer({
     [steps.length],
   )
 
+  const atEnd = steps.length > 0 && idx >= max && !playing
   const transport = (
     <PlaybackTransport
       idx={idx}
@@ -350,8 +342,12 @@ export default function Visualizer({
       phase={step?.phase}
       progress={progress}
       segments={segments}
+      teachableStages={stageInfo.direct}
+      overflowStages={stageInfo.overflow}
       scrubPreview={scrubPreview}
       previewMessage={previewStep?.message}
+      isPreview={isPreview}
+      atEnd={atEnd}
       onReset={reset}
       onPrev={goPrev}
       onNext={goNext}
@@ -379,15 +375,30 @@ export default function Visualizer({
       {chrome}
 
       <div className="stats-row stats-row-fixed" data-testid="stats-row">
-        <span className="stat-chip">
-          比较 <strong className="tabular-nums">{stats?.comparisons ?? '—'}</strong>
-        </span>
-        <span className="stat-chip">
-          交换 <strong className="tabular-nums">{stats?.swaps ?? '—'}</strong>
-        </span>
-        <span className="stat-chip">
-          写入 <strong className="tabular-nums">{stats?.writes ?? '—'}</strong>
-        </span>
+        {stats?.comparisons != null && (
+          <span className="stat-chip">
+            比较 <strong className="tabular-nums">{stats.comparisons}</strong>
+          </span>
+        )}
+        {stats?.swaps != null && (
+          <span className="stat-chip">
+            交换 <strong className="tabular-nums">{stats.swaps}</strong>
+          </span>
+        )}
+        {stats?.writes != null && (
+          <span className="stat-chip">
+            写入 <strong className="tabular-nums">{stats.writes}</strong>
+          </span>
+        )}
+        {stats &&
+          Object.entries(stats)
+            .filter(([k]) => !['comparisons', 'swaps', 'writes'].includes(k))
+            .map(([k, v]) => (
+              <span className="stat-chip" key={k}>
+                {k} <strong className="tabular-nums">{String(v)}</strong>
+              </span>
+            ))}
+        {!stats && <span className="stat-chip muted">暂无统计</span>}
       </div>
 
       {legendItems.length > 0 && (
@@ -413,14 +424,20 @@ export default function Visualizer({
           {!step && <div className="viz-empty soft">暂无画布内容</div>}
         </div>
         <div className="viz-inspector" data-testid="viz-inspector">
-          <div className="inspector-explanation" data-testid="step-explanation">
-            <div className="panel-title">步骤说明</div>
-            <p className="inspector-explain-text">{displayMessage}</p>
+          {/* Primary step message lives in viz-banner only (UI-09) — inspector shows vars/delta */}
+          <div className="inspector-delta" data-testid="step-explanation">
+            <div className="panel-title">变量 / 变化</div>
+            {prevStep && step?.message && prevStep.message !== step.message ? (
+              <p className="inspector-explain-text muted hint">较上步：条件与赋值见下方变量高亮</p>
+            ) : (
+              <p className="inspector-explain-text muted hint">详见顶部步骤说明</p>
+            )}
           </div>
           {(step?.frameId || (step?.vars && 'frameId' in step.vars)) && (
             <div className="inspector-stack" data-testid="call-stack">
-              <div className="panel-title">调用栈 / frame</div>
+              <div className="panel-title">当前帧标识</div>
               <code className="frame-id">{String(step?.frameId ?? step?.vars?.frameId)}</code>
+              <p className="hint muted">frameId 不是完整调用栈</p>
             </div>
           )}
           <div className="viz-vars-stable">

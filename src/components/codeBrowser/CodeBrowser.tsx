@@ -162,7 +162,10 @@ export default function CodeBrowser({
   const [fontSize, setFontSize] = useState(13)
   const [followExec, setFollowExec] = useState(true)
   const [userScrolledAway, setUserScrolledAway] = useState(false)
+  const [copyMsg, setCopyMsg] = useState<string | null>(null)
+  const [lineWrap, setLineWrap] = useState(true)
   const viewRef = useRef<EditorView | null>(null)
+  const pseudoPreRef = useRef<HTMLPreElement | null>(null)
   const programmaticScroll = useRef(false)
   const { theme } = useLabTheme()
 
@@ -244,29 +247,61 @@ export default function CodeBrowser({
     }, 80)
   }, [])
 
+  const scrollPseudoToLine = useCallback((line1: number, center: boolean) => {
+    const pre = pseudoPreRef.current
+    if (!pre || line1 < 1) return
+    const el = pre.querySelector(`[data-line="${line1}"]`) as HTMLElement | null
+    if (!el) return
+    programmaticScroll.current = true
+    el.scrollIntoView({ block: center ? 'center' : 'nearest', behavior: 'smooth' })
+    window.setTimeout(() => {
+      programmaticScroll.current = false
+    }, 120)
+  }, [])
+
+  const canGotoExec = !unmapped && execLine1 != null
+
   const scrollToExecCenter = useCallback(() => {
-    const view = viewRef.current
-    if (!view || execLine1 == null) return
-    markProgrammatic()
-    view.dispatch({
-      effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
-    })
-    scrollLineCenter(view, execLine1)
+    if (!canGotoExec || execLine1 == null) return
+    if (tab === 'ts') {
+      const view = viewRef.current
+      if (!view) return
+      markProgrammatic()
+      view.dispatch({
+        effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
+      })
+      scrollLineCenter(view, execLine1)
+    } else {
+      scrollPseudoToLine(execLine1, true)
+    }
     setUserScrolledAway(false)
     setFollowExec(true)
-  }, [execLine1, contextLines, markProgrammatic])
+  }, [canGotoExec, execLine1, tab, contextLines, markProgrammatic, scrollPseudoToLine])
 
   useEffect(() => {
-    const view = viewRef.current
-    if (!view) return
-    view.dispatch({
-      effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
-    })
-    if (followExec && !userScrolledAway && execLine1 != null) {
-      markProgrammatic()
-      scrollLineNearest(view, execLine1)
+    if (tab === 'ts') {
+      const view = viewRef.current
+      if (!view) return
+      view.dispatch({
+        effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
+      })
+      if (followExec && !userScrolledAway && execLine1 != null) {
+        markProgrammatic()
+        scrollLineNearest(view, execLine1)
+      }
+    } else if (followExec && !userScrolledAway && execLine1 != null) {
+      scrollPseudoToLine(execLine1, false)
     }
-  }, [execLine1, contextLines, followExec, userScrolledAway, markProgrammatic])
+  }, [execLine1, contextLines, followExec, userScrolledAway, markProgrammatic, tab, scrollPseudoToLine])
+
+  // Clear CM viewRef when leaving TS tab so we never dispatch to destroyed editor
+  useEffect(() => {
+    if (tab !== 'ts') {
+      const view = viewRef.current as unknown as { __advScrollCleanup?: () => void } | null
+      view?.__advScrollCleanup?.()
+      viewRef.current = null
+    }
+  }, [tab])
 
   const onCreate = useCallback(
     (view: EditorView) => {
@@ -303,10 +338,26 @@ export default function CodeBrowser({
   const copy = async () => {
     const text = activeDoc?.source ?? ''
     try {
+      if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable')
       await navigator.clipboard.writeText(text)
-    } catch {
-      /* ignore */
+      setCopyMsg('已复制')
+    } catch (err) {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = text
+        ta.setAttribute('readonly', '')
+        ta.style.position = 'fixed'
+        ta.style.left = '-9999px'
+        document.body.appendChild(ta)
+        ta.select()
+        const ok = document.execCommand('copy')
+        document.body.removeChild(ta)
+        setCopyMsg(ok ? '已复制' : '复制失败：请手动选择文本')
+      } catch {
+        setCopyMsg(`复制失败：${err instanceof Error ? err.message : '剪贴板不可用'}`)
+      }
     }
+    window.setTimeout(() => setCopyMsg(null), 2000)
   }
 
   if (!docs || !activeDoc) {
@@ -359,16 +410,28 @@ export default function CodeBrowser({
             aria-label="代码字号"
           />
         </label>
-        <button type="button" onClick={copy} title="复制">
+        <button type="button" onClick={copy} title="复制" data-testid="code-copy-btn">
           复制
         </button>
-        <button type="button" className="primary" onClick={scrollToExecCenter} title="居中到执行行">
+        {copyMsg && (
+          <span className="hint" role="status" data-testid="copy-feedback">
+            {copyMsg}
+          </span>
+        )}
+        <button
+          type="button"
+          className="primary"
+          onClick={scrollToExecCenter}
+          title={canGotoExec ? '居中到执行行' : '当前无执行位置或未映射'}
+          disabled={!canGotoExec}
+          data-testid="goto-exec-btn"
+        >
           回到执行行
         </button>
         <label className="muted" style={{ fontSize: '0.72rem' }}>
           <input
             type="checkbox"
-            checked={followExec}
+            checked={followExec && !userScrolledAway}
             onChange={(e) => {
               setFollowExec(e.target.checked)
               if (e.target.checked) {
@@ -377,6 +440,15 @@ export default function CodeBrowser({
             }}
           />{' '}
           跟随执行
+        </label>
+        {userScrolledAway && followExec && (
+          <span className="hint" data-testid="follow-paused" role="status">
+            已暂停自动跟随
+          </span>
+        )}
+        <label className="muted" style={{ fontSize: '0.72rem' }}>
+          <input type="checkbox" checked={lineWrap} onChange={(e) => setLineWrap(e.target.checked)} />{' '}
+          软换行
         </label>
       </div>
       <div className="code-browser-meta muted">
@@ -420,9 +492,14 @@ export default function CodeBrowser({
       ) : (
         <pre
           className="code-pre"
-          style={{ fontSize }}
+          style={{ fontSize, whiteSpace: lineWrap ? 'pre-wrap' : 'pre', overflow: 'auto' }}
           data-testid="pseudo-pre"
           data-exec-line={execLine1 ?? ''}
+          ref={pseudoPreRef}
+          onScroll={() => {
+            if (programmaticScroll.current) return
+            if (followExec) setUserScrolledAway(true)
+          }}
         >
           {source.split('\n').map((line, i) => {
             const ln = i + 1
