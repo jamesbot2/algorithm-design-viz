@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { GraphAlgoId, GraphDraft } from '../../core/graph/types'
 import { GRAPH_PRESETS, defaultDraftFor } from '../../core/graph/presets'
-import { algoGraphOptions, parseEdgeListText, validateGraphDraft } from '../../core/graph/validate'
+import {
+  algoGraphOptions,
+  parseEdgeListText,
+  parseGraphIntField,
+  validateGraphDraft,
+} from '../../core/graph/validate'
 
 export type GraphValidity = {
   parseOk: boolean
@@ -9,15 +14,20 @@ export type GraphValidity = {
   validationOk: boolean
   canRun: boolean
   issues: { field: string; reason: string }[]
+  /** Field-level n/start parse failures (explicit; not fallback). */
+  nError: string | null
+  startError: string | null
+  nTransient: boolean
+  startTransient: boolean
+  /** Parsed runnable values only when canRun; otherwise null. */
+  runnable: GraphDraft | null
 }
 
 export interface GraphInputProps {
   algoId: GraphAlgoId
   value: GraphDraft
   onChange: (draft: GraphDraft) => void
-  /** Notify parent when draft becomes unrunnable (parse/validation). */
   onValidityChange?: (v: GraphValidity) => void
-  /** External restore/preset/import fingerprint — syncs textarea without remount. */
   syncKey?: string
   showIssues?: boolean
 }
@@ -27,8 +37,8 @@ function edgesToText(edges: [number, number, number][]): string {
 }
 
 /**
- * Single controlled graph draft: raw text + parse + validation + dirty.
- * Illegal text does NOT leave previous valid edges runnable.
+ * Controlled graph draft: raw text kept for editing; n/start/edges validated separately.
+ * Illegal n/start never silently fall back to the previous legal value for running.
  */
 export default function GraphInput({
   algoId,
@@ -44,8 +54,8 @@ export default function GraphInput({
   const [parseError, setParseError] = useState<string | null>(null)
   const lastSync = useRef<string | undefined>(undefined)
   const opts = useMemo(() => algoGraphOptions(algoId), [algoId])
+  const needsStart = opts.requireStart !== false
 
-  // Sync from parent restore/preset/scene — not on every keystroke
   useEffect(() => {
     if (syncKey === undefined) return
     if (lastSync.current === syncKey) return
@@ -56,22 +66,29 @@ export default function GraphInput({
     setParseError(null)
   }, [syncKey, value.edges, value.n, value.start])
 
-  // Also sync when edges identity changes from parent while parse was clean
-  // (e.g. restore defaults without syncKey — AlgoPage should pass syncKey)
   const edgesFingerprint = useMemo(() => edgesToText(value.edges), [value.edges])
-
   const parsedEdges = useMemo(() => parseEdgeListText(edgeText), [edgeText])
 
+  const nParsed = useMemo(() => parseGraphIntField(nText, 'n'), [nText])
+  const startParsed = useMemo(() => {
+    if (!needsStart) {
+      // Optional start: empty → 0 for draft shape; still not used by floyd/kruskal
+      if (startText.trim() === '') return { ok: true as const, value: 0 }
+      return parseGraphIntField(startText, 'start')
+    }
+    return parseGraphIntField(startText, 'start')
+  }, [startText, needsStart])
+
   const draftForValidate: GraphDraft = useMemo(() => {
-    const nParsed = nText.trim() === '' ? NaN : Number(nText)
-    const startParsed = startText.trim() === '' ? NaN : Number(startText)
+    // Never substitute previous legal n/start when parse fails — use NaN so validation fails closed
     return {
       ...value,
-      n: Number.isFinite(nParsed) ? nParsed : value.n,
-      start: Number.isFinite(startParsed) ? startParsed : value.start,
+      n: nParsed.ok ? nParsed.value : Number.NaN,
+      start: startParsed.ok ? startParsed.value : Number.NaN,
       edges: parsedEdges.ok ? parsedEdges.edges : [],
+      directed: value.directed,
     }
-  }, [value, nText, startText, parsedEdges])
+  }, [value, nParsed, startParsed, parsedEdges])
 
   const validation = useMemo(
     () => validateGraphDraft(draftForValidate, opts),
@@ -80,33 +97,74 @@ export default function GraphInput({
 
   const validity: GraphValidity = useMemo(() => {
     const parseOk = parsedEdges.ok
-    const nEmpty = nText.trim() === ''
-    const startEmpty = startText.trim() === '' && opts.requireStart !== false
-    const fieldTransient = nEmpty || startEmpty
+    const nOk = nParsed.ok
+    const startOk = startParsed.ok
+    const nTransient = !nParsed.ok && Boolean(nParsed.transient)
+    const startTransient = !startParsed.ok && Boolean((startParsed as { transient?: boolean }).transient)
+    const fieldErrors: { field: string; reason: string }[] = []
+    if (!nOk && !nTransient) fieldErrors.push({ field: 'n', reason: nParsed.reason })
+    if (needsStart && !startOk && !startTransient) {
+      fieldErrors.push({ field: 'start', reason: (startParsed as { reason: string }).reason })
+    }
+    if (nTransient) fieldErrors.push({ field: 'n', reason: nParsed.reason })
+    if (needsStart && startTransient) {
+      fieldErrors.push({ field: 'start', reason: (startParsed as { reason: string }).reason })
+    }
+
     const validationOk = validation.ok
-    const canRun = parseOk && validationOk && !fieldTransient
+    const issues = [
+      ...fieldErrors,
+      ...(validation.ok ? [] : validation.issues.filter((i) => i.field !== 'n' && i.field !== 'start')),
+      // Still surface n/start range issues from validator when parse ok
+      ...(validation.ok
+        ? []
+        : validation.issues.filter((i) => (i.field === 'n' || i.field === 'start') && nOk && (i.field !== 'start' || startOk))),
+    ]
+    const canRun = parseOk && nOk && (!needsStart || startOk) && validationOk
+    const runnable: GraphDraft | null = canRun && validation.ok ? validation.value : null
     return {
       parseOk,
       parseError: parseOk ? null : parsedEdges.ok === false ? parsedEdges.reason : parseError,
       validationOk,
       canRun,
-      issues: validation.ok ? [] : validation.issues,
+      issues,
+      nError: nOk ? null : nParsed.reason,
+      startError: !needsStart || startOk ? null : (startParsed as { reason: string }).reason,
+      nTransient,
+      startTransient,
+      runnable,
     }
-  }, [parsedEdges, validation, nText, startText, opts.requireStart, parseError])
+  }, [parsedEdges, validation, nParsed, startParsed, needsStart, parseError])
 
   useEffect(() => {
     onValidityChange?.(validity)
   }, [validity, onValidityChange])
 
-  const emitDraft = (partial: Partial<GraphDraft> & { edges?: GraphDraft['edges'] }, text?: string) => {
-    const nextText = text ?? edgeText
-    const parsed = parseEdgeListText(nextText)
+  /** Emit parent draft only with explicitly parsed fields — never Math.trunc fallback. */
+  const emitFromTexts = (
+    partial: Partial<GraphDraft>,
+    next?: { edgeText?: string; nText?: string; startText?: string },
+  ) => {
+    const text = next?.edgeText ?? edgeText
+    const nRaw = next?.nText ?? nText
+    const sRaw = next?.startText ?? startText
+    const parsed = parseEdgeListText(text)
+    const nP = parseGraphIntField(nRaw, 'n')
+    const sP = needsStart
+      ? parseGraphIntField(sRaw, 'start')
+      : sRaw.trim() === ''
+        ? ({ ok: true as const, value: 0 } as const)
+        : parseGraphIntField(sRaw, 'start')
+
     if (!parsed.ok) {
       setParseError(parsed.reason)
-      // Clear edges so parent cannot run previous valid graph
       onChange({
         ...value,
         ...partial,
+        // Keep last numeric n/start only as non-runnable display parent state when parse fails on edges;
+        // runnable gate is canRun. Clear edges so previous graph cannot run.
+        n: nP.ok ? nP.value : value.n,
+        start: sP.ok ? sP.value : value.start,
         edges: [],
       })
       return
@@ -115,11 +173,12 @@ export default function GraphInput({
     onChange({
       ...value,
       ...partial,
+      n: nP.ok ? nP.value : value.n,
+      start: sP.ok ? sP.value : value.start,
       edges: parsed.edges,
     })
   }
 
-  const needsStart = opts.requireStart !== false
   const showPassed = validity.canRun && showIssues
 
   return (
@@ -131,18 +190,13 @@ export default function GraphInput({
             type="text"
             inputMode="numeric"
             aria-label="顶点数 n"
+            data-testid="graph-n"
             value={nText}
+            aria-invalid={validity.nError ? true : undefined}
             onChange={(e) => {
               const raw = e.target.value
               setNText(raw)
-              if (raw.trim() === '') {
-                // Transient empty — do not snap to 1
-                onChange({ ...value, edges: parsedEdges.ok ? parsedEdges.edges : [] })
-                return
-              }
-              const n = Number(raw)
-              if (!Number.isFinite(n)) return
-              emitDraft({ n: Math.trunc(n) })
+              emitFromTexts({}, { nText: raw })
             }}
           />
         </label>
@@ -153,17 +207,13 @@ export default function GraphInput({
               type="text"
               inputMode="numeric"
               aria-label="源点"
+              data-testid="graph-start"
               value={startText}
+              aria-invalid={validity.startError ? true : undefined}
               onChange={(e) => {
                 const raw = e.target.value
                 setStartText(raw)
-                if (raw.trim() === '') {
-                  onChange({ ...value, edges: parsedEdges.ok ? parsedEdges.edges : [] })
-                  return
-                }
-                const s = Number(raw)
-                if (!Number.isFinite(s)) return
-                emitDraft({ start: Math.trunc(s) })
+                emitFromTexts({}, { startText: raw })
               }}
             />
           </label>
@@ -172,7 +222,7 @@ export default function GraphInput({
           <input
             type="checkbox"
             checked={value.directed}
-            onChange={(e) => emitDraft({ directed: e.target.checked })}
+            onChange={(e) => emitFromTexts({ directed: e.target.checked })}
           />
           有向图
         </label>
@@ -186,14 +236,7 @@ export default function GraphInput({
           onChange={(e) => {
             const text = e.target.value
             setEdgeText(text)
-            const parsed = parseEdgeListText(text)
-            if (!parsed.ok) {
-              setParseError(parsed.reason)
-              onChange({ ...value, edges: [] })
-              return
-            }
-            setParseError(null)
-            onChange({ ...value, edges: parsed.edges })
+            emitFromTexts({}, { edgeText: text })
           }}
           spellCheck={false}
           aria-invalid={parsedEdges.ok ? undefined : true}
@@ -222,6 +265,7 @@ export default function GraphInput({
         <button
           type="button"
           className="ghost"
+          data-testid="graph-restore-default"
           onClick={() => {
             const d = defaultDraftFor(algoId)
             setEdgeText(edgesToText(d.edges))
@@ -236,12 +280,22 @@ export default function GraphInput({
       </div>
 
       {!validity.parseOk && (
-        <p className="input-errors" role="alert">
+        <p className="input-errors" role="alert" data-testid="graph-edges-error">
           {validity.parseError ?? '边列表解析失败'}
         </p>
       )}
-      {showIssues && validity.parseOk && !validity.validationOk && (
-        <ul className="input-errors" role="alert">
+      {validity.nError && (
+        <p className="input-errors" role="alert" data-testid="graph-n-error">
+          <strong>n</strong>: {validity.nError}
+        </p>
+      )}
+      {validity.startError && (
+        <p className="input-errors" role="alert" data-testid="graph-start-error">
+          <strong>start</strong>: {validity.startError}
+        </p>
+      )}
+      {showIssues && validity.parseOk && !validity.nError && !validity.startError && !validity.validationOk && (
+        <ul className="input-errors" role="alert" data-testid="graph-validation-errors">
           {validity.issues.map((iss, i) => (
             <li key={i}>
               <strong>{iss.field}</strong>: {iss.reason}
@@ -249,25 +303,18 @@ export default function GraphInput({
           ))}
         </ul>
       )}
-      {nText.trim() === '' && (
-        <p className="hint muted" role="status">
-          请输入顶点数 n（提交时校验）
+      {showPassed && validity.runnable && (
+        <p className="hint muted" data-testid="graph-valid-ok">
+          图校验通过：n={validity.runnable.n}，|E|={validity.runnable.edges.length}，
+          {validity.runnable.directed ? '有向' : '无向'}
+          {needsStart ? `，源=${validity.runnable.start}` : ''}
         </p>
       )}
-      {showPassed && (
-        <p className="hint muted">
-          图校验通过：n={draftForValidate.n}，|E|={draftForValidate.edges.length}，
-          {draftForValidate.directed ? '有向' : '无向'}
-          {needsStart ? `，源=${draftForValidate.start}` : ''}
-        </p>
-      )}
-      {/* silence unused */}
       <span hidden data-edges-fp={edgesFingerprint} />
     </div>
   )
 }
 
-/** Sync edge textarea when parent resets draft from outside. */
 export function graphDraftKey(d: GraphDraft): string {
   return `${d.n}|${d.directed}|${d.start}|${d.edges.map((e) => e.join(',')).join(';')}`
 }

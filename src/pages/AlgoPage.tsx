@@ -183,14 +183,73 @@ export default function AlgoPage() {
       const g = draft.graph ?? defaultDraftFor(id)
       if (graphValidity && !graphValidity.canRun) {
         const errs: FieldError[] = []
+        if (graphValidity.nError) errs.push({ field: 'n', reason: graphValidity.nError })
+        if (graphValidity.startError) errs.push({ field: 'start', reason: graphValidity.startError })
         if (!graphValidity.parseOk) {
           errs.push({ field: 'edges', reason: graphValidity.parseError ?? '边列表解析失败' })
         }
         for (const iss of graphValidity.issues) {
+          if (errs.some((e) => e.field === iss.field && e.reason === iss.reason)) continue
           errs.push({ field: iss.field, reason: iss.reason })
         }
         if (!errs.length) errs.push({ field: 'graph', reason: '图草稿尚未通过校验' })
         return { ok: false, errors: errs }
+      }
+      // Prefer shared runnable snapshot from GraphInput validator (same as UI canRun)
+      if (graphValidity?.runnable) {
+        const runnable = graphValidity.runnable
+        const { n, edges, start, directed } = runnable
+        const inputSize = n + edges.length
+        if (id === 'bfs') {
+          const adj = edgesToAdj(edges, n, directed)
+          return {
+            ok: true,
+            registryInput: { adj, start },
+            fallbackSteps: maybeSteps(() => algo.generateSteps([], adj, start)),
+            inputSize,
+          }
+        }
+        if (id === 'floyd') {
+          const matrix = edgesToFloydMatrix(edges, n)
+          return {
+            ok: true,
+            registryInput: { matrix },
+            fallbackSteps: maybeSteps(() => algo.generateSteps([], matrix)),
+            inputSize,
+          }
+        }
+        if (id === 'kruskal') {
+          return {
+            ok: true,
+            registryInput: { edges, n },
+            fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n)),
+            inputSize,
+          }
+        }
+        if (id === 'prim') {
+          return {
+            ok: true,
+            registryInput: { edges, n, start },
+            fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n, start)),
+            inputSize,
+          }
+        }
+        if (id === 'dijkstraHeap') {
+          return {
+            ok: true,
+            registryInput: { edges, n, start },
+            fallbackSteps: maybeSteps(() =>
+              dijkstraHeap.generateSteps([], edges, n, start, { heavyTrace }),
+            ),
+            inputSize,
+          }
+        }
+        return {
+          ok: true,
+          registryInput: { edges, n, start },
+          fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n, start)),
+          inputSize,
+        }
       }
       const v = validateGraphDraft(g, algoGraphOptions(id))
       if (!v.ok) {
