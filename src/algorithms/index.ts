@@ -16,6 +16,10 @@ import * as bellmanFord from './bellmanFord'
 import * as floyd from './floyd'
 import * as kmp from './kmp'
 import * as prim from './prim'
+import * as nQueens from './nQueens'
+import * as matrixChain from './matrixChain'
+import * as huffman from './huffman'
+import * as maxSubarrayDC from './maxSubarrayDC'
 
 export interface AlgoMeta {
   id: string
@@ -59,6 +63,10 @@ export const algorithms: Record<string, AlgoModule> = {
   floyd: floyd as AlgoModule,
   kmp: kmp as AlgoModule,
   prim: prim as AlgoModule,
+  nQueens: nQueens as AlgoModule,
+  matrixChain: matrixChain as AlgoModule,
+  huffman: huffman as AlgoModule,
+  maxSubarrayDC: maxSubarrayDC as AlgoModule,
 }
 
 export const algoList = Object.values(algorithms)

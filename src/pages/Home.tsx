@@ -1,8 +1,50 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { chapters } from '../data/chapters'
 import { algoList } from '../algorithms'
+import {
+  byDesignThought,
+  byProblemType,
+  completionLabel,
+  EXTENDED_PLANNED,
+  type NavGroup,
+} from '../data/curriculum'
+
+function NavGroupView({ group }: { group: NavGroup }) {
+  return (
+    <div className="nav-dual-group">
+      {group.modules.map((m) => (
+        <div key={m.id} className={`nav-mod-card${m.planned ? ' planned' : ''}`}>
+          <h3>
+            {m.title}
+            {m.planned && <span className="badge-planned">规划中</span>}
+          </h3>
+          <p className="completion">完成标记：{completionLabel(m.completion)}</p>
+          {m.prereqs && m.prereqs.length > 0 && (
+            <p className="hint">先修：{m.prereqs.join(', ')}</p>
+          )}
+          {m.note && <p className="hint muted">{m.note}</p>}
+          <div className="algo-chips">
+            {m.items.map((aid) => (
+              <Link key={aid} to={`/algo/${aid}`} className="chip">
+                {aid}
+              </Link>
+            ))}
+            {m.id === 'knapsack-family' || m.id === 'backtrack' || m.id === 'dp' ? (
+              <Link to="/teach/knapsack" className="chip chip-teach">
+                背包多策略
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function Home() {
+  const [navMode, setNavMode] = useState<'design' | 'problem'>('design')
+
   return (
     <div className="home">
       <header className="hero">
@@ -15,7 +57,34 @@ export default function Home() {
       </header>
 
       <section className="section">
-        <h2>课程章节</h2>
+        <div className="section-head-row">
+          <h2>课程导航</h2>
+          <div className="nav-mode-toggle" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={navMode === 'design'}
+              className={navMode === 'design' ? 'active' : ''}
+              onClick={() => setNavMode('design')}
+            >
+              按设计思想
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={navMode === 'problem'}
+              className={navMode === 'problem' ? 'active' : ''}
+              onClick={() => setNavMode('problem')}
+            >
+              按问题类型
+            </button>
+          </div>
+        </div>
+        <NavGroupView group={navMode === 'design' ? byDesignThought : byProblemType} />
+      </section>
+
+      <section className="section">
+        <h2>课程章节（讲义）</h2>
         <div className="card-grid">
           {chapters.map((ch, i) => (
             <Link key={ch.id} to={`/chapter/${ch.id}`} className="card">
@@ -38,7 +107,19 @@ export default function Home() {
               {a.meta.title}
             </Link>
           ))}
+          <Link to="/teach/knapsack" className="chip chip-teach">
+            背包多策略教学
+          </Link>
         </div>
+      </section>
+
+      <section className="section">
+        <h2>拓展规划</h2>
+        <ul className="muted">
+          {EXTENDED_PLANNED.map((x) => (
+            <li key={x}>{x}</li>
+          ))}
+        </ul>
       </section>
     </div>
   )

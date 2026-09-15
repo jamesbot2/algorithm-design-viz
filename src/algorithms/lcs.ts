@@ -5,18 +5,55 @@ export const meta = {
   title: '最长公共子序列 (LCS)',
   complexity: '时间 O(mn)，空间 O(mn)',
   description:
-    'dp[i][j]：串 X 前 i 与 Y 前 j 的 LCS 长度。矩阵含第 0 行/列边界；字符比较用 0-based 串下标 i-1 / j-1。',
+    'dp[i][j]：串 X 前 i 与 Y 前 j 的 LCS 长度。填表后回溯恢复一条 LCS 字符串；matrixTargets 含 path。',
   code: `if X[i]==Y[j]: dp[i][j]=dp[i-1][j-1]+1
-else: dp[i][j]=max(dp[i-1][j], dp[i][j-1])`,
+else: dp[i][j]=max(dp[i-1][j], dp[i][j-1])
+# reconstruct: from (m,n) follow matches / max`,
   defaultX: 'ABCBDAB',
   defaultY: 'BDCABA',
   implName: 'lcsDP2D',
-  implVersion: '1.1.0',
+  implVersion: '1.2.0',
   timeComplexity: 'O(mn)',
   spaceComplexity: 'O(mn)',
   spaceNotes: 'dp[m+1][n+1]。',
   inputAssumptions: '字符串按 JS code-unit 索引；dp 行列含空前缀。',
   statDefinitions: '不累计 comparisons。',
+}
+
+export function reconstructLcs(X: string, Y: string, dp: number[][]): string {
+  let i = X.length
+  let j = Y.length
+  const chars: string[] = []
+  while (i > 0 && j > 0) {
+    if (X[i - 1] === Y[j - 1]) {
+      chars.push(X[i - 1]!)
+      i--
+      j--
+    } else if (dp[i - 1]![j]! >= dp[i]![j - 1]!) {
+      i--
+    } else {
+      j--
+    }
+  }
+  return chars.reverse().join('')
+}
+
+export function lcsPath(X: string, Y: string, dp: number[][]): [number, number][] {
+  let i = X.length
+  let j = Y.length
+  const path: [number, number][] = [[i, j]]
+  while (i > 0 && j > 0) {
+    if (X[i - 1] === Y[j - 1]) {
+      i--
+      j--
+    } else if (dp[i - 1]![j]! >= dp[i]![j - 1]!) {
+      i--
+    } else {
+      j--
+    }
+    path.push([i, j])
+  }
+  return path
 }
 
 export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaultY): Step[] {
@@ -33,6 +70,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
       current?: [number, number]
       reads?: [number, number][]
       writes?: [number, number][]
+      path?: [number, number][]
     },
     result?: unknown,
   ) => {
@@ -59,9 +97,9 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
       if (X[i - 1] === Y[j - 1]) {
-        dp[i][j] = dp[i - 1][j - 1] + 1
+        dp[i]![j] = dp[i - 1]![j - 1]! + 1
         snap(
-          `X[${i - 1}]='${X[i - 1]}' == Y[${j - 1}]='${Y[j - 1]}' → dp[${i}][${j}]=${dp[i][j]}`,
+          `X[${i - 1}]='${X[i - 1]}' == Y[${j - 1}]='${Y[j - 1]}' → dp[${i}][${j}]=${dp[i]![j]}`,
           { i, j, match: true },
           0,
           {
@@ -71,9 +109,9 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
           },
         )
       } else {
-        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1])
+        dp[i]![j] = Math.max(dp[i - 1]![j]!, dp[i]![j - 1]!)
         snap(
-          `不相等 → dp[${i}][${j}]=max(${dp[i - 1][j]},${dp[i][j - 1]})=${dp[i][j]}`,
+          `不相等 → dp[${i}][${j}]=max(${dp[i - 1]![j]},${dp[i]![j - 1]})=${dp[i]![j]}`,
           { i, j, match: false },
           1,
           {
@@ -88,12 +126,14 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
       }
     }
   }
+  const lcsStr = reconstructLcs(X, Y, dp)
+  const path = lcsPath(X, Y, dp)
   snap(
-    `LCS 长度 = ${dp[m][n]}`,
-    { answer: dp[m][n] },
-    0,
-    { current: [m, n] },
-    { ok: true, length: dp[m][n] },
+    `LCS 长度 = ${dp[m]![n]}；一条 LCS = "${lcsStr}"`,
+    { answer: dp[m]![n], lcs: lcsStr },
+    2,
+    { current: [m, n], path },
+    { ok: true, length: dp[m]![n], lcs: lcsStr },
   )
   return steps
 }

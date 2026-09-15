@@ -21,6 +21,10 @@ import * as insertionSort from './insertionSort'
 import * as mergeSort from './mergeSort'
 import * as quickSort from './quickSort'
 import * as activitySelection from './activitySelection'
+import * as nQueens from './nQueens'
+import * as matrixChain from './matrixChain'
+import * as huffman from './huffman'
+import * as maxSubarrayDC from './maxSubarrayDC'
 
 /** Legacy-compatible registry entry with optional typed validate/solve. */
 export interface RegistryEntry {
@@ -481,6 +485,85 @@ const activityTyped: RegistryEntry = {
 }
 
 
+const nQueensTyped: RegistryEntry = {
+  id: 'nQueens',
+  meta: nQueens.meta as AlgoMeta,
+  generateSteps: nQueens.generateSteps as AlgoModule['generateSteps'],
+  validate(raw: unknown) {
+    const r = (raw ?? {}) as { n?: number; mode?: 'one' | 'all' }
+    const n = r.n ?? nQueens.meta.defaultN
+    const mode = r.mode ?? 'all'
+    if (typeof n !== 'number' || !Number.isInteger(n) || n < 1) {
+      return { ok: false as const, issues: [{ field: 'n', reason: '须为正整数' }] }
+    }
+    return { ok: true as const, value: { n, mode } }
+  },
+  solve(input: unknown) {
+    const v = this.validate!(input)
+    if (!v.ok) return validationFail('nQueens', v.issues)
+    const { n, mode } = v.value as { n: number; mode: 'one' | 'all' }
+    const { result, steps } = nQueens.solveNQueens(n, mode)
+    return {
+      trace: wrapLegacySteps('nQueens', nQueens.meta as AlgoMeta, steps, v.value),
+      result,
+    }
+  },
+}
+
+const matrixChainTyped: RegistryEntry = {
+  id: 'matrixChain',
+  meta: matrixChain.meta as AlgoMeta,
+  generateSteps: matrixChain.generateSteps as AlgoModule['generateSteps'],
+  validate(raw: unknown) {
+    const r = (raw ?? {}) as { dims?: number[] }
+    const dims = r.dims ?? matrixChain.meta.defaultDims
+    if (!Array.isArray(dims) || dims.length < 2) {
+      return { ok: false as const, issues: [{ field: 'dims', reason: '至少 2 个维度（1 个矩阵）' }] }
+    }
+    if (!dims.every((d) => typeof d === 'number' && d > 0)) {
+      return { ok: false as const, issues: [{ field: 'dims', reason: '维度须为正数' }] }
+    }
+    return { ok: true as const, value: { dims } }
+  },
+  solve(input: unknown) {
+    const v = this.validate!(input)
+    if (!v.ok) return validationFail('matrixChain', v.issues)
+    const { dims } = v.value as { dims: number[] }
+    const { result, steps } = matrixChain.solveMatrixChain(dims)
+    return {
+      trace: wrapLegacySteps('matrixChain', matrixChain.meta as AlgoMeta, steps, v.value),
+      result,
+    }
+  },
+}
+
+const huffmanTyped: RegistryEntry = {
+  id: 'huffman',
+  meta: huffman.meta as AlgoMeta,
+  generateSteps: huffman.generateSteps as AlgoModule['generateSteps'],
+  validate(raw: unknown) {
+    const r = (raw ?? {}) as { symbols?: string[]; freqs?: number[] }
+    const symbols = r.symbols ?? huffman.meta.defaultSymbols
+    const freqs = r.freqs ?? huffman.meta.defaultFreqs
+    if (!Array.isArray(symbols) || !Array.isArray(freqs) || symbols.length !== freqs.length) {
+      return { ok: false as const, issues: [{ field: 'symbols/freqs', reason: '须等长数组' }] }
+    }
+    return { ok: true as const, value: { symbols, freqs } }
+  },
+  solve(input: unknown) {
+    const v = this.validate!(input)
+    if (!v.ok) return validationFail('huffman', v.issues)
+    const { symbols, freqs } = v.value as { symbols: string[]; freqs: number[] }
+    const { result, steps } = huffman.solveHuffman(symbols, freqs)
+    return {
+      trace: wrapLegacySteps('huffman', huffman.meta as AlgoMeta, steps, v.value),
+      result,
+    }
+  },
+}
+
+const maxSubarrayDCTyped = makeArrayAlgo('maxSubarrayDC', maxSubarrayDC, { allowEmpty: true })
+
 const sortIds = ['bubbleSort', 'insertionSort', 'mergeSort', 'quickSort'] as const
 const sortMods = {
   bubbleSort,
@@ -503,6 +586,10 @@ const typedEntries: Record<string, RegistryEntry> = {
   floyd: floydTyped,
   bfs: bfsTyped,
   activitySelection: activityTyped,
+  nQueens: nQueensTyped,
+  matrixChain: matrixChainTyped,
+  huffman: huffmanTyped,
+  maxSubarrayDC: maxSubarrayDCTyped,
 }
 
 for (const sid of sortIds) {

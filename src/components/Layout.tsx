@@ -1,12 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { chapters } from '../data/chapters'
 import { algorithms } from '../algorithms'
+import { byDesignThought, byProblemType, completionLabel } from '../data/curriculum'
 
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [navMode, setNavMode] = useState<'design' | 'problem'>('design')
   const location = useLocation()
+  const navModules = useMemo(
+    () => (navMode === 'design' ? byDesignThought.modules : byProblemType.modules),
+    [navMode],
+  )
 
   useEffect(() => {
     setMobileOpen(false)
@@ -66,7 +72,39 @@ export default function Layout() {
         </div>
 
         <nav className="nav-scroll">
-          <div className="nav-group">章节</div>
+          <div className="nav-group">导航视图</div>
+          <div className="nav-mode-toggle compact">
+            <button type="button" className={navMode === 'design' ? 'active' : ''} onClick={() => setNavMode('design')}>按设计思想</button>
+            <button type="button" className={navMode === 'problem' ? 'active' : ''} onClick={() => setNavMode('problem')}>按问题类型</button>
+          </div>
+          {navModules.map((m) => (
+            <div key={m.id}>
+              <div className="nav-item nav-mod-label">
+                <span className="nav-dot" />
+                <span className="nav-item-label">{m.title}{m.planned ? ' · 规划' : ''}</span>
+              </div>
+              {!collapsed && (
+                <div className="nav-algos">
+                  <span className="nav-completion muted">{completionLabel(m.completion)}</span>
+                  {m.items.map((aid) => {
+                    const a = algorithms[aid]
+                    if (!a) return null
+                    return (
+                      <NavLink key={aid} to={`/algo/${aid}`} className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')} onClick={() => setMobileOpen(false)}>
+                        {a.meta.title}
+                      </NavLink>
+                    )
+                  })}
+                  {(m.id === 'knapsack-family' || m.id === 'dp' || m.id === 'backtrack') && (
+                    <NavLink to="/teach/knapsack" className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')} onClick={() => setMobileOpen(false)}>
+                      背包多策略
+                    </NavLink>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          <div className="nav-group">章节讲义</div>
           {chapters.map((ch) => (
             <div key={ch.id}>
               <NavLink

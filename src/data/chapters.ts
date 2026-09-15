@@ -84,7 +84,7 @@ export const chapters: Chapter[] = [
     id: 'divide',
     title: '分治',
     subtitle: '分解 · 解决 · 合并',
-    algos: ['mergeSort', 'quickSort', 'kadane', 'binarySearch'],
+    algos: ['mergeSort', 'quickSort', 'maxSubarrayDC', 'kadane', 'binarySearch'],
     sections: [
       {
         id: 'idea',
@@ -122,7 +122,7 @@ export const chapters: Chapter[] = [
     id: 'dp',
     title: '动态规划',
     subtitle: '最优子结构 · 重叠子问题',
-    algos: ['kadane', 'knapsack01', 'lcs', 'editDistance'],
+    algos: ['kadane', 'knapsack01', 'lcs', 'editDistance', 'matrixChain'],
     sections: [
       {
         id: 'idea',
@@ -157,7 +157,7 @@ export const chapters: Chapter[] = [
     id: 'greedy',
     title: '贪心',
     subtitle: '局部最优 → 全局最优？',
-    algos: ['activitySelection'],
+    algos: ['activitySelection', 'huffman'],
     sections: [
       {
         id: 'idea',
@@ -236,7 +236,7 @@ export const chapters: Chapter[] = [
       {
         id: 'ek',
         title: 'Edmonds-Karp',
-        content: `用 **BFS** 在残量网络找增广路（最短边数），复杂度 O(VE²)。Dinic、ISAP、预流推进等更高效，竞赛常用。`,
+        content: `用 **BFS** 在残量网络找增广路（最短边数），复杂度 O(VE²)。本站将 BFS 标为最大流**先修**；Edmonds-Karp 完整可视化属拓展规划，**勿当作已完成模块**。`,
       },
       {
         id: 'matching',
@@ -269,7 +269,7 @@ export const chapters: Chapter[] = [
     id: 'complexity',
     title: '复杂度理论',
     subtitle: 'P / NP / 近似与回溯',
-    algos: [],
+    algos: ['nQueens'],
     sections: [
       {
         id: 'pnp',

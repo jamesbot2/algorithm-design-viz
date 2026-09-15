@@ -13,7 +13,7 @@ export const meta = {
   merge(a, L, mid, R)`,
 
   implName: 'mergeSortTopDown',
-  implVersion: '1.0.1',
+  implVersion: '1.1.0',
   timeComplexity: 'Θ(n log n)',
   spaceComplexity: 'O(n) 辅助数组 + O(log n) 栈',
   spaceNotes: '合并需要 O(n) 临时空间。',
@@ -27,6 +27,15 @@ export function generateSteps(input: number[]): Step[] {
   let id = 0
   let comparisons = 0
   let writes = 0
+  const callStack: string[] = []
+  const treeRoot: import('../types/step').SearchTreeNode = {
+    id: 'ms-root',
+    label: 'mergeSort',
+    status: 'root',
+    children: [],
+  }
+  const nodeStack: import('../types/step').SearchTreeNode[] = [treeRoot]
+  let treeSeq = 0
 
   const snap = (
     message: string,
@@ -42,16 +51,23 @@ export function generateSteps(input: number[]): Step[] {
         ptrs[k] = vars[k] as number
       }
     }
+    // deep-ish copy tree for this step
+    const cloneTree = (n: import('../types/step').SearchTreeNode): import('../types/step').SearchTreeNode => ({
+      ...n,
+      children: n.children?.map(cloneTree),
+      meta: n.meta ? { ...n.meta } : undefined,
+    })
     steps.push({
       id: id++,
       message,
       highlights: { a: highlights },
       roles: roles ? { a: roles } : undefined,
       arrays: { a: [...a] },
-      vars,
+      vars: { ...vars, callStack: callStack.join(' › ') || '(empty)' },
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
       stats: { comparisons, writes, swaps: 0 },
       codeLine,
+      searchTree: cloneTree(treeRoot),
     })
   }
 
@@ -108,8 +124,25 @@ export function generateSteps(input: number[]): Step[] {
   }
 
   function sort(L: number, R: number) {
+    const frame = `sort(${L},${R})`
+    callStack.push(frame)
+    const node: import('../types/step').SearchTreeNode = {
+      id: `ms${treeSeq++}`,
+      label: frame,
+      status: 'exploring',
+      children: [],
+      meta: { L, R, depth: callStack.length },
+    }
+    const parent = nodeStack[nodeStack.length - 1]!
+    parent.children = parent.children ?? []
+    parent.children.push(node)
+    nodeStack.push(node)
+
     if (L >= R) {
+      node.status = 'feasible'
       snap(`区间 [${L},${R}] 长度 ≤ 1，返回`, L === R ? [L] : [], { L, R }, 1, L === R ? { [L]: 'sorted' } : undefined, { L, R })
+      callStack.pop()
+      nodeStack.pop()
       return
     }
     const mid = Math.floor((L + R) / 2)
@@ -124,6 +157,9 @@ export function generateSteps(input: number[]): Step[] {
     sort(L, mid)
     sort(mid + 1, R)
     merge(L, mid, R)
+    node.status = 'optimal'
+    callStack.pop()
+    nodeStack.pop()
   }
 
   snap('开始归并排序', [], {}, 0)
