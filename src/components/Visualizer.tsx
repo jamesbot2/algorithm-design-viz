@@ -224,6 +224,16 @@ export default function Visualizer({
   useEffect(() => {
     clear()
     if (!playing) return
+    if (steps.length <= 0) {
+      setPlaying(false)
+      return clear
+    }
+    // Single-frame: show once then complete (no infinite empty spin)
+    if (max <= 0) {
+      const t = window.setTimeout(() => setPlaying(false), effectiveInterval)
+      timer.current = t
+      return clear
+    }
     timer.current = window.setInterval(() => {
       setIdx((i) => {
         if (i >= max) {
@@ -234,7 +244,7 @@ export default function Visualizer({
       })
     }, effectiveInterval)
     return clear
-  }, [playing, effectiveInterval, max, clear])
+  }, [playing, effectiveInterval, max, clear, steps.length])
 
   // New runId resets player once — does not pause on every parent re-render
   useEffect(() => {
@@ -275,8 +285,18 @@ export default function Visualizer({
   const togglePlay = useCallback(() => {
     setPlayPulse(true)
     window.setTimeout(() => setPlayPulse(false), 180)
-    setPlaying((p) => !p)
-  }, [])
+    if (playing) {
+      setPlaying(false)
+      return
+    }
+    if (steps.length === 0) return
+    const last = Math.max(0, steps.length - 1)
+    // completed → replay: seek 0 then play (existing trace; must NOT re-solve)
+    if (idx >= last) {
+      setIdx(0)
+    }
+    setPlaying(true)
+  }, [playing, steps.length, idx])
 
   const reset = useCallback(() => {
     setPlaying(false)
