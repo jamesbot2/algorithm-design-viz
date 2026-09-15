@@ -67,9 +67,9 @@ describe('M3 practice multi-answer judges', () => {
     expect(r.ok).toBe(true)
   })
 
-  it('choice judge accepts any of acceptIds', () => {
-    expect(judgeChoices(['b'], ['b', 'c']).ok).toBe(true)
-    expect(judgeChoices(['a'], ['b', 'c']).ok).toBe(false)
+  it('choice judge single mode accepts one of acceptIds', () => {
+    expect(judgeChoices(['b'], ['b', 'c'], 'single').ok).toBe(true)
+    expect(judgeChoices(['a'], ['b', 'c'], 'single').ok).toBe(false)
   })
 
   it('seeded pick is reproducible', () => {
@@ -96,14 +96,13 @@ describe('M3 scene roundtrip', () => {
     expect(back.input).toEqual(scene.input)
   })
 
-  it('version mismatch flagged', () => {
+  it('version mismatch rejected (no silent fallback)', () => {
     const v = validateScene({
       version: 999,
       algoId: 'bfs',
       input: {},
     })
-    expect(v.ok).toBe(true)
-    if (v.ok) expect(v.versionMismatch).toBe(true)
+    expect(v.ok).toBe(false)
   })
 
   it('rejects missing algoId', () => {

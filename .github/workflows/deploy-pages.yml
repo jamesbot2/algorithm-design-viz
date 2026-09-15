@@ -1,7 +1,13 @@
+# Deploy only after CI succeeds on main (workflow_run), or manual dispatch.
+# Honesty: Pages deploy is gated on the CI workflow named "CI" completing successfully
+# for the same commit on main. PRs do not deploy. workflow_dispatch still builds locally
+# in this workflow (no CI wait) for emergency publishes.
 name: Deploy to GitHub Pages
 
 on:
-  push:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
@@ -16,10 +22,19 @@ concurrency:
 
 jobs:
   build:
+    # Only deploy when CI succeeded (or manual dispatch).
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # For workflow_run, check out the commit CI actually tested
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4

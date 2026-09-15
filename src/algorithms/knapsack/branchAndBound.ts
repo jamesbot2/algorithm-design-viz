@@ -1,5 +1,6 @@
 import type { SearchTreeNode, Step } from '../../types/step'
 import type { KnapsackInstance, KnapsackSolution } from './types'
+import { snapshotTree } from '../../utils/cloneTree'
 
 /** Fractional knapsack upper bound on remaining items (sorted by density). */
 export function fractionalUpperBound(
@@ -112,6 +113,15 @@ export function solveBranchAndBound(inst: KnapsackInstance): {
     dfs(i + 1, w, v, chosen, skipNode)
   }
 
+  const steps: Step[] = [
+    {
+      id: 0,
+      message: '开始分支限界',
+      searchTree: snapshotTree(root),
+      vars: { best: 0, note: 'fractional UB' },
+    },
+  ]
+
   dfs(0, 0, 0, [], root)
 
   const solution: KnapsackSolution = {
@@ -121,14 +131,12 @@ export function solveBranchAndBound(inst: KnapsackInstance): {
     method: 'branchAndBound',
     note: '上界用分数背包（浮点）；找一个最优解',
   }
-  const steps: Step[] = [
-    {
-      id: 0,
-      message: `分支限界完成：最优值 ${best}（分数上界剪枝；注意 float）`,
-      searchTree: root,
-      vars: { best, note: 'fractional UB' },
-      result: solution,
-    },
-  ]
-  return { solution, steps, tree: root }
+  steps.push({
+    id: steps.length,
+    message: `分支限界完成：最优值 ${best}（分数上界剪枝；注意 float）`,
+    searchTree: snapshotTree(root),
+    vars: { best, note: 'fractional UB' },
+    result: solution,
+  })
+  return { solution, steps, tree: snapshotTree(root) }
 }

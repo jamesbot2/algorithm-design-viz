@@ -1,4 +1,5 @@
 import type { SearchTreeNode, Step } from '../types/step'
+import { snapshotTree } from '../utils/cloneTree'
 
 export const meta = {
   id: 'nQueens',
@@ -12,7 +13,7 @@ export const meta = {
     if safe: place; place(row+1); remove`,
   defaultN: 4,
   implName: 'nQueensBacktrack',
-  implVersion: '1.0.0',
+  implVersion: '1.1.0',
   timeComplexity: 'O(n!) 量级（剪枝后更少）',
   spaceComplexity: 'O(n)',
   inputAssumptions: 'n≥1；demo 默认求全部解；大 n 需提高 budget',
@@ -28,6 +29,8 @@ export interface NQueensResult {
   solutions: number[][]
   truncated: boolean
   complete: boolean
+  btNodes?: number
+  prunedNodes?: number
 }
 
 function isSafe(cols: number[], row: number, col: number): boolean {
@@ -45,6 +48,7 @@ export function solveNQueens(
 ): { result: NQueensResult; steps: Step[]; tree: SearchTreeNode } {
   const solutions: number[][] = []
   let nodes = 0
+  let prunedNodes = 0
   let truncated = false
   let sid = 0
   const cols: number[] = Array(n).fill(-1)
@@ -57,7 +61,7 @@ export function solveNQueens(
   const steps: Step[] = []
   let stepId = 0
 
-  const boardSnap = (message: string, tree?: SearchTreeNode) => {
+  const boardSnap = (message: string) => {
     const board = Array.from({ length: n }, (_, r) =>
       Array.from({ length: n }, (_, c) => (cols[r] === c ? 'Q' : '.')),
     )
@@ -65,8 +69,9 @@ export function solveNQueens(
       id: stepId++,
       message,
       matrices: { board },
-      searchTree: tree ?? root,
-      vars: { n, solutions: solutions.length, nodes, truncated },
+      searchTree: snapshotTree(root),
+      vars: { n, solutions: solutions.length, nodes, truncated, prunedNodes },
+      stats: { comparisons: nodes, writes: prunedNodes },
     })
   }
 
@@ -99,10 +104,11 @@ export function solveNQueens(
       parent.children.push(node)
       if (!isSafe(cols, row, col)) {
         node.status = 'rejected'
+        prunedNodes++
         continue
       }
       cols[row] = col
-      if (steps.length < 80) boardSnap(`放置 row=${row} col=${col}`, root)
+      if (steps.length < 80) boardSnap(`放置 row=${row} col=${col}`)
       dfs(row + 1, node)
       cols[row] = -1
       if (mode === 'one' && solutions.length >= 1) return
@@ -121,22 +127,26 @@ export function solveNQueens(
     solutions,
     truncated,
     complete,
+    btNodes: nodes,
+    prunedNodes,
   }
   steps.push({
     id: stepId++,
     message: complete
       ? `完成：共 ${solutions.length} 个解`
       : `预算截断：已找到 ${solutions.length} 个解（不可当作完整计数）`,
-    searchTree: root,
+    searchTree: snapshotTree(root),
     vars: {
       n,
       solutionCount: solutions.length,
       truncated,
       complete,
+      btNodes: nodes,
+      prunedNodes,
     },
     result,
   })
-  return { result, steps, tree: root }
+  return { result, steps, tree: snapshotTree(root) }
 }
 
 export function generateSteps(_arr: number[], n = meta.defaultN, mode: NQueensMode = 'all'): Step[] {

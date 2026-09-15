@@ -1,3 +1,4 @@
+# CI must pass before Pages deploy (see deploy-pages.yml workflow_run).
 name: CI
 
 on:

@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom'
 import { listPracticeItems, pickPracticeItem } from '../../practice/bank'
 import { judgeByKey, judgeChoices } from '../../practice/judges'
 import type { PracticeItem } from '../../practice/types'
-import { exportLocalLearningJson, loadLocalLearning, recordPracticeResult, clearLocalLearningConfirmed } from '../../scene/storage'
+import {
+  exportLocalLearningJson,
+  loadLocalLearning,
+  recordPracticeResult,
+  clearLocalLearningConfirmed,
+} from '../../scene/storage'
 
 export default function PracticePage() {
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1e9))
@@ -14,6 +19,12 @@ export default function PracticePage() {
   const [feedback, setFeedback] = useState<string | null>(null)
   const [note, setNote] = useState<string | null>(null)
   const progress = useMemo(() => loadLocalLearning().progress, [feedback])
+
+  const choiceMode =
+    item.type === 'predict_next' || item.type === 'explain_choice'
+      ? (item.judgeMode ?? 'single')
+      : 'single'
+  const isMultiExact = choiceMode === 'multiExact'
 
   const loadSeed = (s: number) => {
     setSeed(s)
@@ -29,7 +40,7 @@ export default function PracticePage() {
     if (item.type === 'counterexample') {
       result = judgeByKey(item.judgeKey, fieldAnswers, item.judgePayload)
     } else {
-      result = judgeChoices(selected, item.acceptIds)
+      result = judgeChoices(selected, item.acceptIds, item.judgeMode ?? 'single')
     }
     setFeedback(result.message)
     setNote(result.note ?? null)
@@ -73,10 +84,7 @@ export default function PracticePage() {
           <button type="button" className="primary" onClick={() => loadSeed(seed)}>
             按种子加载
           </button>
-          <button
-            type="button"
-            onClick={() => loadSeed(Math.floor(Math.random() * 1e9))}
-          >
+          <button type="button" onClick={() => loadSeed(Math.floor(Math.random() * 1e9))}>
             随机一题
           </button>
         </div>
@@ -84,21 +92,29 @@ export default function PracticePage() {
 
       <div className="practice-card">
         <p className="muted">
-          #{item.id} · {item.type} · algo={item.algoId} · seed={item.seed ?? seed}
+          #{item.id} · {item.type} · mode={item.judgeMode ?? '—'} · algo={item.algoId} · seed=
+          {item.seed ?? seed}
         </p>
         <h3>{item.prompt}</h3>
 
         {(item.type === 'predict_next' || item.type === 'explain_choice') && (
           <div className="practice-choices">
+            {isMultiExact && <p className="hint">多选：须选中全部正确项（完整命中）。</p>}
+            {!isMultiExact && <p className="hint">单选：请只选一项。</p>}
             {item.choices.map((c) => (
               <label key={c.id} className="checkbox-label">
                 <input
-                  type="checkbox"
+                  type={isMultiExact ? 'checkbox' : 'radio'}
+                  name={`practice-${item.id}`}
                   checked={selected.includes(c.id)}
                   onChange={(e) => {
-                    setSelected((prev) =>
-                      e.target.checked ? [...prev, c.id] : prev.filter((x) => x !== c.id),
-                    )
+                    if (isMultiExact) {
+                      setSelected((prev) =>
+                        e.target.checked ? [...prev, c.id] : prev.filter((x) => x !== c.id),
+                      )
+                    } else {
+                      setSelected([c.id])
+                    }
                   }}
                 />
                 {c.label}
@@ -111,12 +127,29 @@ export default function PracticePage() {
           item.fields.map((f) => (
             <label key={f.id}>
               {f.label}
-              <textarea
-                rows={3}
-                placeholder={f.placeholder}
-                value={fieldAnswers[f.id] ?? ''}
-                onChange={(e) => setFieldAnswers((m) => ({ ...m, [f.id]: e.target.value }))}
-              />
+              {item.judgeKey === 'greedy_ce' && f.id !== 'capacity' ? (
+                <input
+                  type="text"
+                  placeholder={f.placeholder}
+                  value={fieldAnswers[f.id] ?? ''}
+                  onChange={(e) => setFieldAnswers((m) => ({ ...m, [f.id]: e.target.value }))}
+                />
+              ) : item.judgeKey === 'greedy_ce' && f.id === 'capacity' ? (
+                <input
+                  type="number"
+                  min={0}
+                  placeholder={f.placeholder}
+                  value={fieldAnswers[f.id] ?? ''}
+                  onChange={(e) => setFieldAnswers((m) => ({ ...m, [f.id]: e.target.value }))}
+                />
+              ) : (
+                <textarea
+                  rows={3}
+                  placeholder={f.placeholder}
+                  value={fieldAnswers[f.id] ?? ''}
+                  onChange={(e) => setFieldAnswers((m) => ({ ...m, [f.id]: e.target.value }))}
+                />
+              )}
             </label>
           ))}
 

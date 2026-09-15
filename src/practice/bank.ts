@@ -9,6 +9,7 @@ const STATIC: PracticeItem[] = [
     id: 'knapsack-predict-1',
     algoId: 'knapsack01',
     type: 'predict_next',
+    judgeMode: 'single',
     prompt:
       '0-1 背包：物品 (w,v)=(2,3),(3,4),(4,5)，容量 5。DP 填表时处理完前 2 件后，dp[2][5] 应为多少？',
     choices: [
@@ -25,6 +26,7 @@ const STATIC: PracticeItem[] = [
     id: 'knapsack-explain-1',
     algoId: 'knapsack01',
     type: 'explain_choice',
+    judgeMode: 'single',
     prompt: '分支限界求解 0-1 背包时，为何可用分数背包上界剪枝？',
     choices: [
       { id: 'a', label: '分数上界 ≥ 任何整数可行解，故上界 < 当前最优可剪' },
@@ -40,6 +42,7 @@ const STATIC: PracticeItem[] = [
     id: 'lcs-predict-1',
     algoId: 'lcs',
     type: 'predict_next',
+    judgeMode: 'single',
     prompt: 'X=ABCBDAB，Y=BDCABA。若当前比较到 X 的 B 与 Y 的 B 匹配，下一步 dp 转移是？',
     choices: [
       { id: 'a', label: 'dp[i][j] = dp[i-1][j-1] + 1' },
@@ -55,6 +58,7 @@ const STATIC: PracticeItem[] = [
     id: 'lcs-construct-1',
     algoId: 'lcs',
     type: 'counterexample',
+    judgeMode: 'construct',
     prompt: '构造一条 X=ABCBDAB 与 Y=BDCABA 的最优 LCS 字符串（多解均可）。',
     fields: [{ id: 'lcs', label: 'LCS 串', placeholder: '如 BCBA' }],
     judgeKey: 'lcs_construct',
@@ -66,6 +70,7 @@ const STATIC: PracticeItem[] = [
     id: 'dijkstra-predict-1',
     algoId: 'dijkstra',
     type: 'predict_next',
+    judgeMode: 'single',
     prompt:
       '非负权有向图：0→1(1), 0→2(4), 1→2(2), 1→3(6), 2→3(3)，源 0。第一次选定源后，下一轮选出的顶点是？',
     choices: [
@@ -82,6 +87,7 @@ const STATIC: PracticeItem[] = [
     id: 'dijkstra-path-1',
     algoId: 'dijkstra',
     type: 'counterexample',
+    judgeMode: 'path',
     prompt: '同上图，给出 0 到 3 的一条最短路径（顶点序列，多解若等长代价均可）。',
     fields: [{ id: 'path', label: '路径', placeholder: '0 1 2 3' }],
     judgeKey: 'equal_path',
@@ -104,22 +110,40 @@ const STATIC: PracticeItem[] = [
     id: 'nqueens-predict-1',
     algoId: 'nQueens',
     type: 'predict_next',
+    judgeMode: 'single',
     prompt: 'N=4 皇后，已在第 0 行放列 1。第 1 行哪些列会因攻击被剪？（0-based）',
     choices: [
       { id: 'a', label: '仅列 1' },
       { id: 'b', label: '列 0、1、2' },
-      { id: 'c', label: '列 1 与 2（同列/对角线）' },
+      { id: 'c', label: '列 1 与 2（同列/对角线）——不完整' },
       { id: 'd', label: '全部列都安全' },
     ],
-    acceptIds: ['b', 'c'],
-    explanation: '同列 1；对角线使列 2（及可能 0 视实现）——标准：列1同列，列2主对角。列0反对角也冲突。更精确：冲突列为 0,1,2。',
-    // Accept both c and b as valid understandings — use multi accept
+    acceptIds: ['b'],
+    explanation:
+      '已放 (0,1)：同列剪列1；主对角剪列2；反对角剪列0。故冲突列为 0,1,2；仅选「列1与2」不完整，不接受。',
     stepLink: { algoId: 'nQueens', hint: '攻击检测剪枝' },
+  },
+  {
+    id: 'nqueens-multi-1',
+    algoId: 'nQueens',
+    type: 'predict_next',
+    judgeMode: 'multiExact',
+    prompt: 'N=4 时，下列哪些说法正确？（多选，须全选对）',
+    choices: [
+      { id: 'a', label: '解的个数为 2（不计旋转对称）' },
+      { id: 'b', label: '每行恰好放一个皇后' },
+      { id: 'c', label: 'n=2、n=3 无解' },
+      { id: 'd', label: '可在 O(1) 时间求出全部解' },
+    ],
+    acceptIds: ['a', 'b', 'c'],
+    explanation: 'a/b/c 正确；全解枚举为指数级，非 O(1)。',
+    stepLink: { algoId: 'nQueens', hint: '计数与可行性' },
   },
   {
     id: 'nqueens-explain-1',
     algoId: 'nQueens',
     type: 'explain_choice',
+    judgeMode: 'single',
     prompt: '回溯解 N 皇后时，为何在放置前检查列与对角线即可？',
     choices: [
       { id: 'a', label: '每行恰放一个，故只需禁同列与对角' },
@@ -135,6 +159,7 @@ const STATIC: PracticeItem[] = [
     id: 'greedy-vs-dp-1',
     algoId: 'knapsack01',
     type: 'explain_choice',
+    judgeMode: 'single',
     prompt: '对 0-1 背包，按价值密度贪心为何不一定最优？',
     choices: [
       { id: 'a', label: '物品不可分割，局部密度高可能挤占更优组合' },
@@ -150,25 +175,35 @@ const STATIC: PracticeItem[] = [
     id: 'greedy-ce-1',
     algoId: 'knapsack01',
     type: 'counterexample',
+    judgeMode: 'construct',
     prompt:
-      '给出（或描述）一个使「按密度贪心」劣于最优的 0-1 背包实例。可写 weights/values/capacity。',
-    fields: [{ id: 'inst', label: '实例描述', placeholder: 'w=10,20,30 v=60,100,120 cap=50' }],
+      '构造一个使「按密度贪心」严格劣于最优的 0-1 背包实例（提交 weights / values / capacity）。',
+    fields: [
+      { id: 'weights', label: 'weights（逗号分隔非负整数）', placeholder: '10,20,30' },
+      { id: 'values', label: 'values（逗号分隔非负整数）', placeholder: '60,100,120' },
+      { id: 'capacity', label: 'capacity', placeholder: '50' },
+    ],
     judgeKey: 'greedy_ce',
     judgePayload: (() => {
       const g = greedyByDensity(GREEDY_COUNTEREXAMPLE)
       const opt = solveDp2d(GREEDY_COUNTEREXAMPLE).solution
-      return { expectedMax: opt.maxValue, greedyValue: g.maxValue }
+      return {
+        hintExample: { weights: [10, 20, 30], values: [60, 100, 120], capacity: 50 },
+        expectedMax: opt.maxValue,
+        greedyValue: g.maxValue,
+      }
     })(),
-    explanation: '标准反例最优 220，密度贪心 160。',
+    explanation: '标准反例最优 220，密度贪心 160。判定：对本实例跑贪心与最优，须 greedy < optimal。',
     stepLink: { algoId: 'knapsack01', hint: 'GREEDY_COUNTEREXAMPLE' },
   },
   {
     id: 'mst-alt-1',
     algoId: 'kruskal',
     type: 'counterexample',
+    judgeMode: 'setOptimal',
     prompt:
       '无向边：0-1(1), 0-2(1), 1-2(1), 1-3(2), 2-3(2)。给出一棵总权最优的生成树边集（每行 u v）。',
-    fields: [{ id: 'edges', label: '树边', placeholder: '0 1\\n0 2\\n1 3' }],
+    fields: [{ id: 'edges', label: '树边', placeholder: '0 1\n0 2\n1 3' }],
     judgeKey: 'mst_alt',
     judgePayload: {
       edges: [
@@ -189,6 +224,7 @@ const STATIC: PracticeItem[] = [
     id: 'knapsack-set-1',
     algoId: 'knapsack01',
     type: 'counterexample',
+    judgeMode: 'setOptimal',
     prompt: '物品 0:(2,3), 1:(3,4), 2:(4,5)，容量 5。给出一个最优选中集（物品下标，逗号分隔）。',
     fields: [{ id: 'items', label: '选中下标', placeholder: '0,1' }],
     judgeKey: 'knapsack_set',
@@ -200,6 +236,10 @@ const STATIC: PracticeItem[] = [
 
 export function listPracticeItems(): PracticeItem[] {
   return STATIC
+}
+
+export function getPracticeItem(id: string): PracticeItem | undefined {
+  return STATIC.find((x) => x.id === id)
 }
 
 export function pickPracticeItem(seed: number, filterAlgo?: string): PracticeItem {

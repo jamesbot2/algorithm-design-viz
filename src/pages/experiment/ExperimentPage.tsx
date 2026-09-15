@@ -39,7 +39,9 @@ export default function ExperimentPage() {
         </Link>
         <h1>实验台</h1>
         <p className="subtitle">
-          对照实验输出操作计数行（CSV/JSON）。指数规模已封顶。勿将浏览器墙钟当作复杂度证明。
+          对照实验输出<strong>算法核心操作计数</strong>（comparisons / scans / relaxations / heapPops /
+          staleSkips / dpStates / btNodes / prunedNodes）。metric=<code>vizSteps</code> 单独表示
+          <strong>可视化步骤量</strong>，不是算法工作量。指数规模已封顶。勿将浏览器墙钟当作复杂度证明。
         </p>
       </div>
       <div className="input-panel">
@@ -86,11 +88,14 @@ export default function ExperimentPage() {
               </thead>
               <tbody>
                 {result.rows.map((r, i) => (
-                  <tr key={i}>
+                  <tr key={i} className={r.metric === 'vizSteps' ? 'muted' : undefined}>
                     <td>{r.experiment}</td>
                     <td>{r.method}</td>
                     <td>{r.n}</td>
-                    <td>{r.metric}</td>
+                    <td>
+                      {r.metric}
+                      {r.metric === 'vizSteps' ? '（可视化步骤量）' : ''}
+                    </td>
                     <td>{r.value}</td>
                     <td>
                       <code>{r.extra ? JSON.stringify(r.extra) : ''}</code>

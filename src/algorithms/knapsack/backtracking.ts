@@ -1,5 +1,6 @@
 import type { SearchTreeNode, Step } from '../../types/step'
 import type { KnapsackInstance, KnapsackSolution } from './types'
+import { snapshotTree } from '../../utils/cloneTree'
 
 export function solveBacktracking(
   inst: KnapsackInstance,
@@ -78,6 +79,13 @@ export function solveBacktracking(
     }
   }
 
+  steps.push({
+    id: steps.length,
+    message: '开始回溯',
+    searchTree: snapshotTree(root),
+    vars: { best: 0, nodes: 0, truncated: false },
+  })
+
   dfs(0, 0, 0, [], root)
   // mark best path loosely
   markOptimal(root, new Set(bestIds))
@@ -91,15 +99,15 @@ export function solveBacktracking(
     note: truncated ? `搜索节点达上限 ${maxNodes}` : undefined,
   }
   steps.push({
-    id: 0,
+    id: steps.length,
     message: truncated
       ? `回溯搜索（截断）：目前最佳 ${best}`
       : `回溯完成：最优值 ${best}，选中 [${bestIds.join(', ')}]`,
-    searchTree: root,
+    searchTree: snapshotTree(root),
     vars: { best, nodes: nodeCount, truncated },
     result: solution,
   })
-  return { solution, steps, tree: root }
+  return { solution, steps, tree: snapshotTree(root) }
 }
 
 function markOptimal(node: SearchTreeNode, ids: Set<string>) {

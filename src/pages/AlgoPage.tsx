@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { algorithms } from '../algorithms'
 import { getAlgo } from '../algorithms/registry'
 import type { Trace } from '../core/trace/types'
+import { runAlgo, createCancelFlag } from '../core/runner'
 import Visualizer from '../components/Visualizer'
 import GraphInput from '../components/graph/GraphInput'
 import GraphResultPanel from '../components/graph/GraphResultPanel'
@@ -76,6 +77,14 @@ function defaultDraft(id: string): DraftState {
   return d
 }
 
+type BuildOk = {
+  ok: true
+  registryInput: unknown
+  /** Fallback steps when registry.solve is unavailable — produced once. */
+  fallbackSteps?: Step[]
+  inputSize?: number
+}
+
 export default function AlgoPage() {
   const { id } = useParams()
   const algo = id ? algorithms[id] : undefined
@@ -88,52 +97,22 @@ export default function AlgoPage() {
   const [playbackKey, setPlaybackKey] = useState(0)
   const [hasRun, setHasRun] = useState(false)
   const [sceneWarn, setSceneWarn] = useState<string | null>(null)
-
-  useEffect(() => {
-    setDraft(defaultDraft(id ?? ''))
-    setErrors([])
-    setSteps([])
-    setTrace(undefined)
-    setHasRun(false)
-    setPlaybackKey((k) => k + 1)
-    setSceneWarn(null)
-
-    // Restore scene from URL hash query if present (HashRouter: #/algo/x?scene=...)
-    const loaded = loadSceneFromHash(window.location.hash)
-    if (loaded.ok && loaded.scene.algoId === id) {
-      if (loaded.versionMismatch) {
-        setSceneWarn(
-          `场景协议版本不同：场景 v${loaded.scene.version}，当前 v${SCENE_PROTOCOL_VERSION}，已尝试加载。`,
-        )
-      }
-      if (isGraphAlgo(id) && loaded.scene.input && typeof loaded.scene.input === 'object') {
-        const g = loaded.scene.input as Partial<GraphDraft>
-        if (typeof g.n === 'number' && Array.isArray(g.edges)) {
-          setDraft((d) => ({
-            ...d,
-            graph: {
-              n: g.n!,
-              edges: g.edges as GraphDraft['edges'],
-              directed: Boolean(g.directed),
-              start: typeof g.start === 'number' ? g.start : 0,
-            },
-            mode: loaded.scene.params?.mode === 'experiment' ? 'experiment' : 'teach',
-          }))
-        }
-      }
-    }
-  }, [id])
+  const [seekStepIndex, setSeekStepIndex] = useState(0)
+  const cancelRef = useRef(createCancelFlag())
+  const pendingAutoRun = useRef(false)
 
   const patch = useCallback((partial: Partial<DraftState>) => {
     setDraft((d) => ({ ...d, ...partial }))
   }, [])
 
-  const validateAndBuild = useCallback(():
-    | { ok: true; steps: Step[]; registryInput?: unknown }
-    | { ok: false; errors: FieldError[] } => {
+  /** Validate draft once → registry input. Steps generated at most once in executeOnce. */
+  const validateAndBuild = useCallback((): BuildOk | { ok: false; errors: FieldError[] } => {
     if (!algo || !id) return { ok: false, errors: [{ field: 'algo', reason: '未找到算法' }] }
     const errs: FieldError[] = []
     const heavyTrace = draft.mode !== 'experiment'
+    const hasRegistrySolve = Boolean(getAlgo(id)?.solve)
+    const maybeSteps = (fn: () => Step[]): Step[] | undefined =>
+      hasRegistrySolve ? undefined : fn()
 
     if (isGraphAlgo(id)) {
       const g = draft.graph ?? defaultDraftFor(id)
@@ -145,45 +124,56 @@ export default function AlgoPage() {
         }
       }
       const { n, edges, start, directed } = v.value
+      const inputSize = n + edges.length
       if (id === 'bfs') {
         const adj = edgesToAdj(edges, n, directed)
         return {
           ok: true,
-          steps: algo.generateSteps([], adj, start),
           registryInput: { adj, start },
+          fallbackSteps: maybeSteps(() => algo.generateSteps([], adj, start)),
+          inputSize,
         }
       }
       if (id === 'floyd') {
         const matrix = edgesToFloydMatrix(edges, n)
         return {
           ok: true,
-          steps: algo.generateSteps([], matrix),
           registryInput: { matrix },
+          fallbackSteps: maybeSteps(() => algo.generateSteps([], matrix)),
+          inputSize,
         }
       }
       if (id === 'kruskal') {
         return {
           ok: true,
-          steps: algo.generateSteps([], edges, n),
           registryInput: { edges, n },
+          fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n)),
+          inputSize,
         }
       }
       if (id === 'prim') {
         return {
           ok: true,
-          steps: algo.generateSteps([], edges, n, start),
           registryInput: { edges, n, start },
+          fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n, start)),
+          inputSize,
         }
       }
       if (id === 'dijkstraHeap') {
-        const steps = dijkstraHeap.generateSteps([], edges, n, start, { heavyTrace })
-        return { ok: true, steps, registryInput: { edges, n, start } }
+        return {
+          ok: true,
+          registryInput: { edges, n, start },
+          fallbackSteps: maybeSteps(() =>
+            dijkstraHeap.generateSteps([], edges, n, start, { heavyTrace }),
+          ),
+          inputSize,
+        }
       }
-      // dijkstra / bellmanFord
       return {
         ok: true,
-        steps: algo.generateSteps([], edges, n, start),
         registryInput: { edges, n, start },
+        fallbackSteps: maybeSteps(() => algo.generateSteps([], edges, n, start)),
+        inputSize,
       }
     }
 
@@ -225,8 +215,9 @@ export default function AlgoPage() {
       }
       return {
         ok: true,
-        steps: algo.generateSteps(arr, t.value ?? 0, draft.bsMode),
         registryInput: { arr, target: t.value ?? 0, mode: draft.bsMode },
+        fallbackSteps: maybeSteps(() => algo.generateSteps(arr, t.value ?? 0, draft.bsMode)),
+        inputSize: arr.length,
       }
     }
 
@@ -240,8 +231,9 @@ export default function AlgoPage() {
       if (errs.length) return { ok: false, errors: errs }
       return {
         ok: true,
-        steps: lcs.generateSteps([], draft.strA, draft.strB),
         registryInput: { x: draft.strA, y: draft.strB },
+        fallbackSteps: maybeSteps(() => lcs.generateSteps([], draft.strA, draft.strB)),
+        inputSize: draft.strA.length * draft.strB.length,
       }
     }
 
@@ -255,8 +247,9 @@ export default function AlgoPage() {
       if (errs.length) return { ok: false, errors: errs }
       return {
         ok: true,
-        steps: editDistance.generateSteps([], draft.editA, draft.editB),
         registryInput: { a: draft.editA, b: draft.editB },
+        fallbackSteps: maybeSteps(() => editDistance.generateSteps([], draft.editA, draft.editB)),
+        inputSize: draft.editA.length * draft.editB.length,
       }
     }
 
@@ -270,83 +263,260 @@ export default function AlgoPage() {
       if (errs.length) return { ok: false, errors: errs }
       return {
         ok: true,
-        steps: kmp.generateSteps([], draft.text, draft.pattern),
         registryInput: { text: draft.text, pattern: draft.pattern },
+        fallbackSteps: maybeSteps(() => kmp.generateSteps([], draft.text, draft.pattern)),
+        inputSize: draft.text.length + draft.pattern.length,
       }
     }
 
     if (id === 'knapsack01') {
-      return { ok: true, steps: knapsack01.generateSteps([]), registryInput: {} }
+      return {
+        ok: true,
+        registryInput: {},
+        fallbackSteps: maybeSteps(() => knapsack01.generateSteps([])),
+        inputSize: 8,
+      }
     }
     if (id === 'activitySelection') {
-      return { ok: true, steps: activitySelection.generateSteps([]), registryInput: {} }
+      return {
+        ok: true,
+        registryInput: {},
+        fallbackSteps: maybeSteps(() => activitySelection.generateSteps([])),
+        inputSize: 4,
+      }
     }
     if (id === 'nQueens') {
-      return { ok: true, steps: algo.generateSteps([], 4, 'all'), registryInput: { n: 4, mode: 'all' } }
+      return {
+        ok: true,
+        registryInput: { n: 4, mode: 'all' },
+        fallbackSteps: maybeSteps(() => algo.generateSteps([], 4, 'all')),
+        inputSize: 4,
+      }
     }
     if (id === 'matrixChain') {
-      return { ok: true, steps: algo.generateSteps([]), registryInput: {} }
+      return {
+        ok: true,
+        registryInput: {},
+        fallbackSteps: maybeSteps(() => algo.generateSteps([])),
+        inputSize: 4,
+      }
     }
     if (id === 'huffman') {
-      return { ok: true, steps: algo.generateSteps([]), registryInput: {} }
+      return {
+        ok: true,
+        registryInput: {},
+        fallbackSteps: maybeSteps(() => algo.generateSteps([])),
+        inputSize: 4,
+      }
     }
 
     if (errs.length) return { ok: false, errors: errs }
     if (!arr.length) {
       return { ok: false, errors: [{ field: 'array', reason: '数组不能为空' }] }
     }
-    return { ok: true, steps: algo.generateSteps(arr), registryInput: { arr } }
+    return {
+      ok: true,
+      registryInput: { arr },
+      fallbackSteps: maybeSteps(() => algo.generateSteps(arr)),
+      inputSize: arr.length,
+    }
   }, [algo, id, draft])
+
+  /** Single execution path: validate → run once → {result, steps/trace}. */
+  const executeOnce = useCallback(
+    (seekTo = 0) => {
+      const built = validateAndBuild()
+      if (!built.ok) {
+        setErrors(built.errors)
+        setHasRun(false)
+        return false
+      }
+      setErrors([])
+
+      cancelRef.current.cancelled = false
+      const entry = id ? getAlgo(id) : undefined
+      let outSteps: Step[] = built.fallbackSteps ?? []
+      let outTrace: Trace | undefined
+
+      const budgetMax =
+        draft.mode === 'experiment'
+          ? DEMO_LIMITS.arrayLen * DEMO_LIMITS.arrayLen
+          : DEMO_LIMITS.arrayLen * 200
+
+      if (entry?.validate && entry?.solve) {
+        // Prefer runAlgo: validate + solve once (no double generateSteps + solve)
+        const outcome = runAlgo({
+          algoId: id!,
+          implName: entry.meta.implName,
+          implVersion: entry.meta.implVersion,
+          validate: entry.validate,
+          solve: (input, _ctx) => {
+            const solved = entry.solve!(input)
+            return {
+              steps: (solved.trace.steps as Step[]) ?? [],
+              result: solved.result,
+              status: solved.trace.status,
+            }
+          },
+          rawInput: built.registryInput,
+          budget: {
+            maxSteps: draft.mode === 'experiment' ? 200 : 5000,
+            maxInputSize: budgetMax,
+            inputSize: built.inputSize,
+          },
+          cancel: cancelRef.current,
+          freeze: true,
+        })
+
+        if (outcome.status === 'validation_error' || outcome.status === 'budget_exceeded') {
+          const msgs = (outcome.errors ?? []).map((e) =>
+            'message' in e ? e.message : String(e),
+          )
+          setErrors(
+            msgs.length
+              ? msgs.map((m) => ({ field: 'run', reason: m }))
+              : [{ field: 'run', reason: outcome.status }],
+          )
+          if (outcome.status === 'budget_exceeded' && outcome.steps?.length) {
+            // still show truncated steps
+            outSteps = outcome.steps
+            outTrace = outcome.trace
+          } else if (outcome.status === 'validation_error') {
+            setHasRun(false)
+            return false
+          }
+        } else if (outcome.status === 'cancelled') {
+          setErrors([{ field: 'run', reason: '已取消' }])
+          outSteps = outcome.steps ?? []
+          outTrace = outcome.trace
+        } else {
+          outSteps = outcome.steps ?? outSteps
+          outTrace = outcome.trace
+        }
+      } else {
+        // Legacy path: fallbackSteps already produced once in validateAndBuild
+        outSteps = built.fallbackSteps ?? []
+        outTrace = undefined
+      }
+
+      setSteps(outSteps)
+      setTrace(outTrace)
+      const clamped = Math.max(0, Math.min(seekTo, Math.max(0, outSteps.length - 1)))
+      setSeekStepIndex(clamped)
+      setRunId((r) => r + 1)
+      setPlaybackKey((k) => k + 1)
+      setHasRun(true)
+
+      // Persist scene (incl. stepIndex) for graph algos when small enough
+      if (isGraphAlgo(id) && draft.graph) {
+        const frag = sceneToHashFragment({
+          version: SCENE_PROTOCOL_VERSION,
+          algoId: id,
+          input: draft.graph,
+          params: { mode: draft.mode },
+          seed: 0,
+          stepIndex: clamped,
+        })
+        if (frag && frag.length < 1800) {
+          const base = window.location.hash.split('?')[0] || `#/algo/${id}`
+          window.history.replaceState(null, '', `${base}?${frag}`)
+        }
+      }
+      return true
+    },
+    [validateAndBuild, id, draft],
+  )
+
+  useEffect(() => {
+    setDraft(defaultDraft(id ?? ''))
+    setErrors([])
+    setSteps([])
+    setTrace(undefined)
+    setHasRun(false)
+    setPlaybackKey((k) => k + 1)
+    setSceneWarn(null)
+    setSeekStepIndex(0)
+    pendingAutoRun.current = false
+
+    const loaded = loadSceneFromHash(window.location.hash)
+    if (!loaded.ok) {
+      if (window.location.hash.includes('scene=')) {
+        setSceneWarn(`场景加载失败：${loaded.reason}`)
+      }
+      return
+    }
+    if (loaded.scene.algoId !== id) return
+
+    // Restore input then auto-run + seek
+    if (isGraphAlgo(id) && loaded.scene.input && typeof loaded.scene.input === 'object') {
+      const g = loaded.scene.input as Partial<GraphDraft>
+      if (typeof g.n === 'number' && Array.isArray(g.edges)) {
+        setDraft((d) => ({
+          ...d,
+          graph: {
+            n: g.n!,
+            edges: g.edges as GraphDraft['edges'],
+            directed: Boolean(g.directed),
+            start: typeof g.start === 'number' ? g.start : 0,
+          },
+          mode: loaded.scene.params?.mode === 'experiment' ? 'experiment' : 'teach',
+        }))
+        setSeekStepIndex(loaded.scene.stepIndex ?? 0)
+        pendingAutoRun.current = true
+      } else {
+        setSceneWarn('场景 input 结构非法：缺少 n/edges')
+      }
+    }
+  }, [id])
+
+  // After draft restored from scene, run once and seek
+  useEffect(() => {
+    if (!pendingAutoRun.current) return
+    if (!id || !algo) return
+    pendingAutoRun.current = false
+    executeOnce(seekStepIndex)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional after scene draft restore
+  }, [draft.graph, id])
 
   const onRestoreDefaults = () => {
     setDraft(defaultDraft(id ?? ''))
     setErrors([])
+    setSceneWarn(null)
   }
 
   const onRun = () => {
-    const result = validateAndBuild()
-    if (!result.ok) {
-      setErrors(result.errors)
-      return
-    }
-    setErrors([])
-    setSteps(result.steps)
-    const entry = id ? getAlgo(id) : undefined
-    if (entry?.solve && draft.mode === 'teach') {
-      try {
-        const solved = entry.solve(result.registryInput ?? {})
-        setTrace(solved.trace)
-        if (solved.trace.steps?.length) setSteps(solved.trace.steps as Step[])
-      } catch {
-        setTrace(undefined)
-      }
-    } else {
-      setTrace(undefined)
-    }
-    setRunId((r) => r + 1)
-    setPlaybackKey((k) => k + 1)
-    setHasRun(true)
+    executeOnce(0)
+  }
 
-    // Persist short scene into hash when graph + small
-    if (isGraphAlgo(id) && draft.graph) {
-      const frag = sceneToHashFragment({
-        version: SCENE_PROTOCOL_VERSION,
-        algoId: id,
-        input: draft.graph,
-        params: { mode: draft.mode },
-        seed: 0,
-        stepIndex: 0,
-      })
-      if (frag && frag.length < 1800) {
-        const base = window.location.hash.split('?')[0] || `#/algo/${id}`
-        window.history.replaceState(null, '', `${base}?${frag}`)
-      }
-    }
+  const onCancel = () => {
+    cancelRef.current.cancelled = true
   }
 
   const onResetPlayback = () => {
+    setSeekStepIndex(0)
     setPlaybackKey((k) => k + 1)
   }
+
+  const onStepChange = useCallback(
+    (idx: number) => {
+      setSeekStepIndex(idx)
+      if (isGraphAlgo(id) && draft.graph && hasRun) {
+        const frag = sceneToHashFragment({
+          version: SCENE_PROTOCOL_VERSION,
+          algoId: id!,
+          input: draft.graph,
+          params: { mode: draft.mode },
+          seed: 0,
+          stepIndex: idx,
+        })
+        if (frag && frag.length < 1800) {
+          const base = window.location.hash.split('?')[0] || `#/algo/${id}`
+          window.history.replaceState(null, '', `${base}?${frag}`)
+        }
+      }
+    },
+    [id, draft.graph, draft.mode, hasRun],
+  )
 
   const metaExtras = useMemo(() => {
     if (!algo) return null
@@ -435,11 +605,15 @@ export default function AlgoPage() {
         </div>
         <p className="hint">
           {draft.mode === 'teach'
-            ? '教学：完整轨迹步骤（适合跟步）。'
-            : '实验：轻量轨迹/计数为主（堆 Dijkstra 可关重轨迹）；复杂度勿用 DOM 计时证明。'}{' '}
+            ? '教学：完整轨迹步骤（适合跟步）。一次「运行」只求解一次。'
+            : '实验：轻量轨迹/计数为主；复杂度勿用 DOM 计时证明。一次「运行」只求解一次。'}{' '}
           编辑草稿后点「运行」。演示上限：数组 ≤{DEMO_LIMITS.arrayLen}，图 n≤{DEMO_LIMITS.graphN}。
         </p>
-        {sceneWarn && <p className="input-errors">{sceneWarn}</p>}
+        {sceneWarn && (
+          <p className="input-errors" role="alert">
+            {sceneWarn}
+          </p>
+        )}
 
         {needsArray && (
           <label>
@@ -540,11 +714,18 @@ export default function AlgoPage() {
           <button type="button" className="primary" onClick={onRun}>
             运行
           </button>
+          <button type="button" onClick={onCancel}>
+            取消
+          </button>
           <button type="button" onClick={onResetPlayback} disabled={!hasRun}>
             重置播放
           </button>
         </div>
-        {hasRun && <p className="hint muted">当前运行 #{runId}（已快照输入）· 模式 {draft.mode}</p>}
+        {hasRun && (
+          <p className="hint muted">
+            当前运行 #{runId}（已快照输入）· 模式 {draft.mode} · stepIndex={seekStepIndex}
+          </p>
+        )}
       </div>
 
       {hasRun ? (
@@ -555,6 +736,8 @@ export default function AlgoPage() {
             steps={steps}
             trace={trace}
             code={algo.meta.code as string | undefined}
+            initialStepIndex={seekStepIndex}
+            onStepIndexChange={onStepChange}
           />
         </>
       ) : (

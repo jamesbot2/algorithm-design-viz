@@ -56,11 +56,24 @@
 | ID | 项 | 状态 | 备注 |
 |----|----|------|------|
 | M4-CI | GitHub Actions CI | 已验证（本地工作流文件） | `.github/workflows/ci.yml`：PR + push→main；`npm ci` / lint / `test:run` / build。未 push，远程尚未跑过 |
-| M4-deploy | 与 Pages 关系 | 已文档化 | **未改** `deploy-pages.yml`：仍在 push→main 时独立 build+deploy。CI 与 Pages **并行、互不依赖**（不改远程环境设置的前提下最稳妥）。Pages 上内容可能落后于本地 commits，直至授权 push |
+| M4-deploy | 与 Pages 关系 | 已实现待验证 | 见 V2：`deploy-pages.yml` 经 `workflow_run` 在 CI success 后部署（本地已改；远程待 push） |
 | M4-docs | 文档集 | 已验证 | IMPLEMENTATION_STATUS / VERIFICATION / COURSE_MAP / TRACE_PROTOCOL / CONTRIBUTING / LICENSE_NOTES / FINAL_DELIVERY + README |
 | M4-safety | 内容安全 | 已验证 | Chapter 讲义改为 React 节点渲染 `**`/`code`，**无** `dangerouslySetInnerHTML`；无用户 HTML/MD 直渲；无 markdown-it |
 | M4-E2E | Playwright | 未开始（刻意推迟） | 安装与 CI 可靠性未验证；见 VERIFICATION 手工清单 |
-| M4-T | 验收 | 已验证 | 本地 lint(exit 0)+64 tests+build 绿；见 VERIFICATION / FINAL_DELIVERY |
+| M4-T | 验收 | 已验证 | 本地 lint(exit 0)+84 tests+build 绿；见 V2 节 |
+
+
+## V2 可信性+动画
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| M1-greedy | 贪心反例结构化判定 | 已验证 | `judgeGreedyCounterexample`：解析 weights/values/capacity；校验；密度贪心 vs DP/暴力；仅 greedy<opt 通过；反馈含实例/贪心/最优/gap；随机数字失败；经典 160vs220 通过；PracticePage 结构化输入 |
+| M1-nqueens-bank | N皇后题库+多选精确命中 | 已验证 | `nqueens-predict-1` 仅接受完整答案 b；judgeMode: single / multiExact / construct / path / setOptimal；multiExact 不完整子集失败 |
+| M1-tree-immut | searchTree 逐步快照 | 已验证 | nQueens / knapsack BT / B&B 使用 `snapshotTree`；逐步异引用快照；变异后续步不影响先前 |
+| M1-exp-metrics | 实验台真实计数 | 已验证 | 停用 generateSteps().length 充当工作量；comparisons/scans/relaxations/heapPops/staleSkips/dpStates/btNodes/prunedNodes；vizSteps=可视化步骤量 |
+| M1-single-run | 单次执行路径 | 已验证 | AlgoPage：校验 → runAlgo/solve 一次 → {result,steps/trace}；有 registry 时不预生成 fallback；预算+取消 |
+| M1-scene-seek | 场景 stepIndex 恢复 | 已验证 | 持久化 stepIndex；加载后重跑并 seek；版本不匹配/结构非法/过大 → 明确报错、无静默回退 |
+| M1-deploy-gate | Pages 依赖 CI | 已实现待验证 | deploy-pages.yml 用 workflow_run（CI success on main）；workflow_dispatch 可手动；未 push |
+| M2-motion | 动效 token 起步 | 进行中 | theme/motion.ts、semanticColors.ts、styles/animation.css；prefers-reduced-motion；Visualizer banner/vars 轻闪；视图级动画未铺完 |
 
 ## 拓展（规划，非本轮）
 | 项 | 状态 | 备注 |
@@ -68,6 +81,8 @@
 | Edmonds-Karp / Strassen / 最近点对 | 拓展规划 | `EXTENDED_PLANNED` in curriculum |
 
 ## 缺口 / 已知限制
+- V2 M2：各视图（Array/Matrix/Graph/SearchTree）步进过渡动画尚未全面接线，仅 banner/vars flash
+- deploy-pages 的 workflow_run 门禁需 push 后在 GitHub Actions 实跑确认
 - 教学页（非 AlgoPage）部分算法仍用内置示例参数编辑器较简（nQueens/matrixChain/huffman/背包 AlgoPage）
 - Floyd 结果面板未做 i→j 点选路径重建（矩阵视图为主）
 - 练习题库为静态+种子抽样，题量有限；可继续扩充
@@ -79,5 +94,6 @@
 
 ## 验证记录
 - `npm run lint` → exit 0（warnings only）
-- `npm run test:run` → 8 files / 64 tests passed
-- `npm run build` → tsc + vite build OK（~419 kB JS）
+- `npm run test:run` → 9 files / 84 tests passed（含 tests/v2-credibility.test.ts）
+- `npm run build` → tsc + vite build OK（~432 kB JS）
+- 本轮 **未 push**（parent 负责 push）

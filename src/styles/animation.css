@@ -1,0 +1,57 @@
+/* Motion + semantic tokens (M2 start). prefers-reduced-motion respected. */
+
+:root {
+  --motion-fast: 120ms;
+  --motion-normal: 220ms;
+  --motion-slow: 360ms;
+  --motion-step: 180ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --sem-banner-flash: rgba(59, 130, 246, 0.18);
+  --sem-vars-flash: rgba(34, 197, 94, 0.12);
+}
+
+@keyframes viz-banner-flash {
+  from {
+    background-color: var(--sem-banner-flash);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@keyframes viz-vars-flash {
+  from {
+    box-shadow: inset 0 0 0 1px var(--sem-vars-flash);
+    background-color: var(--sem-vars-flash);
+  }
+  to {
+    box-shadow: none;
+    background-color: transparent;
+  }
+}
+
+.viz-step-flash {
+  animation: viz-banner-flash var(--motion-step) var(--ease-exit);
+}
+
+.viz-vars-flash {
+  border-radius: 8px;
+  animation: viz-vars-flash var(--motion-normal) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-normal: 0ms;
+    --motion-slow: 0ms;
+    --motion-step: 0ms;
+  }
+
+  .viz-step-flash,
+  .viz-vars-flash {
+    animation: none !important;
+  }
+}

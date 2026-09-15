@@ -12,6 +12,9 @@ interface Props {
   steps?: Step[]
   trace?: Trace
   code?: string
+  /** Seek to this step on mount / when steps identity changes */
+  initialStepIndex?: number
+  onStepIndexChange?: (index: number) => void
 }
 
 const ROLE_LABELS: { role: HighlightRole; label: string; cls: string }[] = [
@@ -85,11 +88,19 @@ function computeScaleMax(steps: Step[]): Record<string, number> {
   return max
 }
 
-export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
+export default function Visualizer({
+  steps: stepsProp,
+  trace,
+  code,
+  initialStepIndex = 0,
+  onStepIndexChange,
+}: Props) {
   const steps = useMemo(() => resolveSteps(stepsProp, trace), [stepsProp, trace])
-  const [idx, setIdx] = useState(0)
+  const clamp = (i: number, len: number) => Math.max(0, Math.min(i, Math.max(0, len - 1)))
+  const [idx, setIdx] = useState(() => clamp(initialStepIndex, steps.length))
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(600)
+  const [flashKey, setFlashKey] = useState(0)
   const timer = useRef<number | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -122,9 +133,19 @@ export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
   }, [playing, speed, max, clear])
 
   useEffect(() => {
-    setIdx(0)
+    const next = clamp(initialStepIndex, steps.length)
+    setIdx(next)
     setPlaying(false)
-  }, [steps])
+    setFlashKey((k) => k + 1)
+  }, [steps, initialStepIndex])
+
+  useEffect(() => {
+    onStepIndexChange?.(idx)
+  }, [idx, onStepIndexChange])
+
+  useEffect(() => {
+    setFlashKey((k) => k + 1)
+  }, [idx])
 
   const goPrev = useCallback(() => {
     setPlaying(false)
@@ -179,7 +200,9 @@ export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
 
   return (
     <div className="visualizer" ref={rootRef}>
-      <div className="viz-banner">{step.message}</div>
+      <div key={`banner-${flashKey}`} className="viz-banner viz-step-flash">
+        {step.message}
+      </div>
 
       <div className="viz-toolbar">
         <button type="button" onClick={reset} title="重置">
@@ -288,7 +311,9 @@ export default function Visualizer({ steps: stepsProp, trace, code }: Props) {
           <MatrixView step={step} />
         </div>
         <div className="viz-side">
-          <VarsPanel step={step} />
+          <div key={`vars-${flashKey}`} className="viz-vars-flash">
+            <VarsPanel step={step} />
+          </div>
           {code && <CodePanel code={code} activeLine={step.codeLine} />}
         </div>
       </div>
