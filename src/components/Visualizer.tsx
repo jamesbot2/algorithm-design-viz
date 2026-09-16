@@ -187,6 +187,7 @@ export default function Visualizer({
   const [scrubPreview, setScrubPreview] = useState<number | null>(null)
   const [playPulse, setPlayPulse] = useState(false)
   const [answerOpen, setAnswerOpen] = useState(false)
+  const [inspectorSheetOpen, setInspectorSheetOpen] = useState(false)
   const timer = useRef<number | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const lastSeekReq = useRef<string | number | null>(null)
@@ -291,15 +292,17 @@ export default function Visualizer({
 
   const goPrev = useCallback(() => {
     setPlaying(false)
-    bumpTransitionEpoch()
+    // V10-04: stepping creates a new FLIP via geometry change + new transitionId.
+    // Do not bump transitionEpoch here — that is reserved for cancel-only
+    // (pause / seek / reset / replace-run). Bumping+setIdx together used to
+    // race a post-layout clear that wiped the brand-new invert.
     setIdx((i) => Math.max(0, i - 1))
-  }, [bumpTransitionEpoch])
+  }, [])
 
   const goNext = useCallback(() => {
     setPlaying(false)
-    bumpTransitionEpoch()
     setIdx((i) => Math.min(max, i + 1))
-  }, [max, bumpTransitionEpoch])
+  }, [max])
 
   const togglePlay = useCallback(() => {
     setPlayPulse(true)
@@ -326,6 +329,12 @@ export default function Visualizer({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Escape must close the sheet even if focus is on a button inside it
+      if (e.key === 'Escape' && inspectorSheetOpen) {
+        e.preventDefault()
+        setInspectorSheetOpen(false)
+        return
+      }
       if (shouldIgnoreKeyboard(e)) return
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault()
@@ -340,7 +349,7 @@ export default function Visualizer({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [togglePlay, goPrev, goNext])
+  }, [togglePlay, goPrev, goNext, inspectorSheetOpen])
 
   const progress = useMemo(() => (max === 0 ? 0 : (idx / max) * 100), [idx, max])
   const previewStep = scrubPreview !== null ? steps[scrubPreview] : null
@@ -412,6 +421,15 @@ export default function Visualizer({
       <div className="viz-banner viz-banner-slot" data-testid="viz-banner" role="status">
         <div className="viz-banner-text">{displayMessage}</div>
         {staleResult && <span className="stale-result-badge">上一轮结果</span>}
+        <button
+          type="button"
+          className="ghost inspector-sheet-toggle"
+          data-testid="inspector-sheet-toggle"
+          aria-expanded={inspectorSheetOpen}
+          onClick={() => setInspectorSheetOpen((o) => !o)}
+        >
+          变量/结果
+        </button>
       </div>
 
       {chrome}
@@ -442,16 +460,15 @@ export default function Visualizer({
             ))}
       </div>
 
-      {legendItems.length > 0 && (
-        <div className="viz-legend">
-          {legendItems.map((r) => (
-            <span key={r.role}>
-              <i className="legend-dot" style={{ background: r.color }} />
-              {r.label}
-            </span>
-          ))}
-        </div>
-      )}
+      {/* Always mount legend band — empty placeholder prevents canvas height drift when roles appear */}
+      <div className="viz-legend" data-testid="viz-legend" aria-hidden={legendItems.length === 0}>
+        {legendItems.map((r) => (
+          <span key={r.role}>
+            <i className="legend-dot" style={{ background: r.color }} />
+            {r.label}
+          </span>
+        ))}
+      </div>
 
       {/* Single column: main scene first. Code lives in Workbench right panel only. */}
       <div className="viz-body viz-body-single">
@@ -526,6 +543,53 @@ export default function Visualizer({
       <p className="kbd-hint">
         快捷键：<kbd>空格</kbd> 播放/暂停 · <kbd>←</kbd> 上一步 · <kbd>→</kbd> 下一步（输入框/按钮/滑块/编辑器内不抢键）
       </p>
+
+      {inspectorSheetOpen &&
+        createPortal(
+          <div
+            className="inspector-sheet"
+            data-testid="inspector-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label="变量与结果"
+          >
+            <div className="inspector-sheet-head">
+              <strong>变量 / 结果</strong>
+              <button type="button" className="ghost" onClick={() => setInspectorSheetOpen(false)}>
+                关闭
+              </button>
+            </div>
+            <div className="viz-inspector inspector-sheet-body" data-testid="viz-inspector-sheet">
+              <div className="inspector-delta">
+                <div className="panel-title">变量 / 变化</div>
+                <p className="inspector-explain-text muted hint">与主检查器同源数据</p>
+              </div>
+              {(step?.frameId || (step?.vars && 'frameId' in step.vars)) && (
+                <div className="inspector-stack">
+                  <div className="panel-title">当前帧标识</div>
+                  <code className="frame-id">{String(step?.frameId ?? step?.vars?.frameId)}</code>
+                </div>
+              )}
+              <div className="viz-vars-stable">
+                {step ? <VarsPanel step={step} prevStep={prevStep} /> : null}
+              </div>
+              {finalAnswer !== undefined && finalAnswer !== null && (
+                <div className="final-answer-body">{finalAnswer}</div>
+              )}
+              {legendItems.length > 0 && (
+                <div className="viz-legend">
+                  {legendItems.map((r) => (
+                    <span key={`sheet-${r.role}`}>
+                      <i className="legend-dot" style={{ background: r.color }} />
+                      {r.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }

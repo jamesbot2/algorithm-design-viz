@@ -1,0 +1,170 @@
+[
+  {
+    "route": "#/algo/binarySearch",
+    "viewport": {
+      "name": "1280x800",
+      "width": 1280,
+      "height": 800
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/quickSort",
+    "viewport": {
+      "name": "1280x800",
+      "width": 1280,
+      "height": 800
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/kadane",
+    "viewport": {
+      "name": "1280x800",
+      "width": 1280,
+      "height": 800
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/lcs",
+    "viewport": {
+      "name": "1280x800",
+      "width": 1280,
+      "height": 800
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/knapsack01",
+    "viewport": {
+      "name": "1280x800",
+      "width": 1280,
+      "height": 800
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/dijkstra",
+    "viewport": {
+      "name": "1280x800",
+      "width": 1280,
+      "height": 800
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/nQueens",
+    "viewport": {
+      "name": "1280x800",
+      "width": 1280,
+      "height": 800
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/teach/knapsack",
+    "viewport": {
+      "name": "1280x800",
+      "width": 1280,
+      "height": 800
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/binarySearch",
+    "viewport": {
+      "name": "1024x521",
+      "width": 1024,
+      "height": 521
+    },
+    "layout": "tabs",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/binarySearch",
+    "viewport": {
+      "name": "1024x500",
+      "width": 1024,
+      "height": 500
+    },
+    "layout": "tabs",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/kadane",
+    "viewport": {
+      "name": "844x390",
+      "width": 844,
+      "height": 390
+    },
+    "layout": "split",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  },
+  {
+    "route": "#/algo/quickSort",
+    "viewport": {
+      "name": "768x1024",
+      "width": 768,
+      "height": 1024
+    },
+    "layout": "tabs",
+    "runHit": {
+      "ok": true,
+      "reason": "hit",
+      "tag": "BUTTON"
+    }
+  }
+]

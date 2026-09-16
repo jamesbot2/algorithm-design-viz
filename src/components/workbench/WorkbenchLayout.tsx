@@ -54,9 +54,14 @@ export default function WorkbenchLayout({
       const h = cr?.height ?? el.clientHeight
       setMode(w < NARROW_PX ? 'tabs' : 'split')
       setBudget({ w, h })
-      // When measured height cannot host viz min + transport chrome, allow natural scroll escape
+      // V10-03: follow Layout's data-height-fallback when present; else local need
+      const parent = el.closest('[data-height-fallback]') as HTMLElement | null
+      const parentMode = parent?.getAttribute('data-height-fallback') as HeightMode | null
       const need = MIN_VIZ_PX + 120
-      setHeightMode(h > 0 && h < need ? 'scroll' : 'fill')
+      const localScroll = h > 0 && h < need
+      const next: HeightMode =
+        parentMode === 'scroll' || localScroll ? 'scroll' : 'fill'
+      setHeightMode(next)
       el.style.setProperty('--wb-measured-h', `${Math.max(0, h)}px`)
       el.style.setProperty('--wb-measured-w', `${Math.max(0, w)}px`)
     })

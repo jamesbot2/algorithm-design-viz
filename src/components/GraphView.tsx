@@ -116,15 +116,15 @@ function GraphView({ graph }: { graph: GraphState }) {
       }
 
       const siblings = siblingsByPair.get(undirectedKey(pa, pb)) ?? []
-      const offset = parallelChannelOffset(eid, pa, pb, siblings, 18)
+      const offset = parallelChannelOffset(eid, pa, pb, siblings, 28)
       const inset = insetEndpoints(a.x!, a.y!, b.x!, b.y!, NODE_R, ARROW_PAD)
       let pathD: string
       let labelX: number
       let labelY: number
       if (Math.abs(offset) > 0.5 || siblings.length > 1) {
-        const c = curveControl(inset.ax, inset.ay, inset.bx, inset.by, offset)
+        // Canonical normal via from/to ids — arrow direction stays inset from→to
+        const c = curveControl(inset.ax, inset.ay, inset.bx, inset.by, offset, pa, pb)
         pathD = `M ${inset.ax} ${inset.ay} Q ${c.x} ${c.y} ${inset.bx} ${inset.by}`
-        // Offset label along independent channel so reverse weights do not overlap
         labelX = c.x
         labelY = c.y - 4
       } else {
