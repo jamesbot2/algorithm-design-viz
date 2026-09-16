@@ -924,36 +924,112 @@ button.icon-btn {
   opacity: 0.95;
 }
 
-/* —— M3 polish —— */
+/* —— V11-01 signed bars: shared y(0); pos up / neg down; zero height 0 —— */
 .bars-wrap.signed {
   position: relative;
-  align-items: center;
-  min-height: 200px;
+  align-items: stretch;
+  min-height: var(--bar-chart-h, 200px);
+  height: var(--bar-chart-h, 200px);
 }
 .bars-wrap.signed .bar-baseline {
   position: absolute;
   left: 0; right: 0;
-  top: 50%;
+  top: calc(var(--zero-ratio, 0.5) * 100%);
   height: 1px;
   background: var(--border);
   pointer-events: none;
-}
-.bar-col.neg .bar {
-  align-self: start;
-  margin-top: 50%;
-  transform: translateY(0);
-  border-radius: 0 0 6px 6px;
-}
-.bar-col.pos .bar {
-  align-self: end;
-  margin-bottom: 50%;
+  z-index: 1;
 }
 .bars-wrap.signed .bar-col {
+  justify-content: flex-start;
+  min-height: 100%;
+  height: 100%;
+  position: relative;
+}
+.bars-wrap.signed .bar-flip-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
   justify-content: center;
-  min-height: 200px;
+  width: 100%;
+}
+.bars-wrap.signed .bar-col.pos .bar-flip-layer {
+  bottom: calc((1 - var(--zero-ratio, 0.5)) * 100%);
+  align-items: flex-end;
+}
+.bars-wrap.signed .bar-col.neg .bar-flip-layer {
+  top: calc(var(--zero-ratio, 0.5) * 100%);
+  align-items: flex-start;
+}
+.bars-wrap.signed .bar-col.zero .bar-flip-layer {
+  top: calc(var(--zero-ratio, 0.5) * 100%);
+  transform: translateY(-50%);
+  align-items: center;
+}
+.bars-wrap.signed .bar-col.pos .bar {
+  align-self: auto;
+  margin-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  min-height: 0;
+}
+.bars-wrap.signed .bar-col.neg .bar {
+  align-self: auto;
+  margin-top: 0;
+  border-radius: 0 0 6px 6px;
+  min-height: 0;
 }
 .bar.bar-neg {
   background: rgba(239, 68, 68, 0.35);
+}
+.bar-zero-marker {
+  width: 100%;
+  min-height: 22px;
+  min-width: 22px;
+  padding: 0;
+  margin: 0;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bar-zero-marker .bar-val {
+  font-size: 0.65rem;
+}
+.range-band-abs {
+  position: absolute;
+  top: 0;
+  bottom: 1.8rem;
+  pointer-events: none;
+  z-index: 0;
+}
+.bars-wrap .bar {
+  /* width from slot; never shrink-wrap label */
+  width: 100%;
+  box-sizing: border-box;
+}
+.bars-wrap .bar-val {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.playback-settings-panel {
+  /* V11-08: overlay popover — must not crush stage */
+  position: absolute;
+  z-index: 55;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: calc(100% + 4px);
+  max-height: min(40vh, 280px);
+  overflow: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+}
+.playback-transport {
+  position: relative;
 }
 
 .matrix-table.sticky-labels .sticky-top {
@@ -2195,11 +2271,20 @@ html, body, #root {
   .main-wrap[data-lab-fill="1"] .kbd-hint {
     display: none;
   }
-  .main-wrap[data-lab-fill="1"] .playback-transport .phase-jump,
-  .main-wrap[data-lab-fill="1"] .playback-transport .phase-track,
+  /* V11-08: direct-child only — do NOT hide dock variants inside settings panel */
+  .main-wrap[data-lab-fill="1"] .playback-transport > .phase-jump,
+  .main-wrap[data-lab-fill="1"] .playback-transport > .phase-track,
   .main-wrap[data-lab-fill="1"] .playback-transport > .viz-toolbar > .speed-label,
   .main-wrap[data-lab-fill="1"] .workbench-header {
     display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-jump,
+  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-track,
+  .main-wrap[data-lab-fill="1"] .playback-settings-panel .speed-label {
+    display: flex !important;
+  }
+  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-jump {
+    flex-wrap: wrap;
   }
   /* Dock entries stay visible and usable */
   .main-wrap[data-lab-fill="1"] .playback-settings-dock,
@@ -2245,7 +2330,7 @@ html, body, #root {
   margin-bottom: 0.5rem;
 }
 .playback-settings-panel {
-  margin-top: 0.35rem;
+  margin-top: 0;
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--border-soft);
   border-radius: 8px;

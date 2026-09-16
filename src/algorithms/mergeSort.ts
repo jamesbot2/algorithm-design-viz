@@ -13,7 +13,7 @@ export const meta = {
   merge(a, L, mid, R)`,
 
   implName: 'mergeSortTopDown',
-  implVersion: '1.1.1',
+  implVersion: '1.2.0',
   timeComplexity: 'Θ(n log n)',
   spaceComplexity: 'O(n) 辅助数组 + O(log n) 栈',
   spaceNotes: '合并需要 O(n) 临时空间。',
@@ -21,14 +21,26 @@ export const meta = {
   statDefinitions: 'comparisons=归并比较；writes=写入结果次数（若统计）。',
 }
 
+function pendingId(seq: number, slot: number): string {
+  return `pending:${seq}:${slot}`
+}
+
 export function generateSteps(input: number[]): Step[] {
   const a = [...input]
   const elementIds = input.map((_, i) => `m${i}`)
   const steps: Step[] = []
   let id = 0
+  let pendingSeq = 0
   const DOC = 'mergeSort.ts'
   const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
-  const PHASE_ANCHOR: Record<string, string> = {"init":"divide","divide":"divide","recurse":"recurse","merge":"mergeCompare","done":"done"}
+  const PHASE_ANCHOR: Record<string, string> = {
+    init: 'divide',
+    divide: 'divide',
+    recurse: 'recurse',
+    merge: 'mergeCompare',
+    split: 'divide',
+    done: 'done',
+  }
   let comparisons = 0
   let writes = 0
   const callStack: string[] = []
@@ -51,6 +63,8 @@ export function generateSteps(input: number[]): Step[] {
     arrayOps?: ArrayOp[],
     phase?: string,
     codeRefs?: { documentId: string; anchorId: string }[],
+    extraArrays?: Record<string, number[] | string[]>,
+    extraIds?: Record<string, string[]>,
   ) => {
     const ptrs: Record<string, number> = { ...(pointers ?? {}) }
     for (const k of ['L', 'R', 'mid', 'i', 'j', 'k'] as const) {
@@ -63,14 +77,16 @@ export function generateSteps(input: number[]): Step[] {
       children: n.children?.map(cloneTree),
       meta: n.meta ? { ...n.meta } : undefined,
     })
+    const arrays: Record<string, number[] | string[]> = { a: [...a], ...(extraArrays ?? {}) }
+    const ids: Record<string, string[]> = { a: [...elementIds], ...(extraIds ?? {}) }
     steps.push({
       id: id++,
       message,
       phase,
       highlights: { a: highlights },
       roles: roles ? { a: roles } : undefined,
-      arrays: { a: [...a] },
-      elementIds: { a: [...elementIds] },
+      arrays,
+      elementIds: ids,
       arrayOps: arrayOps?.length ? { a: arrayOps } : undefined,
       vars: { ...vars, callStack: callStack.join(' › ') || '(empty)' },
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
@@ -86,17 +102,27 @@ export function generateSteps(input: number[]): Step[] {
     const right = a.slice(mid + 1, R + 1)
     const leftIds = elementIds.slice(L, mid + 1)
     const rightIds = elementIds.slice(mid + 1, R + 1)
+    // Vacate merge range so buffer ids are not aliased with main array slots
+    const batch = pendingSeq++
+    for (let t = L; t <= R; t++) {
+      elementIds[t] = pendingId(batch, t)
+    }
     snap(
-      `归并区间 [${L},${mid}] 与 [${mid + 1},${R}]`,
+      `归并区间 [${L},${mid}] 与 [${mid + 1},${R}]（抽出 left/right 缓冲）`,
       Array.from({ length: R - L + 1 }, (_, i) => L + i),
-      { L, mid, R },
+      { L, mid, R, i: 0, j: 0, k: L },
       5,
       undefined,
-      { L, mid, R },
+      { L, mid, R, k: L },
       undefined,
       'merge',
+      ref('mergeCompare'),
+      { left: [...left], right: [...right] },
+      { left: [...leftIds], right: [...rightIds] },
     )
-    let i = 0, j = 0, k = L
+    let i = 0,
+      j = 0,
+      k = L
     while (i < left.length && j < right.length) {
       comparisons++
       snap(
@@ -108,6 +134,9 @@ export function generateSteps(input: number[]): Step[] {
         { L, mid, R, k },
         [{ type: 'compare', indices: [k], elementIds: [leftIds[i]!, rightIds[j]!] }],
         'merge',
+        ref('mergeCompare'),
+        { left: [...left], right: [...right] },
+        { left: [...leftIds], right: [...rightIds] },
       )
       if (left[i]! <= right[j]!) {
         a[k] = left[i]!
@@ -120,14 +149,17 @@ export function generateSteps(input: number[]): Step[] {
       }
       writes++
       snap(
-        `写入 a[${k}] = ${a[k]}`,
+        `写入 a[${k}] = ${a[k]}（write-back）`,
         [k],
         { L, mid, R, i, j, k },
         5,
-        { [k]: 'swap' },
+        { [k]: 'update' },
         { L, mid, R, k },
         [{ type: 'write', indices: [k], elementIds: [elementIds[k]!] }],
         'merge',
+        ref('mergePush'),
+        { left: [...left], right: [...right] },
+        { left: [...leftIds], right: [...rightIds] },
       )
       k++
     }
@@ -136,7 +168,19 @@ export function generateSteps(input: number[]): Step[] {
       elementIds[k] = leftIds[i]!
       i++
       writes++
-      snap(`拷贝剩余左半 a[${k}] = ${a[k]}`, [k], { L, mid, R, k }, 5, { [k]: 'read' }, { L, mid, R, k }, [{ type: 'copy', indices: [k], elementIds: [elementIds[k]!] }], 'merge')
+      snap(
+        `拷贝剩余左半 a[${k}] = ${a[k]}`,
+        [k],
+        { L, mid, R, i, j, k },
+        5,
+        { [k]: 'read' },
+        { L, mid, R, k },
+        [{ type: 'copy', indices: [k], elementIds: [elementIds[k]!] }],
+        'merge',
+        ref('mergePush'),
+        { left: [...left], right: [...right] },
+        { left: [...leftIds], right: [...rightIds] },
+      )
       k++
     }
     while (j < right.length) {
@@ -144,7 +188,19 @@ export function generateSteps(input: number[]): Step[] {
       elementIds[k] = rightIds[j]!
       j++
       writes++
-      snap(`拷贝剩余右半 a[${k}] = ${a[k]}`, [k], { L, mid, R, k }, 5, { [k]: 'read' }, { L, mid, R, k }, [{ type: 'copy', indices: [k], elementIds: [elementIds[k]!] }], 'merge')
+      snap(
+        `拷贝剩余右半 a[${k}] = ${a[k]}`,
+        [k],
+        { L, mid, R, i, j, k },
+        5,
+        { [k]: 'read' },
+        { L, mid, R, k },
+        [{ type: 'copy', indices: [k], elementIds: [elementIds[k]!] }],
+        'merge',
+        ref('mergePush'),
+        { left: [...left], right: [...right] },
+        { left: [...leftIds], right: [...rightIds] },
+      )
       k++
     }
   }
@@ -166,7 +222,16 @@ export function generateSteps(input: number[]): Step[] {
 
     if (L >= R) {
       node.status = 'feasible'
-      snap(`区间 [${L},${R}] 长度 ≤ 1，返回`, L === R ? [L] : [], { L, R }, 1, L === R ? { [L]: 'sorted' } : undefined, { L, R }, undefined, 'split')
+      snap(
+        `区间 [${L},${R}] 长度 ≤ 1，返回`,
+        L === R ? [L] : [],
+        { L, R },
+        1,
+        L === R ? { [L]: 'sorted' } : undefined,
+        { L, R },
+        undefined,
+        'split',
+      )
       callStack.pop()
       nodeStack.pop()
       return

@@ -86,6 +86,42 @@ function rangeStyle(
   return { left: `${leftPct}%`, width: `${widthPct}%` }
 }
 
+/** Signed-bar geometry: shared abs domain; zero has data height 0. */
+export function computeBarGeometry(
+  values: number[],
+  scaleMax?: number,
+  maxH = 160,
+): {
+  absMax: number
+  zeroRatio: number
+  heights: number[]
+  directions: ('pos' | 'neg' | 'zero')[]
+} {
+  const absMax = Math.max(1, scaleMax ?? 0, ...values.map((v) => Math.abs(v)))
+  const hasPos = values.some((v) => v > 0)
+  const hasNeg = values.some((v) => v < 0)
+  let zeroRatio = 1
+  if (hasPos && hasNeg) zeroRatio = 0.5
+  else if (hasNeg) zeroRatio = 0
+  const half = hasPos && hasNeg
+  const heights = values.map((v) => {
+    if (v === 0) return 0
+    const span = half ? maxH / 2 : maxH
+    return (Math.abs(v) / absMax) * span
+  })
+  const directions = values.map((v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : 'zero') as 'pos' | 'neg' | 'zero')
+  return { absMax, zeroRatio, heights, directions }
+}
+
+function uniqueDisplayIds(ids: string[]): string[] {
+  const seen = new Map<string, number>()
+  return ids.map((id) => {
+    const n = seen.get(id) ?? 0
+    seen.set(id, n + 1)
+    return n === 0 ? id : `${id}#${n}`
+  })
+}
+
 function resolveIds(values: (number | string)[], elementIds?: string[]): string[] {
   if (elementIds && elementIds.length === values.length) return elementIds
   return values.map((_, i) => `el-${i}`)
@@ -118,15 +154,16 @@ function ArrayView({
     () => (numeric ? (values as number[]) : values.map(() => 1)),
     [numeric, values],
   )
-  const max = useMemo(() => {
-    const local = Math.max(1, ...nums.map((n) => Math.abs(n)))
-    return Math.max(local, scaleMax ?? 0, 1)
-  }, [nums, scaleMax])
-  const minH = 12
   const maxH = 160
-  const hasNegative = numeric && nums.some((n) => n < 0)
+  const geo = useMemo(
+    () => (numeric ? computeBarGeometry(nums, scaleMax, maxH) : null),
+    [numeric, nums, scaleMax],
+  )
+  const hasNegative = Boolean(geo && (geo.zeroRatio < 1 || nums.some((n) => n < 0)))
+  const hasPositive = Boolean(geo && nums.some((n) => n > 0))
+  const signedMode = Boolean(geo && (hasNegative || nums.every((n) => n === 0)))
 
-  const ids = useMemo(() => resolveIds(values, elementIds), [values, elementIds])
+  const ids = useMemo(() => uniqueDisplayIds(resolveIds(values, elementIds)), [values, elementIds])
 
   const pointersByIndex = useMemo(() => {
     const map = new Map<number, string[]>()
@@ -160,6 +197,10 @@ function ArrayView({
   const transitionIdRef = useRef(0)
   const wrapRef = useRef<HTMLDivElement>(null)
   const geometryGen = useRef(0)
+  const [rangeMasks, setRangeMasks] = useState<{
+    current: { left: number; width: number }[]
+    best: { left: number; width: number }[]
+  }>({ current: [], best: [] })
 
   // Clear transforms on cancel / remount / non-swap
   const clearTransforms = () => {
@@ -324,6 +365,47 @@ function ArrayView({
     transitionEpoch,
   ])
 
+
+  // V11-01: range masks from real slot rects (segmented when cells wrap)
+  useLayoutEffect(() => {
+    const wrap = wrapRef.current
+    if (!wrap) return
+    const measure = (range: [number, number] | undefined) => {
+      if (!range || values.length <= 0) return [] as { left: number; width: number }[]
+      const lo = Math.max(0, Math.min(range[0], range[1]))
+      const hi = Math.min(values.length - 1, Math.max(range[0], range[1]))
+      const wrapRect = wrap.getBoundingClientRect()
+      const segs: { left: number; width: number }[] = []
+      let segStart: DOMRect | null = null
+      let segEnd: DOMRect | null = null
+      let lastTop: number | null = null
+      const flush = () => {
+        if (!segStart || !segEnd) return
+        segs.push({
+          left: segStart.left - wrapRect.left,
+          width: segEnd.right - segStart.left,
+        })
+        segStart = null
+        segEnd = null
+      }
+      for (let i = lo; i <= hi; i++) {
+        const el = slotRefs.current.get(i)
+        if (!el) continue
+        const r = el.getBoundingClientRect()
+        if (lastTop !== null && Math.abs(r.top - lastTop) > 4) flush()
+        if (!segStart) segStart = r
+        segEnd = r
+        lastTop = r.top
+      }
+      flush()
+      return segs
+    }
+    setRangeMasks({
+      current: measure(ranges?.current),
+      best: measure(ranges?.best),
+    })
+  }, [values, ranges, mode, ids])
+
   const curBand = rangeStyle(ranges?.current, values.length)
   const bestBand = rangeStyle(ranges?.best, values.length)
 
@@ -352,30 +434,62 @@ function ArrayView({
         )}
       </div>
 
-      {mode === 'bars' && numeric ? (
-        <div className={`bars-wrap${hasNegative ? ' signed' : ''}`} style={{ position: 'relative' }}>
-          {bestBand && <div className="range-band best" style={bestBand} title="最优窗口" />}
-          {curBand && <div className="range-band current" style={curBand} title="当前窗口" />}
-          {hasNegative && <div className="bar-baseline" aria-hidden />}
+      {mode === 'bars' && numeric && geo ? (
+        <div
+          className={`bars-wrap${signedMode ? ' signed' : ''}`}
+          style={
+            {
+              position: 'relative',
+              '--bar-chart-h': `${signedMode && hasPositive && hasNegative ? maxH + 40 : maxH + 24}px`,
+              '--zero-ratio': String(geo.zeroRatio),
+            } as CSSProperties
+          }
+          data-signed={signedMode ? '1' : '0'}
+          data-abs-max={geo.absMax}
+        >
+          {rangeMasks.best.map((s, i) => (
+            <div
+              key={`best-${i}`}
+              className="range-band best range-band-abs"
+              style={{ left: s.left, width: s.width }}
+              title="最优窗口"
+            />
+          ))}
+          {rangeMasks.current.map((s, i) => (
+            <div
+              key={`cur-${i}`}
+              className="range-band current range-band-abs"
+              style={{ left: s.left, width: s.width }}
+              title="当前窗口"
+            />
+          ))}
+          {rangeMasks.current.length === 0 && curBand && (
+            <div className="range-band current" style={curBand} title="当前窗口" />
+          )}
+          {rangeMasks.best.length === 0 && bestBand && (
+            <div className="range-band best" style={bestBand} title="最优窗口" />
+          )}
+          {signedMode && <div className="bar-baseline" style={{ top: `${geo.zeroRatio * 100}%` }} aria-hidden />}
           {values.map((v, i) => {
             const role = roleForIndex(i, highlights, roles, arrayOps)
-            const n = nums[i]!
-            const h = minH + (Math.abs(n) / max) * (maxH - minH)
+            const h = geo.heights[i]!
+            const dir = geo.directions[i]!
             const ptrs = pointersByIndex.get(i) ?? []
-            const neg = n < 0
             const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
             const eid = ids[i]!
+            const slotKey = `slot-${i}`
             return (
               <div
-                key={eid}
-                className={`bar-col${neg ? ' neg' : ' pos'}`}
+                key={slotKey}
+                className={`bar-col ${dir}`}
                 data-el-id={eid}
                 data-slot-index={i}
+                data-bar-dir={dir}
+                data-bar-h={h}
                 ref={(el) => {
                   slotRefs.current.set(i, el)
                 }}
               >
-                {/* Outer slot is stable geometry; inner flip layer translates; pulse on deepest */}
                 <div
                   className="bar-flip-layer"
                   data-flip-layer
@@ -384,15 +498,34 @@ function ArrayView({
                   }}
                   style={{ transform: 'none' } as CSSProperties}
                 >
-                  <div
-                    className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${neg ? ' bar-neg' : ''}${
-                      isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
-                    }`}
-                    style={{ height: `${h}px` }}
-                    title={`[${i}] = ${v}`}
-                  >
-                    <span className="bar-val">{String(v)}</span>
-                  </div>
+                  {dir === 'zero' ? (
+                    <button
+                      type="button"
+                      className={`bar-zero-marker${role ? ` ${ROLE_CLASS[role]}` : ''}`}
+                      data-bar-zero
+                      data-data-height="0"
+                      title={`[${i}] = ${v}`}
+                      aria-label={`索引 ${i} 值 0`}
+                    >
+                      <span className="bar-val">0</span>
+                    </button>
+                  ) : (
+                    <div
+                      className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${dir === 'neg' ? ' bar-neg' : ''}${
+                        isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
+                      }`}
+                      style={{
+                        height: `${h}px`,
+                        // Width from slot geometry (100%), not label text
+                        width: '100%',
+                        minHeight: 0,
+                      }}
+                      data-data-height={h}
+                      title={`[${i}] = ${v}`}
+                    >
+                      <span className="bar-val">{String(v)}</span>
+                    </div>
+                  )}
                 </div>
                 <span className="bar-idx">{i}</span>
                 <div className="pointer-row">
@@ -413,9 +546,10 @@ function ArrayView({
               const role = roleForIndex(i, highlights, roles, arrayOps)
               const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
               const eid = ids[i]!
+              const slotKey = `slot-${i}`
               return (
                 <div
-                  key={eid}
+                  key={slotKey}
                   className="cell-slot"
                   data-el-id={eid}
                   data-slot-index={i}

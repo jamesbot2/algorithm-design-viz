@@ -1,5 +1,5 @@
-# E2E does NOT currently gate Pages deploy (see deploy-pages.yml V10 note).
-# Treat failures as release blockers on the same SHA anyway — do not ship red E2E.
+# V11: Pages deploy (deploy-pages.yml) now requires E2E success on the *same* SHA
+# as CI before publish. Treat failures as hard release blockers.
 # Prefer failing fast with evidence (traces under docs/traces/) for hidden-input timeouts.
 name: E2E
 

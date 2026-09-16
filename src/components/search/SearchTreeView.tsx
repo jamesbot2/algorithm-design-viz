@@ -6,6 +6,8 @@ interface Props {
   title?: string
   /** When board matrix is also present in the step */
   linkedBoard?: boolean
+  /** Explicit active path from generator — prefer over guessing exploring child */
+  activePathIds?: string[]
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -17,15 +19,11 @@ const STATUS_LABEL: Record<string, string> = {
   root: '根',
 }
 
-function collectPathIds(node: SearchTreeNode, acc: string[] = []): string[] {
+/** @deprecated Guessing path from first exploring child — kept only as last-resort fallback */
+function collectPathIdsGuess(node: SearchTreeNode, acc: string[] = []): string[] {
   acc.push(node.id)
   const exploring = node.children?.find((c) => c.status === 'exploring')
-  if (exploring) return collectPathIds(exploring, acc)
-  // Prefer deepest non-pruned leaf on first branch if no exploring
-  const live = node.children?.find((c) => c.status !== 'pruned' && c.status !== 'rejected')
-  if (live && (live.status === 'feasible' || live.status === 'optimal')) {
-    return collectPathIds(live, acc)
-  }
+  if (exploring) return collectPathIdsGuess(exploring, acc)
   return acc
 }
 
@@ -67,11 +65,14 @@ function NodeView({
   )
 }
 
-function SearchTreeView({ tree, title = '搜索树', linkedBoard }: Props) {
-  const pathSet = useMemo(() => new Set(collectPathIds(tree)), [tree])
+function SearchTreeView({ tree, title = '搜索树', linkedBoard, activePathIds }: Props) {
+  const pathSet = useMemo(() => {
+    if (activePathIds && activePathIds.length > 0) return new Set(activePathIds)
+    return new Set(collectPathIdsGuess(tree))
+  }, [tree, activePathIds])
 
   return (
-    <div className="search-tree-view panel">
+    <div className="search-tree-view panel" data-path-source={activePathIds?.length ? 'explicit' : 'guess'}>
       <h4>{title}</h4>
       {linkedBoard && (
         <p className="board-tree-link">与棋盘矩阵联动：路径高亮对应当前回溯深度。</p>

@@ -1,11 +1,8 @@
-# Deploy only after CI succeeds on main (workflow_run), or manual dispatch
-# that verifies CI green on the SAME SHA.
+# V11: Pages deploy requires CI + E2E success on the *same* SHA.
+# workflow_run still listens to CI completion, then e2e-gate verifies E2E green
+# for that SHA before build/deploy. Manual dispatch similarly requires both.
 #
-# V10 note: Pages currently gates on workflow `CI` only (unit/build). E2E is a
-# separate workflow (`e2e.yml`) and is NOT yet a hard required check for deploy.
-# Preferred future gate: require both CI and E2E success on the *same* SHA before
-# Pages publish. Until then, treat E2E failures on main as release blockers manually.
-# Do not deploy a SHA whose E2E is red even if CI is green.
+# DO NOT deploy a SHA whose E2E is red even if CI is green.
 name: Deploy to GitHub Pages
 
 on:
@@ -26,17 +23,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Manual dispatch must prove CI already passed on this exact SHA.
-  # (Documented alternative would be skipping this gate — we implement the check.)
   ci-gate:
     runs-on: ubuntu-latest
+    outputs:
+      target_sha: ${{ steps.sha.outputs.sha }}
     steps:
-      - name: Require successful CI on same SHA (dispatch only)
-        if: github.event_name == 'workflow_dispatch'
+      - name: Resolve target SHA
+        id: sha
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Require successful CI on same SHA
         uses: actions/github-script@v7
         with:
           script: |
-            const sha = context.sha;
+            const sha = '${{ steps.sha.outputs.sha }}';
             const { owner, repo } = context.repo;
             const workflows = await github.rest.actions.listWorkflowRuns({
               owner, repo, workflow_id: 'ci.yml', per_page: 50,
@@ -45,32 +50,54 @@ jobs:
               (r) => r.head_sha === sha && r.conclusion === 'success' && r.status === 'completed'
             );
             if (!hit) {
+              core.setFailed(`Deploy blocked: no successful CI run for SHA ${sha}`);
+            } else {
+              core.info(`CI gate OK: run ${hit.id} for ${sha}`);
+            }
+
+  e2e-gate:
+    needs: [ci-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful E2E on same SHA
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = '${{ needs.ci-gate.outputs.target_sha }}';
+            const { owner, repo } = context.repo;
+            // Prefer workflow file e2e.yml
+            const workflows = await github.rest.actions.listWorkflowRuns({
+              owner, repo, workflow_id: 'e2e.yml', per_page: 50,
+            });
+            const hit = (workflows.data.workflow_runs || []).find(
+              (r) => r.head_sha === sha && r.conclusion === 'success' && r.status === 'completed'
+            );
+            if (!hit) {
               core.setFailed(
-                `workflow_dispatch deploy blocked: no successful CI run for SHA ${sha}. ` +
-                `Run CI on this commit first, then dispatch Pages.`
+                `Deploy blocked: no successful E2E run for SHA ${sha}. ` +
+                `CI alone is insufficient (V11 same-SHA gate).`
               );
             } else {
-              core.info(`CI gate OK: run ${hit.id} succeeded for ${sha}`);
+              core.info(`E2E gate OK: run ${hit.id} for ${sha}`);
             }
-      - name: workflow_run path
-        if: github.event_name != 'workflow_dispatch'
-        run: echo "CI already gated this workflow_run; ci-gate is a no-op success."
 
   build:
-    needs: [ci-gate]
+    needs: [ci-gate, e2e-gate]
     if: >
-      always() && (
+      always() &&
+      needs.ci-gate.result == 'success' &&
+      needs.e2e-gate.result == 'success' && (
         (github.event_name == 'workflow_run' &&
          github.event.workflow_run.conclusion == 'success' &&
          github.event.workflow_run.event == 'push') ||
-        (github.event_name == 'workflow_dispatch' && needs.ci-gate.result == 'success')
+        github.event_name == 'workflow_dispatch'
       )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ needs.ci-gate.outputs.target_sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4

@@ -97,16 +97,17 @@ export function generateSteps(_arr: number[], matrix = meta.defaultMatrix): Step
     snap(
       `检测到负环：对角元 d[i][i]<0（i ∈ [${negDiag.join(', ')}]）。矩阵不可当作有效全源最短路。`,
       { negativeCycle: true, vertices: negDiag.join(',') },
-      0,
+      undefined,
       { path: negDiag.map((i) => [i, i] as [number, number]) },
       { ok: false, error: 'negative_cycle', diagonal: negDiag },
+      ref('done'),
     )
   } else {
-    snap('Floyd 完成（无负环）', { negativeCycle: false }, 0, undefined, {
+    snap('Floyd 完成（无负环）', { negativeCycle: false }, undefined, undefined, {
       ok: true,
       negativeCycle: false,
       matrix: d.map((r) => r.map((x) => (x === Infinity ? null : x))),
-    })
+    }, ref('done'))
   }
   return steps
 }

@@ -29,7 +29,7 @@ import * as kmp from '../algorithms/kmp'
 import * as dijkstraHeap from '../algorithms/dijkstraHeap'
 import type { Step } from '../types/step'
 import { DEMO_LIMITS } from '../utils/limits'
-import { parseIntStrict, parseNumberList, type FieldError } from '../utils/parseInput'
+import { parseIntStrict, parseNonNegInt, parseNumberList, assertNonNegIntegers, type FieldError } from '../utils/parseInput'
 import type { GraphAlgoId, GraphDraft } from '../core/graph/types'
 import { defaultDraftFor } from '../core/graph/presets'
 import { algoGraphOptions, edgesToAdj, edgesToFloydMatrix, validateGraphDraft } from '../core/graph/validate'
@@ -407,11 +407,14 @@ export default function AlgoPage() {
     if (id === 'knapsack01') {
       const wts = parseNumberList(draft.knapsackWeights, 'weights', { allowEmpty: true, maxLen: DEMO_LIMITS.arrayLen })
       const vals = parseNumberList(draft.knapsackValues, 'values', { allowEmpty: true, maxLen: DEMO_LIMITS.arrayLen })
-      const W = parseIntStrict(draft.knapsackW, 'W')
+      const W = parseNonNegInt(draft.knapsackW, 'W')
       errs.push(...wts.errors, ...vals.errors, ...W.errors)
+      errs.push(...assertNonNegIntegers(wts.values, 'weights', { allowZero: false }))
+      errs.push(...assertNonNegIntegers(vals.values, 'values', { allowZero: true }))
       if (wts.values.length !== vals.values.length) {
         errs.push({ field: 'weights', reason: 'weights 与 values 长度须一致' })
       }
+      // Discrete DP: never call solver on illegal input (no NaN / non-int / Inf capacity)
       if (errs.length) return { ok: false, errors: errs }
       const weights = wts.values
       const values = vals.values

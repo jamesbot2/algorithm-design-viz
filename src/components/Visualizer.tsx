@@ -369,7 +369,26 @@ export default function Visualizer({
     }))
     .sort((a, b) => a.label.localeCompare(b.label, 'zh'))
 
-  const hasBoard = Boolean(step?.matrices?.board)
+  // V11-03: keep last board when a step omits matrices.board (e.g. legacy traces)
+  const [cachedBoard, setCachedBoard] = useState<(string | number | null)[][] | null>(null)
+  const stepsBoardKey = useMemo(() => steps.map((s) => s.id).join(','), [steps])
+  useEffect(() => {
+    setCachedBoard(null)
+  }, [stepsBoardKey])
+  useEffect(() => {
+    const b = step?.matrices?.board
+    if (b) setCachedBoard(b as (string | number | null)[][])
+  }, [step])
+  const displayBoard = (step?.matrices?.board ?? cachedBoard) as (string | number | null)[][] | null
+  const hasBoard = Boolean(displayBoard)
+  const stepForMatrix = useMemo(() => {
+    if (!step) return step
+    if (step.matrices?.board || !displayBoard) return step
+    return {
+      ...step,
+      matrices: { ...(step.matrices ?? {}), board: displayBoard },
+    }
+  }, [step, displayBoard])
   const displayMessage = step?.message ?? '就绪：调整输入后点击「运行」。'
 
   const seekTo = useCallback(
@@ -488,15 +507,15 @@ export default function Visualizer({
               snapSwap={snapSwap}
             />
           )}
-          {step && <MatrixView step={step} prevStep={prevStep} />}
+          {stepForMatrix && <MatrixView step={stepForMatrix} prevStep={prevStep} />}
           {step?.searchTree && hasBoard && (
             <details className="search-tree-aux" data-testid="search-tree-aux">
               <summary>搜索树（辅助视图）</summary>
-              <SearchTreeView tree={step.searchTree} linkedBoard />
+              <SearchTreeView tree={step.searchTree} linkedBoard activePathIds={step.activePathIds} />
             </details>
           )}
           {step?.searchTree && !hasBoard && (
-            <SearchTreeView tree={step.searchTree} linkedBoard={false} />
+            <SearchTreeView tree={step.searchTree} linkedBoard={false} activePathIds={step.activePathIds} />
           )}
           {!step && <div className="viz-empty soft">暂无画布内容</div>}
         </div>
