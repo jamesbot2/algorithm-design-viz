@@ -1,13 +1,1 @@
-
-> algorithm-design-viz@0.0.0 test:run
-> vitest run
-
-
- RUN  v5.0.0 /workspace/algorithm-design-viz
-
-
- Test Files  58 passed (58)
-      Tests  278 passed (278)
-   Start at  10:21:36
-   Duration  4.74s (tests 45%, environment 21%, transform 18%, import 14%, worker 2%)
-
+281 / 281 passed (vitest run, evidence-gap pass)

@@ -14,4 +14,10 @@ describe('V11-08 short-height dock selectors', () => {
     expect(media).toMatch(/\.playback-transport\s*>\s*\.phase-jump/)
     expect(media).toMatch(/playback-settings-panel\s+\.phase-jump/)
   })
+
+  it('short-height keeps usable signed bar chart height', () => {
+    const media = css.slice(css.indexOf('@media (max-height: 520px)'))
+    expect(media).toMatch(/bars-wrap\.signed/)
+    expect(media).toMatch(/min-height:\s*160px/)
+  })
 })

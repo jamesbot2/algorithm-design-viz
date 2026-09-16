@@ -14,6 +14,8 @@ import { resolveDuration } from '../theme/motion'
 
 interface Props {
   name: string
+  /** Display label; defaults to name. Use for buffers e.g. "temp · key". */
+  label?: string
   values: (number | string)[]
   highlights?: number[]
   roles?: Record<number, HighlightRole>
@@ -27,6 +29,8 @@ interface Props {
   prevElementIds?: string[]
   /** When true, skip FLIP (seek jump / non-adjacent snap) */
   snapSwap?: boolean
+  /** Compact buffer strip — prefer cells, smaller chart */
+  compact?: boolean
 }
 
 const ROLE_CLASS: Record<HighlightRole, string> = {
@@ -129,6 +133,7 @@ function resolveIds(values: (number | string)[], elementIds?: string[]): string[
 
 function ArrayView({
   name,
+  label,
   values,
   highlights = [],
   roles,
@@ -141,11 +146,12 @@ function ArrayView({
   prevValues,
   prevElementIds,
   snapSwap = false,
+  compact = false,
 }: Props) {
   const numeric = values.every((v) => typeof v === 'number' && Number.isFinite(v as number))
   const suitable = barSuitable(values)
   const [mode, setMode] = useState<'bars' | 'cells'>(
-    defaultMode ?? (suitable ? 'bars' : 'cells'),
+    defaultMode ?? (compact ? 'cells' : suitable ? 'bars' : 'cells'),
   )
   const { mode: motionMode, speedIntervalMs, transitionEpoch } = useMotion()
   const swapMs = resolveDuration(280, motionMode, speedIntervalMs)
@@ -154,10 +160,10 @@ function ArrayView({
     () => (numeric ? (values as number[]) : values.map(() => 1)),
     [numeric, values],
   )
-  const maxH = 160
+  const [maxH, setMaxH] = useState(compact ? 64 : 160)
   const geo = useMemo(
     () => (numeric ? computeBarGeometry(nums, scaleMax, maxH) : null),
-    [numeric, nums, scaleMax],
+    [numeric, nums, scaleMax, maxH],
   )
   const hasNegative = Boolean(geo && (geo.zeroRatio < 1 || nums.some((n) => n < 0)))
   const hasPositive = Boolean(geo && nums.some((n) => n > 0))
@@ -196,6 +202,29 @@ function ArrayView({
   const animToken = useRef(0)
   const transitionIdRef = useRef(0)
   const wrapRef = useRef<HTMLDivElement>(null)
+  // Fit signed/unsigned bar chart into short stage so bars stay painted (not clipped to banner).
+  useLayoutEffect(() => {
+    if (compact || mode !== 'bars') return
+    const self = wrapRef.current
+    if (!self) return
+    const stage = self.closest('[data-testid="viz-canvas"]') as HTMLElement | null
+    const apply = () => {
+      const stageH = stage?.clientHeight ?? 0
+      if (stageH <= 0) return
+      // Prefer room still inside the browser viewport so short-height shots show bars
+      const top = stage?.getBoundingClientRect().top ?? 0
+      const roomInViewport = Math.max(0, window.innerHeight - top - 4)
+      const usable = Math.min(stageH, roomInViewport)
+      // label ~28px; signed chart uses maxH+40; leave a little pad
+      const budget = Math.max(56, Math.min(160, usable - 72))
+      setMaxH((prev) => (Math.abs(prev - budget) >= 4 ? budget : prev))
+    }
+    apply()
+    const ro = new ResizeObserver(apply)
+    if (stage) ro.observe(stage)
+    ro.observe(self)
+    return () => ro.disconnect()
+  }, [compact, mode, values.length])
   const geometryGen = useRef(0)
   const [rangeMasks, setRangeMasks] = useState<{
     current: { left: number; width: number }[]
@@ -410,10 +439,16 @@ function ArrayView({
   const bestBand = rangeStyle(ranges?.best, values.length)
 
   return (
-    <div className="array-view" data-array={name} ref={wrapRef} data-flip-xy="1">
+    <div
+      className={`array-view${compact ? ' array-view-compact' : ''}`}
+      data-array={name}
+      ref={wrapRef}
+      data-flip-xy="1"
+      data-compact={compact ? '1' : '0'}
+    >
       <div className="array-label">
-        <span>{name}</span>
-        {numeric && (
+        <span>{label ?? name}</span>
+        {numeric && !compact && (
           <div className="view-toggle">
             <button
               type="button"
@@ -610,6 +645,15 @@ function ArrayView({
 
 export default memo(ArrayView)
 
+/** Aux copy buffers shown as a compact strip (not full-height second bar chart). */
+const BUFFER_ARRAY_NAMES = new Set(['temp', 'left', 'right', 'key'])
+const BUFFER_LABELS: Record<string, string> = {
+  temp: 'temp · key',
+  left: 'left',
+  right: 'right',
+  key: 'key',
+}
+
 export const ArraysFromStep = memo(function ArraysFromStep({
   step,
   prevStep,
@@ -622,25 +666,37 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   snapSwap?: boolean
 }) {
   if (!step.arrays) return null
+  const entries = Object.entries(step.arrays)
+  const buffers = entries.filter(([name]) => BUFFER_ARRAY_NAMES.has(name))
+  const primary = entries.filter(([name]) => !BUFFER_ARRAY_NAMES.has(name))
+  const renderOne = (name: string, values: (number | string)[], compact: boolean) => (
+    <ArrayView
+      key={name}
+      name={name}
+      label={compact ? BUFFER_LABELS[name] ?? name : undefined}
+      values={values}
+      highlights={step.highlights?.[name] ?? []}
+      roles={step.roles?.[name]}
+      pointers={deriveArrayPointers(step, name)}
+      scaleMax={scaleMaxByArray?.[name]}
+      ranges={!compact && (name === 'a' || primary.length === 1) ? step.ranges : undefined}
+      arrayOps={step.arrayOps?.[name]}
+      elementIds={step.elementIds?.[name]}
+      prevValues={prevStep?.arrays?.[name]}
+      prevElementIds={prevStep?.elementIds?.[name]}
+      snapSwap={snapSwap}
+      compact={compact}
+      defaultMode={compact ? 'cells' : undefined}
+    />
+  )
   return (
     <div className="arrays-panel">
-      {Object.entries(step.arrays).map(([name, values]) => (
-        <ArrayView
-          key={name}
-          name={name}
-          values={values}
-          highlights={step.highlights?.[name] ?? []}
-          roles={step.roles?.[name]}
-          pointers={deriveArrayPointers(step, name)}
-          scaleMax={scaleMaxByArray?.[name]}
-          ranges={name === 'a' || Object.keys(step.arrays!).length === 1 ? step.ranges : undefined}
-          arrayOps={step.arrayOps?.[name]}
-          elementIds={step.elementIds?.[name]}
-          prevValues={prevStep?.arrays?.[name]}
-          prevElementIds={prevStep?.elementIds?.[name]}
-          snapSwap={snapSwap}
-        />
-      ))}
+      {buffers.length > 0 && (
+        <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
+          {buffers.map(([name, values]) => renderOne(name, values, true))}
+        </div>
+      )}
+      {primary.map(([name, values]) => renderOne(name, values, false))}
     </div>
   )
 })

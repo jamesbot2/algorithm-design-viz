@@ -9,11 +9,11 @@ Legend: ✅ verified · 🔶 partial · ⬜ 未验证 · ❌ fail
 | Algo / strategy | Final answer | Step semantics | Code sync | Main canvas | Mid anim | Mobile/desktop | Boundary inputs |
 |-----------------|-------------|----------------|-----------|-------------|----------|----------------|-----------------|
 | bubbleSort | ✅ unit | ✅ | 🔶 | 🔶 e2e legacy | ✅ V11-09 | ⬜ | ⬜ |
-| insertionSort | ✅ | ✅ V11-02 | ✅ | ✅ e2e | ✅ | 🔶 | ✅ [2,1][3,2,1] |
+| insertionSort | ✅ | ✅ V11-02 | ✅ | ✅ e2e + temp buffer | ✅ | 🔶 | ✅ [2,1][3,2,1] |
 | mergeSort | ✅ | ✅ V11-02 | ✅ V11-05 | 🔶 | ✅ | ⬜ | ✅ |
 | quickSort | 🔶 legacy | 🔶 | 🔶 | 🔶 v10 e2e | ⬜ | 🔶 | ⬜ |
 | binarySearch | 🔶 | 🔶 | 🔶 | 🔶 v10 | ⬜ | 🔶 | ⬜ |
-| kadane | ✅ | ✅ ranges | 🔶 | ✅ e2e docks | ⬜ | ✅ short-h | ✅ signed |
+| kadane | ✅ | ✅ ranges | 🔶 | ✅ e2e docks + painted bars | ⬜ | ✅ short-h bars | ✅ signed |
 | knapsack01 | ✅ | ✅ | ✅ done | 🔶 | ⬜ | ⬜ | ✅ V11-04 |
 | lcs | ✅ V11-07 | 🔶 | 🔶 | 🔶 | ⬜ | ⬜ | ⬜ |
 | editDistance | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
@@ -26,7 +26,7 @@ Legend: ✅ verified · 🔶 partial · ⬜ 未验证 · ❌ fail
 | floyd | ✅ | ✅ | ✅ V11-05 | ⬜ | ⬜ | ⬜ | 🔶 |
 | kmp | ✅ V11-07 | 🔶 | 🔶 | ⬜ | ⬜ | ⬜ | ⬜ |
 | prim | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| nQueens | ✅ oracle | ✅ V11-03 | ✅ | ✅ e2e end board | ⬜ | 🔶 | ✅ n=1..8 |
+| nQueens | ✅ oracle | ✅ V11-03 | ✅ | ✅ e2e end board (完成+Q) | ⬜ | 🔶 | ✅ n=1..8 |
 | matrixChain | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | huffman | ✅ | ✅ forest | ✅ | 🔶 | ⬜ | ⬜ | ✅ dup |
 | maxSubarrayDC | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
@@ -40,3 +40,14 @@ Legend: ✅ verified · 🔶 partial · ⬜ 未验证 · ❌ fail
 | teach branchAndBound | ✅ | 🔶 | 🔶 | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Viewports **未验证** in this pass: 360×640, 320×568, 768×1024 (covered by prior V10), 1024×521 (close to 520).
+
+
+## Evidence-gap follow-up
+
+Cross-check found three false-green shots; fixed on `v11-semantic-visual` locally (not pushed):
+
+| Gap | Was | Now |
+|-----|-----|-----|
+| `nQueens-end-board.png` | Step 1/113 empty | 113/113 done + queens via「完成」 |
+| Kadane 1024×500 / 844×390 | Banner-only / clipped chart | Adaptive bar `maxH`; painted `.pos`/`.neg` asserted |
+| `insertionSort-mid-*.png` | Only `a` visible | Compact `temp · key` buffer strip in stage |

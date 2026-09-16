@@ -1190,6 +1190,48 @@ button.icon-btn {
 .hl-update { /* alias */ }
 .arrays-panel { display: flex; flex-direction: column; gap: 0.75rem; }
 
+/* V11 evidence fix: temp/left/right as compact buffer strip (visible above main array) */
+.array-buffers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: flex-start;
+  padding: 0.35rem 0.5rem;
+  border: 1px dashed var(--border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg-elev, #111) 88%, var(--accent, #10a37f) 12%);
+}
+.array-buffers .array-view-compact {
+  flex: 0 1 auto;
+  min-width: 4.5rem;
+}
+.array-buffers .array-view-compact .array-label {
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent, #10a37f);
+}
+.array-buffers .array-view-compact .view-toggle {
+  display: none;
+}
+.array-buffers .array-view-compact .array-cells {
+  gap: 0.25rem;
+}
+.array-buffers .array-view-compact .cell {
+  min-width: 2.2rem;
+  min-height: 2.2rem;
+  padding: 0.2rem 0.35rem;
+}
+.array-buffers .array-view-compact .bars-wrap {
+  min-height: 48px;
+  height: auto;
+}
+.array-buffers .array-view-compact .bars-wrap.signed {
+  min-height: 64px;
+  height: 64px;
+  --bar-chart-h: 64px;
+}
+
 /* —— V3 Workbench / Lab theme (gradual migration) —— */
 :root, [data-lab-theme="lab-dark"] {
   --lab-bg: #0F1117;
@@ -2262,7 +2304,21 @@ html, body, #root {
     min-height: 0;
   }
   .main-wrap[data-lab-fill="1"] .stage-viewport {
-    min-height: 140px;
+    min-height: 160px;
+  }
+  /* Keep signed bars usable — avoid 200px chart crushed into empty strip */
+  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
+    --bar-chart-h: min(110px, 26vh);
+    min-height: var(--bar-chart-h);
+    height: var(--bar-chart-h);
+  }
+  .main-wrap[data-lab-fill="1"] .bars-wrap:not(.signed) {
+    min-height: min(96px, 22vh);
+  }
+  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
+    max-height: 2.2rem;
+    min-height: 2rem;
+    height: auto;
   }
   /* Inline chrome hidden ONLY when dock/sheet entry exists */
   .main-wrap[data-lab-fill="1"] .viz-inspector:not(.inspector-sheet-body),
@@ -2353,4 +2409,20 @@ html, body, #root {
 }
 .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .workbench-layout[data-height-mode="scroll"] {
   overflow: visible;
+}
+
+
+/* Ultra-short landscape (e.g. 844×390): keep a painted bar band */
+@media (max-height: 400px) {
+  .main-wrap[data-lab-fill="1"] .stage-viewport {
+    min-height: 140px;
+  }
+  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
+    --bar-chart-h: min(88px, 22vh);
+    min-height: var(--bar-chart-h);
+    height: var(--bar-chart-h);
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact {
+    display: none;
+  }
 }
