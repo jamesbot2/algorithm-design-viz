@@ -126,6 +126,22 @@ function uniqueDisplayIds(ids: string[]): string[] {
   })
 }
 
+
+/** Element ids whose slot index changed — drives XY FLIP for swap and same-array move. */
+export function relocatingElementIds(prevIds: string[] | undefined, nextIds: string[]): string[] {
+  if (!prevIds || prevIds.length !== nextIds.length) return []
+  const prevIndex = new Map(prevIds.map((id, i) => [id, i]))
+  const out: string[] = []
+  for (let i = 0; i < nextIds.length; i++) {
+    const id = nextIds[i]!
+    // Skip ephemeral vacancies — they are not continuous identity
+    if (id.startsWith('vacant:') || id.startsWith('pending:')) continue
+    const prev = prevIndex.get(id)
+    if (prev !== undefined && prev !== i) out.push(id)
+  }
+  return out
+}
+
 function resolveIds(values: (number | string)[], elementIds?: string[]): string[] {
   if (elementIds && elementIds.length === values.length) return elementIds
   return values.map((_, i) => `el-${i}`)
@@ -202,7 +218,7 @@ function ArrayView({
   const animToken = useRef(0)
   const transitionIdRef = useRef(0)
   const wrapRef = useRef<HTMLDivElement>(null)
-  // Fit signed/unsigned bar chart into short stage so bars stay painted (not clipped to banner).
+  // Fit signed/unsigned bar chart into remaining stage (after banner/toggles) — landscape short prefers taller bars.
   useLayoutEffect(() => {
     if (compact || mode !== 'bars') return
     const self = wrapRef.current
@@ -211,20 +227,32 @@ function ArrayView({
     const apply = () => {
       const stageH = stage?.clientHeight ?? 0
       if (stageH <= 0) return
-      // Prefer room still inside the browser viewport so short-height shots show bars
       const top = stage?.getBoundingClientRect().top ?? 0
       const roomInViewport = Math.max(0, window.innerHeight - top - 4)
       const usable = Math.min(stageH, roomInViewport)
-      // label ~28px; signed chart uses maxH+40; leave a little pad
-      const budget = Math.max(56, Math.min(160, usable - 72))
+      const labelH = self.querySelector('.array-label')?.getBoundingClientRect().height ?? 28
+      const noteH = self.querySelector('.matrix-note')?.getBoundingClientRect().height ?? 0
+      const short = window.innerHeight <= 520
+      const ultra = window.innerHeight <= 400
+      const landscape = window.innerWidth > window.innerHeight
+      // signed chart box ≈ maxH+40; keep that inside remaining stage after label/note
+      const chartChrome = 40
+      const overhead = labelH + noteH + chartChrome + 8
+      const minBudget = landscape && ultra ? 140 : landscape && short ? 110 : short ? 80 : 56
+      const maxBudget = landscape && ultra ? 240 : landscape && short ? 220 : short ? 180 : 160
+      const budget = Math.max(minBudget, Math.min(maxBudget, usable - overhead))
       setMaxH((prev) => (Math.abs(prev - budget) >= 4 ? budget : prev))
     }
     apply()
     const ro = new ResizeObserver(apply)
     if (stage) ro.observe(stage)
     ro.observe(self)
-    return () => ro.disconnect()
-  }, [compact, mode, values.length])
+    window.addEventListener('resize', apply)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', apply)
+    }
+  }, [compact, mode, values.length, signedMode])
   const geometryGen = useRef(0)
   const [rangeMasks, setRangeMasks] = useState<{
     current: { left: number; width: number }[]
@@ -287,7 +315,7 @@ function ArrayView({
   useLayoutEffect(() => {
     const epochChanged = lastCancelEpoch.current !== transitionEpoch
     lastCancelEpoch.current = transitionEpoch
-    const geomSig = `${ids.join('\0')}|${values.join('\0')}|${swapPair ? swapPair.join(',') : ''}`
+    const geomSig = `${ids.join('\0')}|${values.join('\0')}|${swapPair ? swapPair.join(',') : ''}|${arrayOps?.map((o) => o.type).join(',') ?? ''}`
     const geometryChanged = lastGeomSig.current !== geomSig
     lastGeomSig.current = geomSig
     // Invalidate in-flight RAF/timeouts from any prior transition instance
@@ -322,32 +350,44 @@ function ArrayView({
       return
     }
 
+    // FLIP targets: explicit swap pair OR same-array move (id relocates). Copy/write from
+    // aux buffers (temp/left/right) are intentional instant — buffer strip is the mid-viz.
+    const movingIds = relocatingElementIds(prevElementIds, ids)
+    const hasMoveOp = Boolean(arrayOps?.some((o) => o.type === 'move'))
+    const flipIds =
+      swapPair !== null
+        ? [ids[swapPair[0]!]!, ids[swapPair[1]!]!].filter(Boolean)
+        : hasMoveOp
+          ? movingIds
+          : movingIds.length > 0 && !arrayOps?.some((o) => o.type === 'copy' || o.type === 'write')
+            ? movingIds
+            : []
+
     const shouldFlip =
-      swapPair !== null &&
+      flipIds.length > 0 &&
       !snapSwap &&
       prevValues &&
       prevValues.length === values.length &&
       motionMode !== 'reduced' &&
       swapMs > 0
 
-    if (!shouldFlip || !swapPair) {
+    if (!shouldFlip) {
       clearTransforms()
       seedCenters()
       return
     }
 
-    const [i, j] = swapPair
-    const idAt = (idx: number) => ids[idx]!
-    const targets = [i, j]
-
-    for (const idx of targets) {
-      const id = idAt(idx)
+    const idToIndex = new Map(ids.map((id, i) => [id, i]))
+    for (const id of flipIds) {
+      const idx = idToIndex.get(id)
+      if (idx == null) continue
       const layer = layers.get(id)
       const newCenter = slotCenter(idx)
       const oldCenter = prevCenters.current.get(id)
       if (!layer || newCenter == null || oldCenter == null) continue
       const dx = oldCenter.x - newCenter.x
       const dy = oldCenter.y - newCenter.y
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue
       layer.style.transition = 'none'
       layer.style.transform = `translate(${dx}px, ${dy}px)`
       layer.dataset.transitionId = String(transitionId)
@@ -358,8 +398,7 @@ function ArrayView({
 
     requestAnimationFrame(() => {
       if (animToken.current !== token || geometryGen.current !== gen) return
-      for (const idx of targets) {
-        const id = idAt(idx)
+      for (const id of flipIds) {
         const layer = layers.get(id)
         if (!layer || layer.dataset.transitionId !== String(transitionId)) continue
         layer.style.transition = `transform ${swapMs}ms ease`
@@ -367,8 +406,7 @@ function ArrayView({
       }
       window.setTimeout(() => {
         if (animToken.current !== token || geometryGen.current !== gen) return
-        for (const idx of targets) {
-          const id = idAt(idx)
+        for (const id of flipIds) {
           const layer = layers.get(id)
           if (!layer || layer.dataset.transitionId !== String(transitionId)) continue
           layer.style.transition = 'none'
@@ -386,6 +424,7 @@ function ArrayView({
     values,
     ids,
     swapPair,
+    arrayOps,
     snapSwap,
     prevValues,
     prevElementIds,

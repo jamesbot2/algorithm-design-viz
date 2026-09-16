@@ -52,22 +52,35 @@ export default function WorkbenchLayout({
       const cr = entries[0]?.contentRect
       const w = cr?.width ?? el.clientWidth
       const h = cr?.height ?? el.clientHeight
-      setMode(w < NARROW_PX ? 'tabs' : 'split')
+      const ultraShortLandscape =
+        typeof window !== 'undefined' &&
+        window.innerHeight <= 400 &&
+        window.innerWidth > window.innerHeight
+      const shortLandscape =
+        typeof window !== 'undefined' &&
+        window.innerHeight <= 520 &&
+        window.innerWidth > window.innerHeight
+      setMode(w < NARROW_PX || ultraShortLandscape ? 'tabs' : 'split')
       setBudget({ w, h })
       // V10-03: follow Layout's data-height-fallback when present; else local need
       const parent = el.closest('[data-height-fallback]') as HTMLElement | null
       const parentMode = parent?.getAttribute('data-height-fallback') as HeightMode | null
-      const need = MIN_VIZ_PX + 120
+      // Short landscape: prefer fill so stage min-height can paint (scroll only if tiny)
+      const need = shortLandscape ? MIN_VIZ_PX + 40 : MIN_VIZ_PX + 120
       const localScroll = h > 0 && h < need
       const next: HeightMode =
-        parentMode === 'scroll' || localScroll ? 'scroll' : 'fill'
+        parentMode === 'scroll' || (localScroll && !shortLandscape) ? 'scroll' : 'fill'
       setHeightMode(next)
       el.style.setProperty('--wb-measured-h', `${Math.max(0, h)}px`)
       el.style.setProperty('--wb-measured-w', `${Math.max(0, w)}px`)
     })
     ro.observe(el)
     const initial = el.clientWidth
-    if (initial > 0) setMode(initial < NARROW_PX ? 'tabs' : 'split')
+    if (initial > 0) {
+      const shortLandscape =
+        window.innerHeight <= 400 && window.innerWidth > window.innerHeight
+      setMode(initial < NARROW_PX || shortLandscape ? 'tabs' : 'split')
+    }
     return () => ro.disconnect()
   }, [])
 

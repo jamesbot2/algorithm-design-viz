@@ -18,6 +18,16 @@ describe('V11-08 short-height dock selectors', () => {
   it('short-height keeps usable signed bar chart height', () => {
     const media = css.slice(css.indexOf('@media (max-height: 520px)'))
     expect(media).toMatch(/bars-wrap\.signed/)
-    expect(media).toMatch(/min-height:\s*160px/)
+    expect(media).toMatch(/min-height:\s*180px/)
+    expect(media).toMatch(/input-actions-sticky/)
+  })
+
+  it('short landscape raises stage min and hides page header', () => {
+    expect(css).toMatch(/orientation:\s*landscape/)
+    const land = css.slice(css.indexOf('orientation: landscape'))
+    expect(land).toMatch(/page-header-compact/)
+    expect(land).toMatch(/min-height:\s*180px/)
+    expect(land).toMatch(/bars-wrap\.signed/)
+    expect(css).toMatch(/input-actions-sticky/)
   })
 })

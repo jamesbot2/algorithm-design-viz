@@ -71,7 +71,7 @@ async function assertBarsPainted(page: Page, vpName: string) {
   const stage = page.getByTestId('viz-canvas')
   await expect(stage).toBeVisible()
   const box = await stage.boundingBox()
-  expect(box && box.height >= 100, `stage crushed @${vpName}`).toBeTruthy()
+  expect(box && box.height >= 120, `stage crushed @${vpName}: ${box?.height}`).toBeTruthy()
 
   const metrics = await page.evaluate(() => {
     const canvas = document.querySelector('[data-testid="viz-canvas"]') as HTMLElement | null
@@ -81,7 +81,8 @@ async function assertBarsPainted(page: Page, vpName: string) {
       .map((el) => {
         const r = el.getBoundingClientRect()
         const dh = Number(el.getAttribute('data-data-height') || 0)
-        return { h: r.height, dh, top: r.top, bottom: r.bottom }
+        const label = el.querySelector('.bar-val')?.textContent ?? el.textContent ?? ''
+        return { h: r.height, dh, top: r.top, bottom: r.bottom, label: label.trim() }
       })
       .filter((b) => b.h > 4 || b.dh > 0)
     const vh = window.innerHeight
@@ -91,21 +92,31 @@ async function assertBarsPainted(page: Page, vpName: string) {
       const bottom = Math.min(b.bottom, cr.bottom, vh)
       return bottom - top > 4
     })
+    const labeled = visibleInStage.filter((b) => /^-?\d/.test(b.label))
     const neg = document.querySelectorAll('.bar-col.neg').length
     const pos = document.querySelectorAll('.bar-col.pos').length
+    const zeroLine = document.querySelector('.bars-wrap.signed .bar-baseline')
+    const zr = zeroLine?.getBoundingClientRect()
     return {
       paintedCount: painted.length,
       visibleCount: visibleInStage.length,
+      labeledCount: labeled.length,
       maxVisibleH: visibleInStage.reduce((m, b) => Math.max(m, b.h), 0),
       neg,
       pos,
       stageH: cr?.height ?? 0,
+      hasZeroLine: Boolean(zeroLine && zr && zr.width > 20),
     }
   })
   expect(metrics.paintedCount, `no painted bars @${vpName}`).toBeGreaterThan(0)
-  expect(metrics.visibleCount, `bars not visible in stage @${vpName}: ${JSON.stringify(metrics)}`).toBeGreaterThan(0)
-  expect(metrics.maxVisibleH, `bar height too small @${vpName}`).toBeGreaterThan(8)
-  // Kadane default input has both signs
+  expect(metrics.visibleCount, `bars not visible in stage @${vpName}: ${JSON.stringify(metrics)}`).toBeGreaterThanOrEqual(3)
+  expect(metrics.labeledCount, `bar labels missing @${vpName}`).toBeGreaterThanOrEqual(3)
+  const minH = Math.max(24, metrics.stageH * 0.08)
+  expect(
+    metrics.maxVisibleH,
+    `bar height too small @${vpName}: ${metrics.maxVisibleH} < ${minH} ${JSON.stringify(metrics)}`,
+  ).toBeGreaterThanOrEqual(minH)
+  expect(metrics.hasZeroLine, `missing zero line @${vpName}`).toBeTruthy()
   expect(metrics.neg, `missing .neg @${vpName}`).toBeGreaterThan(0)
   expect(metrics.pos, `missing .pos @${vpName}`).toBeGreaterThan(0)
   return metrics

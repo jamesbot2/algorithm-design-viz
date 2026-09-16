@@ -2,7 +2,7 @@
 
 **Branch:** `v11-semantic-visual`  
 **Baseline HEAD:** `e51c950` (V10 on main)  
-**Tip:** see `git rev-parse HEAD` on `v11-semantic-visual` after local evidence-gap commit (not pushed).
+**Tip:** see `git rev-parse HEAD` on `v11-semantic-visual` after local short-height + move-FLIP commit (not pushed).
 **Not pushed. Not deployed.**
 
 **User screenshot:** **待确认 / 附件缺失** — no new「严重 bug」original in attachments (only older V8/V9 layout PNGs). **Do not claim that screenshot bug is fixed.**
@@ -35,7 +35,7 @@ Chrome: `/usr/bin/google-chrome`.
 | **Old → new** | Vacate source on move; merge vacates range then write-back; temp/left/right buffers; React keys = `slot-i`; ops move/copy/write ≠ swap |
 | **Tests** | `tests/v11-02-copy-identity.test.ts`, `tests/dom/v11-copy-keys.test.tsx` |
 | **Evidence fix** | Compact `array-buffers` strip for `temp`/`left`/`right` (cells, labeled `temp · key`); e2e asserts temp visible in stage; `insertionSort-mid-1280x800.png` recaptured |
-| **Unverified** | FLIP animation for move/copy (swap FLIP preserved) |
+| **Unverified** | Cross-buffer copy FLIP (same-array move FLIP added; swap preserved) |
 
 ## V11-03 — N-Queens path/board/end/sampling (P1)
 
@@ -92,18 +92,21 @@ Chrome: `/usr/bin/google-chrome`.
 
 | | |
 |--|--|
-| **Repro?** | Yes — descendant `.playback-transport .phase-jump` hid dock copies |
-| **Files** | `styles.css`, `PlaybackTransport.tsx` |
+| **Repro?** | Yes — descendant `.playback-transport .phase-jump` hid dock copies; landscape short still crushed bars after e7abf60 |
+| **Files** | `styles.css`, `PlaybackTransport.tsx`, `ArrayView.tsx`, `WorkbenchLayout.tsx` |
 | **Old → new** | Direct-child hide; panel copies forced visible; settings as overlay dialog; Escape/focus |
-| **Evidence fix** | Adaptive `maxH` via ResizeObserver + short-height stage min 160px; e2e asserts painted `.bar` height in viewport + `.neg`/`.pos`; Kadane short screenshots recaptured with bars |
+| **Evidence fix (post e7abf60)** | Landscape short: hide page header + post-run Run/Cancel row; shorten banner; raise stage/visualizer mins; ResizeObserver `maxH` uses remaining stage after label/note (ultra land minBudget ≥140); ≤400 land forces tabs so demo owns width; e2e requires ≥3 labeled bars, zero line, maxBar ≥ max(24px, 8% stage). Recaptured `kadane-844x390.png`, `kadane-1024x500.png`, `kadane-1024x520.png` |
 | **Tests** | `tests/v11-08-short-height-css.test.ts`, e2e @1024×520/500/844×390 |
+| **Residual** | 844×390 still tight (~70px max signed bar); chrome (topbar+tabs+transport) competes; not physical-device verified |
 
 ## V11-09 — Mid-transition verification (P2)
 
 | | |
 |--|--|
-| **Files** | generators + `tests/v11-09-mid-transition.test.ts` |
-| **Note** | V10 cancel/create FLIP preserved; mid pairs for swap/move/copy sampled |
+| **Files** | `ArrayView.tsx` (`relocatingElementIds` + move FLIP), `tests/v11-09-mid-transition.test.ts`, `tests/dom/v11-move-flip.test.tsx` |
+| **Old → new** | Same-array **move** uses XY FLIP via relocating element ids (swap path preserved; V10 cancel/create intact). Merge **copy/write** from left/right buffers stays instant — buffer strip is the mid-viz (no cross-ArrayView FLIP) |
+| **Tests** | unit relocating-id pairs; DOM move mid-transform + no duplicate keys; write path transform-free |
+| **Residual** | Cross-buffer copy FLIP not implemented (honest: instant + visible temp/left/right) |
 
 ---
 
@@ -117,7 +120,7 @@ Local edit to `.github/workflows/deploy-pages.yml`: require **CI + E2E** success
 
 | Suite | Result |
 |-------|--------|
-| Unit (`npm run test:run`) | **281 / 281** passed |
+| Unit (`npm run test:run`) | **286 / 286** passed |
 | Lint | not re-run this pass |
 | Build | not re-run this pass |
 | E2E V11 | **8 / 8** passed (`docs/traces/v11/e2e-v11.log`) |
@@ -125,10 +128,11 @@ Local edit to `.github/workflows/deploy-pages.yml`: require **CI + E2E** success
 
 ### Evidence-gap follow-up (local only)
 
-Three false-green / evidence gaps from V11 cross-check fixed locally — **no push / no deploy**:
+Prior three gaps (N-Queens seek, short-height paint assert, insert temp strip) remain from e7abf60.
 
-1. **N-Queens end board** — scrub `evaluate` was a no-op on controlled React range; now seek「完成」, assert last step + queens.
-2. **Short-height Kadane bars** — stage was 140px while chart forced 200px (clipped); adaptive chart height + stronger painted-bar asserts.
-3. **insertionSort temp** — generator had `arrays.temp` but second full ArrayView sat below fold; compact buffer strip above `a`.
+**This pass (landscape short + move FLIP)** — **no push / no deploy**:
+
+1. **Landscape Kadane bars** — chrome collapse (header/actions/banner) + stage/visualizer mins + tabs@≤400 land + stronger e2e (N bars, labels, zero line, ≥24px/8% stage). Screenshots recaptured.
+2. **Move FLIP** — same-array move XY FLIP; copy/write from buffers documented as instant + buffer viz.
 
 Full coverage: `docs/V11_COVERAGE_MATRIX.md` · M0: `docs/V11_M0_REPRO.md`
