@@ -2,7 +2,7 @@
 
 **Branch:** `v11-semantic-visual`  
 **Baseline HEAD:** `e51c950` (V10 on main)  
-**Tip SHA:** `bc0d8c4` · main fix `9b0cb93` · docs follow-ups `eb41b40`/`9ca18af`/`bc0d8c4` (fix `9b0cb93`) (fix `9b0cb93`)  
+**Tip:** see `git rev-parse HEAD` on `v11-semantic-visual` (main fix commit `9b0cb93`; baseline `e51c950`).  
 **Not pushed. Not deployed.**
 
 **User screenshot:** **待确认 / 附件缺失** — no new「严重 bug」original in attachments (only older V8/V9 layout PNGs). **Do not claim that screenshot bug is fixed.**
