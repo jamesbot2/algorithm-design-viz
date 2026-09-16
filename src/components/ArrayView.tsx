@@ -14,6 +14,8 @@ import { resolveDuration } from '../theme/motion'
 
 interface Props {
   name: string
+  /** Display label; defaults to name. Use for buffers e.g. "temp · key". */
+  label?: string
   values: (number | string)[]
   highlights?: number[]
   roles?: Record<number, HighlightRole>
@@ -27,6 +29,8 @@ interface Props {
   prevElementIds?: string[]
   /** When true, skip FLIP (seek jump / non-adjacent snap) */
   snapSwap?: boolean
+  /** Compact buffer strip — prefer cells, smaller chart */
+  compact?: boolean
 }
 
 const ROLE_CLASS: Record<HighlightRole, string> = {
@@ -86,6 +90,58 @@ function rangeStyle(
   return { left: `${leftPct}%`, width: `${widthPct}%` }
 }
 
+/** Signed-bar geometry: shared abs domain; zero has data height 0. */
+export function computeBarGeometry(
+  values: number[],
+  scaleMax?: number,
+  maxH = 160,
+): {
+  absMax: number
+  zeroRatio: number
+  heights: number[]
+  directions: ('pos' | 'neg' | 'zero')[]
+} {
+  const absMax = Math.max(1, scaleMax ?? 0, ...values.map((v) => Math.abs(v)))
+  const hasPos = values.some((v) => v > 0)
+  const hasNeg = values.some((v) => v < 0)
+  let zeroRatio = 1
+  if (hasPos && hasNeg) zeroRatio = 0.5
+  else if (hasNeg) zeroRatio = 0
+  const half = hasPos && hasNeg
+  const heights = values.map((v) => {
+    if (v === 0) return 0
+    const span = half ? maxH / 2 : maxH
+    return (Math.abs(v) / absMax) * span
+  })
+  const directions = values.map((v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : 'zero') as 'pos' | 'neg' | 'zero')
+  return { absMax, zeroRatio, heights, directions }
+}
+
+function uniqueDisplayIds(ids: string[]): string[] {
+  const seen = new Map<string, number>()
+  return ids.map((id) => {
+    const n = seen.get(id) ?? 0
+    seen.set(id, n + 1)
+    return n === 0 ? id : `${id}#${n}`
+  })
+}
+
+
+/** Element ids whose slot index changed — drives XY FLIP for swap and same-array move. */
+export function relocatingElementIds(prevIds: string[] | undefined, nextIds: string[]): string[] {
+  if (!prevIds || prevIds.length !== nextIds.length) return []
+  const prevIndex = new Map(prevIds.map((id, i) => [id, i]))
+  const out: string[] = []
+  for (let i = 0; i < nextIds.length; i++) {
+    const id = nextIds[i]!
+    // Skip ephemeral vacancies — they are not continuous identity
+    if (id.startsWith('vacant:') || id.startsWith('pending:')) continue
+    const prev = prevIndex.get(id)
+    if (prev !== undefined && prev !== i) out.push(id)
+  }
+  return out
+}
+
 function resolveIds(values: (number | string)[], elementIds?: string[]): string[] {
   if (elementIds && elementIds.length === values.length) return elementIds
   return values.map((_, i) => `el-${i}`)
@@ -93,6 +149,7 @@ function resolveIds(values: (number | string)[], elementIds?: string[]): string[
 
 function ArrayView({
   name,
+  label,
   values,
   highlights = [],
   roles,
@@ -105,11 +162,12 @@ function ArrayView({
   prevValues,
   prevElementIds,
   snapSwap = false,
+  compact = false,
 }: Props) {
   const numeric = values.every((v) => typeof v === 'number' && Number.isFinite(v as number))
   const suitable = barSuitable(values)
   const [mode, setMode] = useState<'bars' | 'cells'>(
-    defaultMode ?? (suitable ? 'bars' : 'cells'),
+    defaultMode ?? (compact ? 'cells' : suitable ? 'bars' : 'cells'),
   )
   const { mode: motionMode, speedIntervalMs, transitionEpoch } = useMotion()
   const swapMs = resolveDuration(280, motionMode, speedIntervalMs)
@@ -118,15 +176,16 @@ function ArrayView({
     () => (numeric ? (values as number[]) : values.map(() => 1)),
     [numeric, values],
   )
-  const max = useMemo(() => {
-    const local = Math.max(1, ...nums.map((n) => Math.abs(n)))
-    return Math.max(local, scaleMax ?? 0, 1)
-  }, [nums, scaleMax])
-  const minH = 12
-  const maxH = 160
-  const hasNegative = numeric && nums.some((n) => n < 0)
+  const [maxH, setMaxH] = useState(compact ? 64 : 160)
+  const geo = useMemo(
+    () => (numeric ? computeBarGeometry(nums, scaleMax, maxH) : null),
+    [numeric, nums, scaleMax, maxH],
+  )
+  const hasNegative = Boolean(geo && (geo.zeroRatio < 1 || nums.some((n) => n < 0)))
+  const hasPositive = Boolean(geo && nums.some((n) => n > 0))
+  const signedMode = Boolean(geo && (hasNegative || nums.every((n) => n === 0)))
 
-  const ids = useMemo(() => resolveIds(values, elementIds), [values, elementIds])
+  const ids = useMemo(() => uniqueDisplayIds(resolveIds(values, elementIds)), [values, elementIds])
 
   const pointersByIndex = useMemo(() => {
     const map = new Map<number, string[]>()
@@ -159,7 +218,46 @@ function ArrayView({
   const animToken = useRef(0)
   const transitionIdRef = useRef(0)
   const wrapRef = useRef<HTMLDivElement>(null)
+  // Fit signed/unsigned bar chart into remaining stage (after banner/toggles) — landscape short prefers taller bars.
+  useLayoutEffect(() => {
+    if (compact || mode !== 'bars') return
+    const self = wrapRef.current
+    if (!self) return
+    const stage = self.closest('[data-testid="viz-canvas"]') as HTMLElement | null
+    const apply = () => {
+      const stageH = stage?.clientHeight ?? 0
+      if (stageH <= 0) return
+      const top = stage?.getBoundingClientRect().top ?? 0
+      const roomInViewport = Math.max(0, window.innerHeight - top - 4)
+      const usable = Math.min(stageH, roomInViewport)
+      const labelH = self.querySelector('.array-label')?.getBoundingClientRect().height ?? 28
+      const noteH = self.querySelector('.matrix-note')?.getBoundingClientRect().height ?? 0
+      const short = window.innerHeight <= 520
+      const ultra = window.innerHeight <= 400
+      const landscape = window.innerWidth > window.innerHeight
+      // signed chart box ≈ maxH+40; keep that inside remaining stage after label/note
+      const chartChrome = 40
+      const overhead = labelH + noteH + chartChrome + 8
+      const minBudget = landscape && ultra ? 140 : landscape && short ? 110 : short ? 80 : 56
+      const maxBudget = landscape && ultra ? 240 : landscape && short ? 220 : short ? 180 : 160
+      const budget = Math.max(minBudget, Math.min(maxBudget, usable - overhead))
+      setMaxH((prev) => (Math.abs(prev - budget) >= 4 ? budget : prev))
+    }
+    apply()
+    const ro = new ResizeObserver(apply)
+    if (stage) ro.observe(stage)
+    ro.observe(self)
+    window.addEventListener('resize', apply)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', apply)
+    }
+  }, [compact, mode, values.length, signedMode])
   const geometryGen = useRef(0)
+  const [rangeMasks, setRangeMasks] = useState<{
+    current: { left: number; width: number }[]
+    best: { left: number; width: number }[]
+  }>({ current: [], best: [] })
 
   // Clear transforms on cancel / remount / non-swap
   const clearTransforms = () => {
@@ -217,7 +315,7 @@ function ArrayView({
   useLayoutEffect(() => {
     const epochChanged = lastCancelEpoch.current !== transitionEpoch
     lastCancelEpoch.current = transitionEpoch
-    const geomSig = `${ids.join('\0')}|${values.join('\0')}|${swapPair ? swapPair.join(',') : ''}`
+    const geomSig = `${ids.join('\0')}|${values.join('\0')}|${swapPair ? swapPair.join(',') : ''}|${arrayOps?.map((o) => o.type).join(',') ?? ''}`
     const geometryChanged = lastGeomSig.current !== geomSig
     lastGeomSig.current = geomSig
     // Invalidate in-flight RAF/timeouts from any prior transition instance
@@ -252,32 +350,44 @@ function ArrayView({
       return
     }
 
+    // FLIP targets: explicit swap pair OR same-array move (id relocates). Copy/write from
+    // aux buffers (temp/left/right) are intentional instant — buffer strip is the mid-viz.
+    const movingIds = relocatingElementIds(prevElementIds, ids)
+    const hasMoveOp = Boolean(arrayOps?.some((o) => o.type === 'move'))
+    const flipIds =
+      swapPair !== null
+        ? [ids[swapPair[0]!]!, ids[swapPair[1]!]!].filter(Boolean)
+        : hasMoveOp
+          ? movingIds
+          : movingIds.length > 0 && !arrayOps?.some((o) => o.type === 'copy' || o.type === 'write')
+            ? movingIds
+            : []
+
     const shouldFlip =
-      swapPair !== null &&
+      flipIds.length > 0 &&
       !snapSwap &&
       prevValues &&
       prevValues.length === values.length &&
       motionMode !== 'reduced' &&
       swapMs > 0
 
-    if (!shouldFlip || !swapPair) {
+    if (!shouldFlip) {
       clearTransforms()
       seedCenters()
       return
     }
 
-    const [i, j] = swapPair
-    const idAt = (idx: number) => ids[idx]!
-    const targets = [i, j]
-
-    for (const idx of targets) {
-      const id = idAt(idx)
+    const idToIndex = new Map(ids.map((id, i) => [id, i]))
+    for (const id of flipIds) {
+      const idx = idToIndex.get(id)
+      if (idx == null) continue
       const layer = layers.get(id)
       const newCenter = slotCenter(idx)
       const oldCenter = prevCenters.current.get(id)
       if (!layer || newCenter == null || oldCenter == null) continue
       const dx = oldCenter.x - newCenter.x
       const dy = oldCenter.y - newCenter.y
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue
       layer.style.transition = 'none'
       layer.style.transform = `translate(${dx}px, ${dy}px)`
       layer.dataset.transitionId = String(transitionId)
@@ -288,8 +398,7 @@ function ArrayView({
 
     requestAnimationFrame(() => {
       if (animToken.current !== token || geometryGen.current !== gen) return
-      for (const idx of targets) {
-        const id = idAt(idx)
+      for (const id of flipIds) {
         const layer = layers.get(id)
         if (!layer || layer.dataset.transitionId !== String(transitionId)) continue
         layer.style.transition = `transform ${swapMs}ms ease`
@@ -297,8 +406,7 @@ function ArrayView({
       }
       window.setTimeout(() => {
         if (animToken.current !== token || geometryGen.current !== gen) return
-        for (const idx of targets) {
-          const id = idAt(idx)
+        for (const id of flipIds) {
           const layer = layers.get(id)
           if (!layer || layer.dataset.transitionId !== String(transitionId)) continue
           layer.style.transition = 'none'
@@ -316,6 +424,7 @@ function ArrayView({
     values,
     ids,
     swapPair,
+    arrayOps,
     snapSwap,
     prevValues,
     prevElementIds,
@@ -324,14 +433,61 @@ function ArrayView({
     transitionEpoch,
   ])
 
+
+  // V11-01: range masks from real slot rects (segmented when cells wrap)
+  useLayoutEffect(() => {
+    const wrap = wrapRef.current
+    if (!wrap) return
+    const measure = (range: [number, number] | undefined) => {
+      if (!range || values.length <= 0) return [] as { left: number; width: number }[]
+      const lo = Math.max(0, Math.min(range[0], range[1]))
+      const hi = Math.min(values.length - 1, Math.max(range[0], range[1]))
+      const wrapRect = wrap.getBoundingClientRect()
+      const segs: { left: number; width: number }[] = []
+      let segStart: DOMRect | null = null
+      let segEnd: DOMRect | null = null
+      let lastTop: number | null = null
+      const flush = () => {
+        if (!segStart || !segEnd) return
+        segs.push({
+          left: segStart.left - wrapRect.left,
+          width: segEnd.right - segStart.left,
+        })
+        segStart = null
+        segEnd = null
+      }
+      for (let i = lo; i <= hi; i++) {
+        const el = slotRefs.current.get(i)
+        if (!el) continue
+        const r = el.getBoundingClientRect()
+        if (lastTop !== null && Math.abs(r.top - lastTop) > 4) flush()
+        if (!segStart) segStart = r
+        segEnd = r
+        lastTop = r.top
+      }
+      flush()
+      return segs
+    }
+    setRangeMasks({
+      current: measure(ranges?.current),
+      best: measure(ranges?.best),
+    })
+  }, [values, ranges, mode, ids])
+
   const curBand = rangeStyle(ranges?.current, values.length)
   const bestBand = rangeStyle(ranges?.best, values.length)
 
   return (
-    <div className="array-view" data-array={name} ref={wrapRef} data-flip-xy="1">
+    <div
+      className={`array-view${compact ? ' array-view-compact' : ''}`}
+      data-array={name}
+      ref={wrapRef}
+      data-flip-xy="1"
+      data-compact={compact ? '1' : '0'}
+    >
       <div className="array-label">
-        <span>{name}</span>
-        {numeric && (
+        <span>{label ?? name}</span>
+        {numeric && !compact && (
           <div className="view-toggle">
             <button
               type="button"
@@ -352,30 +508,62 @@ function ArrayView({
         )}
       </div>
 
-      {mode === 'bars' && numeric ? (
-        <div className={`bars-wrap${hasNegative ? ' signed' : ''}`} style={{ position: 'relative' }}>
-          {bestBand && <div className="range-band best" style={bestBand} title="最优窗口" />}
-          {curBand && <div className="range-band current" style={curBand} title="当前窗口" />}
-          {hasNegative && <div className="bar-baseline" aria-hidden />}
+      {mode === 'bars' && numeric && geo ? (
+        <div
+          className={`bars-wrap${signedMode ? ' signed' : ''}`}
+          style={
+            {
+              position: 'relative',
+              '--bar-chart-h': `${signedMode && hasPositive && hasNegative ? maxH + 40 : maxH + 24}px`,
+              '--zero-ratio': String(geo.zeroRatio),
+            } as CSSProperties
+          }
+          data-signed={signedMode ? '1' : '0'}
+          data-abs-max={geo.absMax}
+        >
+          {rangeMasks.best.map((s, i) => (
+            <div
+              key={`best-${i}`}
+              className="range-band best range-band-abs"
+              style={{ left: s.left, width: s.width }}
+              title="最优窗口"
+            />
+          ))}
+          {rangeMasks.current.map((s, i) => (
+            <div
+              key={`cur-${i}`}
+              className="range-band current range-band-abs"
+              style={{ left: s.left, width: s.width }}
+              title="当前窗口"
+            />
+          ))}
+          {rangeMasks.current.length === 0 && curBand && (
+            <div className="range-band current" style={curBand} title="当前窗口" />
+          )}
+          {rangeMasks.best.length === 0 && bestBand && (
+            <div className="range-band best" style={bestBand} title="最优窗口" />
+          )}
+          {signedMode && <div className="bar-baseline" style={{ top: `${geo.zeroRatio * 100}%` }} aria-hidden />}
           {values.map((v, i) => {
             const role = roleForIndex(i, highlights, roles, arrayOps)
-            const n = nums[i]!
-            const h = minH + (Math.abs(n) / max) * (maxH - minH)
+            const h = geo.heights[i]!
+            const dir = geo.directions[i]!
             const ptrs = pointersByIndex.get(i) ?? []
-            const neg = n < 0
             const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
             const eid = ids[i]!
+            const slotKey = `slot-${i}`
             return (
               <div
-                key={eid}
-                className={`bar-col${neg ? ' neg' : ' pos'}`}
+                key={slotKey}
+                className={`bar-col ${dir}`}
                 data-el-id={eid}
                 data-slot-index={i}
+                data-bar-dir={dir}
+                data-bar-h={h}
                 ref={(el) => {
                   slotRefs.current.set(i, el)
                 }}
               >
-                {/* Outer slot is stable geometry; inner flip layer translates; pulse on deepest */}
                 <div
                   className="bar-flip-layer"
                   data-flip-layer
@@ -384,15 +572,34 @@ function ArrayView({
                   }}
                   style={{ transform: 'none' } as CSSProperties}
                 >
-                  <div
-                    className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${neg ? ' bar-neg' : ''}${
-                      isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
-                    }`}
-                    style={{ height: `${h}px` }}
-                    title={`[${i}] = ${v}`}
-                  >
-                    <span className="bar-val">{String(v)}</span>
-                  </div>
+                  {dir === 'zero' ? (
+                    <button
+                      type="button"
+                      className={`bar-zero-marker${role ? ` ${ROLE_CLASS[role]}` : ''}`}
+                      data-bar-zero
+                      data-data-height="0"
+                      title={`[${i}] = ${v}`}
+                      aria-label={`索引 ${i} 值 0`}
+                    >
+                      <span className="bar-val">0</span>
+                    </button>
+                  ) : (
+                    <div
+                      className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${dir === 'neg' ? ' bar-neg' : ''}${
+                        isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
+                      }`}
+                      style={{
+                        height: `${h}px`,
+                        // Width from slot geometry (100%), not label text
+                        width: '100%',
+                        minHeight: 0,
+                      }}
+                      data-data-height={h}
+                      title={`[${i}] = ${v}`}
+                    >
+                      <span className="bar-val">{String(v)}</span>
+                    </div>
+                  )}
                 </div>
                 <span className="bar-idx">{i}</span>
                 <div className="pointer-row">
@@ -413,9 +620,10 @@ function ArrayView({
               const role = roleForIndex(i, highlights, roles, arrayOps)
               const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
               const eid = ids[i]!
+              const slotKey = `slot-${i}`
               return (
                 <div
-                  key={eid}
+                  key={slotKey}
                   className="cell-slot"
                   data-el-id={eid}
                   data-slot-index={i}
@@ -476,6 +684,15 @@ function ArrayView({
 
 export default memo(ArrayView)
 
+/** Aux copy buffers shown as a compact strip (not full-height second bar chart). */
+const BUFFER_ARRAY_NAMES = new Set(['temp', 'left', 'right', 'key'])
+const BUFFER_LABELS: Record<string, string> = {
+  temp: 'temp · key',
+  left: 'left',
+  right: 'right',
+  key: 'key',
+}
+
 export const ArraysFromStep = memo(function ArraysFromStep({
   step,
   prevStep,
@@ -488,25 +705,37 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   snapSwap?: boolean
 }) {
   if (!step.arrays) return null
+  const entries = Object.entries(step.arrays)
+  const buffers = entries.filter(([name]) => BUFFER_ARRAY_NAMES.has(name))
+  const primary = entries.filter(([name]) => !BUFFER_ARRAY_NAMES.has(name))
+  const renderOne = (name: string, values: (number | string)[], compact: boolean) => (
+    <ArrayView
+      key={name}
+      name={name}
+      label={compact ? BUFFER_LABELS[name] ?? name : undefined}
+      values={values}
+      highlights={step.highlights?.[name] ?? []}
+      roles={step.roles?.[name]}
+      pointers={deriveArrayPointers(step, name)}
+      scaleMax={scaleMaxByArray?.[name]}
+      ranges={!compact && (name === 'a' || primary.length === 1) ? step.ranges : undefined}
+      arrayOps={step.arrayOps?.[name]}
+      elementIds={step.elementIds?.[name]}
+      prevValues={prevStep?.arrays?.[name]}
+      prevElementIds={prevStep?.elementIds?.[name]}
+      snapSwap={snapSwap}
+      compact={compact}
+      defaultMode={compact ? 'cells' : undefined}
+    />
+  )
   return (
     <div className="arrays-panel">
-      {Object.entries(step.arrays).map(([name, values]) => (
-        <ArrayView
-          key={name}
-          name={name}
-          values={values}
-          highlights={step.highlights?.[name] ?? []}
-          roles={step.roles?.[name]}
-          pointers={deriveArrayPointers(step, name)}
-          scaleMax={scaleMaxByArray?.[name]}
-          ranges={name === 'a' || Object.keys(step.arrays!).length === 1 ? step.ranges : undefined}
-          arrayOps={step.arrayOps?.[name]}
-          elementIds={step.elementIds?.[name]}
-          prevValues={prevStep?.arrays?.[name]}
-          prevElementIds={prevStep?.elementIds?.[name]}
-          snapSwap={snapSwap}
-        />
-      ))}
+      {buffers.length > 0 && (
+        <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
+          {buffers.map(([name, values]) => renderOne(name, values, true))}
+        </div>
+      )}
+      {primary.map(([name, values]) => renderOne(name, values, false))}
     </div>
   )
 })

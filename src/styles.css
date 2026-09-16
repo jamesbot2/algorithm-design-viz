@@ -924,36 +924,112 @@ button.icon-btn {
   opacity: 0.95;
 }
 
-/* —— M3 polish —— */
+/* —— V11-01 signed bars: shared y(0); pos up / neg down; zero height 0 —— */
 .bars-wrap.signed {
   position: relative;
-  align-items: center;
-  min-height: 200px;
+  align-items: stretch;
+  min-height: var(--bar-chart-h, 200px);
+  height: var(--bar-chart-h, 200px);
 }
 .bars-wrap.signed .bar-baseline {
   position: absolute;
   left: 0; right: 0;
-  top: 50%;
+  top: calc(var(--zero-ratio, 0.5) * 100%);
   height: 1px;
   background: var(--border);
   pointer-events: none;
-}
-.bar-col.neg .bar {
-  align-self: start;
-  margin-top: 50%;
-  transform: translateY(0);
-  border-radius: 0 0 6px 6px;
-}
-.bar-col.pos .bar {
-  align-self: end;
-  margin-bottom: 50%;
+  z-index: 1;
 }
 .bars-wrap.signed .bar-col {
+  justify-content: flex-start;
+  min-height: 100%;
+  height: 100%;
+  position: relative;
+}
+.bars-wrap.signed .bar-flip-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
   justify-content: center;
-  min-height: 200px;
+  width: 100%;
+}
+.bars-wrap.signed .bar-col.pos .bar-flip-layer {
+  bottom: calc((1 - var(--zero-ratio, 0.5)) * 100%);
+  align-items: flex-end;
+}
+.bars-wrap.signed .bar-col.neg .bar-flip-layer {
+  top: calc(var(--zero-ratio, 0.5) * 100%);
+  align-items: flex-start;
+}
+.bars-wrap.signed .bar-col.zero .bar-flip-layer {
+  top: calc(var(--zero-ratio, 0.5) * 100%);
+  transform: translateY(-50%);
+  align-items: center;
+}
+.bars-wrap.signed .bar-col.pos .bar {
+  align-self: auto;
+  margin-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  min-height: 0;
+}
+.bars-wrap.signed .bar-col.neg .bar {
+  align-self: auto;
+  margin-top: 0;
+  border-radius: 0 0 6px 6px;
+  min-height: 0;
 }
 .bar.bar-neg {
   background: rgba(239, 68, 68, 0.35);
+}
+.bar-zero-marker {
+  width: 100%;
+  min-height: 22px;
+  min-width: 22px;
+  padding: 0;
+  margin: 0;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bar-zero-marker .bar-val {
+  font-size: 0.65rem;
+}
+.range-band-abs {
+  position: absolute;
+  top: 0;
+  bottom: 1.8rem;
+  pointer-events: none;
+  z-index: 0;
+}
+.bars-wrap .bar {
+  /* width from slot; never shrink-wrap label */
+  width: 100%;
+  box-sizing: border-box;
+}
+.bars-wrap .bar-val {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.playback-settings-panel {
+  /* V11-08: overlay popover — must not crush stage */
+  position: absolute;
+  z-index: 55;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: calc(100% + 4px);
+  max-height: min(40vh, 280px);
+  overflow: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+}
+.playback-transport {
+  position: relative;
 }
 
 .matrix-table.sticky-labels .sticky-top {
@@ -1113,6 +1189,48 @@ button.icon-btn {
 }
 .hl-update { /* alias */ }
 .arrays-panel { display: flex; flex-direction: column; gap: 0.75rem; }
+
+/* V11 evidence fix: temp/left/right as compact buffer strip (visible above main array) */
+.array-buffers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: flex-start;
+  padding: 0.35rem 0.5rem;
+  border: 1px dashed var(--border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg-elev, #111) 88%, var(--accent, #10a37f) 12%);
+}
+.array-buffers .array-view-compact {
+  flex: 0 1 auto;
+  min-width: 4.5rem;
+}
+.array-buffers .array-view-compact .array-label {
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent, #10a37f);
+}
+.array-buffers .array-view-compact .view-toggle {
+  display: none;
+}
+.array-buffers .array-view-compact .array-cells {
+  gap: 0.25rem;
+}
+.array-buffers .array-view-compact .cell {
+  min-width: 2.2rem;
+  min-height: 2.2rem;
+  padding: 0.2rem 0.35rem;
+}
+.array-buffers .array-view-compact .bars-wrap {
+  min-height: 48px;
+  height: auto;
+}
+.array-buffers .array-view-compact .bars-wrap.signed {
+  min-height: 64px;
+  height: 64px;
+  --bar-chart-h: 64px;
+}
 
 /* —— V3 Workbench / Lab theme (gradual migration) —— */
 :root, [data-lab-theme="lab-dark"] {
@@ -2016,6 +2134,36 @@ html, body, #root {
 .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport {
   min-height: 160px;
 }
+@media (max-height: 520px) {
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport,
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-main {
+    min-height: 180px;
+  }
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .visualizer {
+    min-height: 220px;
+  }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport,
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-main {
+    min-height: 180px;
+  }
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .visualizer {
+    min-height: 230px;
+  }
+}
+@media (max-height: 400px) and (orientation: landscape) {
+  .main-wrap[data-lab-fill="1"] .stage-viewport,
+  .main-wrap[data-lab-fill="1"] .viz-main,
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport,
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-main {
+    min-height: 180px;
+  }
+  .main-wrap[data-lab-fill="1"] .visualizer,
+  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .visualizer {
+    min-height: 220px;
+  }
+}
 .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .workbench-panels-stable {
   min-height: 200px !important;
 }
@@ -2186,7 +2334,36 @@ html, body, #root {
     min-height: 0;
   }
   .main-wrap[data-lab-fill="1"] .stage-viewport {
-    min-height: 140px;
+    min-height: 180px;
+  }
+  /* Keep signed bars usable — avoid 200px chart crushed into empty strip */
+  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
+    --bar-chart-h: min(140px, 32vh);
+    min-height: var(--bar-chart-h);
+    height: var(--bar-chart-h);
+  }
+  .main-wrap[data-lab-fill="1"] .bars-wrap:not(.signed) {
+    min-height: min(112px, 26vh);
+  }
+  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
+    max-height: 1.8rem;
+    min-height: 1.5rem;
+    height: 1.6rem;
+  }
+  .main-wrap[data-lab-fill="1"] .viz-banner-text {
+    -webkit-line-clamp: 1;
+    max-height: 1.5rem;
+    font-size: 0.78rem;
+  }
+  /* After run, reclaim Run/Cancel row — reopen via 编辑输入 */
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky {
+    display: none !important;
+  }
+  .main-wrap[data-lab-fill="1"] .array-view > .matrix-note {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .input-panel-v9 {
+    padding: 0.2rem 0.45rem;
   }
   /* Inline chrome hidden ONLY when dock/sheet entry exists */
   .main-wrap[data-lab-fill="1"] .viz-inspector:not(.inspector-sheet-body),
@@ -2195,11 +2372,20 @@ html, body, #root {
   .main-wrap[data-lab-fill="1"] .kbd-hint {
     display: none;
   }
-  .main-wrap[data-lab-fill="1"] .playback-transport .phase-jump,
-  .main-wrap[data-lab-fill="1"] .playback-transport .phase-track,
+  /* V11-08: direct-child only — do NOT hide dock variants inside settings panel */
+  .main-wrap[data-lab-fill="1"] .playback-transport > .phase-jump,
+  .main-wrap[data-lab-fill="1"] .playback-transport > .phase-track,
   .main-wrap[data-lab-fill="1"] .playback-transport > .viz-toolbar > .speed-label,
   .main-wrap[data-lab-fill="1"] .workbench-header {
     display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-jump,
+  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-track,
+  .main-wrap[data-lab-fill="1"] .playback-settings-panel .speed-label {
+    display: flex !important;
+  }
+  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-jump {
+    flex-wrap: wrap;
   }
   /* Dock entries stay visible and usable */
   .main-wrap[data-lab-fill="1"] .playback-settings-dock,
@@ -2245,7 +2431,7 @@ html, body, #root {
   margin-bottom: 0.5rem;
 }
 .playback-settings-panel {
-  margin-top: 0.35rem;
+  margin-top: 0;
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--border-soft);
   border-radius: 8px;
@@ -2268,4 +2454,131 @@ html, body, #root {
 }
 .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .workbench-layout[data-height-mode="scroll"] {
   overflow: visible;
+}
+
+
+/* Ultra-short (e.g. 844×390): raise stage — never lower below ≤520 floor */
+@media (max-height: 400px) {
+  .main-wrap[data-lab-fill="1"] > .main {
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+  }
+  .main-wrap[data-lab-fill="1"] .input-summary-bar {
+    min-height: 0;
+    padding: 0.05rem 0;
+  }
+  .main-wrap[data-lab-fill="1"] .visualizer {
+    min-height: 220px;
+  }
+  .main-wrap[data-lab-fill="1"] .stage-viewport,
+  .main-wrap[data-lab-fill="1"] .viz-main {
+    min-height: 180px;
+  }
+  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
+    --bar-chart-h: min(150px, 40vh);
+    min-height: var(--bar-chart-h);
+    height: var(--bar-chart-h);
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
+    max-height: 1.35rem;
+    min-height: 1.2rem;
+    height: 1.25rem;
+  }
+}
+
+/* Short landscape (w>h or h≤520 landscape): prefer stage over chrome */
+@media (max-height: 520px) and (orientation: landscape) {
+  .main-wrap[data-lab-fill="1"] .page-header-compact {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .visualizer {
+    min-height: 230px;
+  }
+  .main-wrap[data-lab-fill="1"] .stage-viewport,
+  .main-wrap[data-lab-fill="1"] .viz-main {
+    min-height: 180px;
+  }
+  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
+    --bar-chart-h: min(160px, 42vh);
+    min-height: var(--bar-chart-h);
+    height: var(--bar-chart-h);
+  }
+  .main-wrap[data-lab-fill="1"] .bars-wrap:not(.signed) {
+    min-height: min(130px, 34vh);
+  }
+  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
+    max-height: 1.5rem;
+    min-height: 1.25rem;
+    height: 1.35rem;
+  }
+  .main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar button {
+    padding: 0.15rem 0.35rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* Ultra-short landscape: tabs mode (JS) + compact tablist; demo full width */
+@media (max-height: 400px) and (orientation: landscape) {
+  .main-wrap[data-lab-fill="1"] .workbench-tabs {
+    display: flex !important;
+    min-height: 0;
+    padding: 0;
+    gap: 0.25rem;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-tabs button {
+    padding: 0.1rem 0.45rem;
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+  .main-wrap[data-lab-fill="1"] .topbar {
+    min-height: 0;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-transport {
+    padding-top: 0.05rem;
+    padding-bottom: 0.05rem;
+  }
+  .main-wrap[data-lab-fill="1"] .playback-transport .scrub-row {
+    margin: 0;
+  }
+  .main-wrap[data-lab-fill="1"] .visualizer {
+    min-height: 240px !important;
+    overflow: visible !important;
+  }
+  .main-wrap[data-lab-fill="1"] .stage-viewport,
+  .main-wrap[data-lab-fill="1"] .viz-main {
+    min-height: 190px !important;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-panels-stable {
+    min-height: 240px !important;
+    overflow: visible !important;
+    flex: 1 1 auto !important;
+  }
+  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
+    --bar-chart-h: min(170px, 48vh);
+    min-height: var(--bar-chart-h);
+    height: var(--bar-chart-h);
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-layout {
+    overflow: visible !important;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-height-mode="scroll"] .workbench-panels-stable,
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-height-mode="fill"] .workbench-panels-stable {
+    flex: 1 1 auto !important;
+    min-height: 240px !important;
+    overflow: visible !important;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-transport {
+    flex: 0 0 auto;
+    max-height: 56px;
+    overflow: hidden;
+  }
+  .main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar {
+    flex-wrap: nowrap;
+    gap: 0.2rem;
+  }
 }

@@ -4,8 +4,7 @@
       "/home/box/.local/node-v24.20.0-linux-x64/bin/node",
       "/workspace/algorithm-design-viz/node_modules/.bin/playwright",
       "test",
-      "tests/e2e/v5-r1-r4.spec.ts",
-      "tests/e2e/v5-m3-m4.spec.ts"
+      "tests/e2e/v11-semantic-visual.spec.ts"
     ],
     "configFile": "/workspace/algorithm-design-viz/playwright.config.ts",
     "rootDir": "/workspace/algorithm-design-viz/tests/e2e",
@@ -72,20 +71,20 @@
   },
   "suites": [
     {
-      "title": "v5-m3-m4.spec.ts",
-      "file": "v5-m3-m4.spec.ts",
+      "title": "v11-semantic-visual.spec.ts",
+      "file": "v11-semantic-visual.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "V5 M3/M4 workbench + expand e2e",
-          "file": "v5-m3-m4.spec.ts",
-          "line": 3,
+          "title": "V11 semantic/visual smokes",
+          "file": "v11-semantic-visual.spec.ts",
+          "line": 114,
           "column": 6,
           "specs": [
             {
-              "title": "binarySearch TS↔pseudo mid lines differ by document",
+              "title": "insertionSort [2,1] edit→run→mid shows temp buffer",
               "ok": true,
               "tags": [],
               "tests": [
@@ -100,12 +99,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1250,
+                      "duration": 1408,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T12:12:43.281Z",
+                      "startTime": "2026-09-16T13:56:17.973Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -113,13 +112,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "5864b949189d35594b31-544c8b13c59c21f4aed4",
-              "file": "v5-m3-m4.spec.ts",
-              "line": 4,
+              "id": "b01bc08d62ac1a1c26eb-e0b625e75cc086892e37",
+              "file": "v11-semantic-visual.spec.ts",
+              "line": 117,
               "column": 3
             },
             {
-              "title": "LCS write primary anchor present after run",
+              "title": "nQueens end keeps board matrix with queens",
               "ok": true,
               "tags": [],
               "tests": [
@@ -134,12 +133,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1589,
+                      "duration": 1340,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T12:12:44.683Z",
+                      "startTime": "2026-09-16T13:56:19.568Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -147,13 +146,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "5864b949189d35594b31-56a5406fafb70267a8c1",
-              "file": "v5-m3-m4.spec.ts",
-              "line": 27,
+              "id": "b01bc08d62ac1a1c26eb-ffc841399187d84a0ef8",
+              "file": "v11-semantic-visual.spec.ts",
+              "line": 153,
               "column": 3
             },
             {
-              "title": "quickSort play advances steps",
+              "title": "knapsack rejects non-integer weight without solving",
               "ok": true,
               "tags": [],
               "tests": [
@@ -168,12 +167,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1744,
+                      "duration": 1228,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T12:12:46.281Z",
+                      "startTime": "2026-09-16T13:56:20.919Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -181,15 +180,17 @@
                   "status": "expected"
                 }
               ],
-              "id": "5864b949189d35594b31-65d554684b8d87f84e24",
-              "file": "v5-m3-m4.spec.ts",
-              "line": 50,
+              "id": "b01bc08d62ac1a1c26eb-1a75ed28a48fde35e609",
+              "file": "v11-semantic-visual.spec.ts",
+              "line": 176,
               "column": 3
             },
             {
-              "title": "cancel enabled while heavy nQueens running",
+              "title": "short-height docks @1366x768",
               "ok": true,
-              "tags": [],
+              "tags": [
+                "1366x768"
+              ],
               "tests": [
                 {
                   "timeout": 120000,
@@ -202,12 +203,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 719,
+                      "duration": 1014,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T12:12:48.033Z",
+                      "startTime": "2026-09-16T13:56:22.165Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -215,15 +216,17 @@
                   "status": "expected"
                 }
               ],
-              "id": "5864b949189d35594b31-6a92ab9a0551bfb93f5f",
-              "file": "v5-m3-m4.spec.ts",
-              "line": 64,
-              "column": 3
+              "id": "b01bc08d62ac1a1c26eb-2aadee49391526e8a999",
+              "file": "v11-semantic-visual.spec.ts",
+              "line": 201,
+              "column": 5
             },
             {
-              "title": "theme switch readability smoke",
+              "title": "short-height docks @390x844",
               "ok": true,
-              "tags": [],
+              "tags": [
+                "390x844"
+              ],
               "tests": [
                 {
                   "timeout": 120000,
@@ -236,12 +239,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 706,
+                      "duration": 913,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T12:12:48.762Z",
+                      "startTime": "2026-09-16T13:56:23.190Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -249,66 +252,17 @@
                   "status": "expected"
                 }
               ],
-              "id": "5864b949189d35594b31-3d6ccb09dce6b38dcd1a",
-              "file": "v5-m3-m4.spec.ts",
-              "line": 77,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "v5-r1-r4.spec.ts",
-      "file": "v5-r1-r4.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "V5 R1 tab switch + R4 swap settle",
-          "file": "v5-r1-r4.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "R1 binarySearch tab switch uses that doc anchors",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1055,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-15T12:12:49.486Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e02e8a85606d82fc5e36-840600790aaddfa73c6b",
-              "file": "v5-r1-r4.spec.ts",
-              "line": 6,
-              "column": 3
+              "id": "b01bc08d62ac1a1c26eb-dd59549f475c3a9df98f",
+              "file": "v11-semantic-visual.spec.ts",
+              "line": 201,
+              "column": 5
             },
             {
-              "title": "R4 quickSort swap settles to transform none",
+              "title": "short-height docks @1024x520",
               "ok": true,
-              "tags": [],
+              "tags": [
+                "1024x520"
+              ],
               "tests": [
                 {
                   "timeout": 120000,
@@ -321,12 +275,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1563,
+                      "duration": 994,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-15T12:12:50.549Z",
+                      "startTime": "2026-09-16T13:56:24.113Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -334,10 +288,82 @@
                   "status": "expected"
                 }
               ],
-              "id": "e02e8a85606d82fc5e36-86eb475272e66a3977ef",
-              "file": "v5-r1-r4.spec.ts",
-              "line": 31,
-              "column": 3
+              "id": "b01bc08d62ac1a1c26eb-87b50359c0e057445dc6",
+              "file": "v11-semantic-visual.spec.ts",
+              "line": 201,
+              "column": 5
+            },
+            {
+              "title": "short-height docks @1024x500",
+              "ok": true,
+              "tags": [
+                "1024x500"
+              ],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1071,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T13:56:25.117Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b01bc08d62ac1a1c26eb-5f3c86cc92e027bb8143",
+              "file": "v11-semantic-visual.spec.ts",
+              "line": 201,
+              "column": 5
+            },
+            {
+              "title": "short-height docks @844x390",
+              "ok": true,
+              "tags": [
+                "844x390"
+              ],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1041,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T13:56:26.198Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b01bc08d62ac1a1c26eb-08e35b35fc74aa3bfbfb",
+              "file": "v11-semantic-visual.spec.ts",
+              "line": 201,
+              "column": 5
             }
           ]
         }
@@ -346,9 +372,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-15T12:12:42.501Z",
-    "duration": 9755.362000000001,
-    "expected": 7,
+    "startTime": "2026-09-16T13:56:17.445Z",
+    "duration": 9888.503999999999,
+    "expected": 8,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

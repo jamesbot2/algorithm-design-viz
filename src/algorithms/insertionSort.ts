@@ -14,22 +14,33 @@ export const meta = {
   a[j+1] = key`,
 
   implName: 'insertionSort',
-  implVersion: '1.0.2',
+  implVersion: '1.1.0',
   timeComplexity: '最坏 O(n²)，最好 O(n)',
   spaceComplexity: 'O(1)',
   spaceNotes: '原地。',
   inputAssumptions: '任意数值数组。',
-  statDefinitions: 'comparisons=插入探测比较；writes/swaps 依实现计入 swaps。',
+  statDefinitions: 'comparisons=插入探测比较；writes=右移与插入写入。',
+}
+
+function vacantId(seq: number, slot: number): string {
+  return `vacant:${seq}:${slot}`
 }
 
 export function generateSteps(input: number[]): Step[] {
   const a = [...input]
+  // Slot-stable display ids start as logical element ids; never duplicate within a snapshot.
   const elementIds = input.map((_, i) => `ins${i}`)
   const steps: Step[] = []
   let id = 0
+  let vacantSeq = 0
   const DOC = 'insertionSort.ts'
   const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
-  const PHASE_ANCHOR: Record<string, string> = {"init":"outer","insert":"insert","shift":"shift","done":"done"}
+  const PHASE_ANCHOR: Record<string, string> = {
+    init: 'outer',
+    insert: 'insert',
+    shift: 'shift',
+    done: 'done',
+  }
   let comparisons = 0
   let writes = 0
 
@@ -43,12 +54,16 @@ export function generateSteps(input: number[]): Step[] {
     arrayOps?: ArrayOp[],
     phase?: string,
     codeRefs?: { documentId: string; anchorId: string }[],
+    extraArrays?: Record<string, number[] | string[]>,
+    extraIds?: Record<string, string[]>,
   ) => {
     const sortedRoles: Record<number, HighlightRole> = { ...(roles ?? {}) }
     const iVar = typeof vars.i === 'number' ? vars.i : -1
     if (iVar >= 1) {
       for (let s = 0; s < iVar; s++) {
-        if (!(s in sortedRoles)) sortedRoles[s] = 'sorted'
+        if (!(s in sortedRoles) && !String(elementIds[s]).startsWith('vacant:')) {
+          sortedRoles[s] = 'sorted'
+        }
       }
     }
     const ptrs =
@@ -57,14 +72,16 @@ export function generateSteps(input: number[]): Step[] {
         ...(typeof vars.i === 'number' && vars.i >= 0 ? { i: vars.i as number } : {}),
         ...(typeof vars.j === 'number' && (vars.j as number) >= 0 ? { j: vars.j as number } : {}),
       }
+    const arrays: Record<string, number[] | string[]> = { a: [...a], ...(extraArrays ?? {}) }
+    const ids: Record<string, string[]> = { a: [...elementIds], ...(extraIds ?? {}) }
     steps.push({
       id: id++,
       message,
       phase,
       highlights: { a: highlights },
       roles: Object.keys(sortedRoles).length ? { a: sortedRoles } : undefined,
-      arrays: { a: [...a] },
-      elementIds: { a: [...elementIds] },
+      arrays,
+      elementIds: ids,
       arrayOps: arrayOps?.length ? { a: arrayOps } : undefined,
       vars: { n: a.length, ...vars },
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
@@ -79,31 +96,55 @@ export function generateSteps(input: number[]): Step[] {
     const key = a[i]!
     const keyId = elementIds[i]!
     let j = i - 1
-    snap(`取出 key = a[${i}] = ${key}`, [i], { i, j, key }, 1, { [i]: 'read' }, { i, j }, [{ type: 'compare', indices: [i], elementIds: [keyId] }], 'insert')
+    // Lift key into temp — vacate slot i so ids stay unique during right-shifts (move, not alias).
+    const hole = vacantId(vacantSeq++, i)
+    a[i] = key // value retained until overwritten; identity vacated
+    elementIds[i] = hole
+    snap(
+      `取出 key = a[${i}] = ${key} → temp`,
+      [i],
+      { i, j, key },
+      1,
+      { [i]: 'read' },
+      { i, j },
+      [{ type: 'compare', indices: [i], elementIds: [keyId] }],
+      'insert',
+      undefined,
+      { temp: [key] },
+      { temp: [keyId] },
+    )
     while (j >= 0 && a[j]! > key) {
       comparisons++
       snap(
-        `a[${j}]=${a[j]} > key=${key}，右移`,
+        `a[${j}]=${a[j]} > key=${key}，准备右移`,
         [j, j + 1],
         { i, j, key },
         3,
-        { [j]: 'compare', [j + 1]: 'swap' },
+        { [j]: 'compare', [j + 1]: 'update' },
         { i, j },
         [{ type: 'compare', indices: [j], elementIds: [elementIds[j]!] }],
         'shift',
+        undefined,
+        { temp: [key] },
+        { temp: [keyId] },
       )
+      // Move: transfer identity to j+1; leave unique vacancy at j
       a[j + 1] = a[j]!
       elementIds[j + 1] = elementIds[j]!
+      elementIds[j] = vacantId(vacantSeq++, j)
       writes++
       snap(
-        `a[${j + 1}] ← ${a[j + 1]}`,
+        `右移 a[${j + 1}] ← a[${j}]（move）`,
         [j + 1],
         { i, j, key },
         4,
-        { [j + 1]: 'swap' },
+        { [j + 1]: 'update' },
         { i, j },
         [{ type: 'move', indices: [j, j + 1], elementIds: [elementIds[j + 1]!] }],
         'shift',
+        undefined,
+        { temp: [key] },
+        { temp: [keyId] },
       )
       j--
     }
@@ -120,6 +161,9 @@ export function generateSteps(input: number[]): Step[] {
       { i, ...(j >= 0 ? { j } : {}) },
       [{ type: 'write', indices: [j + 1], elementIds: [keyId] }],
       'insert',
+      undefined,
+      { temp: [key] },
+      { temp: [keyId] },
     )
   }
   const allSorted: Record<number, HighlightRole> = {}

@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { segmentGeometry, type StageSegment } from '../../utils/teachableStages'
 
 export interface PlaybackTransportProps {
@@ -70,6 +70,24 @@ export default function PlaybackTransport({
 }: PlaybackTransportProps) {
   const [moreOpen, setMoreOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const settingsRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!settingsOpen) return
+    const panel = settingsRef.current
+    const prev = document.activeElement as HTMLElement | null
+    panel?.querySelector<HTMLElement>('input,button,select,[href]')?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        setSettingsOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => {
+      window.removeEventListener('keydown', onKey, true)
+      prev?.focus?.()
+    }
+  }, [settingsOpen])
   const n = stepsLen
   const jumps = teachableStages ?? segments.filter((s) => s.kind !== 'event')
   const primaryLabel =
@@ -242,6 +260,10 @@ export default function PlaybackTransport({
         id="playback-settings-panel"
         className="playback-settings-panel"
         data-testid="playback-settings-panel"
+        role="dialog"
+        aria-label="播放设置"
+        aria-modal="true"
+        ref={settingsRef}
         hidden={!settingsOpen}
       >
         <label className="speed-label">

@@ -124,6 +124,11 @@ export interface Step {
   }[]
   ranges?: StepRanges
   /**
+   * Explicit active search-tree path (node ids). Prefer over guessing
+   * the first child with status===exploring.
+   */
+  activePathIds?: string[]
+  /**
    * Optional row/col/item labels for matrix teaching sync
    * (e.g. knapsack items, LCS characters).
    */

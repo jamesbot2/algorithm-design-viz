@@ -1,0 +1,15 @@
+
+Running 8 tests using 1 worker
+
+(node:1545445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/e2e/v11-semantic-visual.spec.ts:117:3 › V11 semantic/visual smokes › insertionSort [2,1] edit→run→mid shows temp buffer (1.4s)
+  ✓  2 [chromium] › tests/e2e/v11-semantic-visual.spec.ts:153:3 › V11 semantic/visual smokes › nQueens end keeps board matrix with queens (1.3s)
+  ✓  3 [chromium] › tests/e2e/v11-semantic-visual.spec.ts:176:3 › V11 semantic/visual smokes › knapsack rejects non-integer weight without solving (1.2s)
+  ✓  4 [chromium] › tests/e2e/v11-semantic-visual.spec.ts:201:5 › V11 semantic/visual smokes › short-height docks @1366x768 (1.0s)
+  ✓  5 [chromium] › tests/e2e/v11-semantic-visual.spec.ts:201:5 › V11 semantic/visual smokes › short-height docks @390x844 (913ms)
+  ✓  6 [chromium] › tests/e2e/v11-semantic-visual.spec.ts:201:5 › V11 semantic/visual smokes › short-height docks @1024x520 (994ms)
+  ✓  7 [chromium] › tests/e2e/v11-semantic-visual.spec.ts:201:5 › V11 semantic/visual smokes › short-height docks @1024x500 (1.1s)
+  ✓  8 [chromium] › tests/e2e/v11-semantic-visual.spec.ts:201:5 › V11 semantic/visual smokes › short-height docks @844x390 (1.0s)
+
+  8 passed (9.9s)
