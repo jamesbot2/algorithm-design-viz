@@ -97,6 +97,8 @@ function maxOuterDrift(samples: Awaited<ReturnType<typeof sampleDuringPlay>>) {
     ] as const
     for (const [a, b] of pairs) {
       if (!a || !b) continue
+      // V10: tabs-hidden panels report 0×0 — skip (not real chrome motion)
+      if (a.w * a.h < 1 || b.w * b.h < 1) continue
       m = Math.max(m, drift(a, b))
     }
   }
@@ -188,10 +190,29 @@ test.describe('V4 E — stability sampling', () => {
         for (const s of samples) m = Math.max(m, drift(base ?? null, s.input))
         return m
       })()
+      const regionDrift = (() => {
+        const base = samples[0]!
+        const keys = ['workbench', 'canvas', 'code', 'input', 'transport'] as const
+        const out: Record<string, number> = {}
+        for (const k of keys) {
+          let m = 0
+          for (const s of samples) {
+            const a = base[k] as Box | null
+            const b = s[k] as Box | null
+            if (!a || !b) continue
+            // Ignore zero-size (tabs-hidden) panels
+            if (a.w * a.h < 1 || b.w * b.h < 1) continue
+            m = Math.max(m, drift(a, b))
+          }
+          out[k] = m
+        }
+        return out
+      })()
       const summary = {
         viewport: vp,
         samples: samples.length,
         outerDriftPx: outer,
+        regionDrift,
         scrollYDrift: scrollDrift,
         scrollYFirst: scrollYs[0],
         controlDriftPx: controlDrift,
@@ -201,6 +222,11 @@ test.describe('V4 E — stability sampling', () => {
       }
       fs.writeFileSync(
         path.join(OUT_TRACES, `binarySearch-play-${vp.name}.json`),
+        JSON.stringify(summary, null, 2),
+      )
+      fs.mkdirSync(path.join(process.cwd(), 'docs/traces/v10'), { recursive: true })
+      fs.writeFileSync(
+        path.join(process.cwd(), 'docs/traces/v10', `binarySearch-play-${vp.name}.json`),
         JSON.stringify(summary, null, 2),
       )
       await page.screenshot({
@@ -237,10 +263,24 @@ test.describe('V4 E — stability sampling', () => {
 
   test('LCS / nQueens / dijkstra / knapsack teach paths', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
+    fs.mkdirSync(path.join(process.cwd(), 'docs/traces/v10'), { recursive: true })
     for (const route of ['#/algo/lcs', '#/algo/nQueens', '#/algo/dijkstra', '#/teach/knapsack']) {
       await page.goto(route)
       await expect(page.getByTestId('workbench-layout')).toBeVisible({ timeout: 20_000 })
-      await expect(page.getByTestId('code-browser')).toBeVisible()
+      const layout = await page.getByTestId('workbench-layout').getAttribute('data-layout')
+      // Tabs: code is intentionally hidden until「代码」tab — not a crush failure
+      if (layout === 'tabs') {
+        await page.getByRole('tab', { name: '代码' }).click()
+      }
+      const code = page.getByTestId('code-browser')
+      await expect(code).toBeVisible({ timeout: 15_000 })
+      const box = await code.boundingBox()
+      expect(box, `${route} code-browser missing box`).toBeTruthy()
+      expect(box!.width * box!.height, `${route} code crushed (layout=${layout})`).toBeGreaterThan(200)
+      // Split must show code without needing the tab
+      if (layout === 'split') {
+        await expect(code).toBeVisible()
+      }
       const run = page.getByTestId('run-btn')
       if (await run.count()) {
         await run.click()
@@ -248,6 +288,10 @@ test.describe('V4 E — stability sampling', () => {
       }
       const safe = route.replace(/[#/]/g, '_')
       await page.screenshot({ path: path.join(OUT_SHOTS, `path${safe}.png`) })
+      fs.writeFileSync(
+        path.join(process.cwd(), 'docs/traces/v10', `path${safe}-code.json`),
+        JSON.stringify({ route, layout, box }, null, 2),
+      )
     }
   })
 

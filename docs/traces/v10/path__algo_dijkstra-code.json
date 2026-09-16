@@ -1,0 +1,10 @@
+{
+  "route": "#/algo/dijkstra",
+  "layout": "split",
+  "box": {
+    "x": 830.28125,
+    "y": 669.3125,
+    "width": 406.9375,
+    "height": 25.078125
+  }
+}

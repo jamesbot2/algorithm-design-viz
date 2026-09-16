@@ -208,14 +208,22 @@ function ArrayView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Pause / seek / replace-run epoch: cancel in-flight FLIP
-  useEffect(() => {
-    animToken.current += 1
-    clearTransforms()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transitionEpoch, snapSwap])
+  // V10-04: cancel-old vs create-new in ONE layout pass.
+  // A separate useEffect(clear on transitionEpoch) ran AFTER layout and killed
+  // the brand-new FLIP that goNext just created (epoch+idx batched).
+  const lastCancelEpoch = useRef(transitionEpoch)
+  const lastGeomSig = useRef('')
 
   useLayoutEffect(() => {
+    const epochChanged = lastCancelEpoch.current !== transitionEpoch
+    lastCancelEpoch.current = transitionEpoch
+    const geomSig = `${ids.join('\0')}|${values.join('\0')}|${swapPair ? swapPair.join(',') : ''}`
+    const geometryChanged = lastGeomSig.current !== geomSig
+    lastGeomSig.current = geomSig
+    // Invalidate in-flight RAF/timeouts from any prior transition instance
+    if (epochChanged || snapSwap) {
+      animToken.current += 1
+    }
     const token = ++animToken.current
     const transitionId = ++transitionIdRef.current
     const layers = layerRefs.current
@@ -229,6 +237,21 @@ function ArrayView({
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 }
     }
 
+    const seedCenters = () => {
+      for (let i = 0; i < values.length; i++) {
+        const c = slotCenter(i)
+        const id = ids[i]
+        if (c != null && id) prevCenters.current.set(id, c)
+      }
+    }
+
+    // Pause/seek/reset: epoch bumped without new geometry → cancel only (do not restart FLIP)
+    if (snapSwap || (epochChanged && !geometryChanged)) {
+      clearTransforms()
+      seedCenters()
+      return
+    }
+
     const shouldFlip =
       swapPair !== null &&
       !snapSwap &&
@@ -239,11 +262,7 @@ function ArrayView({
 
     if (!shouldFlip || !swapPair) {
       clearTransforms()
-      for (let i = 0; i < values.length; i++) {
-        const c = slotCenter(i)
-        const id = ids[i]
-        if (c != null && id) prevCenters.current.set(id, c)
-      }
+      seedCenters()
       return
     }
 

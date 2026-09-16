@@ -1,5 +1,11 @@
 # Deploy only after CI succeeds on main (workflow_run), or manual dispatch
 # that verifies CI green on the SAME SHA.
+#
+# V10 note: Pages currently gates on workflow `CI` only (unit/build). E2E is a
+# separate workflow (`e2e.yml`) and is NOT yet a hard required check for deploy.
+# Preferred future gate: require both CI and E2E success on the *same* SHA before
+# Pages publish. Until then, treat E2E failures on main as release blockers manually.
+# Do not deploy a SHA whose E2E is red even if CI is green.
 name: Deploy to GitHub Pages
 
 on:

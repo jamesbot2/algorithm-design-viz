@@ -14,6 +14,24 @@ export function leftNormal(ax: number, ay: number, bx: number, by: number): Pt {
   return { x: -dy / len, y: dx / len }
 }
 
+/**
+ * V10-05: one fixed geometric normal per unordered endpoint pair.
+ * Always left-of (lex-smaller id → lex-larger id), independent of arrow direction.
+ * ax,ay = from-node coords; bx,by = to-node coords of the directed edge being drawn.
+ */
+export function pairCanonicalNormal(
+  fromId: string,
+  toId: string,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+): Pt {
+  if (fromId <= toId) return leftNormal(ax, ay, bx, by)
+  // Directed edge is opposite of canonical chord — flip endpoints for the normal only
+  return leftNormal(bx, by, ax, ay)
+}
+
 /** Inset endpoints toward each other so arrows clear node radii. */
 export function insetEndpoints(
   ax: number,
@@ -39,7 +57,7 @@ export function insetEndpoints(
 /**
  * Channel offset for parallel / reverse edges.
  * indexInPair: 0..count-1 among edges sharing undirected endpoints (excluding self-loops).
- * Uses stable ordering by edge id so A→B and B→A get opposite signs.
+ * Uses stable ordering by edge id. Offsets are along the *canonical* normal (see curveControl).
  */
 export function parallelChannelOffset(
   edgeId: string,
@@ -56,19 +74,51 @@ export function parallelChannelOffset(
   return (idx - mid) * spacing
 }
 
-/** Quadratic control point for a curved channel. */
+/**
+ * Quadratic control point for a curved channel.
+ * When fromId/toId provided, offset is applied along the canonical pair normal
+ * so A→B and B→A with opposite channel indices land on opposite sides (not the same side).
+ */
 export function curveControl(
   ax: number,
   ay: number,
   bx: number,
   by: number,
   offset: number,
+  fromId?: string,
+  toId?: string,
 ): Pt {
-  const n = leftNormal(ax, ay, bx, by)
+  const n =
+    fromId != null && toId != null
+      ? pairCanonicalNormal(fromId, toId, ax, ay, bx, by)
+      : leftNormal(ax, ay, bx, by)
   return {
     x: (ax + bx) / 2 + n.x * offset,
     y: (ay + by) / 2 + n.y * offset,
   }
+}
+
+/** Approximate label axis-aligned box around a control/label point. */
+export function labelBounds(x: number, y: number, halfW = 14, halfH = 8): {
+  minX: number
+  minY: number
+  maxX: number
+  maxY: number
+} {
+  return { minX: x - halfW, minY: y - halfH, maxX: x + halfW, maxY: y + halfH }
+}
+
+export function boundsOverlap(
+  a: { minX: number; minY: number; maxX: number; maxY: number },
+  b: { minX: number; minY: number; maxX: number; maxY: number },
+  pad = 0,
+): boolean {
+  return !(
+    a.maxX + pad < b.minX ||
+    b.maxX + pad < a.minX ||
+    a.maxY + pad < b.minY ||
+    b.maxY + pad < a.minY
+  )
 }
 
 /** Self-loop path (elliptical) around a node. Returns null if unsupported policy is reject. */

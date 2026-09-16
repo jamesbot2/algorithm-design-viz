@@ -30,12 +30,13 @@ test.describe('V5 R1 tab switch + R4 swap settle', () => {
 
   test('R4 quickSort swap settles to transform none', async ({ page }) => {
     await page.goto('#/algo/quickSort')
-    // Use [2,1] input if field exists
-    const arr = page.locator('input').filter({ hasText: '' }).first()
+    // V10-01: open folded input before fill
+    const edit = page.getByTestId('input-edit-toggle')
+    await expect(edit).toBeVisible()
+    if ((await edit.textContent())?.includes('编辑输入')) await edit.click()
     const arrayInput = page.locator('label.field-array input, [data-testid="array-input"]').first()
-    if (await arrayInput.count()) {
-      await arrayInput.fill('2, 1')
-    }
+    await expect(arrayInput).toBeVisible({ timeout: 5_000 })
+    await arrayInput.fill('2, 1')
     await page.getByTestId('run-btn').click()
 
     // Advance until a swap step

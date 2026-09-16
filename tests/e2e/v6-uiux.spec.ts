@@ -43,7 +43,13 @@ test.describe('V6 UI/UX consistency', () => {
     await expect(page.getByTestId('visualizer')).toBeVisible({ timeout: 20_000 })
     const stepsBefore = await page.getByTestId('step-counter').textContent()
 
+    // V10-03: successful run collapses input for demo budget — re-open to edit edges
+    const edit = page.getByTestId('input-edit-toggle')
+    await expect(edit).toBeVisible()
+    if ((await edit.textContent())?.includes('编辑输入')) await edit.click()
+
     const edges = page.getByRole('textbox', { name: /边列表/ })
+    await expect(edges).toBeVisible({ timeout: 5_000 })
     await edges.fill('this is not valid')
     await expect(page.getByRole('alert').first()).toBeVisible()
     await expect(page.getByText(/图校验通过/)).toHaveCount(0)

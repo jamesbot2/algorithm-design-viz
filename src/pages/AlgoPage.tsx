@@ -746,6 +746,9 @@ export default function AlgoPage() {
       seekReqRef.current += 1
       setSeekCommand({ requestId: seekReqRef.current, target: clamped })
       setHasRun(true)
+      // V10-03: after successful run, collapse input so demo/stage keeps the height budget.
+      // User re-opens via「编辑输入」— same session, same draft.
+      setInputEditing(false)
 
       // Persist scene from RunSnapshot + cursor — never live draft on cursor change
       if (isGraphAlgo(algoIdAtStart) && snap.input) {
@@ -965,6 +968,19 @@ export default function AlgoPage() {
   const [theoryOpen, setTheoryOpen] = useState(false)
   const [inputEditing, setInputEditing] = useState(false)
   const [running, setRunning] = useState(false)
+  const theoryToggleRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!theoryOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setTheoryOpen(false)
+        theoryToggleRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [theoryOpen])
 
   // Complex forms (graph / nQueens / DP strings) start expanded so fields stay operable;
   // simple array algos stay on summary until「编辑输入」.
@@ -1053,7 +1069,9 @@ export default function AlgoPage() {
         <button
           type="button"
           className="ghost theory-toggle"
+          ref={theoryToggleRef}
           aria-expanded={theoryOpen}
+          aria-controls="theory-drawer"
           onClick={() => setTheoryOpen((o) => !o)}
         >
           {theoryOpen ? '收起说明' : '展开说明 / 理论'}
@@ -1061,11 +1079,18 @@ export default function AlgoPage() {
       </div>
 
       {theoryOpen && (
-        <aside className="theory-drawer" data-testid="theory-drawer" role="region" aria-label="说明与理论">
+        <aside
+          className="theory-drawer"
+          id="theory-drawer"
+          data-testid="theory-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="说明与理论"
+        >
           <div className="theory-drawer-inner theory-expandable">
             <div className="theory-drawer-head">
               <strong>说明 / 理论</strong>
-              <button type="button" className="ghost" onClick={() => setTheoryOpen(false)}>
+              <button type="button" className="ghost" data-testid="theory-close" onClick={() => setTheoryOpen(false)}>
                 关闭
               </button>
             </div>

@@ -1,0 +1,10 @@
+{
+  "route": "#/algo/nQueens",
+  "layout": "split",
+  "box": {
+    "x": 830.28125,
+    "y": 506.53125,
+    "width": 406.9375,
+    "height": 152.84375
+  }
+}

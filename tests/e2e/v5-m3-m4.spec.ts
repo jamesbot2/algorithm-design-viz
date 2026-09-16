@@ -49,8 +49,13 @@ test.describe('V5 M3/M4 workbench + expand e2e', () => {
 
   test('quickSort play advances steps', async ({ page }) => {
     await page.goto('#/algo/quickSort')
+    // V10-01: simple array algos fold input until「编辑输入」
+    const edit = page.getByTestId('input-edit-toggle')
+    await expect(edit).toBeVisible()
+    if ((await edit.textContent())?.includes('编辑输入')) await edit.click()
     const arrayInput = page.locator('[data-testid="array-input"], label.field-array input').first()
-    if (await arrayInput.count()) await arrayInput.fill('3,1,2')
+    await expect(arrayInput).toBeVisible({ timeout: 5_000 })
+    await arrayInput.fill('3,1,2')
     await page.getByTestId('run-btn').click()
     await expect(page.getByTestId('play-btn')).toBeVisible()
     const before = await page.getByTestId('step-counter').textContent()

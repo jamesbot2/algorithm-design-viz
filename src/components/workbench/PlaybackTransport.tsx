@@ -69,6 +69,7 @@ export default function PlaybackTransport({
   style,
 }: PlaybackTransportProps) {
   const [moreOpen, setMoreOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const n = stepsLen
   const jumps = teachableStages ?? segments.filter((s) => s.kind !== 'event')
   const primaryLabel =
@@ -117,6 +118,16 @@ export default function PlaybackTransport({
             aria-label="播放速度"
           />
         </label>
+        <button
+          type="button"
+          className="ghost playback-settings-dock"
+          data-testid="playback-settings-toggle"
+          aria-expanded={settingsOpen}
+          aria-controls="playback-settings-panel"
+          onClick={() => setSettingsOpen((o) => !o)}
+        >
+          播放设置
+        </button>
         <span className="spacer" />
         <span className="step-counter tabular-nums" data-testid="step-counter">
           {stepsLen ? `${idx + 1} / ${stepsLen}` : '— / —'}
@@ -226,6 +237,73 @@ export default function PlaybackTransport({
           )}
         </div>
       )}
+
+      <div
+        id="playback-settings-panel"
+        className="playback-settings-panel"
+        data-testid="playback-settings-panel"
+        hidden={!settingsOpen}
+      >
+        <label className="speed-label">
+          速度 {speedMultiplier(speed)}
+          <input
+            type="range"
+            min={100}
+            max={1500}
+            step={50}
+            value={1600 - speed}
+            onChange={(e) => onSpeed(1600 - Number(e.target.value))}
+            aria-label="播放速度（设置面板）"
+          />
+        </label>
+        {segments.length > 0 && n > 0 && (
+          <div className="phase-track" data-testid="phase-track-dock" aria-hidden="true">
+            {segments.map((seg) => {
+              const g =
+                seg.leftPct != null && seg.widthPct != null
+                  ? { leftPct: seg.leftPct, widthPct: seg.widthPct }
+                  : segmentGeometry(seg.start, seg.end, n)
+              return (
+                <span
+                  key={`dock-seg-${seg.phase}-${seg.start}`}
+                  className="phase-segment"
+                  style={{ left: `${g.leftPct}%`, width: `${g.widthPct}%` }}
+                  data-phase={seg.phase}
+                  title={`${seg.label ?? seg.phase} (#${seg.start + 1}–${seg.end + 1})`}
+                />
+              )
+            })}
+          </div>
+        )}
+        {jumps.length > 0 && (
+          <div className="phase-jump" data-testid="phase-jump-dock">
+            <span className="muted">阶段跳转：</span>
+            {jumps.map((seg) =>
+              seg.phase === 'more' ? (
+                <button
+                  key={`dock-more-${seg.start}`}
+                  type="button"
+                  className={moreOpen ? 'active' : ''}
+                  aria-expanded={moreOpen}
+                  onClick={() => setMoreOpen((o) => !o)}
+                >
+                  {seg.label}
+                </button>
+              ) : (
+                <button
+                  key={`dock-btn-${seg.phase}-${seg.start}-${seg.label}`}
+                  type="button"
+                  className={idx >= seg.start && idx <= seg.end ? 'active' : ''}
+                  title={`${seg.label}（#${seg.start + 1}–${seg.end + 1}）`}
+                  onClick={() => onSeek(seg.start)}
+                >
+                  {seg.label}
+                </button>
+              ),
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

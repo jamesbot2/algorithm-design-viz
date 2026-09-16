@@ -1,5 +1,6 @@
-# E2E does NOT gate Pages deploy (see ci.yml + deploy-pages.yml).
-# Best-effort browser verification on main/PRs.
+# E2E does NOT currently gate Pages deploy (see deploy-pages.yml V10 note).
+# Treat failures as release blockers on the same SHA anyway — do not ship red E2E.
+# Prefer failing fast with evidence (traces under docs/traces/) for hidden-input timeouts.
 name: E2E
 
 on:

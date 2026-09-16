@@ -78,23 +78,39 @@ export default function Layout() {
   }, [mobileModalOpen])
 
 
-  // V9: visualViewport / short windows → allow natural scroll escape (not 100dvh-only)
+  // V10-03: single height-budget owner — visualViewport + chrome + edit state
   useEffect(() => {
     const apply = () => {
       const vv = window.visualViewport
       const h = vv?.height ?? window.innerHeight
       const w = vv?.width ?? window.innerWidth
-      // Soft keyboard / tiny portrait: allow natural scroll.
-      // Short landscape phones: keep fill + compact chrome (CSS), not auto-height push.
-      const scroll = h < 360 || (h < 560 && w < 700)
+      const editing = !!document.querySelector('.algo-page[data-input-editing="1"]')
+      const topbar = document.querySelector('.topbar') as HTMLElement | null
+      const chrome = (topbar?.getBoundingClientRect().height ?? 48) + 24
+      const remain = h - chrome
+      // Soft keyboard / tiny portrait / expanded input on short view → scroll escape.
+      // Demo (collapsed input) on moderate short landscape stays fill+compact.
+      const scroll =
+        h < 360 ||
+        (h < 560 && w < 700) ||
+        (editing && remain < 420) ||
+        remain < 280
       setHeightFallback(scroll ? 'scroll' : 'fill')
+      document.documentElement.dataset.heightBudget = scroll ? 'scroll' : 'fill'
     }
     apply()
     window.visualViewport?.addEventListener('resize', apply)
     window.addEventListener('resize', apply)
+    const mo = new MutationObserver(apply)
+    mo.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-input-editing'],
+    })
     return () => {
       window.visualViewport?.removeEventListener('resize', apply)
       window.removeEventListener('resize', apply)
+      mo.disconnect()
     }
   }, [])
 
