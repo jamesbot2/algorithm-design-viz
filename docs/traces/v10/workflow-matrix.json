@@ -146,7 +146,7 @@
       "width": 844,
       "height": 390
     },
-    "layout": "split",
+    "layout": "tabs",
     "runHit": {
       "ok": true,
       "reason": "hit",

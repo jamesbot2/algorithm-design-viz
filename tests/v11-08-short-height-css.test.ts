@@ -22,10 +22,26 @@ describe('V11-08 short-height dock selectors', () => {
     expect(media).toMatch(/input-actions-sticky/)
   })
 
-  it('short landscape raises stage min and hides page header', () => {
+  it('short-height keeps Run visible (no display:none on collapsed sticky actions)', () => {
+    const dock = css.slice(css.indexOf('V10-02: short-height'))
+    expect(dock).toMatch(/input-actions-sticky/)
+    // Must not reclaim the Run row with display:none — preview + after-run need 运行
+    expect(dock).not.toMatch(
+      /data-input-editing="0"[^{]*input-actions-sticky\s*\{[^}]*display:\s*none/s,
+    )
+    expect(dock).toMatch(/\[data-testid="cancel-btn"\]:disabled/)
+    expect(dock).toMatch(/\[data-testid=run-btn\]|keep Run reachable|NEVER hide Run/)
+  })
+
+  it('short landscape raises stage min and collapses page header chrome', () => {
     expect(css).toMatch(/orientation:\s*landscape/)
-    const land = css.slice(css.indexOf('orientation: landscape'))
+    const land = css.slice(css.indexOf('/* Short landscape'))
     expect(land).toMatch(/page-header-compact/)
+    expect(land).toMatch(/theory-toggle/)
+    // Title/back may hide; whole header must not display:none (theory drawer entry)
+    expect(land).not.toMatch(
+      /page-header-compact\s*\{\s*display:\s*none/s,
+    )
     expect(land).toMatch(/min-height:\s*180px/)
     expect(land).toMatch(/bars-wrap\.signed/)
     expect(css).toMatch(/input-actions-sticky/)

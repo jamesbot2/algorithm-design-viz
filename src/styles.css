@@ -2355,9 +2355,33 @@ html, body, #root {
     max-height: 1.5rem;
     font-size: 0.78rem;
   }
-  /* After run, reclaim Run/Cancel row — reopen via 编辑输入 */
+  /* V11 fix: NEVER hide Run on short height (preview + after-run).
+     Collapse idle Cancel / status chrome only; keep [data-testid=run-btn] operable. */
   .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky {
-    display: none !important;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+    padding-top: 0.1rem;
+    min-height: 0;
+  }
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky.control-row {
+    min-height: 0;
+  }
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky button {
+    height: auto;
+    min-height: 28px;
+    padding: 0.18rem 0.55rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky [data-testid="cancel-btn"]:disabled {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky .muted,
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky [data-testid="run-status"] {
+    font-size: 0.7rem;
   }
   .main-wrap[data-lab-fill="1"] .array-view > .matrix-note {
     display: none;
@@ -2480,7 +2504,26 @@ html, body, #root {
     height: var(--bar-chart-h);
   }
   .main-wrap[data-lab-fill="1"] .page-header-compact {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0.05rem 0;
+    min-height: 0;
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact > :not(.theory-toggle) {
     display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact .theory-toggle {
+    display: inline-flex;
+    margin: 0;
+    padding: 0.12rem 0.4rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    height: auto;
+    min-height: 0;
   }
   .main-wrap[data-lab-fill="1"] .viz-banner-slot {
     max-height: 1.35rem;
@@ -2492,7 +2535,26 @@ html, body, #root {
 /* Short landscape (w>h or h≤520 landscape): prefer stage over chrome */
 @media (max-height: 520px) and (orientation: landscape) {
   .main-wrap[data-lab-fill="1"] .page-header-compact {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0.05rem 0;
+    min-height: 0;
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact > :not(.theory-toggle) {
     display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact .theory-toggle {
+    display: inline-flex;
+    margin: 0;
+    padding: 0.12rem 0.4rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    height: auto;
+    min-height: 0;
   }
   .main-wrap[data-lab-fill="1"] .visualizer {
     min-height: 230px;

@@ -4,7 +4,9 @@
       "/home/box/.local/node-v24.20.0-linux-x64/bin/node",
       "/workspace/algorithm-design-viz/node_modules/.bin/playwright",
       "test",
-      "tests/e2e/v11-semantic-visual.spec.ts"
+      "tests/e2e/v9-viewport-motion.spec.ts",
+      "tests/e2e/v10-workflow.spec.ts",
+      "--project=chromium"
     ],
     "configFile": "/workspace/algorithm-design-viz/playwright.config.ts",
     "rootDir": "/workspace/algorithm-design-viz/tests/e2e",
@@ -71,20 +73,20 @@
   },
   "suites": [
     {
-      "title": "v11-semantic-visual.spec.ts",
-      "file": "v11-semantic-visual.spec.ts",
+      "title": "v10-workflow.spec.ts",
+      "file": "v10-workflow.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "V11 semantic/visual smokes",
-          "file": "v11-semantic-visual.spec.ts",
-          "line": 114,
+          "title": "V10-07 real workflow acceptance",
+          "file": "v10-workflow.spec.ts",
+          "line": 81,
           "column": 6,
           "specs": [
             {
-              "title": "insertionSort [2,1] edit→run→mid shows temp buffer",
+              "title": "viewport matrix runs edit→run→mid→end with reachable chrome",
               "ok": true,
               "tags": [],
               "tests": [
@@ -99,12 +101,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1408,
+                      "duration": 9118,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T13:56:17.973Z",
+                      "startTime": "2026-09-16T15:56:30.359Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -112,13 +114,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "b01bc08d62ac1a1c26eb-e0b625e75cc086892e37",
-              "file": "v11-semantic-visual.spec.ts",
-              "line": 117,
+              "id": "11564b3af0b60f751607-8482c2dc87147a2b21d1",
+              "file": "v10-workflow.spec.ts",
+              "line": 84,
               "column": 3
             },
             {
-              "title": "nQueens end keeps board matrix with queens",
+              "title": "continuous short-height resize keeps vars/speed access",
               "ok": true,
               "tags": [],
               "tests": [
@@ -133,12 +135,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1340,
+                      "duration": 1758,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T13:56:19.568Z",
+                      "startTime": "2026-09-16T15:56:39.668Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -146,13 +148,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "b01bc08d62ac1a1c26eb-ffc841399187d84a0ef8",
-              "file": "v11-semantic-visual.spec.ts",
-              "line": 153,
+              "id": "11564b3af0b60f751607-713a307f606043771383",
+              "file": "v10-workflow.spec.ts",
+              "line": 138,
               "column": 3
             },
             {
-              "title": "knapsack rejects non-integer weight without solving",
+              "title": "theory drawer dialog Escape returns focus",
               "ok": true,
               "tags": [],
               "tests": [
@@ -167,12 +169,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1228,
+                      "duration": 772,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T13:56:20.919Z",
+                      "startTime": "2026-09-16T15:56:41.433Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -180,17 +182,338 @@
                   "status": "expected"
                 }
               ],
-              "id": "b01bc08d62ac1a1c26eb-1a75ed28a48fde35e609",
-              "file": "v11-semantic-visual.spec.ts",
-              "line": 176,
+              "id": "11564b3af0b60f751607-45559f1ff5c2e098b952",
+              "file": "v10-workflow.spec.ts",
+              "line": 178,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "v9-viewport-motion.spec.ts",
+      "file": "v9-viewport-motion.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "V9 viewport visibility + motion",
+          "file": "v9-viewport-motion.spec.ts",
+          "line": 14,
+          "column": 6,
+          "specs": [
+            {
+              "title": "kadane stage operable @ 1366x768",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 814,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:42.224Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-9bf4242207e31abe2ca8",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "kadane stage operable @ 1280x800",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 861,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:43.046Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-b959e060700e5dfebd6d",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "kadane stage operable @ 1024x500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 903,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:43.915Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-b2a652cab32ebb982504",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "kadane stage operable @ 900x500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 824,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:44.826Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-92f248830cc9e13b932a",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "kadane stage operable @ 390x844",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 821,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:45.658Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-dd9d11540ef0a833f70c",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "kadane stage operable @ 360x640",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 838,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:46.487Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-f5a867b660340938602e",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "kadane stage operable @ 320x568",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 828,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:47.334Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-4382486ae53413d463bb",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "kadane stage operable @ 844x390",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 826,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:48.168Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-48f952f1dcb053d9504d",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "dijkstra: graph is main scene; result not above SVG fighting height",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 932,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-16T15:56:49.001Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8eeaf8e2cc5ecb4d035b-7e16000d56756e9091a9",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 81,
               "column": 3
             },
             {
-              "title": "short-height docks @1366x768",
+              "title": "nQueens: board before full search tree (tree aux collapsed)",
               "ok": true,
-              "tags": [
-                "1366x768"
-              ],
+              "tags": [],
               "tests": [
                 {
                   "timeout": 120000,
@@ -203,12 +526,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1014,
+                      "duration": 844,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T13:56:22.165Z",
+                      "startTime": "2026-09-16T15:56:49.940Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -216,17 +539,15 @@
                   "status": "expected"
                 }
               ],
-              "id": "b01bc08d62ac1a1c26eb-2aadee49391526e8a999",
-              "file": "v11-semantic-visual.spec.ts",
-              "line": 201,
-              "column": 5
+              "id": "8eeaf8e2cc5ecb4d035b-45382dda90c30d8d724a",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 111,
+              "column": 3
             },
             {
-              "title": "short-height docks @390x844",
+              "title": "V8 mobile tab selector still works",
               "ok": true,
-              "tags": [
-                "390x844"
-              ],
+              "tags": [],
               "tests": [
                 {
                   "timeout": 120000,
@@ -239,12 +560,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 913,
+                      "duration": 657,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T13:56:23.190Z",
+                      "startTime": "2026-09-16T15:56:50.793Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -252,118 +573,10 @@
                   "status": "expected"
                 }
               ],
-              "id": "b01bc08d62ac1a1c26eb-dd59549f475c3a9df98f",
-              "file": "v11-semantic-visual.spec.ts",
-              "line": 201,
-              "column": 5
-            },
-            {
-              "title": "short-height docks @1024x520",
-              "ok": true,
-              "tags": [
-                "1024x520"
-              ],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 994,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T13:56:24.113Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "b01bc08d62ac1a1c26eb-87b50359c0e057445dc6",
-              "file": "v11-semantic-visual.spec.ts",
-              "line": 201,
-              "column": 5
-            },
-            {
-              "title": "short-height docks @1024x500",
-              "ok": true,
-              "tags": [
-                "1024x500"
-              ],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1071,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T13:56:25.117Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "b01bc08d62ac1a1c26eb-5f3c86cc92e027bb8143",
-              "file": "v11-semantic-visual.spec.ts",
-              "line": 201,
-              "column": 5
-            },
-            {
-              "title": "short-height docks @844x390",
-              "ok": true,
-              "tags": [
-                "844x390"
-              ],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1041,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T13:56:26.198Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "b01bc08d62ac1a1c26eb-08e35b35fc74aa3bfbfb",
-              "file": "v11-semantic-visual.spec.ts",
-              "line": 201,
-              "column": 5
+              "id": "8eeaf8e2cc5ecb4d035b-eb19cee9b81689c7cfaa",
+              "file": "v9-viewport-motion.spec.ts",
+              "line": 138,
+              "column": 3
             }
           ]
         }
@@ -372,9 +585,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-16T13:56:17.445Z",
-    "duration": 9888.503999999999,
-    "expected": 8,
+    "startTime": "2026-09-16T15:56:29.910Z",
+    "duration": 21668.490999999998,
+    "expected": 14,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
