@@ -15,14 +15,20 @@ interface Props {
 
 type LayoutMode = 'split' | 'tabs'
 type TabId = 'demo' | 'code' | 'inspector'
+type HeightMode = 'fill' | 'scroll'
 
 const NARROW_PX = 720
+/** Absolute readable mins — not only percentage floors */
+const MIN_VIZ_PX = 180
+const MIN_CODE_PX = 160
 
 /**
  * Shared workbench shell.
  * Layout mode from container width (ResizeObserver) — NOT a dual React tree.
  * Split and tabs share one stable panel tree so crossing 720px does not remount
  * Visualizer / CodeBrowser session state (runId, cursor, play, speed, font, follow).
+ *
+ * Height budget comes from measured available space (contentRect), not a fixed 14rem guess.
  */
 export default function WorkbenchLayout({
   title,
@@ -36,16 +42,25 @@ export default function WorkbenchLayout({
   const rootRef = useRef<HTMLDivElement>(null)
   const [mode, setMode] = useState<LayoutMode>('split')
   const [tab, setTab] = useState<TabId>('demo')
+  const [heightMode, setHeightMode] = useState<HeightMode>('fill')
+  const [budget, setBudget] = useState({ w: 0, h: 0 })
 
   useEffect(() => {
     const el = rootRef.current
     if (!el || typeof ResizeObserver === 'undefined') return
     const ro = new ResizeObserver((entries) => {
-      const w = entries[0]?.contentRect.width ?? el.clientWidth
+      const cr = entries[0]?.contentRect
+      const w = cr?.width ?? el.clientWidth
+      const h = cr?.height ?? el.clientHeight
       setMode(w < NARROW_PX ? 'tabs' : 'split')
+      setBudget({ w, h })
+      // When measured height cannot host viz min + transport chrome, allow natural scroll escape
+      const need = MIN_VIZ_PX + 120
+      setHeightMode(h > 0 && h < need ? 'scroll' : 'fill')
+      el.style.setProperty('--wb-measured-h', `${Math.max(0, h)}px`)
+      el.style.setProperty('--wb-measured-w', `${Math.max(0, w)}px`)
     })
     ro.observe(el)
-    // Avoid 0-width first paint (tests / hidden) forcing tabs then remounting mental model
     const initial = el.clientWidth
     if (initial > 0) setMode(initial < NARROW_PX ? 'tabs' : 'split')
     return () => ro.disconnect()
@@ -58,6 +73,12 @@ export default function WorkbenchLayout({
   const codeActive = mode === 'split' || tab === 'code'
   const inspectorActive = mode === 'split' || tab === 'inspector'
 
+  // Convert absolute px mins to % for the panel library when we know width
+  const vizMinPct =
+    budget.w > 0 ? Math.min(40, Math.max(15, (MIN_VIZ_PX / budget.w) * 100)) : 20
+  const codeMinPct =
+    budget.w > 0 ? Math.min(35, Math.max(12, (MIN_CODE_PX / budget.w) * 100)) : 15
+
   const panels = (
     <Group
       orientation="horizontal"
@@ -66,15 +87,17 @@ export default function WorkbenchLayout({
     >
       <Panel
         defaultSize={hasCode ? '55' : '100'}
-        minSize="20"
+        minSize={String(Math.round(vizMinPct))}
         className="workbench-viz-panel"
         data-tab-active={vizActive ? '1' : '0'}
+        style={{ minWidth: mode === 'split' ? MIN_VIZ_PX : undefined }}
       >
         {/* Keep mounted; hide only via attribute/CSS — never unmount on layout switch */}
         <div
           className="workbench-panel-inner"
           hidden={mode === 'tabs' && !vizActive}
           data-testid="workbench-viz-slot"
+          data-scroll-owner="viz"
         >
           {viz}
         </div>
@@ -88,14 +111,16 @@ export default function WorkbenchLayout({
           />
           <Panel
             defaultSize="45"
-            minSize="15"
+            minSize={String(Math.round(codeMinPct))}
             className="workbench-code-panel"
             data-tab-active={codeActive ? '1' : '0'}
+            style={{ minWidth: mode === 'split' ? MIN_CODE_PX : undefined }}
           >
             <div
               className="workbench-panel-inner workbench-code-inner"
               hidden={mode === 'tabs' && !codeActive}
               data-testid="workbench-code-slot"
+              data-scroll-owner="code"
             >
               {code}
             </div>
@@ -119,6 +144,7 @@ export default function WorkbenchLayout({
               className="workbench-panel-inner"
               hidden={mode === 'tabs' && !inspectorActive}
               data-testid="workbench-inspector-slot"
+              data-scroll-owner="inspector"
             >
               {inspector}
             </div>
@@ -134,6 +160,7 @@ export default function WorkbenchLayout({
       data-testid="workbench-layout"
       data-layout={mode}
       data-tab={tab}
+      data-height-mode={heightMode}
       ref={rootRef}
     >
       <div className="workbench-header">
