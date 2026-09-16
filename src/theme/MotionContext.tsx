@@ -22,6 +22,12 @@ type MotionCtx = {
   cssVars: Record<string, string>
   density: 'normal' | 'projection'
   setDensity: (d: 'normal' | 'projection') => void
+  /** Live playback interval from Visualizer (ms between steps). */
+  speedIntervalMs: number
+  setSpeedIntervalMs: (ms: number) => void
+  /** Bumped on pause / seek / resize / replace-run — stale FLIP callbacks must ignore. */
+  transitionEpoch: number
+  bumpTransitionEpoch: () => void
 }
 
 const Ctx = createContext<MotionCtx | null>(null)
@@ -44,7 +50,8 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       : false,
   )
   const [density, setDensity] = useState<'normal' | 'projection'>('normal')
-  const [speedIntervalMs] = useState(600)
+  const [speedIntervalMs, setSpeedIntervalMs] = useState(600)
+  const [transitionEpoch, setTransitionEpoch] = useState(0)
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -67,6 +74,10 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     setUserPref(userPref === null ? 'reduced' : userPref === 'reduced' ? 'standard' : null)
   }, [userPref, setUserPref])
 
+  const bumpTransitionEpoch = useCallback(() => {
+    setTransitionEpoch((n) => n + 1)
+  }, [])
+
   const mode: AnimationMode =
     userPref !== null ? userPref : systemReduced ? 'reduced' : 'standard'
 
@@ -76,8 +87,30 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   )
 
   const value = useMemo(
-    () => ({ mode, userPref, setUserPref, cyclePref, cssVars, density, setDensity }),
-    [mode, userPref, setUserPref, cyclePref, cssVars, density],
+    () => ({
+      mode,
+      userPref,
+      setUserPref,
+      cyclePref,
+      cssVars,
+      density,
+      setDensity,
+      speedIntervalMs,
+      setSpeedIntervalMs,
+      transitionEpoch,
+      bumpTransitionEpoch,
+    }),
+    [
+      mode,
+      userPref,
+      setUserPref,
+      cyclePref,
+      cssVars,
+      density,
+      speedIntervalMs,
+      transitionEpoch,
+      bumpTransitionEpoch,
+    ],
   )
 
   return (
@@ -104,6 +137,10 @@ export function useMotion(): MotionCtx {
       cssVars: { ...semanticCssVars(), ...motionCssVars('standard') },
       density: 'normal',
       setDensity: () => {},
+      speedIntervalMs: 600,
+      setSpeedIntervalMs: () => {},
+      transitionEpoch: 0,
+      bumpTransitionEpoch: () => {},
     }
   }
   return ctx
