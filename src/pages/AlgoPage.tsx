@@ -930,11 +930,6 @@ export default function AlgoPage() {
     setRunLabel('cancelled')
   }
 
-  const onResetPlayback = () => {
-    seekReqRef.current += 1
-    setSeekCommand({ requestId: seekReqRef.current, target: 0 })
-    setCursorIndex(0)
-  }
 
   /** Notify-only: update cursor + scene from snapshot — do NOT set seekCommand */
   const onStepChange = useCallback(
@@ -968,7 +963,28 @@ export default function AlgoPage() {
   const isPreviewMode = !(hasRun && steps.length)
 
   const [theoryOpen, setTheoryOpen] = useState(false)
+  const [inputEditing, setInputEditing] = useState(false)
   const [running, setRunning] = useState(false)
+
+  // Complex forms (graph / nQueens / DP strings) start expanded so fields stay operable;
+  // simple array algos stay on summary until「编辑输入」.
+  useEffect(() => {
+    if (!id) return
+    const complex =
+      isGraphAlgo(id) ||
+      id === 'nQueens' ||
+      id === 'knapsack01' ||
+      id === 'lcs' ||
+      id === 'editDistance' ||
+      id === 'matrixChain' ||
+      id === 'huffman' ||
+      id === 'kmp'
+    setInputEditing(complex)
+  }, [id])
+
+  useEffect(() => {
+    if (errors.length > 0) setInputEditing(true)
+  }, [errors.length])
 
   const metaExtras = useMemo(() => {
 
@@ -1016,8 +1032,18 @@ export default function AlgoPage() {
     ...GRAPH_ALGOS,
   ].includes(id!)
 
+  const inputSummaryText = isPreviewMode
+    ? '预览 · 尚未运行'
+    : draftDirty
+      ? '草稿已改 · 显示上一轮运行'
+      : `步骤 ${cursorIndex + 1}/${Math.max(steps.length, 1)}`
+
   return (
-    <div className="page algo-page">
+    <div
+      className="page algo-page"
+      data-theory-open={theoryOpen ? '1' : '0'}
+      data-input-editing={inputEditing ? '1' : '0'}
+    >
       <div className="page-header page-header-compact">
         <Link to="/" className="back">
           ← 首页
@@ -1032,8 +1058,17 @@ export default function AlgoPage() {
         >
           {theoryOpen ? '收起说明' : '展开说明 / 理论'}
         </button>
-        {theoryOpen && (
-          <div className="theory-expandable">
+      </div>
+
+      {theoryOpen && (
+        <aside className="theory-drawer" data-testid="theory-drawer" role="region" aria-label="说明与理论">
+          <div className="theory-drawer-inner theory-expandable">
+            <div className="theory-drawer-head">
+              <strong>说明 / 理论</strong>
+              <button type="button" className="ghost" onClick={() => setTheoryOpen(false)}>
+                关闭
+              </button>
+            </div>
             <p className="subtitle">{algo.meta.description}</p>
             {metaExtras}
             {(id === 'dijkstra' || id === 'dijkstraHeap') && (
@@ -1047,14 +1082,33 @@ export default function AlgoPage() {
               </p>
             )}
           </div>
-        )}
-      </div>
+        </aside>
+      )}
 
       <div
-        className={`input-panel input-panel-v4${errors.length ? ' has-errors shake-pending' : ''}${shakeKey > 0 && errors.length ? ' shake' : ''}`}
+        className={`input-panel input-panel-v4 input-panel-v9${errors.length ? ' has-errors shake-pending' : ''}${shakeKey > 0 && errors.length ? ' shake' : ''}`}
         data-testid="input-panel"
+        data-editing={inputEditing ? '1' : '0'}
       >
-        <h3>输入控制</h3>
+        <div className="input-summary-bar" data-testid="input-summary-bar">
+          <div className="input-summary-text">
+            <strong>输入</strong>
+            <span className="muted"> · {inputSummaryText}</span>
+            {isGraphAlgo(id) && draft.graph && (
+              <span className="muted"> · 图 n={draft.graph.n}</span>
+            )}
+          </div>
+          <button
+            type="button"
+            className="ghost"
+            data-testid="input-edit-toggle"
+            onClick={() => setInputEditing((v) => !v)}
+          >
+            {inputEditing ? '收起编辑' : '编辑输入'}
+          </button>
+        </div>
+        <div className="input-panel-body" hidden={!inputEditing && !errors.length} data-testid="input-panel-body">
+        <h3 className="sr-only">输入控制</h3>
         <div className="mode-toggle control-row-item">
           <button
             type="button"
@@ -1231,11 +1285,14 @@ export default function AlgoPage() {
             ))}
           </ul>
         )}
+        </div>
 
-        <div className="input-actions control-row" data-testid="input-actions">
-          <button type="button" onClick={onRestoreDefaults}>
-            恢复默认示例
-          </button>
+        <div className="input-actions control-row input-actions-sticky" data-testid="input-actions">
+          {inputEditing && (
+            <button type="button" onClick={onRestoreDefaults}>
+              恢复默认示例
+            </button>
+          )}
           <button type="button" className="primary" onClick={onRun} data-testid="run-btn">
             运行
           </button>
@@ -1255,9 +1312,6 @@ export default function AlgoPage() {
           {!running && runLabel === 'truncated' && (
             <span className="run-status-truncated" data-testid="run-status">采样截断</span>
           )}
-          <button type="button" onClick={onResetPlayback} disabled={!hasRun}>
-            重置播放
-          </button>
         </div>
         {hasRun && draftDirty && (
           <p className="dirty-banner" role="status">
@@ -1292,37 +1346,28 @@ export default function AlgoPage() {
               className="workbench-chrome-host"
               data-testid="workbench-transport"
             />
-            {hasRun && steps[cursorIndex] ? (
-              <div className="workbench-inspector" data-testid="workbench-inspector">
-                <strong>检查器</strong>
-                <span className="muted"> · {steps[cursorIndex]?.message}</span>
-                {steps[cursorIndex]?.frameId && (
-                  <span className="muted"> · frame {steps[cursorIndex]?.frameId}</span>
-                )}
-              </div>
-            ) : null}
           </div>
         }
         viz={
-          <>
-            {isGraphAlgo(id) && hasRun && (
-              <div className={`result-panel-enter${staleResult ? ' is-stale' : ''}`}>
-                {staleResult && <span className="stale-result-badge">上一轮结果</span>}
-                <GraphResultPanel algoId={id} steps={steps} />
-              </div>
-            )}
-            <Visualizer
-              key={hasRun ? (runSnapshot?.runId ?? runId) : 'preview'}
-              steps={displaySteps}
-              trace={hasRun ? trace : undefined}
-              seekCommand={hasRun ? seekCommand : null}
-              runId={hasRun ? (runSnapshot?.runId ?? runId) : 'preview'}
-              onStepIndexChange={hasRun ? onStepChange : undefined}
-              staleResult={hasRun && (staleResult || draftDirty)}
-              chromePlacement="workbench"
-              externalChromeHost={chromeHost}
-              finalAnswer={
-                hasRun && steps.length ? (
+          <Visualizer
+            key={hasRun ? (runSnapshot?.runId ?? runId) : 'preview'}
+            steps={displaySteps}
+            trace={hasRun ? trace : undefined}
+            seekCommand={hasRun ? seekCommand : null}
+            runId={hasRun ? (runSnapshot?.runId ?? runId) : 'preview'}
+            onStepIndexChange={hasRun ? onStepChange : undefined}
+            staleResult={hasRun && (staleResult || draftDirty)}
+            chromePlacement="workbench"
+            externalChromeHost={chromeHost}
+            finalAnswer={
+              hasRun && steps.length ? (
+                <>
+                  {isGraphAlgo(id) && (
+                    <div className={`result-panel-enter${staleResult ? ' is-stale' : ''}`}>
+                      {staleResult && <span className="stale-result-badge">上一轮结果</span>}
+                      <GraphResultPanel algoId={id} steps={steps} />
+                    </div>
+                  )}
                   <FinalAnswerResult
                     result={steps[steps.length - 1]?.result}
                     vars={steps[steps.length - 1]?.vars}
@@ -1337,10 +1382,10 @@ export default function AlgoPage() {
                       </>
                     }
                   />
-                ) : null
-              }
-            />
-          </>
+                </>
+              ) : null
+            }
+          />
         }
         code={(() => {
           const catalog = id ? getCatalog(id) : null

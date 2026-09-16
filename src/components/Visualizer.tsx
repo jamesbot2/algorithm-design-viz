@@ -9,7 +9,8 @@ import CodePanel from './CodePanel'
 import GraphView from './GraphView'
 import SearchTreeView from './search/SearchTreeView'
 import { SEMANTIC_ROLE_LABELS } from '../theme/semanticColors'
-import { motionCssVars, speedFeelMultiplier } from '../theme/motion'
+import { motionCssVars } from '../theme/motion'
+import { coordinatedStepIntervalMs } from '../utils/playbackClock'
 import { useMotion } from '../theme/MotionContext'
 import PlaybackTransport from './workbench/PlaybackTransport'
 import { segmentGeometry, teachableStages } from '../utils/teachableStages'
@@ -191,7 +192,7 @@ export default function Visualizer({
   const lastSeekReq = useRef<string | number | null>(null)
   const lastRunId = useRef<string | number | undefined>(undefined)
   const [snapSwap, setSnapSwap] = useState(false)
-  const { mode } = useMotion()
+  const { mode, setSpeedIntervalMs, bumpTransitionEpoch } = useMotion()
 
   const step = steps[idx] ?? steps[0]
   const prevStep = idx > 0 ? steps[idx - 1] : undefined
@@ -207,10 +208,24 @@ export default function Visualizer({
   }, [steps, stageInfo])
   const scaleMaxByArray = useMemo(() => computeScaleMax(steps), [steps])
 
-  const effectiveInterval = useMemo(() => {
-    const feel = speedFeelMultiplier(speed)
-    return Math.max(80, Math.round(speed / Math.max(0.5, 2 - feel)))
-  }, [speed])
+  const stepHasSwapMotion = useMemo(() => {
+    if (!step?.arrayOps) return false
+    return Object.values(step.arrayOps).some((ops) => ops.some((o) => o.type === 'swap'))
+  }, [step])
+
+  const effectiveInterval = useMemo(
+    () =>
+      coordinatedStepIntervalMs(speed, mode, {
+        hasSwapMotion: stepHasSwapMotion,
+        baseSwapMs: 280,
+      }),
+    [speed, mode, stepHasSwapMotion],
+  )
+
+  // Keep motion tokens / FLIP durations on the same clock as playback
+  useEffect(() => {
+    setSpeedIntervalMs(speed)
+  }, [speed, setSpeedIntervalMs])
 
   const speedVars = useMemo(() => motionCssVars(mode, speed), [mode, speed])
 
@@ -253,7 +268,8 @@ export default function Visualizer({
     lastRunId.current = runId
     setIdx(0)
     setPlaying(false)
-  }, [runId])
+    bumpTransitionEpoch()
+  }, [runId, bumpTransitionEpoch])
 
   // Explicit seek only when requestId changes — snap geometry (no FLIP residue)
   useEffect(() => {
@@ -263,9 +279,10 @@ export default function Visualizer({
     setSnapSwap(true)
     setIdx(clamp(seekCommand.target, steps.length))
     setPlaying(false)
+    bumpTransitionEpoch()
     const t = window.setTimeout(() => setSnapSwap(false), 50)
     return () => window.clearTimeout(t)
-  }, [seekCommand, steps.length])
+  }, [seekCommand, steps.length, bumpTransitionEpoch])
 
   // Notify-only — must NOT feed back into seek/init in parent
   useEffect(() => {
@@ -274,19 +291,22 @@ export default function Visualizer({
 
   const goPrev = useCallback(() => {
     setPlaying(false)
+    bumpTransitionEpoch()
     setIdx((i) => Math.max(0, i - 1))
-  }, [])
+  }, [bumpTransitionEpoch])
 
   const goNext = useCallback(() => {
     setPlaying(false)
+    bumpTransitionEpoch()
     setIdx((i) => Math.min(max, i + 1))
-  }, [max])
+  }, [max, bumpTransitionEpoch])
 
   const togglePlay = useCallback(() => {
     setPlayPulse(true)
     window.setTimeout(() => setPlayPulse(false), 180)
     if (playing) {
       setPlaying(false)
+      bumpTransitionEpoch()
       return
     }
     if (steps.length === 0) return
@@ -296,12 +316,13 @@ export default function Visualizer({
       setIdx(0)
     }
     setPlaying(true)
-  }, [playing, steps.length, idx])
+  }, [playing, steps.length, idx, bumpTransitionEpoch])
 
   const reset = useCallback(() => {
     setPlaying(false)
+    bumpTransitionEpoch()
     setIdx(0)
-  }, [])
+  }, [bumpTransitionEpoch])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -345,9 +366,10 @@ export default function Visualizer({
   const seekTo = useCallback(
     (i: number) => {
       setPlaying(false)
+      bumpTransitionEpoch()
       setIdx(clamp(i, steps.length))
     },
-    [steps.length],
+    [steps.length, bumpTransitionEpoch],
   )
 
   const atEnd = steps.length > 0 && idx >= max && !playing
@@ -418,7 +440,6 @@ export default function Visualizer({
                 {k} <strong className="tabular-nums">{String(v)}</strong>
               </span>
             ))}
-        {!stats && <span className="stat-chip muted">暂无统计</span>}
       </div>
 
       {legendItems.length > 0 && (
@@ -432,15 +453,34 @@ export default function Visualizer({
         </div>
       )}
 
-      {/* Single column: canvas + compact inspector. Code lives in Workbench right panel only. */}
+      {/* Single column: main scene first. Code lives in Workbench right panel only. */}
       <div className="viz-body viz-body-single">
-        <div className="viz-main" data-testid="viz-canvas">
+        <div
+          className="viz-main stage-viewport"
+          data-testid="viz-canvas"
+          data-stage-viewport="1"
+          id="stage-viewport"
+        >
+          {/* Priority: graph | arrays | board/matrix — search tree is aux when board present */}
           {step?.graph && <GraphView graph={step.graph} />}
-          {step?.searchTree && (
-            <SearchTreeView tree={step.searchTree} linkedBoard={hasBoard} />
+          {step && (
+            <ArraysFromStep
+              step={step}
+              prevStep={prevStep}
+              scaleMaxByArray={scaleMaxByArray}
+              snapSwap={snapSwap}
+            />
           )}
-          {step && <ArraysFromStep step={step} prevStep={prevStep} scaleMaxByArray={scaleMaxByArray} snapSwap={snapSwap} />}
-          {step && <MatrixView step={step} />}
+          {step && <MatrixView step={step} prevStep={prevStep} />}
+          {step?.searchTree && hasBoard && (
+            <details className="search-tree-aux" data-testid="search-tree-aux">
+              <summary>搜索树（辅助视图）</summary>
+              <SearchTreeView tree={step.searchTree} linkedBoard />
+            </details>
+          )}
+          {step?.searchTree && !hasBoard && (
+            <SearchTreeView tree={step.searchTree} linkedBoard={false} />
+          )}
           {!step && <div className="viz-empty soft">暂无画布内容</div>}
         </div>
         <div className="viz-inspector" data-testid="viz-inspector">

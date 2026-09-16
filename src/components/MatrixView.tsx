@@ -1,26 +1,8 @@
 import { memo, useMemo } from 'react'
 import type { Step } from '../types/step'
+import { dpCellClassNames } from '../utils/dpCellRoles'
 
-function cellClass(
-  i: number,
-  j: number,
-  target?: {
-    current?: [number, number]
-    reads?: [number, number][]
-    writes?: [number, number][]
-    path?: [number, number][]
-  },
-): string {
-  if (!target) return ''
-  const eq = (p?: [number, number]) => p !== undefined && p[0] === i && p[1] === j
-  if (eq(target.current)) return 'hl-focus'
-  if (target.writes?.some((p) => p[0] === i && p[1] === j)) return 'hl-swap hl-write'
-  if (target.path?.some((p) => p[0] === i && p[1] === j)) return 'hl-sorted hl-path'
-  if (target.reads?.some((p) => p[0] === i && p[1] === j)) return 'hl-read'
-  return ''
-}
-
-function MatrixView({ step }: { step: Step }) {
+function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
   const hints = step.labelHints
   const syncRows = useMemo(() => {
     const set = new Set<number>()
@@ -50,11 +32,12 @@ function MatrixView({ step }: { step: Step }) {
     <div className="matrices-panel">
       {Object.entries(step.matrices).map(([name, mat]) => {
         const target = step.matrixTargets?.[name]
+        const prevMat = prevStep?.matrices?.[name]
         const rows = mat.length
         const cols = mat[0]?.length ?? 0
         const anti = Boolean(hints?.antiExample)
         return (
-          <div key={name} className={`matrix-view${anti ? ' matrix-anti-example' : ''}`}>
+          <div key={name} className={`matrix-view${anti ? ' matrix-anti-example' : ''}`} data-matrix={name}>
             <div className="array-label">
               {name}
               <span className="matrix-index-hint">（下标 0-based）</span>
@@ -87,7 +70,7 @@ function MatrixView({ step }: { step: Step }) {
                 )}
               </p>
             )}
-            <div className="matrix-scroll">
+            <div className="matrix-scroll" data-scroll-owner="matrix">
               <table className={`matrix-table sticky-labels${anti ? ' matrix-anti-example' : ''}`}>
                 <thead>
                   <tr>
@@ -113,9 +96,24 @@ function MatrixView({ step }: { step: Step }) {
                       {row.map((cell, j) => {
                         const display =
                           cell === null || cell === undefined ? '·' : String(cell)
-                        const cls = cellClass(i, j, target)
+                        const prevCell = prevMat?.[i]?.[j]
+                        const prevDisplay =
+                          prevCell === null || prevCell === undefined
+                            ? undefined
+                            : String(prevCell)
+                        const cls = dpCellClassNames(i, j, target)
+                        // Real prev from previous step state — never fake prev with current
+                        const dataPrev =
+                          prevDisplay !== undefined && prevDisplay !== display
+                            ? prevDisplay
+                            : undefined
                         return (
-                          <td key={j} className={cls} data-prev={display}>
+                          <td
+                            key={j}
+                            className={cls}
+                            data-prev={dataPrev}
+                            data-cell={`${i},${j}`}
+                          >
                             {display}
                           </td>
                         )
@@ -131,7 +129,7 @@ function MatrixView({ step }: { step: Step }) {
               </p>
             )}
             {name === 'board' && step.searchTree && (
-              <p className="board-tree-link">棋盘与搜索树同步：当前步树快照见下方/侧栏搜索树。</p>
+              <p className="board-tree-link">棋盘为主场景；完整搜索树见下方折叠面板。</p>
             )}
           </div>
         )

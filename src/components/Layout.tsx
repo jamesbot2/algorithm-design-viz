@@ -10,6 +10,7 @@ export default function Layout() {
   const [desktopCollapsed, setDesktopCollapsed] = useState(false)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [heightFallback, setHeightFallback] = useState<'fill' | 'scroll'>('fill')
   const [navMode, setNavMode] = useState<'design' | 'problem'>('design')
   const [algoFilter, setAlgoFilter] = useState('')
   const { userPref, setUserPref, density, setDensity } = useMotion()
@@ -75,6 +76,27 @@ export default function Layout() {
       }
     }
   }, [mobileModalOpen])
+
+
+  // V9: visualViewport / short windows → allow natural scroll escape (not 100dvh-only)
+  useEffect(() => {
+    const apply = () => {
+      const vv = window.visualViewport
+      const h = vv?.height ?? window.innerHeight
+      const w = vv?.width ?? window.innerWidth
+      // Soft keyboard / tiny portrait: allow natural scroll.
+      // Short landscape phones: keep fill + compact chrome (CSS), not auto-height push.
+      const scroll = h < 360 || (h < 560 && w < 700)
+      setHeightFallback(scroll ? 'scroll' : 'fill')
+    }
+    apply()
+    window.visualViewport?.addEventListener('resize', apply)
+    window.addEventListener('resize', apply)
+    return () => {
+      window.visualViewport?.removeEventListener('resize', apply)
+      window.removeEventListener('resize', apply)
+    }
+  }, [])
 
   // Unmount: always release lock
   useEffect(() => {
@@ -332,7 +354,7 @@ export default function Layout() {
         <footer className="side-foot">GitHub Pages · 本地可视化</footer>
       </aside>
 
-      <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'}>
+      <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'} data-height-fallback={isAlgo ? heightFallback : undefined}>
         <header className="topbar">
           <button
             type="button"

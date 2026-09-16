@@ -111,8 +111,8 @@ function ArrayView({
   const [mode, setMode] = useState<'bars' | 'cells'>(
     defaultMode ?? (suitable ? 'bars' : 'cells'),
   )
-  const { mode: motionMode } = useMotion()
-  const swapMs = resolveDuration(280, motionMode, 600)
+  const { mode: motionMode, speedIntervalMs, transitionEpoch } = useMotion()
+  const swapMs = resolveDuration(280, motionMode, speedIntervalMs)
 
   const nums = useMemo(
     () => (numeric ? (values as number[]) : values.map(() => 1)),
@@ -155,8 +155,11 @@ function ArrayView({
 
   const slotRefs = useRef<Map<number, HTMLElement | null>>(new Map())
   const layerRefs = useRef<Map<string, HTMLElement | null>>(new Map())
-  const prevCenters = useRef<Map<string, number>>(new Map())
+  const prevCenters = useRef<Map<string, { x: number; y: number }>>(new Map())
   const animToken = useRef(0)
+  const transitionIdRef = useRef(0)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const geometryGen = useRef(0)
 
   // Clear transforms on cancel / remount / non-swap
   const clearTransforms = () => {
@@ -175,17 +178,55 @@ function ArrayView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Invalidate geometry cache on bars/cells toggle (hide→restore remounts layers)
+  useEffect(() => {
+    geometryGen.current += 1
+    prevCenters.current.clear()
+    animToken.current += 1
+    clearTransforms()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode])
+
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    let lastW = el.clientWidth
+    let lastH = el.clientHeight
+    const ro = new ResizeObserver(() => {
+      const w = el.clientWidth
+      const h = el.clientHeight
+      if (Math.abs(w - lastW) < 1 && Math.abs(h - lastH) < 1) return
+      lastW = w
+      lastH = h
+      geometryGen.current += 1
+      prevCenters.current.clear()
+      clearTransforms()
+      animToken.current += 1
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Pause / seek / replace-run epoch: cancel in-flight FLIP
+  useEffect(() => {
+    animToken.current += 1
+    clearTransforms()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transitionEpoch, snapSwap])
+
   useLayoutEffect(() => {
     const token = ++animToken.current
+    const transitionId = ++transitionIdRef.current
     const layers = layerRefs.current
     const slots = slotRefs.current
+    const gen = geometryGen.current
 
-    // Measure current slot centers
     const slotCenter = (i: number) => {
       const el = slots.get(i)
       if (!el) return null
       const r = el.getBoundingClientRect()
-      return r.left + r.width / 2
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 }
     }
 
     const shouldFlip =
@@ -198,7 +239,6 @@ function ArrayView({
 
     if (!shouldFlip || !swapPair) {
       clearTransforms()
-      // Record centers for next time
       for (let i = 0; i < values.length; i++) {
         const c = slotCenter(i)
         const id = ids[i]
@@ -208,14 +248,6 @@ function ArrayView({
     }
 
     const [i, j] = swapPair
-    const adjacent = Math.abs(j - i) === 1
-    // Seek / non-adjacent: snap (no residual translate)
-    if (!adjacent && snapSwap) {
-      clearTransforms()
-      return
-    }
-
-    // FLIP: elements now sit in new slots; invert from previous centers
     const idAt = (idx: number) => ids[idx]!
     const targets = [i, j]
 
@@ -225,33 +257,35 @@ function ArrayView({
       const newCenter = slotCenter(idx)
       const oldCenter = prevCenters.current.get(id)
       if (!layer || newCenter == null || oldCenter == null) continue
-      const dx = oldCenter - newCenter
+      const dx = oldCenter.x - newCenter.x
+      const dy = oldCenter.y - newCenter.y
       layer.style.transition = 'none'
-      layer.style.transform = `translateX(${dx}px)`
+      layer.style.transform = `translate(${dx}px, ${dy}px)`
+      layer.dataset.transitionId = String(transitionId)
+      layer.dataset.runFlip = '1'
     }
 
-    // Force reflow
     void document.body.offsetHeight
 
     requestAnimationFrame(() => {
-      if (animToken.current !== token) return
+      if (animToken.current !== token || geometryGen.current !== gen) return
       for (const idx of targets) {
         const id = idAt(idx)
         const layer = layers.get(id)
-        if (!layer) continue
+        if (!layer || layer.dataset.transitionId !== String(transitionId)) continue
         layer.style.transition = `transform ${swapMs}ms ease`
-        layer.style.transform = 'translateX(0px)'
+        layer.style.transform = 'translate(0px, 0px)'
       }
       window.setTimeout(() => {
-        if (animToken.current !== token) return
+        if (animToken.current !== token || geometryGen.current !== gen) return
         for (const idx of targets) {
           const id = idAt(idx)
           const layer = layers.get(id)
-          if (!layer) continue
+          if (!layer || layer.dataset.transitionId !== String(transitionId)) continue
           layer.style.transition = 'none'
           layer.style.transform = 'none'
+          delete layer.dataset.runFlip
         }
-        // Update prev centers after settle
         for (let k = 0; k < values.length; k++) {
           const c = slotCenter(k)
           const id = ids[k]
@@ -268,13 +302,14 @@ function ArrayView({
     prevElementIds,
     motionMode,
     swapMs,
+    transitionEpoch,
   ])
 
   const curBand = rangeStyle(ranges?.current, values.length)
   const bestBand = rangeStyle(ranges?.best, values.length)
 
   return (
-    <div className="array-view" data-array={name}>
+    <div className="array-view" data-array={name} ref={wrapRef} data-flip-xy="1">
       <div className="array-label">
         <span>{name}</span>
         {numeric && (
