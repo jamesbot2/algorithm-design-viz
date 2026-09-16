@@ -1,0 +1,57 @@
+
+Running 49 tests using 1 worker
+
+(node:1483675) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/49] [chromium] › tests/e2e/v10-workflow.spec.ts:84:3 › V10-07 real workflow acceptance › viewport matrix runs edit→run→mid→end with reachable chrome
+[2/49] [chromium] › tests/e2e/v10-workflow.spec.ts:138:3 › V10-07 real workflow acceptance › continuous short-height resize keeps vars/speed access
+[3/49] [chromium] › tests/e2e/v10-workflow.spec.ts:178:3 › V10-07 real workflow acceptance › theory drawer dialog Escape returns focus
+[4/49] [chromium] › tests/e2e/v11-semantic-visual.spec.ts:37:3 › V11 semantic/visual smokes › insertionSort [2,1] edit→run→mid no crash; board/code present
+[5/49] [chromium] › tests/e2e/v11-semantic-visual.spec.ts:61:3 › V11 semantic/visual smokes › nQueens end keeps board matrix
+[6/49] [chromium] › tests/e2e/v11-semantic-visual.spec.ts:77:3 › V11 semantic/visual smokes › knapsack rejects non-integer weight without solving
+[7/49] [chromium] › tests/e2e/v11-semantic-visual.spec.ts:102:5 › V11 semantic/visual smokes › short-height docks @1366x768
+[8/49] [chromium] › tests/e2e/v11-semantic-visual.spec.ts:102:5 › V11 semantic/visual smokes › short-height docks @390x844
+[9/49] [chromium] › tests/e2e/v11-semantic-visual.spec.ts:102:5 › V11 semantic/visual smokes › short-height docks @1024x520
+[10/49] [chromium] › tests/e2e/v11-semantic-visual.spec.ts:102:5 › V11 semantic/visual smokes › short-height docks @1024x500
+[11/49] [chromium] › tests/e2e/v11-semantic-visual.spec.ts:102:5 › V11 semantic/visual smokes › short-height docks @844x390
+[12/49] [chromium] › tests/e2e/v4-stability.spec.ts:111:3 › V4 A — fail-first gates (must pass after fix) › binarySearch init without Run: array preview + code panel + empty exec arrow
+[13/49] [chromium] › tests/e2e/v4-stability.spec.ts:127:3 › V4 A — fail-first gates (must pass after fix) › workbench height stable pre-run vs post-run (delta <= 1px)
+[14/49] [chromium] › tests/e2e/v4-stability.spec.ts:162:5 › V4 E — stability sampling › binarySearch play sample @1357x743
+[15/49] [chromium] › tests/e2e/v4-stability.spec.ts:162:5 › V4 E — stability sampling › binarySearch play sample @1280x800
+[16/49] [chromium] › tests/e2e/v4-stability.spec.ts:162:5 › V4 E — stability sampling › binarySearch play sample @1440x900
+[17/49] [chromium] › tests/e2e/v4-stability.spec.ts:162:5 › V4 E — stability sampling › binarySearch play sample @768x1024
+[18/49] [chromium] › tests/e2e/v4-stability.spec.ts:162:5 › V4 E — stability sampling › binarySearch play sample @390x844
+[19/49] [chromium] › tests/e2e/v4-stability.spec.ts:247:3 › V4 E — stability sampling › code visible; manual scroll pauses follow; no window scroll
+[20/49] [chromium] › tests/e2e/v4-stability.spec.ts:264:3 › V4 E — stability sampling › LCS / nQueens / dijkstra / knapsack teach paths
+[21/49] [chromium] › tests/e2e/v4-stability.spec.ts:298:3 › V4 E — stability sampling › theme switch does not remount workbench
+[22/49] [chromium] › tests/e2e/v5-m3-m4.spec.ts:4:3 › V5 M3/M4 workbench + expand e2e › binarySearch TS↔pseudo mid lines differ by document
+[23/49] [chromium] › tests/e2e/v5-m3-m4.spec.ts:27:3 › V5 M3/M4 workbench + expand e2e › LCS write primary anchor present after run
+[24/49] [chromium] › tests/e2e/v5-m3-m4.spec.ts:50:3 › V5 M3/M4 workbench + expand e2e › quickSort play advances steps
+[25/49] [chromium] › tests/e2e/v5-m3-m4.spec.ts:69:3 › V5 M3/M4 workbench + expand e2e › cancel enabled while heavy nQueens running
+[26/49] [chromium] › tests/e2e/v5-m3-m4.spec.ts:82:3 › V5 M3/M4 workbench + expand e2e › theme switch readability smoke
+[27/49] [chromium] › tests/e2e/v5-r1-r4.spec.ts:6:3 › V5 R1 tab switch + R4 swap settle › R1 binarySearch tab switch uses that doc anchors
+[28/49] [chromium] › tests/e2e/v5-r1-r4.spec.ts:31:3 › V5 R1 tab switch + R4 swap settle › R4 quickSort swap settles to transform none
+[29/49] [chromium] › tests/e2e/v6-uiux.spec.ts:12:3 › V6 UI/UX consistency › UI-01 bubble: phase jump bounded after long run
+[30/49] [chromium] › tests/e2e/v6-uiux.spec.ts:40:3 › V6 UI/UX consistency › UI-04 graph illegal edges do not run previous graph
+[31/49] [chromium] › tests/e2e/v6-uiux.spec.ts:65:3 › V6 UI/UX consistency › UI-05 experiment export keeps dijkstra snapshot after switching
+[32/49] [chromium] › tests/e2e/v6-uiux.spec.ts:81:3 › V6 UI/UX consistency › UI-05 knapsack dirty after preset switch
+[33/49] [chromium] › tests/e2e/v7-state.spec.ts:4:3 › V7 state regressions › R2 dijkstra illegal n blocks run and keeps raw text
+[34/49] [chromium] › tests/e2e/v7-state.spec.ts:16:3 › V7 state regressions › R3 bubble replay seeks to start without re-run status
+[35/49] [chromium] › tests/e2e/v7-state.spec.ts:30:3 › V7 state regressions › R4 workbench keeps layout attribute while resizing container
+[36/49] [chromium] › tests/e2e/v7-state.spec.ts:46:3 › V7 state regressions › R6 mobile open then desktop releases scroll lock
+[37/49] [chromium] › tests/e2e/v8-preview-layout.spec.ts:4:3 › V8 preview layout › mobile tabs is single-pane with usable preview height
+[38/49] [chromium] › tests/e2e/v8-preview-layout.spec.ts:64:3 › V8 preview layout › desktop split panes have usable min height
+[39/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:16:5 › V9 viewport visibility + motion › kadane stage operable @ 1366x768
+[40/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:16:5 › V9 viewport visibility + motion › kadane stage operable @ 1280x800
+[41/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:16:5 › V9 viewport visibility + motion › kadane stage operable @ 1024x500
+[42/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:16:5 › V9 viewport visibility + motion › kadane stage operable @ 900x500
+[43/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:16:5 › V9 viewport visibility + motion › kadane stage operable @ 390x844
+[44/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:16:5 › V9 viewport visibility + motion › kadane stage operable @ 360x640
+[45/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:16:5 › V9 viewport visibility + motion › kadane stage operable @ 320x568
+[46/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:16:5 › V9 viewport visibility + motion › kadane stage operable @ 844x390
+[47/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:81:3 › V9 viewport visibility + motion › dijkstra: graph is main scene; result not above SVG fighting height
+[48/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:111:3 › V9 viewport visibility + motion › nQueens: board before full search tree (tree aux collapsed)
+[49/49] [chromium] › tests/e2e/v9-viewport-motion.spec.ts:138:3 › V9 viewport visibility + motion › V8 mobile tab selector still works
+  49 passed (1.5m)
