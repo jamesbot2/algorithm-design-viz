@@ -1,0 +1,75 @@
+{
+  "found": true,
+  "layout": "tabs",
+  "tab": "demo",
+  "wb": {
+    "w": 363,
+    "h": 408,
+    "y": 424,
+    "x": 14
+  },
+  "panelsGroup": null,
+  "transport": {
+    "w": 337,
+    "h": 154,
+    "y": 656,
+    "x": 27
+  },
+  "vizSlot": {
+    "w": 337,
+    "h": 127,
+    "y": 515,
+    "x": 27
+  },
+  "codeSlot": {
+    "w": 0,
+    "h": 127,
+    "y": 515,
+    "x": 363
+  },
+  "vizHidden": false,
+  "codeHidden": true,
+  "viewport": {
+    "w": 390,
+    "h": 844
+  },
+  "panels": [
+    {
+      "className": "",
+      "dataTab": "1",
+      "style": "min-height: 0px; max-height: 100%; height: auto; min-width: 0px; max-width: 100%; width: auto; border: 0px; padding: 0px; margin: 0px; display: flex; overflow: visible; flex: 55 1 0px;",
+      "childClass": "workbench-viz-panel",
+      "childDataTab": null,
+      "rect": {
+        "w": 337,
+        "h": 127,
+        "y": 515,
+        "x": 27
+      },
+      "matchesCss": false,
+      "matchesCombined": true,
+      "childMatchesCombined": false
+    },
+    {
+      "className": "",
+      "dataTab": "0",
+      "style": "min-height: 0px; max-height: 100%; height: auto; min-width: 0px; max-width: 100%; width: auto; border: 0px; padding: 0px; margin: 0px; display: flex; overflow: visible; flex: 45 1 0px;",
+      "childClass": "workbench-code-panel",
+      "childDataTab": null,
+      "rect": {
+        "w": 0,
+        "h": 127,
+        "y": 515,
+        "x": 363
+      },
+      "matchesCss": false,
+      "matchesCombined": true,
+      "childMatchesCombined": false
+    }
+  ],
+  "selectorHits": {
+    "oldInactive": 0,
+    "newInactive": 1,
+    "newActive": 1
+  }
+}

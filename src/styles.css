@@ -1326,9 +1326,9 @@ button.icon-btn {
 }
 
 
-/* —— V6 height chain: viewport-budgeted shell, panels flex within —— */
+/* —— V6/V8 height chain: viewport-budgeted shell, panels flex within —— */
 .workbench-layout {
-  /* Stable outer height (V4 gate) without nested min(72vh) + 100% fight */
+  /* When lab-fill is active, flex grows inside the page; clamp is a fallback. */
   --wb-chrome: 14rem; /* topbar + page header + compact input approx */
   flex: 1 1 auto;
   height: clamp(420px, calc(100dvh - var(--wb-chrome)), 880px);
@@ -1336,6 +1336,7 @@ button.icon-btn {
   max-height: none;
   display: flex;
   flex-direction: column;
+  gap: 0.45rem;
 }
 .workbench-panels {
   flex: 1 1 auto;
@@ -1673,11 +1674,15 @@ html, body, #root {
   flex: 0 0 auto;
 }
 
-/* Narrow workbench tabs (UI-03 / V7-R4): SAME panel tree, visibility only — no remount */
+/* Narrow workbench tabs (UI-03 / V7-R4 / V8): SAME panel tree, visibility only — no remount.
+ * react-resizable-panels v4 puts className on an INNER wrapper and spreads data-* on the
+ * outer [data-panel] node — selectors must target [data-panel][data-tab-active], not
+ * .workbench-*-panel[data-tab-active] (those never match the same element). */
 .workbench-tabs {
   display: none;
   gap: 0.35rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex: 0 0 auto;
 }
 .workbench-layout[data-layout="tabs"] .workbench-tabs {
   display: flex;
@@ -1685,30 +1690,45 @@ html, body, #root {
 }
 .workbench-layout[data-layout="tabs"] .workbench-panels-stable {
   flex: 1 1 auto;
-  min-height: 280px;
+  min-height: 240px;
 }
 .workbench-layout[data-layout="tabs"] .workbench-resize {
   display: none !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: 0 0 0 !important;
 }
-.workbench-layout[data-layout="tabs"] .workbench-viz-panel[data-tab-active="0"],
-.workbench-layout[data-layout="tabs"] .workbench-code-panel[data-tab-active="0"],
-.workbench-layout[data-layout="tabs"] .workbench-inspector-panel[data-tab-active="0"] {
-  /* Panel chrome stays mounted; inner uses hidden attribute */
+/* Collapse inactive outer panel (library flex shorthand lives here) */
+.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="0"] {
+  flex: 0 0 0px !important;
   flex-grow: 0 !important;
-  flex-basis: 0 !important;
+  flex-shrink: 0 !important;
+  flex-basis: 0px !important;
   min-width: 0 !important;
+  max-width: 0 !important;
   width: 0 !important;
   overflow: hidden !important;
   padding: 0 !important;
   border: none !important;
+  margin: 0 !important;
+  pointer-events: none !important;
 }
-.workbench-layout[data-layout="tabs"] .workbench-viz-panel[data-tab-active="1"],
-.workbench-layout[data-layout="tabs"] .workbench-code-panel[data-tab-active="1"],
-.workbench-layout[data-layout="tabs"] .workbench-inspector-panel[data-tab-active="1"] {
+.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] {
+  flex: 1 1 auto !important;
   flex-grow: 1 !important;
-  flex-basis: 100% !important;
-  min-width: 100% !important;
+  flex-basis: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
   width: 100% !important;
+}
+.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="0"] > .workbench-viz-panel,
+.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="0"] > .workbench-code-panel,
+.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="0"] > .workbench-inspector-panel {
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
 }
 .workbench-tab-panels { display: none; } /* legacy unused */
 .workbench-tab-panel { display: none; }
@@ -1763,4 +1783,177 @@ html, body, #root {
 }
 .playback-transport .phase-jump {
   min-height: 2rem;
+}
+
+/* —— V8 preview height: lab pages fill viewport; workbench gets remaining space —— */
+.app-shell {
+  min-height: 100dvh;
+}
+.main-wrap[data-lab-fill="1"] {
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+.main-wrap[data-lab-fill="1"] > .topbar {
+  flex: 0 0 auto;
+}
+.main-wrap[data-lab-fill="1"] > .main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.5rem;
+  padding-bottom: 0.4rem;
+}
+.main-wrap[data-lab-fill="1"] .algo-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  gap: 0.35rem;
+}
+.main-wrap[data-lab-fill="1"] .page-header-compact {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+}
+.main-wrap[data-lab-fill="1"] .page-header-compact h1 {
+  font-size: 1.15rem;
+  margin: 0.05rem 0;
+}
+.main-wrap[data-lab-fill="1"] .page-header-compact .complexity {
+  margin: 0.1rem 0;
+  font-size: 0.78rem;
+}
+.main-wrap[data-lab-fill="1"] .page-header-compact .theory-toggle {
+  margin-top: 0.15rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.78rem;
+}
+.main-wrap[data-lab-fill="1"] .input-panel {
+  flex: 0 1 auto;
+  max-height: min(18vh, 150px);
+  overflow: auto;
+  margin-bottom: 0;
+  padding: 0.5rem 0.65rem;
+  gap: 0.45rem;
+}
+.main-wrap[data-lab-fill="1"] .input-panel h3 {
+  margin: 0 0 0.2rem;
+  font-size: 0.88rem;
+}
+.main-wrap[data-lab-fill="1"] .input-panel > .hint {
+  display: none; /* reclaim height; mode buttons still explain teach/experiment */
+}
+.main-wrap[data-lab-fill="1"] .input-panel .debug-details {
+  display: none; /* available in source / after expand later if needed */
+}
+.main-wrap[data-lab-fill="1"] .workbench-layout {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto !important;
+  max-height: none;
+  overflow: hidden;
+  padding: 0.45rem;
+  gap: 0.3rem;
+}
+.main-wrap[data-lab-fill="1"] .workbench-header {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+}
+/* Critical: library sets height:100% on Group which becomes a huge flex-basis and then
+ * shrinks against non-shrinking transport — use basis 0 so panels absorb free space. */
+.main-wrap[data-lab-fill="1"] .workbench-panels,
+.main-wrap[data-lab-fill="1"] .workbench-panels-stable {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-self: stretch;
+}
+.main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] .workbench-panels-stable,
+.main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="split"] .workbench-panels-stable {
+  min-height: 0 !important;
+}
+.main-wrap[data-lab-fill="1"] .viz-banner-slot {
+  min-height: 2.2rem;
+  max-height: 3.2rem;
+}
+.main-wrap[data-lab-fill="1"] .kbd-hint {
+  margin-top: 0.2rem;
+  font-size: 0.65rem;
+  line-height: 1.3;
+}
+
+/* Compact transport under lab-fill (both breakpoints) */
+.main-wrap[data-lab-fill="1"] .workbench-transport {
+  flex: 0 0 auto;
+  padding-top: 0.25rem;
+}
+.main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar,
+.main-wrap[data-lab-fill="1"] .workbench-transport-toolbar {
+  gap: 0.25rem;
+  padding: 0.22rem;
+  margin-bottom: 0.25rem;
+  border-radius: 10px;
+}
+.main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar button {
+  padding: 0.28rem 0.55rem;
+  font-size: 0.78rem;
+}
+.main-wrap[data-lab-fill="1"] .playback-transport .play-btn {
+  min-width: 5rem;
+}
+.main-wrap[data-lab-fill="1"] .scrub-row {
+  margin-bottom: 0.25rem;
+  gap: 0.4rem;
+}
+.main-wrap[data-lab-fill="1"] .phase-track {
+  height: 5px;
+  margin: 0 0 0.15rem;
+}
+.main-wrap[data-lab-fill="1"] .phase-jump {
+  max-height: 2rem;
+  min-height: 0;
+  gap: 0.2rem;
+}
+.main-wrap[data-lab-fill="1"] .phase-jump button {
+  padding: 0.2rem 0.45rem;
+  font-size: 0.72rem;
+}
+.main-wrap[data-lab-fill="1"] .step-counter {
+  font-size: 0.72rem;
+}
+
+/* Extra-tight on tabs / phone */
+.workbench-layout[data-layout="tabs"] .kbd-hint {
+  display: none;
+}
+@media (max-width: 720px) {
+  .main-wrap[data-lab-fill="1"] .input-panel {
+    max-height: min(16vh, 130px);
+  }
+  .main-wrap[data-lab-fill="1"] > .main {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    padding-top: 0.4rem;
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact .complexity {
+    display: none;
+  }
+}
+
+@media (min-width: 721px) {
+  .main-wrap[data-lab-fill="1"] .input-panel {
+    max-height: min(16vh, 140px);
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-code-panel .code-browser {
+    min-height: 0;
+  }
+  .main-wrap[data-lab-fill="1"] .kbd-hint {
+    /* secondary — one line */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }

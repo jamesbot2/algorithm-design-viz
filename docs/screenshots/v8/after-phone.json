@@ -1,0 +1,124 @@
+{
+  "labFill": "1",
+  "layout": "tabs",
+  "viewport": {
+    "w": 390,
+    "h": 844
+  },
+  "rects": {
+    "mainWrap": {
+      "w": 390,
+      "h": 844,
+      "y": 0
+    },
+    "main": {
+      "w": 390,
+      "h": 784,
+      "y": 60
+    },
+    "algo": {
+      "w": 368,
+      "h": 771,
+      "y": 66
+    },
+    "input": {
+      "w": 368,
+      "h": 130,
+      "y": 161
+    },
+    "wb": {
+      "w": 368,
+      "h": 542,
+      "y": 296
+    },
+    "panels": {
+      "w": 351,
+      "h": 308,
+      "y": 377
+    },
+    "transport": {
+      "w": 351,
+      "h": 126,
+      "y": 695
+    },
+    "viz": {
+      "w": 351,
+      "h": 308,
+      "y": 377
+    }
+  },
+  "computed": {
+    "mainWrap": {
+      "display": "flex",
+      "flex": "1 1 0%",
+      "height": "844px",
+      "minHeight": "844px",
+      "maxHeight": "844px",
+      "overflow": "hidden"
+    },
+    "main": {
+      "display": "flex",
+      "flex": "1 1 auto",
+      "height": "784.219px",
+      "minHeight": "0px",
+      "maxHeight": "none",
+      "overflow": "hidden"
+    },
+    "algo": {
+      "display": "flex",
+      "flex": "1 1 auto",
+      "height": "771.438px",
+      "minHeight": "0px",
+      "maxHeight": "none",
+      "overflow": "hidden"
+    },
+    "input": {
+      "display": "flex",
+      "flex": "0 1 auto",
+      "height": "130px",
+      "minHeight": "auto",
+      "maxHeight": "130px",
+      "overflow": "auto"
+    },
+    "wb": {
+      "display": "flex",
+      "flex": "1 1 0px",
+      "height": "541.516px",
+      "minHeight": "0px",
+      "maxHeight": "none",
+      "overflow": "hidden"
+    },
+    "panels": {
+      "display": "flex",
+      "flex": "1 1 0px",
+      "height": "307.906px",
+      "minHeight": "0px",
+      "maxHeight": "none",
+      "overflow": "hidden"
+    }
+  },
+  "panelNodes": [
+    {
+      "tab": "1",
+      "rect": {
+        "w": 351,
+        "h": 308,
+        "y": 377
+      },
+      "computedFlex": "1 1 auto",
+      "computedWidth": "351.25px",
+      "computedMaxWidth": "100%"
+    },
+    {
+      "tab": "0",
+      "rect": {
+        "w": 0,
+        "h": 308,
+        "y": 377
+      },
+      "computedFlex": "0 0 0px",
+      "computedWidth": "0px",
+      "computedMaxWidth": "0px"
+    }
+  ]
+}

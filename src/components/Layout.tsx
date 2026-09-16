@@ -332,7 +332,7 @@ export default function Layout() {
         <footer className="side-foot">GitHub Pages · 本地可视化</footer>
       </aside>
 
-      <div className="main-wrap">
+      <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'}>
         <header className="topbar">
           <button
             type="button"
