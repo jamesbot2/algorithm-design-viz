@@ -141,6 +141,24 @@ test.describe('V12 stage overlap + settings', () => {
     await page.reload()
     await runAlgo(page, '#/algo/bfs')
     await expect(page.getByTestId('graph-view')).toBeVisible()
+    await expect(page.getByTestId('graph-plot')).toBeVisible()
+    // Wait until nodes are laid out inside stage (avoid 0 in-stage hits before camera fit)
+    await page.waitForFunction(() => {
+      const stage = document.querySelector('[data-testid="viz-canvas"]') as HTMLElement | null
+      const nodes = [...document.querySelectorAll('.graph-svg circle')] as SVGCircleElement[]
+      if (!stage || nodes.length < 6) return false
+      const tr = stage.getBoundingClientRect()
+      if (tr.height < 120) return false
+      let inStage = 0
+      for (const el of nodes.slice(0, 6)) {
+        const r = el.getBoundingClientRect()
+        if (r.width < 1 || r.height < 1) continue
+        const x = r.left + r.width / 2
+        const y = r.top + r.height / 2
+        if (y >= tr.top + 1 && y <= tr.bottom - 1 && x >= tr.left && x <= tr.right) inStage++
+      }
+      return inStage >= 6
+    }, { timeout: 12_000 })
     const after = await measureOverlap(page)
     fs.writeFileSync(path.join(OUT_TRACES, 'bfs-overlap-after.json'), JSON.stringify(after, null, 2))
     await page.screenshot({ path: path.join(OUT_SHOTS, 'bfs-overlap-after.png') })

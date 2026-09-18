@@ -1,14 +1,14 @@
 {
   "ok": true,
   "svg": {
-    "top": 494.296875,
-    "bottom": 622.625,
-    "height": 128.328125
+    "top": 263,
+    "bottom": 613.890625,
+    "height": 350.890625
   },
   "stage": {
-    "top": 487.703125,
-    "bottom": 629.21875,
-    "height": 141.515625
+    "top": 256.40625,
+    "bottom": 620.484375,
+    "height": 364.078125
   },
   "inspector": {
     "top": 0,
@@ -59,5 +59,5 @@
   "inStageHitCount": 6,
   "outOfStage": 0,
   "nodeCount": 6,
-  "rawSvgBottom": 622.625
+  "rawSvgBottom": 613.890625
 }

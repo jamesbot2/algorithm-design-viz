@@ -3462,15 +3462,47 @@ html, body, #root {
   flex: 1 1 auto;
   min-height: 0;
 }
-/* Main array before aux buffers visually preferred */
+/* V18.1: primary owns flex height; aux buffers stay compact + in-stage (top).
+ * DOM order = buffers then primary so mid-step temp/key intersects viz-canvas. */
 .arrays-panel[data-array-order="primary-first"] {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
-.arrays-panel[data-array-order="primary-first"] .array-buffers {
-  order: 2;
+.arrays-panel[data-array-order="primary-first"] > .array-buffers {
+  flex: 0 0 auto;
+  order: 0;
+  max-height: 88px;
+  overflow: hidden;
 }
 .arrays-panel[data-array-order="primary-first"] > .array-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
   order: 1;
+}
+
+/* V18.1: graph primary must keep plot hittable — do not let min-height:0 zero the stage */
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport[data-primary-scene="graph"],
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main[data-primary-scene="graph"] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport[data-primary-scene="graph"] .graph-view,
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main[data-primary-scene="graph"] .graph-view {
+  flex: 1 1 auto;
+  min-height: 140px;
+  overflow: hidden;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport[data-primary-scene="graph"] .graph-plot,
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main[data-primary-scene="graph"] .graph-plot {
+  flex: 1 1 auto;
+  min-height: 120px;
+  overflow: hidden;
 }

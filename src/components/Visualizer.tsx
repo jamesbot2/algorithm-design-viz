@@ -298,12 +298,18 @@ export default function Visualizer({
     onStepIndexChange?.(idx)
   }, [idx, onStepIndexChange])
 
-  // V14-01: whenever inline inspector is CSS-hidden, expose alternate entry (drawer toggle)
+  // V14-01 / V18.1: whenever inline inspector is CSS-hidden, expose alternate entry (drawer toggle).
+  // Graph primary hides inline via :has(.graph-view) — force drawer immediately (no RO race → layout:inline + both unreachable).
   useEffect(() => {
     const el = inlineInspectorRef.current
     const root = rootRef.current
     if (!el || !root) return
     const measure = () => {
+      const graphPresent = Boolean(step?.graph) || Boolean(root.querySelector('.graph-view'))
+      if (graphPresent) {
+        setInspectorLayout('drawer')
+        return
+      }
       const cs = getComputedStyle(el)
       const r = el.getBoundingClientRect()
       const hidden =
@@ -316,8 +322,14 @@ export default function Visualizer({
       if (!hidden) setInspectorSheetOpen(false)
     }
     measure()
+    // :has(.graph-view) applies after child commit — remeasure next frames
+    const raf1 = requestAnimationFrame(() => {
+      measure()
+      requestAnimationFrame(measure)
+    })
     const ro = new ResizeObserver(measure)
     ro.observe(root)
+    ro.observe(el)
     if (el.parentElement) ro.observe(el.parentElement)
     window.addEventListener('resize', measure)
     // matchMedia covers short/narrow dock rule without waiting for resize of root
@@ -325,6 +337,7 @@ export default function Visualizer({
     const onMql = () => measure()
     mql.addEventListener?.('change', onMql)
     return () => {
+      cancelAnimationFrame(raf1)
       ro.disconnect()
       window.removeEventListener('resize', measure)
       mql.removeEventListener?.('change', onMql)

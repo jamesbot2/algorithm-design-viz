@@ -57,10 +57,40 @@ async function inspectorReachable(page: Page) {
 }
 
 async function openInspectorIfNeeded(page: Page) {
+  // Product may still be measuring drawer vs inline after graph mount — wait briefly.
+  await page.waitForFunction(() => {
+    const inline = document.querySelector('[data-testid="viz-inspector"]') as HTMLElement | null
+    const toggle = document.querySelector(
+      '[data-testid="inspector-sheet-toggle"]',
+    ) as HTMLElement | null
+    const layout = document
+      .querySelector('[data-testid="visualizer"]')
+      ?.getAttribute('data-inspector-layout')
+    const inlineVisible = (() => {
+      if (!inline) return false
+      const cs = getComputedStyle(inline)
+      const r = inline.getBoundingClientRect()
+      return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1 && r.height > 1
+    })()
+    const toggleReachable = (() => {
+      if (!toggle || toggle.hasAttribute('hidden')) return false
+      const cs = getComputedStyle(toggle)
+      const r = toggle.getBoundingClientRect()
+      return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1 && r.height > 1
+    })()
+    return inlineVisible || toggleReachable || layout === 'drawer'
+  }, { timeout: 8_000 }).catch(() => null)
+
   const state = await inspectorReachable(page)
   if (state.inlineVisible) return 'inline' as const
-  if (state.toggleReachable) {
-    await page.getByTestId('inspector-sheet-toggle').click()
+  if (state.toggleReachable || state.layout === 'drawer') {
+    const toggle = page.getByTestId('inspector-sheet-toggle')
+    // layout:drawer should have cleared [hidden]; if still racing, click when visible
+    if (await toggle.isVisible().catch(() => false)) {
+      await toggle.click()
+    } else if (state.layout === 'drawer') {
+      await toggle.evaluate((el) => (el as HTMLElement).click())
+    }
     await expect(page.getByTestId('inspector-sheet')).toBeVisible()
     return 'drawer' as const
   }
@@ -267,7 +297,17 @@ test.describe('V14 inspector / arrays / pan / visibility', () => {
     test.setTimeout(90_000)
     await page.setViewportSize({ width: 1280, height: 800 })
     await runAlgo(page, '#/algo/bfs')
-    await page.getByTestId('graph-plot').scrollIntoViewIfNeeded()
+    // Re-query after run/layout — graph-plot can detach on camera/fit remount
+    await expect(page.getByTestId('graph-plot')).toBeVisible({ timeout: 15_000 })
+    await page.waitForFunction(() => {
+      const plot = document.querySelector('[data-testid="graph-plot"]')
+      const nodes = document.querySelectorAll('.graph-svg circle')
+      if (!plot || nodes.length < 1) return false
+      const r = plot.getBoundingClientRect()
+      return r.width > 40 && r.height > 40
+    }, { timeout: 10_000 })
+    const plot = page.getByTestId('graph-plot')
+    await plot.scrollIntoViewIfNeeded()
     await page.waitForTimeout(250)
     const positive = await measureStrictGraphVisibility(page)
     fs.writeFileSync(

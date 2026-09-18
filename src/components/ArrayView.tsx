@@ -243,12 +243,19 @@ function ArrayView({
       const usable = Math.min(stageH, roomInViewport)
       const labelH = self.querySelector('.array-label')?.getBoundingClientRect().height ?? 28
       const noteH = self.querySelector('.matrix-note')?.getBoundingClientRect().height ?? 0
+      // Reserve sibling aux buffer strip so primary bars do not push temp outside viz-canvas
+      const panel = self.closest('.arrays-panel')
+      const bufEl = panel?.querySelector(':scope > .array-buffers, :scope > [data-testid="array-buffers"]') as HTMLElement | null
+      const reserveBuf =
+        bufEl && !self.closest('.array-buffers')
+          ? Math.max(56, Math.ceil(bufEl.getBoundingClientRect().height) || 64) + 8
+          : 0
       const short = window.innerHeight <= 520
       const ultra = window.innerHeight <= 400
       const landscape = window.innerWidth > window.innerHeight
-      // signed chart box ≈ maxH+40; keep that inside remaining stage after label/note
+      // signed chart box ≈ maxH+40; keep that inside remaining stage after label/note/buffers
       const chartChrome = 40
-      const overhead = labelH + noteH + chartChrome + 8
+      const overhead = labelH + noteH + chartChrome + 8 + reserveBuf
       const minBudget = landscape && ultra ? 140 : landscape && short ? 110 : short ? 80 : 56
       // V17-03: main array maxH from usable stage — not a hard desktop 160 cap
       const stageBudget = Math.max(0, usable - overhead)
@@ -811,15 +818,16 @@ export const ArraysFromStep = memo(function ArraysFromStep({
       </div>
     )
   }
-  // V18-02: main array preferred over aux buffers (primary first)
+  // V18-02 / V18.1: primary owns flex budget; aux buffers stay ON TOP inside stage
+  // so mid-step temp/key remains in viz-canvas (primary-first was clipping buffers below fold).
   return (
     <div className="arrays-panel" data-array-order="primary-first" data-testid="arrays-panel">
-      {primary.map(([name, values]) => renderOne(name, values, false))}
       {buffers.length > 0 && (
         <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
           {buffers.map(([name, values]) => renderOne(name, values, true))}
         </div>
       )}
+      {primary.map(([name, values]) => renderOne(name, values, false))}
     </div>
   )
 })
