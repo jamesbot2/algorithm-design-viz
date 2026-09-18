@@ -3,7 +3,7 @@
 **Branch:** `v17-input-edit-code-arrays-acceptance`  
 **Baseline HEAD:** `4172ead39d7a9c9cb08190ae350e530f18fb424f` (main / V16 + input-edit e2e fix)  
 **Fix tip:** `f6c1da9b59d725e516a7290406afe230bd1ec575`  
-**Branch tip:** `75165d3c0a407b5563ff565afe9eef7781e94389`  
+**Branch tip:** `a9a1f63e8337f5f7056f9e91646094e2a6cf3b31`  
 **Not pushed. Not deployed. No force-push.** Local branch commits only.
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).  
@@ -82,4 +82,6 @@ None for the four closes. Not pushed / not deployed (per brief).
 
 ## Tip SHAs
 
-See git log on branch after docs commit; recorded in commit messages and final report.
+- Fix tip: `f6c1da9b59d725e516a7290406afe230bd1ec575`
+- Branch tip: `a9a1f63e8337f5f7056f9e91646094e2a6cf3b31`
+
