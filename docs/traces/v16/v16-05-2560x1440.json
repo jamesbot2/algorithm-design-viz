@@ -1,0 +1,80 @@
+{
+  "after": {
+    "viewport": {
+      "w": 2560,
+      "h": 1440
+    },
+    "main": {
+      "x": 260,
+      "y": 58,
+      "w": 2300,
+      "h": 1382
+    },
+    "wb": {
+      "x": 270,
+      "y": 297,
+      "w": 2279,
+      "h": 1136
+    },
+    "plot": {
+      "x": 304,
+      "y": 488,
+      "w": 1186,
+      "h": 764
+    },
+    "code": {
+      "x": 1536,
+      "y": 338,
+      "w": 999,
+      "h": 962
+    },
+    "sheet": null,
+    "sheetOverlapsCode": false,
+    "mainMaxWidth": "none",
+    "preview": "0",
+    "stepIndex": "0",
+    "mainCounter": "1 / 11 · init"
+  },
+  "withData": {
+    "viewport": {
+      "w": 2560,
+      "h": 1440
+    },
+    "main": {
+      "x": 260,
+      "y": 58,
+      "w": 2300,
+      "h": 1382
+    },
+    "wb": {
+      "x": 270,
+      "y": 297,
+      "w": 1924,
+      "h": 1136
+    },
+    "plot": {
+      "x": 304,
+      "y": 488,
+      "w": 991,
+      "h": 764
+    },
+    "code": {
+      "x": 1341,
+      "y": 338,
+      "w": 839,
+      "h": 962
+    },
+    "sheet": {
+      "x": 2200,
+      "y": 0,
+      "w": 360,
+      "h": 1440
+    },
+    "sheetOverlapsCode": false,
+    "mainMaxWidth": "none",
+    "preview": "0",
+    "stepIndex": "0",
+    "mainCounter": "1 / 11 · init",
+    "drawerCounter": "1 / 11 · init"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "before": {
+    "step": "2",
+    "preview": "0",
+    "counter": "3 / 11 · relax"
+  },
+  "mid": {
+    "step": "2",
+    "preview": "0"
+  },
+  "after": {
+    "step": "2",
+    "preview": "0"
+  }
+}
