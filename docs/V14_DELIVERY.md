@@ -2,7 +2,7 @@
 
 **Branch:** `v14-inspector-arrays-pan-visibility`  
 **Baseline HEAD:** `dc40e1679e6fad3f37236146a72d6d6f8a28f771` (main / V13)  
-**Tip SHAs:** see git log on this branch (fix tip + docs tip).  
+**Tip SHA:** `1cc141227db12614154b8fd17c3405260511c71a` (fix+docs in one commit).  
 **Not pushed. Not deployed. No force-push.**
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).
