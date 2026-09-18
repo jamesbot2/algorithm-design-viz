@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "svg": {
+    "top": 500.703125,
+    "bottom": 720.703125,
+    "height": 220
+  },
+  "stage": {
+    "top": 487.703125,
+    "bottom": 535.703125,
+    "height": 48
+  },
+  "inspector": {
+    "top": 546.09375,
+    "bottom": 642.09375,
+    "height": 96
+  },
+  "overlapArea": 43230,
+  "overlapH": 96,
+  "hits": [],
+  "blockedHits": 0,
+  "nodeCount": 6,
+  "rawSvgBottom": 720.703125
+}

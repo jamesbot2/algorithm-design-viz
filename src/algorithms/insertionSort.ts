@@ -37,6 +37,7 @@ export function generateSteps(input: number[]): Step[] {
   const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
   const PHASE_ANCHOR: Record<string, string> = {
     init: 'outer',
+    takeKey: 'outer',
     insert: 'insert',
     shift: 'shift',
     done: 'done',
@@ -108,7 +109,7 @@ export function generateSteps(input: number[]): Step[] {
       { [i]: 'read' },
       { i, j },
       [{ type: 'compare', indices: [i], elementIds: [keyId] }],
-      'insert',
+      'takeKey',
       undefined,
       { temp: [key] },
       { temp: [keyId] },

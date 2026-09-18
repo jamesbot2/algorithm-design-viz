@@ -19,11 +19,12 @@ export function decorativeMotionMs(
 export function coordinatedStepIntervalMs(
   speedIntervalMs: number,
   mode: AnimationMode,
-  opts?: { hasSwapMotion?: boolean; baseSwapMs?: number },
+  opts?: { hasSwapMotion?: boolean; hasMoveMotion?: boolean; baseSwapMs?: number },
 ): number {
   const feel = speedFeelMultiplier(speedIntervalMs)
   const base = Math.max(80, Math.round(speedIntervalMs / Math.max(0.5, 2 - feel)))
-  if (mode === 'reduced' || !opts?.hasSwapMotion) return base
-  const motion = decorativeMotionMs(mode, speedIntervalMs, opts.baseSwapMs ?? 280)
+  const needsMotion = Boolean(opts?.hasSwapMotion || opts?.hasMoveMotion)
+  if (mode === 'reduced' || !needsMotion) return base
+  const motion = decorativeMotionMs(mode, speedIntervalMs, opts?.baseSwapMs ?? 280)
   return Math.max(base, motion)
 }

@@ -22,6 +22,8 @@ interface Props {
   pointers?: Record<string, number>
   defaultMode?: 'bars' | 'cells'
   scaleMax?: number
+  /** Run-level signed domain (stable half-span across steps). */
+  signedDomain?: { hasPos: boolean; hasNeg: boolean }
   ranges?: StepRanges
   arrayOps?: ArrayOp[]
   elementIds?: string[]
@@ -90,11 +92,14 @@ function rangeStyle(
   return { left: `${leftPct}%`, width: `${widthPct}%` }
 }
 
-/** Signed-bar geometry: shared abs domain; zero has data height 0. */
+/** Signed-bar geometry: shared abs domain; zero has data height 0.
+ * Pass runDomain so mid-run all-positive frames keep the same half-span as signed runs.
+ */
 export function computeBarGeometry(
   values: number[],
   scaleMax?: number,
   maxH = 160,
+  runDomain?: { hasPos: boolean; hasNeg: boolean },
 ): {
   absMax: number
   zeroRatio: number
@@ -102,11 +107,12 @@ export function computeBarGeometry(
   directions: ('pos' | 'neg' | 'zero')[]
 } {
   const absMax = Math.max(1, scaleMax ?? 0, ...values.map((v) => Math.abs(v)))
-  const hasPos = values.some((v) => v > 0)
-  const hasNeg = values.some((v) => v < 0)
+  const hasPos = runDomain?.hasPos ?? values.some((v) => v > 0)
+  const hasNeg = runDomain?.hasNeg ?? values.some((v) => v < 0)
   let zeroRatio = 1
   if (hasPos && hasNeg) zeroRatio = 0.5
-  else if (hasNeg) zeroRatio = 0
+  else if (hasNeg && !hasPos) zeroRatio = 0
+  else if (hasPos && !hasNeg) zeroRatio = 1
   const half = hasPos && hasNeg
   const heights = values.map((v) => {
     if (v === 0) return 0
@@ -156,6 +162,7 @@ function ArrayView({
   pointers = {},
   defaultMode,
   scaleMax,
+  signedDomain,
   ranges,
   arrayOps,
   elementIds,
@@ -178,12 +185,16 @@ function ArrayView({
   )
   const [maxH, setMaxH] = useState(compact ? 64 : 160)
   const geo = useMemo(
-    () => (numeric ? computeBarGeometry(nums, scaleMax, maxH) : null),
-    [numeric, nums, scaleMax, maxH],
+    () => (numeric ? computeBarGeometry(nums, scaleMax, maxH, signedDomain) : null),
+    [numeric, nums, scaleMax, maxH, signedDomain],
   )
-  const hasNegative = Boolean(geo && (geo.zeroRatio < 1 || nums.some((n) => n < 0)))
-  const hasPositive = Boolean(geo && nums.some((n) => n > 0))
-  const signedMode = Boolean(geo && (hasNegative || nums.every((n) => n === 0)))
+  const hasNegative = Boolean(
+    geo && (signedDomain?.hasNeg || geo.zeroRatio < 1 || nums.some((n) => n < 0)),
+  )
+  const hasPositive = Boolean(geo && (signedDomain?.hasPos || nums.some((n) => n > 0)))
+  const signedMode = Boolean(
+    geo && (hasNegative || signedDomain?.hasNeg || nums.every((n) => n === 0)),
+  )
 
   const ids = useMemo(() => uniqueDisplayIds(resolveIds(values, elementIds)), [values, elementIds])
 
@@ -255,9 +266,10 @@ function ArrayView({
   }, [compact, mode, values.length, signedMode])
   const geometryGen = useRef(0)
   const [rangeMasks, setRangeMasks] = useState<{
-    current: { left: number; width: number }[]
-    best: { left: number; width: number }[]
+    current: { left: number; width: number; top: number; height: number }[]
+    best: { left: number; width: number; top: number; height: number }[]
   }>({ current: [], best: [] })
+  const overlayHostRef = useRef<HTMLDivElement>(null)
 
   // Clear transforms on cancel / remount / non-swap
   const clearTransforms = () => {
@@ -434,24 +446,27 @@ function ArrayView({
   ])
 
 
-  // V11-01: range masks from real slot rects (segmented when cells wrap)
+  // V12-05: range masks in overlay-host coords; resize remeasure; wrap segments include top/height
   useLayoutEffect(() => {
-    const wrap = wrapRef.current
-    if (!wrap) return
+    const host = overlayHostRef.current ?? wrapRef.current
+    if (!host) return
     const measure = (range: [number, number] | undefined) => {
-      if (!range || values.length <= 0) return [] as { left: number; width: number }[]
+      if (!range || values.length <= 0)
+        return [] as { left: number; width: number; top: number; height: number }[]
       const lo = Math.max(0, Math.min(range[0], range[1]))
       const hi = Math.min(values.length - 1, Math.max(range[0], range[1]))
-      const wrapRect = wrap.getBoundingClientRect()
-      const segs: { left: number; width: number }[] = []
+      const hostRect = host.getBoundingClientRect()
+      const segs: { left: number; width: number; top: number; height: number }[] = []
       let segStart: DOMRect | null = null
       let segEnd: DOMRect | null = null
       let lastTop: number | null = null
       const flush = () => {
         if (!segStart || !segEnd) return
         segs.push({
-          left: segStart.left - wrapRect.left,
+          left: segStart.left - hostRect.left,
           width: segEnd.right - segStart.left,
+          top: Math.min(segStart.top, segEnd.top) - hostRect.top,
+          height: Math.max(segStart.bottom, segEnd.bottom) - Math.min(segStart.top, segEnd.top),
         })
         segStart = null
         segEnd = null
@@ -468,10 +483,19 @@ function ArrayView({
       flush()
       return segs
     }
-    setRangeMasks({
-      current: measure(ranges?.current),
-      best: measure(ranges?.best),
-    })
+    const apply = () =>
+      setRangeMasks({
+        current: measure(ranges?.current),
+        best: measure(ranges?.best),
+      })
+    apply()
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => apply()) : null
+    ro?.observe(host)
+    window.addEventListener('resize', apply)
+    return () => {
+      ro?.disconnect()
+      window.removeEventListener('resize', apply)
+    }
   }, [values, ranges, mode, ids])
 
   const curBand = rangeStyle(ranges?.current, values.length)
@@ -511,6 +535,7 @@ function ArrayView({
       {mode === 'bars' && numeric && geo ? (
         <div
           className={`bars-wrap${signedMode ? ' signed' : ''}`}
+          ref={overlayHostRef}
           style={
             {
               position: 'relative',
@@ -525,7 +550,7 @@ function ArrayView({
             <div
               key={`best-${i}`}
               className="range-band best range-band-abs"
-              style={{ left: s.left, width: s.width }}
+              style={{ left: s.left, width: s.width, top: s.top, height: s.height }}
               title="最优窗口"
             />
           ))}
@@ -533,7 +558,7 @@ function ArrayView({
             <div
               key={`cur-${i}`}
               className="range-band current range-band-abs"
-              style={{ left: s.left, width: s.width }}
+              style={{ left: s.left, width: s.width, top: s.top, height: s.height }}
               title="当前窗口"
             />
           ))}
@@ -615,7 +640,23 @@ function ArrayView({
         </div>
       ) : (
         <>
-          <div className="array-cells">
+          <div className="array-cells" ref={overlayHostRef} style={{ position: 'relative' }}>
+            {rangeMasks.best.map((s, i) => (
+              <div
+                key={`cell-best-${i}`}
+                className="range-band best range-band-abs"
+                style={{ left: s.left, width: s.width, top: s.top, height: s.height }}
+                title="最优窗口"
+              />
+            ))}
+            {rangeMasks.current.map((s, i) => (
+              <div
+                key={`cell-cur-${i}`}
+                className="range-band current range-band-abs"
+                style={{ left: s.left, width: s.width, top: s.top, height: s.height }}
+                title="当前窗口"
+              />
+            ))}
             {values.map((v, i) => {
               const role = roleForIndex(i, highlights, roles, arrayOps)
               const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
@@ -697,11 +738,13 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   step,
   prevStep,
   scaleMaxByArray,
+  signedDomainByArray,
   snapSwap,
 }: {
   step: Step
   prevStep?: Step
   scaleMaxByArray?: Record<string, number>
+  signedDomainByArray?: Record<string, { hasPos: boolean; hasNeg: boolean }>
   snapSwap?: boolean
 }) {
   if (!step.arrays) return null
@@ -718,6 +761,7 @@ export const ArraysFromStep = memo(function ArraysFromStep({
       roles={step.roles?.[name]}
       pointers={deriveArrayPointers(step, name)}
       scaleMax={scaleMaxByArray?.[name]}
+      signedDomain={signedDomainByArray?.[name]}
       ranges={!compact && (name === 'a' || primary.length === 1) ? step.ranges : undefined}
       arrayOps={step.arrayOps?.[name]}
       elementIds={step.elementIds?.[name]}
