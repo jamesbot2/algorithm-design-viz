@@ -985,7 +985,8 @@ export default function AlgoPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [theoryOpen])
 
-  // Complex forms (graph / nQueens / DP strings) start expanded so fields stay operable;
+  // Complex forms (graph / nQueens / DP strings) start expanded when height allows;
+  // on short laptop viewports prefer summary so stage keeps budget (V16-05).
   // simple array algos stay on summary until「编辑输入」.
   useEffect(() => {
     if (!id) return
@@ -998,7 +999,9 @@ export default function AlgoPage() {
       id === 'matrixChain' ||
       id === 'huffman' ||
       id === 'kmp'
-    setInputEditing(complex)
+    const tallEnough =
+      typeof window === 'undefined' ? true : window.innerHeight >= 820
+    setInputEditing(complex && tallEnough)
   }, [id])
 
   useEffect(() => {

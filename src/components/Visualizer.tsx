@@ -15,6 +15,7 @@ import { useMotion } from '../theme/MotionContext'
 import PlaybackTransport from './workbench/PlaybackTransport'
 import { segmentGeometry, teachableStages } from '../utils/teachableStages'
 import { shouldIgnoreKeyboard } from '../utils/keyboardGuard'
+import { formatStepCounter } from '../utils/stepDisplay'
 
 /** Parent sends this only on scene load / new run / explicit external seek — never from onStepIndexChange. */
 export type SeekCommand = { requestId: number | string; target: number }
@@ -653,8 +654,8 @@ export default function Visualizer({
               >
                 ← 上一步
               </button>
-              <span className="tabular-nums" data-testid="inspector-step-counter">
-                {idx}/{max}
+              <span className="tabular-nums step-counter" data-testid="inspector-step-counter" data-step-display="1-based">
+                {formatStepCounter({ idx, stepsLen: steps.length, phase: step?.phase })}
               </span>
               <button
                 type="button"

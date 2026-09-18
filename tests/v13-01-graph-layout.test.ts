@@ -17,7 +17,7 @@ describe('V13-01 graph warn vs plot + readability', () => {
   })
 
   it('node-label size comes from GraphView camera (~12–14 CSS px policy)', () => {
-    expect(graphView).toMatch(/MIN_LABEL_CSS_PX\s*=\s*12/)
+    expect(graphView).toMatch(/MIN_LABEL_CSS_PX\s*=\s*1[234]/) // V16-06: 12–14 CSS px band
     expect(graphView).toMatch(/BASE_LABEL_USER\s*=\s*1[234]/)
     // CSS must NOT hard-lock font-size (would defeat user-unit camera scaling)
     expect(css).not.toMatch(/\.node-label\s*\{[^}]*font-size:/s)

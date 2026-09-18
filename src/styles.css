@@ -3023,3 +3023,192 @@ html, body, #root {
     overflow: auto;
   }
 }
+
+/* ============================================================================
+ * V16-05 / V16-06 — Desktop workbench uses available space; enlarge real content
+ * ============================================================================ */
+
+/* Lab-fill algo pages: NOT limited by article --viz-max / --content-max card */
+.main-wrap[data-lab-fill="1"] > .main,
+.main-wrap[data-lab-fill="1"] > .main.wide {
+  max-width: none !important;
+  width: 100%;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0.65rem;
+  padding-right: 0.65rem;
+  box-sizing: border-box;
+}
+
+/* Compact page header on lab-fill */
+.main-wrap[data-lab-fill="1"] .page-header-compact {
+  padding: 0.1rem 0;
+  margin-bottom: 0.15rem;
+}
+.main-wrap[data-lab-fill="1"] .page-header-compact h1 {
+  font-size: 1.05rem;
+  margin: 0;
+}
+.main-wrap[data-lab-fill="1"] .page-header-compact .meta-extras,
+.main-wrap[data-lab-fill="1"] .page-header-compact .complexity {
+  font-size: 0.72rem;
+  margin: 0.05rem 0;
+}
+
+/* Input: keep summary compact; editing body smaller so stage keeps budget */
+.main-wrap[data-lab-fill="1"] .input-panel-v9 {
+  padding: 0.3rem 0.5rem;
+}
+.main-wrap[data-lab-fill="1"] .input-panel-body {
+  max-height: min(26vh, 200px);
+}
+.main-wrap[data-lab-fill="1"][data-input-collapsed="1"] .input-panel-body,
+.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-body {
+  /* collapsed via [hidden] already; belt-and-suspenders */
+}
+
+/* Workbench fills main width */
+.main-wrap[data-lab-fill="1"] .workbench-layout {
+  width: 100%;
+  max-width: none;
+}
+
+/* V16-06: enlarge via flex growth after width/chrome reclaim — do NOT force
+ * min-heights larger than the flex budget (that painted nodes under transport). */
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport:has(.graph-view),
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main:has(.graph-view) {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport:has(.graph-view) .graph-view,
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport:has(.graph-view) .graph-plot {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+
+/* Arrays / DP companion: grow with viewport a bit more under taller stages */
+@media (min-height: 800px) {
+  .main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .arrays-panel {
+    max-height: min(120px, 14vh);
+  }
+}
+
+/* Code panel: own scroll, fill height */
+.main-wrap[data-lab-fill="1"] .workbench-code-panel .code-browser,
+.main-wrap[data-lab-fill="1"] .workbench-code-inner {
+  min-height: 0;
+  height: 100%;
+}
+
+/* V16-05: data sheet participates — reserve gutter so it does not cover code */
+@media (min-width: 900px) and (min-height: 560px) {
+  body:has(.inspector-sheet[data-inspect-mode="side"]:not([hidden])) .main-wrap[data-lab-fill="1"] > .main {
+    padding-right: calc(min(360px, 38vw) + 0.35rem);
+  }
+  body:has(.inspector-sheet[data-inspect-mode="side"]:not([hidden])) .main-wrap[data-lab-fill="1"] {
+    /* keep shell full-bleed; padding is on main */
+  }
+  .inspector-sheet[data-inspect-mode="side"] {
+    /* dock in reserved viewport gutter; still one player / same portal */
+    width: min(360px, 38vw);
+    max-width: 38vw;
+  }
+}
+
+/* Wide desktop (≥1440 content): prefer split panels; tabs stay for narrow WorkbenchLayout */
+@media (min-width: 1440px) {
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="split"] .workbench-panels-stable {
+    min-height: 0;
+  }
+}
+
+/* Laptop mid-width: ensure workbench uses nearly full main (already width 100%) */
+@media (min-width: 1100px) and (max-width: 1599px) {
+  .main-wrap[data-lab-fill="1"] .workbench-layout {
+    /* scene | code; data docks via side sheet + gutter when open */
+  }
+}
+
+/* Warn strip stays outside plot flex budget (V13 contract) */
+.main-wrap[data-lab-fill="1"] .graph-view > .graph-neg-warning {
+  flex: 0 0 auto;
+}
+
+/* Slightly larger readable labels in CSS fallback contexts */
+.main-wrap[data-lab-fill="1"] .node-label {
+  /* SVG font-size set in user units by camera; CSS min as soft hint for HTML labels */
+}
+.main-wrap[data-lab-fill="1"] .arrays-panel .array-view {
+  font-size: 0.8rem;
+}
+
+/* V16-06b: force flex 0-basis so stage absorbs free space (auto basis left ~90px unused) */
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .visualizer {
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-body-single {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport,
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-view,
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-plot {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: auto;
+}
+
+/* Compact chrome → stage */
+@media (max-height: 900px) {
+  .main-wrap[data-lab-fill="1"] .page-header-compact {
+    max-height: 3.2rem;
+    overflow: hidden;
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact .meta-extras {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .stats-row-fixed {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .viz-legend {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .input-panel-v9 {
+    max-height: 4.5rem;
+    overflow: hidden;
+  }
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
+    max-height: 2.8rem;
+  }
+}
+
+/* V16-06c: laptop 768-class — reclaim ~20–40px more for plot */
+@media (max-height: 800px) {
+  .main-wrap[data-lab-fill="1"] .page-header-compact {
+    max-height: 2.4rem;
+  }
+  .main-wrap[data-lab-fill="1"] .page-header-compact .back,
+  .main-wrap[data-lab-fill="1"] .page-header-compact .complexity {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
+    height: 2rem;
+    min-height: 2rem;
+    max-height: 2rem;
+  }
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
+    max-height: 2.4rem;
+    padding: 0.2rem 0.45rem;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-transport {
+    /* slightly tighter transport padding */
+    padding-top: 0.15rem;
+  }
+}
