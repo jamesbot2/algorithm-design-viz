@@ -1,9 +1,11 @@
-import { memo, useMemo } from 'react'
+import { memo, useEffect, useMemo, useRef } from 'react'
 import type { Step } from '../types/step'
 import { dpCellClassNames } from '../utils/dpCellRoles'
 
 function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
   const hints = step.labelHints
+  const scrollRefs = useRef<Map<string, HTMLDivElement | null>>(new Map())
+
   const syncRows = useMemo(() => {
     const set = new Set<number>()
     if (!step.matrixTargets) return set
@@ -26,10 +28,45 @@ function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
     return set
   }, [step.matrixTargets])
 
+  // V18-02: follow current cell inside matrix-scroll only (never window / stage scrollIntoView)
+  useEffect(() => {
+    if (!step.matrixTargets) return
+    // rAF: wait layout/flex settle after primary-scene resize
+    const raf = requestAnimationFrame(() => {
+      for (const [name, target] of Object.entries(step.matrixTargets!)) {
+        const cur = target.current ?? target.writes?.[0]
+        if (!cur) continue
+        const scroller = scrollRefs.current.get(name)
+        if (!scroller) continue
+        const cell = scroller.querySelector(`td[data-cell="${cur[0]},${cur[1]}"]`) as HTMLElement | null
+        if (!cell) continue
+        const sRect = scroller.getBoundingClientRect()
+        if (sRect.height < 8 || sRect.width < 8) continue
+        const cRect = cell.getBoundingClientRect()
+        const pad = 12
+        let nextTop = scroller.scrollTop
+        let nextLeft = scroller.scrollLeft
+        // Prefer keeping cell fully inside scroller; nudge toward center when far out
+        if (cRect.top < sRect.top + pad || cRect.bottom > sRect.bottom - pad) {
+          const cellMid = cell.offsetTop + cell.offsetHeight / 2
+          nextTop = Math.max(0, cellMid - sRect.height / 2)
+        }
+        if (cRect.left < sRect.left + pad || cRect.right > sRect.right - pad) {
+          const cellMidX = cell.offsetLeft + cell.offsetWidth / 2
+          nextLeft = Math.max(0, cellMidX - sRect.width / 2)
+        }
+        if (nextTop !== scroller.scrollTop || nextLeft !== scroller.scrollLeft) {
+          scroller.scrollTo({ top: nextTop, left: nextLeft, behavior: 'auto' })
+        }
+      }
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [step.id, step.matrixTargets])
+
   if (!step.matrices) return null
 
   return (
-    <div className="matrices-panel">
+    <div className="matrices-panel" data-testid="matrices-panel">
       {Object.entries(step.matrices).map(([name, mat]) => {
         const target = step.matrixTargets?.[name]
         const prevMat = prevStep?.matrices?.[name]
@@ -70,7 +107,14 @@ function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
                 )}
               </p>
             )}
-            <div className="matrix-scroll" data-scroll-owner="matrix">
+            <div
+              className="matrix-scroll"
+              data-scroll-owner="matrix"
+              data-testid={`matrix-scroll-${name}`}
+              ref={(el) => {
+                scrollRefs.current.set(name, el)
+              }}
+            >
               <table className={`matrix-table sticky-labels${anti ? ' matrix-anti-example' : ''}`}>
                 <thead>
                   <tr>

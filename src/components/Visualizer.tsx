@@ -437,6 +437,17 @@ export default function Visualizer({
       matrices: { ...(step.matrices ?? {}), board: displayBoard },
     }
   }, [step, displayBoard])
+  /** V18-02: explicit primary scene — LCS→DP matrix, sort→main array, NQ→board, graph→graph */
+  const primaryScene = useMemo(() => {
+    if (step?.graph) return 'graph' as const
+    if (hasBoard) return 'board' as const
+    const mats = stepForMatrix?.matrices
+    if (mats && Object.keys(mats).some((k) => k !== 'board')) return 'matrix' as const
+    if (step?.arrays && Object.keys(step.arrays).length > 0) return 'array' as const
+    if (step?.searchTree) return 'tree' as const
+    return 'empty' as const
+  }, [step, hasBoard, stepForMatrix])
+  const arraysCompanion = primaryScene === 'matrix' || primaryScene === 'board'
   const displayMessage = step?.message ?? '就绪：调整输入后点击「运行」。'
 
   const seekTo = useCallback(
@@ -555,20 +566,37 @@ export default function Visualizer({
           className="viz-main stage-viewport"
           data-testid="viz-canvas"
           data-stage-viewport="1"
+          data-primary-scene={primaryScene}
           id="stage-viewport"
         >
-          {/* Priority: graph | arrays | board/matrix — search tree is aux when board present */}
+          {/* V18-02 Priority: graph | companion labels (compact) | board/matrix primary | main array | tree aux */}
           {step?.graph && <GraphView graph={step.graph} />}
-          {step && !step.graph && (
+          {step && !step.graph && arraysCompanion && (
             <ArraysFromStep
               step={step}
               prevStep={prevStep}
               scaleMaxByArray={scaleMaxByArray}
               signedDomainByArray={signedDomainByArray}
               snapSwap={snapSwap}
+              companionMode
             />
           )}
-          {stepForMatrix && <MatrixView step={stepForMatrix} prevStep={prevStep} />}
+          {(primaryScene === 'matrix' || primaryScene === 'board') && stepForMatrix && (
+            <MatrixView step={stepForMatrix} prevStep={prevStep} />
+          )}
+          {step && !step.graph && !arraysCompanion && (
+            <ArraysFromStep
+              step={step}
+              prevStep={prevStep}
+              scaleMaxByArray={scaleMaxByArray}
+              signedDomainByArray={signedDomainByArray}
+              snapSwap={snapSwap}
+              companionMode={false}
+            />
+          )}
+          {primaryScene !== 'matrix' && primaryScene !== 'board' && stepForMatrix?.matrices && (
+            <MatrixView step={stepForMatrix} prevStep={prevStep} />
+          )}
           {step?.searchTree && hasBoard && (
             <details className="search-tree-aux" data-testid="search-tree-aux">
               <summary>搜索树（辅助视图）</summary>
@@ -668,10 +696,9 @@ export default function Visualizer({
                 下一步 →
               </button>
             </div>
-            <div className="viz-inspector inspector-sheet-body" data-testid="viz-inspector-sheet">
+            <div className="inspector-sheet-body" data-testid="viz-inspector-sheet" data-inspector-surface="drawer-body">
               <div className="inspector-delta">
-                <div className="panel-title">变量 / 变化</div>
-                <p className="inspector-explain-text muted hint">与主检查器同源数据</p>
+                <p className="inspector-explain-text muted hint">当前步变量与数组（与主检查器同源）</p>
               </div>
               {(step?.frameId || (step?.vars && 'frameId' in step.vars)) && (
                 <div className="inspector-stack">

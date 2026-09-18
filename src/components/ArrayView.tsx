@@ -733,6 +733,8 @@ export default memo(ArrayView)
 
 /** Aux copy buffers shown as a compact strip (not full-height second bar chart). */
 const BUFFER_ARRAY_NAMES = new Set(['temp', 'left', 'right', 'key'])
+/** String / label arrays that accompany a DP matrix (LCS X/Y) — compact labels, not primary scene. */
+const LABEL_ARRAY_NAMES = new Set(['X', 'Y', 'x', 'y', 'S', 'T', 'pattern', 'text'])
 const BUFFER_LABELS: Record<string, string> = {
   temp: 'temp · key',
   left: 'left',
@@ -746,17 +748,31 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   scaleMaxByArray,
   signedDomainByArray,
   snapSwap,
+  /** V18-02: when matrix/board is primary, render arrays as compact companion labels */
+  companionMode = false,
 }: {
   step: Step
   prevStep?: Step
   scaleMaxByArray?: Record<string, number>
   signedDomainByArray?: Record<string, { hasPos: boolean; hasNeg: boolean }>
   snapSwap?: boolean
+  companionMode?: boolean
 }) {
   if (!step.arrays) return null
   const entries = Object.entries(step.arrays)
   const buffers = entries.filter(([name]) => BUFFER_ARRAY_NAMES.has(name))
-  const primary = entries.filter(([name]) => !BUFFER_ARRAY_NAMES.has(name))
+  const primary = companionMode
+    ? []
+    : entries.filter(([name]) => !BUFFER_ARRAY_NAMES.has(name))
+  // Companion: prefer X/Y-style labels, then any other non-buffer (all compact)
+  const companionEntries = companionMode
+    ? [
+        ...entries.filter(([name]) => LABEL_ARRAY_NAMES.has(name)),
+        ...entries.filter(
+          ([name]) => !BUFFER_ARRAY_NAMES.has(name) && !LABEL_ARRAY_NAMES.has(name),
+        ),
+      ]
+    : []
   const renderOne = (name: string, values: (number | string)[], compact: boolean) => (
     <ArrayView
       key={name}
@@ -778,14 +794,32 @@ export const ArraysFromStep = memo(function ArraysFromStep({
       defaultMode={compact ? 'cells' : undefined}
     />
   )
+  if (companionMode) {
+    return (
+      <div
+        className="arrays-panel array-labels-strip"
+        data-testid="array-labels"
+        data-companion="1"
+        aria-label="输入序列"
+      >
+        {companionEntries.map(([name, values]) => renderOne(name, values, true))}
+        {buffers.length > 0 && (
+          <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
+            {buffers.map(([name, values]) => renderOne(name, values, true))}
+          </div>
+        )}
+      </div>
+    )
+  }
+  // V18-02: main array preferred over aux buffers (primary first)
   return (
-    <div className="arrays-panel">
+    <div className="arrays-panel" data-array-order="primary-first" data-testid="arrays-panel">
+      {primary.map(([name, values]) => renderOne(name, values, false))}
       {buffers.length > 0 && (
         <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
           {buffers.map(([name, values]) => renderOne(name, values, true))}
         </div>
       )}
-      {primary.map(([name, values]) => renderOne(name, values, false))}
     </div>
   )
 })
