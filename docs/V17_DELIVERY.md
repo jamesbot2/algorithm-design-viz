@@ -3,7 +3,7 @@
 **Branch:** `v17-input-edit-code-arrays-acceptance`  
 **Baseline HEAD:** `4172ead39d7a9c9cb08190ae350e530f18fb424f` (main / V16 + input-edit e2e fix)  
 **Fix tip:** `f6c1da9b59d725e516a7290406afe230bd1ec575`  
-**Branch tip:** `4e176be499dbe7c01a9b5297f5d8e6b6c7ff7e3d` (docs; will refresh after tip SHA commit)  
+**Branch tip:** `2cf3eb8637253babf0e15af168b862122fcf8978`  
 **Not pushed. Not deployed. No force-push.** Local branch commits only.
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).  
