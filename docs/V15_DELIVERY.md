@@ -3,7 +3,7 @@
 **Branch:** `v15-keyboard-dijkstra-inspect-visibility`  
 **Baseline HEAD:** `f414430794829dba7c2c68e76a4bd36c399cdc9f` (main / V14 live)  
 **Fix tip:** `09a3e220ed632e703bd160dca9d5109982e0cc6e`  
-**Docs tip:** `e32f93e4aad3ddb12556e9c8be96577a6120c84e`  
+**Docs tip:** `fe01b8f3f8b0104962d4f4cc080c4f1d3e09649f`  
 **Not pushed. Not deployed. No force-push.** Local branch commits only.
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).
