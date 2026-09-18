@@ -2,7 +2,8 @@
 
 **Branch:** `v14-inspector-arrays-pan-visibility`  
 **Baseline HEAD:** `dc40e1679e6fad3f37236146a72d6d6f8a28f771` (main / V13)  
-**Tip SHA:** `65d72e1b07b4616e327aadaa609d90f0ab3b58f2` (docs tip; fix=`1cc141227db12614154b8fd17c3405260511c71a`).
+**Fix tip:** `1cc141227db12614154b8fd17c3405260511c71a`  
+**Docs tip:** `76fe50509d6e3b4bda6fd9172f7874e5d9185b5c`
 **Not pushed. Not deployed. No force-push.**
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).
