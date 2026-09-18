@@ -252,29 +252,68 @@ function GraphView({ graph }: { graph: GraphState }) {
     setCamera(fitCamera(box, plotSize.w, plotSize.h, panRef.current))
   }, [box, plotSize, sKey])
 
-  const onPointerDown = useCallback((e: ReactPointerEvent) => {
-    ;(e.target as Element).setPointerCapture?.(e.pointerId)
+  const svgRef = useRef<SVGSVGElement>(null)
+
+  /**
+   * V14-03: convert screen delta → user delta with the SAME uniform meet scale
+   * the SVG uses (xMidYMid meet), including letterbox. Prefer CTM inverse;
+   * fall back to min(plotW/vbW, plotH/vbH).
+   */
+  const screenDeltaToUser = useCallback(
+    (dxPx: number, dyPx: number): { dx: number; dy: number } => {
+      const svg = svgRef.current
+      const ctm = svg?.getScreenCTM?.()
+      if (ctm && typeof DOMPoint !== 'undefined') {
+        try {
+          const inv = ctm.inverse()
+          const p0 = new DOMPoint(0, 0).matrixTransform(inv)
+          const p1 = new DOMPoint(dxPx, dyPx).matrixTransform(inv)
+          return { dx: p1.x - p0.x, dy: p1.y - p0.y }
+        } catch {
+          /* fall through */
+        }
+      }
+      if (!camera || plotSize.w < 1 || plotSize.h < 1) return { dx: 0, dy: 0 }
+      const scale = Math.min(plotSize.w / camera.w, plotSize.h / camera.h)
+      if (!(scale > 0)) return { dx: 0, dy: 0 }
+      return { dx: dxPx / scale, dy: dyPx / scale }
+    },
+    [camera, plotSize.w, plotSize.h],
+  )
+
+  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    // Capture on the plot host (not a child node) so moves stay coherent
+    e.currentTarget.setPointerCapture?.(e.pointerId)
     dragRef.current = { px: e.clientX, py: e.clientY, pan: { ...panRef.current } }
   }, [])
   const onPointerMove = useCallback(
-    (e: ReactPointerEvent) => {
+    (e: ReactPointerEvent<HTMLDivElement>) => {
       const d = dragRef.current
-      if (!d || !camera || plotSize.w < 1) return
+      if (!d) return
       const dxPx = e.clientX - d.px
       const dyPx = e.clientY - d.py
-      const sx = camera.w / plotSize.w
-      const sy = camera.h / plotSize.h
+      const { dx, dy } = screenDeltaToUser(dxPx, dyPx)
       panRef.current = {
-        dx: d.pan.dx - dxPx * sx,
-        dy: d.pan.dy - dyPx * sy,
+        dx: d.pan.dx - dx,
+        dy: d.pan.dy - dy,
       }
       setCamera(fitCamera(box, plotSize.w, plotSize.h, panRef.current))
     },
-    [box, camera, plotSize.w, plotSize.h],
+    [box, plotSize.w, plotSize.h, screenDeltaToUser],
   )
-  const onPointerUp = useCallback(() => {
+  const onPointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    }
     dragRef.current = null
   }, [])
+
+  const resetView = useCallback(() => {
+    panRef.current = { dx: 0, dy: 0 }
+    if (plotSize.w >= 8 && plotSize.h >= 8) {
+      setCamera(fitCamera(box, plotSize.w, plotSize.h, panRef.current))
+    }
+  }, [box, plotSize.w, plotSize.h])
 
   const viewBox = camera
     ? `${camera.x} ${camera.y} ${camera.w} ${camera.h}`
@@ -289,6 +328,18 @@ function GraphView({ graph }: { graph: GraphState }) {
           负环警告：当前距离不构成合法最短路（Bellman-Ford / Floyd 检测）。
         </p>
       )}
+      <div className="graph-view-toolbar" data-testid="graph-view-toolbar">
+        <button
+          type="button"
+          className="ghost graph-reset-view"
+          data-testid="graph-reset-view"
+          aria-label="重置视图"
+          title="重置平移（仅相机）"
+          onClick={resetView}
+        >
+          重置视图
+        </button>
+      </div>
       <div
         className="graph-plot"
         data-testid="graph-plot"
@@ -297,8 +348,11 @@ function GraphView({ graph }: { graph: GraphState }) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
+        style={{ touchAction: 'none' }}
+        data-pan-policy="pointer-capture-meet"
       >
         <svg
+          ref={svgRef}
           viewBox={viewBox}
           className="graph-svg"
           preserveAspectRatio="xMidYMid meet"

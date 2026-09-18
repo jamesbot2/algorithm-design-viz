@@ -1,0 +1,58 @@
+{
+  "seen": [
+    "∞",
+    "10",
+    "2"
+  ],
+  "sawInf": true,
+  "saw10": true,
+  "saw2": true,
+  "parentAt2": "2",
+  "stepTrace": [
+    {
+      "step": "0",
+      "dist1": "∞",
+      "parent1": "-"
+    },
+    {
+      "step": "1",
+      "dist1": "∞",
+      "parent1": "-"
+    },
+    {
+      "step": "2",
+      "dist1": "∞",
+      "parent1": "-"
+    },
+    {
+      "step": "3",
+      "dist1": "10",
+      "parent1": "0"
+    },
+    {
+      "step": "4",
+      "dist1": "10",
+      "parent1": "0"
+    },
+    {
+      "step": "5",
+      "dist1": "10",
+      "parent1": "0"
+    },
+    {
+      "step": "6",
+      "dist1": "10",
+      "parent1": "0"
+    },
+    {
+      "step": "7",
+      "dist1": "10",
+      "parent1": "0"
+    },
+    {
+      "step": "8",
+      "dist1": "2",
+      "parent1": "2"
+    }
+  ]
+}

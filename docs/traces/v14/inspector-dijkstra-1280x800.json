@@ -1,0 +1,9 @@
+{
+  "reach": {
+    "inlineVisible": false,
+    "toggleReachable": true,
+    "layout": "drawer",
+    "ok": true
+  },
+  "beforeStep": "0"
+}
