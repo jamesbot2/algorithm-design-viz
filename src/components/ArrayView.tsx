@@ -250,8 +250,14 @@ function ArrayView({
       const chartChrome = 40
       const overhead = labelH + noteH + chartChrome + 8
       const minBudget = landscape && ultra ? 140 : landscape && short ? 110 : short ? 80 : 56
-      const maxBudget = landscape && ultra ? 240 : landscape && short ? 220 : short ? 180 : 160
-      const budget = Math.max(minBudget, Math.min(maxBudget, usable - overhead))
+      // V17-03: main array maxH from usable stage — not a hard desktop 160 cap
+      const stageBudget = Math.max(0, usable - overhead)
+      const shortMax = landscape && ultra ? 240 : landscape && short ? 220 : short ? 180 : null
+      const maxBudget =
+        shortMax != null
+          ? shortMax
+          : Math.min(stageBudget, Math.floor(window.innerHeight * 0.5))
+      const budget = Math.max(minBudget, Math.min(maxBudget, stageBudget))
       setMaxH((prev) => (Math.abs(prev - budget) >= 4 ? budget : prev))
     }
     apply()

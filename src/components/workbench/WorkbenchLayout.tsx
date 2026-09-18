@@ -21,6 +21,9 @@ const NARROW_PX = 720
 /** Absolute readable mins — not only percentage floors */
 const MIN_VIZ_PX = 180
 const MIN_CODE_PX = 160
+/** V17-02: below this viewport width, data-open may honestly use tabs */
+const DATA_OPEN_SPLIT_MIN_VW = 1100
+const WIDE_PROFILE_VW = 1600
 
 /**
  * Shared workbench shell.
@@ -44,28 +47,54 @@ export default function WorkbenchLayout({
   const [tab, setTab] = useState<TabId>('demo')
   const [heightMode, setHeightMode] = useState<HeightMode>('fill')
   const [budget, setBudget] = useState({ w: 0, h: 0 })
+  /** V17-02: workbench-owned data-open (inspector side sheet) */
+  const [dataOpen, setDataOpen] = useState(false)
+  const [layoutProfile, setLayoutProfile] = useState<'wide' | 'laptop' | 'narrow'>('laptop')
+
+  useEffect(() => {
+    const readDataOpen = () => {
+      // Portal mounts only while open; fixed sheets often have offsetParent=null
+      const sheet = document.querySelector('[data-testid="inspector-sheet"]')
+      const open = !!sheet
+      setDataOpen(open)
+      return open
+    }
+    readDataOpen()
+    const mo = new MutationObserver(() => readDataOpen())
+    mo.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['hidden', 'data-inspect-mode', 'class'],
+    })
+    return () => mo.disconnect()
+  }, [])
 
   useEffect(() => {
     const el = rootRef.current
     if (!el || typeof ResizeObserver === 'undefined') return
-    const ro = new ResizeObserver((entries) => {
-      const cr = entries[0]?.contentRect
-      const w = cr?.width ?? el.clientWidth
-      const h = cr?.height ?? el.clientHeight
-      const ultraShortLandscape =
-        typeof window !== 'undefined' &&
-        window.innerHeight <= 400 &&
-        window.innerWidth > window.innerHeight
-      const shortLandscape =
-        typeof window !== 'undefined' &&
-        window.innerHeight <= 520 &&
-        window.innerWidth > window.innerHeight
-      setMode(w < NARROW_PX || ultraShortLandscape ? 'tabs' : 'split')
+    const apply = (w: number, h: number) => {
+      const vw = typeof window !== 'undefined' ? window.innerWidth : w
+      const vh = typeof window !== 'undefined' ? window.innerHeight : h
+      const ultraShortLandscape = vh <= 400 && vw > vh
+      const shortLandscape = vh <= 520 && vw > vh
+      const open = !!document.querySelector('[data-testid="inspector-sheet"]')
+      // V17-02: when data is open on laptop+, keep split even if reserved sheet
+      // shrinks container below NARROW_PX (that was the code.w=0 fault).
+      const forceSplitForData = open && vw >= DATA_OPEN_SPLIT_MIN_VW
+      const nextMode: LayoutMode =
+        forceSplitForData ? 'split' : w < NARROW_PX || ultraShortLandscape ? 'tabs' : 'split'
+      setMode(nextMode)
+      const profile: 'wide' | 'laptop' | 'narrow' =
+        nextMode === 'tabs' || vw < DATA_OPEN_SPLIT_MIN_VW
+          ? 'narrow'
+          : vw >= WIDE_PROFILE_VW
+            ? 'wide'
+            : 'laptop'
+      setLayoutProfile(profile)
       setBudget({ w, h })
-      // V10-03: follow Layout's data-height-fallback when present; else local need
       const parent = el.closest('[data-height-fallback]') as HTMLElement | null
       const parentMode = parent?.getAttribute('data-height-fallback') as HeightMode | null
-      // Short landscape: prefer fill so stage min-height can paint (scroll only if tiny)
       const need = shortLandscape ? MIN_VIZ_PX + 40 : MIN_VIZ_PX + 120
       const localScroll = h > 0 && h < need
       const next: HeightMode =
@@ -73,16 +102,22 @@ export default function WorkbenchLayout({
       setHeightMode(next)
       el.style.setProperty('--wb-measured-h', `${Math.max(0, h)}px`)
       el.style.setProperty('--wb-measured-w', `${Math.max(0, w)}px`)
+    }
+    const ro = new ResizeObserver((entries) => {
+      const cr = entries[0]?.contentRect
+      const w = cr?.width ?? el.clientWidth
+      const h = cr?.height ?? el.clientHeight
+      apply(w, h)
     })
     ro.observe(el)
-    const initial = el.clientWidth
-    if (initial > 0) {
-      const shortLandscape =
-        window.innerHeight <= 400 && window.innerWidth > window.innerHeight
-      setMode(initial < NARROW_PX || shortLandscape ? 'tabs' : 'split')
+    const onWin = () => apply(el.clientWidth, el.clientHeight)
+    window.addEventListener('resize', onWin)
+    apply(el.clientWidth, el.clientHeight)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', onWin)
     }
-    return () => ro.disconnect()
-  }, [])
+  }, [dataOpen])
 
   const hasCode = code !== undefined && code !== null
   const hasInspector = inspector !== undefined && inspector !== null
@@ -179,6 +214,8 @@ export default function WorkbenchLayout({
       data-layout={mode}
       data-tab={tab}
       data-height-mode={heightMode}
+      data-data-open={dataOpen ? '1' : '0'}
+      data-layout-profile={layoutProfile}
       ref={rootRef}
     >
       <div className="workbench-header">

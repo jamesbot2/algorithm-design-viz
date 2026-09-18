@@ -1113,6 +1113,13 @@ button.icon-btn {
   max-height: 420px;
   overflow: auto;
 }
+/* V17-03: DP matrix uses stage budget — do not early-cap at 420 under lab-fill */
+.main-wrap[data-lab-fill="1"] .stage-viewport .matrix-scroll,
+.main-wrap[data-lab-fill="1"] .viz-main .matrix-scroll {
+  max-height: min(70vh, calc(var(--wb-measured-h, 70vh) - 4rem));
+  flex: 1 1 auto;
+  min-height: 120px;
+}
 
 .phase-jump {
   display: flex;
@@ -3101,18 +3108,28 @@ html, body, #root {
   height: 100%;
 }
 
-/* V16-05: data sheet participates — reserve gutter so it does not cover code */
+/* V17-02: Workbench owns data-open layout — NO fixed body gutter that shrinks
+ * content <720 → tabs → code.w=0 on 1366. Sheet docks; workbench reserves via
+ * its own margin when [data-data-open=1] and stays in split on laptop+. */
 @media (min-width: 900px) and (min-height: 560px) {
-  body:has(.inspector-sheet[data-inspect-mode="side"]:not([hidden])) .main-wrap[data-lab-fill="1"] > .main {
-    padding-right: calc(min(360px, 38vw) + 0.35rem);
-  }
-  body:has(.inspector-sheet[data-inspect-mode="side"]:not([hidden])) .main-wrap[data-lab-fill="1"] {
-    /* keep shell full-bleed; padding is on main */
-  }
   .inspector-sheet[data-inspect-mode="side"] {
-    /* dock in reserved viewport gutter; still one player / same portal */
     width: min(360px, 38vw);
     max-width: 38vw;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-data-open="1"] {
+    /* Reserve sheet without forcing body padding / tab collapse */
+    margin-right: min(360px, 38vw);
+    width: auto;
+    max-width: calc(100% - min(360px, 38vw));
+  }
+  /* Laptop: scene|code stay split; data is side sheet (stacked visually with scene column) */
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-data-open="1"][data-layout-profile="laptop"] .workbench-code-panel,
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-data-open="1"][data-layout-profile="laptop"] [data-testid="workbench-code-slot"] {
+    min-width: 160px;
+  }
+  /* Wide: keep readable code + scene beside docked data */
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-data-open="1"][data-layout-profile="wide"] .workbench-code-panel {
+    min-width: 200px;
   }
 }
 
@@ -3165,7 +3182,9 @@ html, body, #root {
   height: auto;
 }
 
-/* Compact chrome → stage */
+/* Compact chrome → stage.
+ * V17-01: collapsed/idle may compact; editing/error must NOT get 4.5rem overflow:hidden
+ * (that zeroed input body @1366/1440×900). Editing gets a real body budget. */
 @media (max-height: 900px) {
   .main-wrap[data-lab-fill="1"] .page-header-compact {
     max-height: 3.2rem;
@@ -3180,12 +3199,21 @@ html, body, #root {
   .main-wrap[data-lab-fill="1"] .viz-legend {
     display: none;
   }
-  .main-wrap[data-lab-fill="1"] .input-panel-v9 {
-    max-height: 4.5rem;
-    overflow: hidden;
-  }
+  /* Idle/collapsed only — never blanket-clamp while editing */
   .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
     max-height: 2.8rem;
+    overflow: hidden;
+  }
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .input-panel-v9,
+  .main-wrap[data-lab-fill="1"] .input-panel-v9.has-errors {
+    max-height: none;
+    overflow: visible;
+  }
+  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .input-panel-body,
+  .main-wrap[data-lab-fill="1"] .input-panel-v9.has-errors .input-panel-body {
+    max-height: min(40vh, 300px);
+    min-height: 4.5rem;
+    overflow: auto;
   }
 }
 
@@ -3211,4 +3239,30 @@ html, body, #root {
     /* slightly tighter transport padding */
     padding-top: 0.15rem;
   }
+}
+
+
+/* ============================================================================
+ * V17 — input edit / data+code / array stage budget
+ * ============================================================================ */
+
+/* V17-01: ensure sticky actions + summary stay reachable while editing on short heights */
+.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .input-summary-bar,
+.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .input-actions-sticky {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 3;
+}
+.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .theory-toggle,
+.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] [data-testid="run-btn"],
+.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] [data-testid="input-edit-toggle"] {
+  pointer-events: auto;
+}
+
+/* V17-02: zero-width code must not be treated as "ok" by layout profile alone —
+ * keep code slot visible in split whenever data is open on laptop+ */
+.main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="split"][data-data-open="1"] [data-testid="workbench-code-slot"] {
+  display: block;
+  min-width: 160px;
+  overflow: auto;
 }
