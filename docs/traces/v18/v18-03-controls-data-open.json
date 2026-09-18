@@ -1,0 +1,53 @@
+{
+  "compact": {
+    "panelH": 47,
+    "panelMaxH": "none",
+    "panelOverflow": "visible",
+    "runClip": {
+      "frac": 1,
+      "ah": 28,
+      "panelH": 47
+    },
+    "editClip": {
+      "frac": 1,
+      "ah": 36,
+      "panelH": 47
+    }
+  },
+  "sheet": {
+    "sheetBodyH": 952,
+    "sheetBodyCssH": "951.859px",
+    "sheetBodyMaxH": "none",
+    "sheetBodyMinH": "0px",
+    "rowsVisible": 6,
+    "algoDataOpen": "1",
+    "headerRight": 1550,
+    "inputRight": 1550,
+    "sheetLeft": 1560
+  },
+  "editHit": {
+    "ok": true,
+    "topTest": "input-edit-toggle",
+    "topClass": "ghost",
+    "x": 1454,
+    "y": 188,
+    "right": 1541
+  },
+  "runHit": {
+    "ok": true,
+    "topTest": "run-btn",
+    "topClass": "primary",
+    "x": 279,
+    "y": 246,
+    "right": 338
+  },
+  "theoryHit": {
+    "ok": true,
+    "topTest": null,
+    "topClass": "ghost theory-toggle",
+    "x": 270,
+    "y": 144,
+    "right": 375
+  },
+  "editClickOk": true
+}

@@ -151,8 +151,9 @@ test.describe('V17 input-edit / code+data / arrays / acceptance', () => {
       if (vp.h <= 900) {
         expect(m.panelMaxH === 'none' || m.panelMaxH === '' || !m.panelMaxH || parseFloat(m.panelMaxH) > 100).toBeTruthy()
       }
-      expect(m.runHit || (await page.getByTestId('run-btn').isVisible())).toBeTruthy()
-      expect(m.editHit || (await edit.isVisible())).toBeTruthy()
+      // V18-04: no hit||isVisible OR — real elementFromPoint hit required
+      expect(m.runHit, JSON.stringify(m)).toBe(true)
+      expect(m.editHit, JSON.stringify(m)).toBe(true)
       await expect(page.locator('.theory-toggle')).toBeVisible()
 
       // Illegal input → errors still show body

@@ -1,0 +1,13 @@
+{
+  "mutationSanity": {
+    "force96BodyDetected": true,
+    "coverEditDetected": true,
+    "zeroCodeDetected": true,
+    "dpOffStageDetected": true
+  },
+  "dpFault": {
+    "ok": true,
+    "vis": 0,
+    "detected": true
+  }
+}

@@ -7,7 +7,7 @@
     "panelOverflow": "visible",
     "runHit": true,
     "editHit": true,
-    "theoryHit": false,
+    "theoryHit": true,
     "viewport": {
       "w": 1366,
       "h": 768
@@ -21,7 +21,7 @@
     "panelOverflow": "visible",
     "runHit": true,
     "editHit": true,
-    "theoryHit": false,
+    "theoryHit": true,
     "viewport": {
       "w": 1366,
       "h": 768

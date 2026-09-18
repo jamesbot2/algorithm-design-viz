@@ -52,11 +52,20 @@ export default function WorkbenchLayout({
   const [layoutProfile, setLayoutProfile] = useState<'wide' | 'laptop' | 'narrow'>('laptop')
 
   useEffect(() => {
+    const syncAlgoPageAttr = (open: boolean) => {
+      // V18-03: reserve sheet on whole algo page (header+input+workbench), not workbench alone
+      const algo = rootRef.current?.closest('.algo-page') as HTMLElement | null
+      if (algo) {
+        if (open) algo.setAttribute('data-data-open', '1')
+        else algo.removeAttribute('data-data-open')
+      }
+    }
     const readDataOpen = () => {
       // Portal mounts only while open; fixed sheets often have offsetParent=null
       const sheet = document.querySelector('[data-testid="inspector-sheet"]')
       const open = !!sheet
       setDataOpen(open)
+      syncAlgoPageAttr(open)
       return open
     }
     readDataOpen()
@@ -67,7 +76,10 @@ export default function WorkbenchLayout({
       attributes: true,
       attributeFilter: ['hidden', 'data-inspect-mode', 'class'],
     })
-    return () => mo.disconnect()
+    return () => {
+      mo.disconnect()
+      syncAlgoPageAttr(false)
+    }
   }, [])
 
   useEffect(() => {

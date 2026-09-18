@@ -1,0 +1,24 @@
+{
+  "1366x768": {
+    "sheetBodyH": 640,
+    "sheetBodyCssH": "639.859px",
+    "sheetBodyMaxH": "none",
+    "sheetBodyMinH": "0px",
+    "rowsVisible": 6,
+    "algoDataOpen": "1",
+    "headerRight": 996,
+    "inputRight": 996,
+    "sheetLeft": 1006
+  },
+  "1920x1080": {
+    "sheetBodyH": 952,
+    "sheetBodyCssH": "951.859px",
+    "sheetBodyMaxH": "none",
+    "sheetBodyMinH": "0px",
+    "rowsVisible": 6,
+    "algoDataOpen": "1",
+    "headerRight": 1550,
+    "inputRight": 1550,
+    "sheetLeft": 1560
+  }
+}
