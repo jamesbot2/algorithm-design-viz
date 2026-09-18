@@ -162,3 +162,16 @@
 | V15-03 | 数据面板打开连续 ≥10 步 | 已验证 | drawer-internal transport 同源 goPrev/goNext；aria-modal=false；侧栏 inspect |
 | V15-04 | strictGraphVisibility 字段分离 | 已验证 | geometry/hit/text/paint；pe:none / 细字 / 部分裁剪必败 |
 | V15-T | 回归 | 已验证 | vitest 350；pw v15=5；v13+v14=42；mergeSort 6；**未 push** |
+
+
+## V16 Workbench space / keyboard / visibility
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| V16-01 | 原生键盘：按钮/勾选框拥有 Space | 已验证 | keyboardGuard activation controls；一键一次 |
+| V16-02 | 运行就绪 + Dijkstra×10 零重试 | 已验证 | waitForRunReady；三历史 flaky 场景各×10 |
+| V16-03 | 单一可见性检测器 | 已验证 | measurePageGraphVisibility + window bridge；pe:none |
+| V16-04 | 统一 1-based 步数显示 | 已验证 | formatStepCounter；内部 idx 不变 |
+| V16-05 | 桌面工作台吃满可用宽度 | 已验证 | lab-fill 去 1180 卡片；数据抽屉占位不盖代码 |
+| V16-06 | 放大真实图/数据/代码 | 已验证 | flex 0-basis；标签 ~13px；1366 plot≈322 |
+| V16-07 | 布局不打断会话/动画 | 已验证 | resize+数据开关保持 cursor；单播放器 |
+| V16-T | 回归 | 已验证 | vitest 359；pw v16=10；v13+v15=17；mergeSort 6；**未 push** |

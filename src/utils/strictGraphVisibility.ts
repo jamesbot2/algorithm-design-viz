@@ -373,7 +373,155 @@ export function sampleHitsMulti(el: Element): HitSample[] {
   })
 }
 
-/** In-page evaluator stub — use assertStrictGraphVisible in e2e. */
-export function measureStrictGraphVisibilityInPage(): never {
-  throw new Error('Use assertStrictGraphVisible(page) which inlines the browser script')
+/**
+ * V16-03: Single page-level audit used by DOM tests and E2E (via window bridge).
+ * Fault injection must only mutate the page; this detector is the sole pass/fail entry.
+ */
+export type PageGraphVisibilityReport = {
+  ok: boolean
+  issues: string[]
+  details: { id: string; kind: string; issues: string[]; fields?: StrictVisibilityFields }[]
+  nodesChecked: number
+  edgeLabelsChecked: number
+  plot: { w: number; h: number } | null
+  stage: { w: number; h: number } | null
+  fieldsSummary: StrictVisibilityFields
+}
+
+export function measurePageGraphVisibility(opts?: {
+  minLabelPx?: number
+}): PageGraphVisibilityReport {
+  const minLabelPx = opts?.minLabelPx ?? 10
+  const issues: string[] = []
+  const details: PageGraphVisibilityReport['details'] = []
+  const fieldsSummary: StrictVisibilityFields = {
+    geometryVisible: true,
+    hitReachable: true,
+    textReadable: true,
+    paintOcclusionChecked: false,
+  }
+
+  if (typeof document === 'undefined') {
+    return {
+      ok: false,
+      issues: ['missing-target'],
+      details: [],
+      nodesChecked: 0,
+      edgeLabelsChecked: 0,
+      plot: null,
+      stage: null,
+      fieldsSummary,
+    }
+  }
+
+  const plot =
+    (document.querySelector('[data-testid="graph-plot"]') as HTMLElement | null) ||
+    (document.querySelector('.graph-plot') as HTMLElement | null)
+  const svg =
+    (document.querySelector('[data-testid="graph-svg"]') as SVGElement | null) ||
+    (document.querySelector('.graph-svg') as SVGElement | null)
+  const stage =
+    (document.querySelector('[data-testid="viz-canvas"]') as HTMLElement | null) ||
+    (document.querySelector('.stage-viewport') as HTMLElement | null)
+
+  if (!svg || !stage || !plot) {
+    return {
+      ok: false,
+      issues: ['missing-svg-or-stage', 'missing-target'],
+      details: [],
+      nodesChecked: 0,
+      edgeLabelsChecked: 0,
+      plot: null,
+      stage: null,
+      fieldsSummary: {
+        geometryVisible: false,
+        hitReachable: false,
+        textReadable: false,
+        paintOcclusionChecked: true,
+      },
+    }
+  }
+
+  const plotR = plot.getBoundingClientRect()
+  const stageR = stage.getBoundingClientRect()
+  if (plotR.width < 8 || plotR.height < 8 || stageR.width < 8 || stageR.height < 8) {
+    issues.push('hidden-canvas')
+    fieldsSummary.geometryVisible = false
+  }
+
+  const checkTarget = (target: Element, kind: string, id: string, isLabel = false) => {
+    const samples = sampleHitsMulti(target)
+    const primary = samples[0] ?? sampleHitAtCenter(target)
+    // Merge multi-sample: any pe:auto occlusion fails
+    let merged = evaluateTargetVisibility(target, primary, {
+      minLabelPx,
+      isLabel,
+    })
+    for (const s of samples.slice(1)) {
+      const r = evaluateTargetVisibility(target, s, {
+        minLabelPx,
+        isLabel,
+        skipPaintCheck: true, // paint checked once on primary
+      })
+      if (!r.ok) {
+        merged = {
+          ok: false,
+          issues: [...new Set([...merged.issues, ...r.issues])],
+          fields: {
+            geometryVisible: merged.fields.geometryVisible && r.fields.geometryVisible,
+            hitReachable: merged.fields.hitReachable && r.fields.hitReachable,
+            textReadable: merged.fields.textReadable && r.fields.textReadable,
+            paintOcclusionChecked: merged.fields.paintOcclusionChecked,
+          },
+        }
+      }
+    }
+    fieldsSummary.geometryVisible = fieldsSummary.geometryVisible && merged.fields.geometryVisible
+    fieldsSummary.hitReachable = fieldsSummary.hitReachable && merged.fields.hitReachable
+    fieldsSummary.textReadable = fieldsSummary.textReadable && merged.fields.textReadable
+    fieldsSummary.paintOcclusionChecked =
+      fieldsSummary.paintOcclusionChecked || merged.fields.paintOcclusionChecked
+    if (!merged.ok) {
+      issues.push(...merged.issues)
+      details.push({ id, kind, issues: merged.issues, fields: merged.fields })
+    }
+  }
+
+  const nodeGs = [...document.querySelectorAll('.graph-svg g[data-node-id]')] as Element[]
+  const fallback = [...document.querySelectorAll('.graph-svg circle')] as Element[]
+  const targets = nodeGs.length ? nodeGs : fallback
+  let nodesChecked = 0
+  for (const n of targets.slice(0, 12)) {
+    const id = n.getAttribute('data-node-id') ?? `n${nodesChecked}`
+    const circle = (n.querySelector?.('circle') as Element | null) ?? n
+    checkTarget(circle, 'node', id)
+    nodesChecked++
+    const label = n.querySelector?.('text.node-label, .node-label, text') as Element | null
+    if (label) checkTarget(label, 'label', id, true)
+  }
+
+  let edgeLabelsChecked = 0
+  for (const lab of [
+    ...document.querySelectorAll('.graph-svg .edge-label, .graph-svg [data-edge-label]'),
+  ].slice(0, 8)) {
+    checkTarget(lab as Element, 'edge-label', `e${edgeLabelsChecked}`, true)
+    edgeLabelsChecked++
+  }
+
+  const uniqueIssues = [...new Set(issues)]
+  return {
+    ok: uniqueIssues.length === 0 && nodesChecked > 0,
+    issues: uniqueIssues,
+    details,
+    nodesChecked,
+    edgeLabelsChecked,
+    plot: { w: plotR.width, h: plotR.height },
+    stage: { w: stageR.width, h: stageR.height },
+    fieldsSummary,
+  }
+}
+
+/** @deprecated alias — use measurePageGraphVisibility */
+export function measureStrictGraphVisibilityInPage(): PageGraphVisibilityReport {
+  return measurePageGraphVisibility()
 }

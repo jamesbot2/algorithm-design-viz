@@ -1,0 +1,346 @@
+{
+  "pos": {
+    "ok": true,
+    "issues": [],
+    "details": [],
+    "nodesChecked": 3,
+    "edgeLabelsChecked": 3,
+    "plot": {
+      "w": 482.484375,
+      "h": 354.46875
+    },
+    "stage": {
+      "w": 495.671875,
+      "h": 367.65625
+    },
+    "fieldsSummary": {
+      "geometryVisible": true,
+      "hitReachable": true,
+      "textReadable": true,
+      "paintOcclusionChecked": true
+    }
+  },
+  "neg": {
+    "ok": false,
+    "issues": [
+      "paint-occluded",
+      "opaque-overlay"
+    ],
+    "details": [
+      {
+        "id": "0",
+        "kind": "node",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "0",
+        "kind": "label",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "1",
+        "kind": "node",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "1",
+        "kind": "label",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "2",
+        "kind": "node",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "2",
+        "kind": "label",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "e0",
+        "kind": "edge-label",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "e1",
+        "kind": "edge-label",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "e2",
+        "kind": "edge-label",
+        "issues": [
+          "paint-occluded",
+          "opaque-overlay"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      }
+    ],
+    "nodesChecked": 3,
+    "edgeLabelsChecked": 3,
+    "plot": {
+      "w": 482.484375,
+      "h": 354.46875
+    },
+    "stage": {
+      "w": 495.671875,
+      "h": 367.65625
+    },
+    "fieldsSummary": {
+      "geometryVisible": true,
+      "hitReachable": false,
+      "textReadable": true,
+      "paintOcclusionChecked": true
+    }
+  },
+  "recovered": {
+    "ok": true,
+    "issues": [],
+    "details": [],
+    "nodesChecked": 3,
+    "edgeLabelsChecked": 3,
+    "plot": {
+      "w": 482.484375,
+      "h": 354.46875
+    },
+    "stage": {
+      "w": 495.671875,
+      "h": 367.65625
+    },
+    "fieldsSummary": {
+      "geometryVisible": true,
+      "hitReachable": true,
+      "textReadable": true,
+      "paintOcclusionChecked": true
+    }
+  },
+  "neg2": {
+    "ok": false,
+    "issues": [
+      "opaque-overlay",
+      "topmost-not-target"
+    ],
+    "details": [
+      {
+        "id": "0",
+        "kind": "node",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "0",
+        "kind": "label",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "1",
+        "kind": "node",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "1",
+        "kind": "label",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "2",
+        "kind": "node",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "2",
+        "kind": "label",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "e0",
+        "kind": "edge-label",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "e1",
+        "kind": "edge-label",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      },
+      {
+        "id": "e2",
+        "kind": "edge-label",
+        "issues": [
+          "opaque-overlay",
+          "topmost-not-target"
+        ],
+        "fields": {
+          "geometryVisible": true,
+          "hitReachable": false,
+          "textReadable": true,
+          "paintOcclusionChecked": true
+        }
+      }
+    ],
+    "nodesChecked": 3,
+    "edgeLabelsChecked": 3,
+    "plot": {
+      "w": 482.484375,
+      "h": 354.46875
+    },
+    "stage": {
+      "w": 495.671875,
+      "h": 367.65625
+    },
+    "fieldsSummary": {
+      "geometryVisible": true,
+      "hitReachable": false,
+      "textReadable": true,
+      "paintOcclusionChecked": true
+    }
+  }
+}

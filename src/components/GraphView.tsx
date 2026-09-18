@@ -37,7 +37,7 @@ const LABEL_PAD = 10
 /** Base SVG user-space font for .node-label when display scale is 1. */
 const BASE_LABEL_USER = 13
 /** Target on-screen CSS px for default-graph node labels. */
-const MIN_LABEL_CSS_PX = 12
+const MIN_LABEL_CSS_PX = 13
 const MAX_LABEL_USER = 36
 const CONTENT_PAD = 32
 

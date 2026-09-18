@@ -1,0 +1,2291 @@
+{
+  "1366x768": {
+    "before": {
+      "label": "1366x768-closed",
+      "viewport": {
+        "w": 1366,
+        "h": 768
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 768,
+        "right": 260,
+        "bottom": 768
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 1106,
+        "h": 768,
+        "right": 1366,
+        "bottom": 768
+      },
+      "main": {
+        "x": 260,
+        "y": 58,
+        "w": 1106,
+        "h": 710,
+        "right": 1366,
+        "bottom": 768
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 1106,
+        "h": 58,
+        "right": 1366,
+        "bottom": 58
+      },
+      "header": {
+        "x": 288,
+        "y": 66,
+        "w": 1050,
+        "h": 112,
+        "right": 1338,
+        "bottom": 178
+      },
+      "input": {
+        "x": 288,
+        "y": 183,
+        "w": 1050,
+        "h": 440,
+        "right": 1338,
+        "bottom": 623
+      },
+      "workbench": {
+        "x": 288,
+        "y": 629,
+        "w": 1050,
+        "h": 200,
+        "right": 1338,
+        "bottom": 829
+      },
+      "stage": {
+        "x": 315,
+        "y": 813,
+        "w": 524,
+        "h": 0,
+        "right": 838,
+        "bottom": 813
+      },
+      "plot": {
+        "x": 321,
+        "y": 820,
+        "w": 510,
+        "h": 127,
+        "right": 832,
+        "bottom": 947
+      },
+      "svg": {
+        "x": 321,
+        "y": 820,
+        "w": 510,
+        "h": 127,
+        "right": 832,
+        "bottom": 947
+      },
+      "arrays": null,
+      "code": {
+        "x": 878,
+        "y": 669,
+        "w": 446,
+        "h": 25,
+        "right": 1323,
+        "bottom": 694
+      },
+      "cm": {
+        "x": 878,
+        "y": 776,
+        "w": 446,
+        "h": 676,
+        "right": 1323,
+        "bottom": 1452
+      },
+      "transport": {
+        "x": 296,
+        "y": 711,
+        "w": 1034,
+        "h": 110,
+        "right": 1330,
+        "bottom": 820
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": null,
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.81,
+        "mainW_vs_availBesideSidebar": 1,
+        "wbW_vs_main": 0.949,
+        "wbH_vs_viewport": 0.26,
+        "coreH_vs_viewport": 0,
+        "plotH": 127,
+        "stageH": 0,
+        "blankRight": 0,
+        "blankLeftOfMain": 260,
+        "unusedBesideSidebar": 0
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1106px",
+          "margin": "0px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "768px",
+          "overflow": "hidden",
+          "max-height": "768px"
+        },
+        "workbench": {
+          "height": "200px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1050px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "scroll",
+        "preview": "1",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 710,
+          "clientH": 710
+        },
+        {
+          "name": "wb",
+          "overflowY": "auto",
+          "scrollH": 198,
+          "clientH": 198
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 103,
+          "clientH": 25
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 676,
+          "clientH": 676
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 140,
+          "clientH": 0
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 768,
+          "clientH": 768
+        }
+      ]
+    },
+    "withData": {
+      "label": "1366x768-data-open",
+      "viewport": {
+        "w": 1366,
+        "h": 768
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 768,
+        "right": 260,
+        "bottom": 768
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 1106,
+        "h": 768,
+        "right": 1366,
+        "bottom": 768
+      },
+      "main": {
+        "x": 260,
+        "y": 58,
+        "w": 1106,
+        "h": 710,
+        "right": 1366,
+        "bottom": 768
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 1106,
+        "h": 58,
+        "right": 1366,
+        "bottom": 58
+      },
+      "header": {
+        "x": 288,
+        "y": 66,
+        "w": 1050,
+        "h": 112,
+        "right": 1338,
+        "bottom": 178
+      },
+      "input": {
+        "x": 288,
+        "y": 183,
+        "w": 1050,
+        "h": 440,
+        "right": 1338,
+        "bottom": 623
+      },
+      "workbench": {
+        "x": 288,
+        "y": 629,
+        "w": 1050,
+        "h": 200,
+        "right": 1338,
+        "bottom": 829
+      },
+      "stage": {
+        "x": 315,
+        "y": 790,
+        "w": 524,
+        "h": 0,
+        "right": 838,
+        "bottom": 790
+      },
+      "plot": {
+        "x": 321,
+        "y": 797,
+        "w": 510,
+        "h": 127,
+        "right": 832,
+        "bottom": 924
+      },
+      "svg": {
+        "x": 321,
+        "y": 797,
+        "w": 510,
+        "h": 127,
+        "right": 832,
+        "bottom": 924
+      },
+      "arrays": null,
+      "code": {
+        "x": 878,
+        "y": 669,
+        "w": 446,
+        "h": 25,
+        "right": 1323,
+        "bottom": 694
+      },
+      "cm": {
+        "x": 878,
+        "y": 776,
+        "w": 446,
+        "h": 676,
+        "right": 1323,
+        "bottom": 1452
+      },
+      "transport": {
+        "x": 296,
+        "y": 711,
+        "w": 1034,
+        "h": 110,
+        "right": 1330,
+        "bottom": 820
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": {
+        "x": 1006,
+        "y": 0,
+        "w": 360,
+        "h": 768,
+        "right": 1366,
+        "bottom": 768
+      },
+      "sheetOverlapsCode": true,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.81,
+        "mainW_vs_availBesideSidebar": 1,
+        "wbW_vs_main": 0.949,
+        "wbH_vs_viewport": 0.26,
+        "coreH_vs_viewport": 0,
+        "plotH": 127,
+        "stageH": 0,
+        "blankRight": 0,
+        "blankLeftOfMain": 260,
+        "unusedBesideSidebar": 0
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1106px",
+          "margin": "0px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "768px",
+          "overflow": "hidden",
+          "max-height": "768px"
+        },
+        "workbench": {
+          "height": "200px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1050px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "scroll",
+        "preview": "1",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 710,
+          "clientH": 710
+        },
+        {
+          "name": "wb",
+          "overflowY": "auto",
+          "scrollH": 198,
+          "clientH": 198
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 103,
+          "clientH": 25
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 676,
+          "clientH": 676
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 140,
+          "clientH": 0
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 768,
+          "clientH": 768
+        }
+      ]
+    },
+    "afterRun": {
+      "label": "1366x768-after-run",
+      "viewport": {
+        "w": 1366,
+        "h": 768
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 768,
+        "right": 260,
+        "bottom": 768
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 1106,
+        "h": 768,
+        "right": 1366,
+        "bottom": 768
+      },
+      "main": {
+        "x": 260,
+        "y": 58,
+        "w": 1106,
+        "h": 710,
+        "right": 1366,
+        "bottom": 768
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 1106,
+        "h": 58,
+        "right": 1366,
+        "bottom": 58
+      },
+      "header": {
+        "x": 288,
+        "y": 66,
+        "w": 1050,
+        "h": 112,
+        "right": 1338,
+        "bottom": 178
+      },
+      "input": {
+        "x": 288,
+        "y": 183,
+        "w": 1050,
+        "h": 114,
+        "right": 1338,
+        "bottom": 297
+      },
+      "workbench": {
+        "x": 288,
+        "y": 303,
+        "w": 1050,
+        "h": 459,
+        "right": 1338,
+        "bottom": 762
+      },
+      "stage": {
+        "x": 315,
+        "y": 488,
+        "w": 524,
+        "h": 110,
+        "right": 838,
+        "bottom": 598
+      },
+      "plot": {
+        "x": 321,
+        "y": 494,
+        "w": 510,
+        "h": 127,
+        "right": 832,
+        "bottom": 621
+      },
+      "svg": {
+        "x": 321,
+        "y": 494,
+        "w": 510,
+        "h": 127,
+        "right": 832,
+        "bottom": 621
+      },
+      "arrays": null,
+      "code": {
+        "x": 878,
+        "y": 344,
+        "w": 446,
+        "h": 284,
+        "right": 1323,
+        "bottom": 627
+      },
+      "cm": {
+        "x": 878,
+        "y": 451,
+        "w": 446,
+        "h": 681,
+        "right": 1323,
+        "bottom": 1132
+      },
+      "transport": {
+        "x": 296,
+        "y": 644,
+        "w": 1034,
+        "h": 110,
+        "right": 1330,
+        "bottom": 753
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": null,
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.81,
+        "mainW_vs_availBesideSidebar": 1,
+        "wbW_vs_main": 0.949,
+        "wbH_vs_viewport": 0.598,
+        "coreH_vs_viewport": 0.143,
+        "plotH": 127,
+        "stageH": 110,
+        "blankRight": 0,
+        "blankLeftOfMain": 260,
+        "unusedBesideSidebar": 0
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1106px",
+          "margin": "0px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "768px",
+          "overflow": "hidden",
+          "max-height": "768px"
+        },
+        "workbench": {
+          "height": "458.578px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1050px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "fill",
+        "preview": "0",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 710,
+          "clientH": 710
+        },
+        {
+          "name": "wb",
+          "overflowY": "hidden",
+          "scrollH": 457,
+          "clientH": 457
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 284,
+          "clientH": 284
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 681,
+          "clientH": 681
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 140,
+          "clientH": 110
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 768,
+          "clientH": 768
+        }
+      ]
+    },
+    "dataOpened": true
+  },
+  "1920x1080": {
+    "before": {
+      "label": "1920x1080-closed",
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 1080,
+        "right": 260,
+        "bottom": 1080
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 1660,
+        "h": 1080,
+        "right": 1920,
+        "bottom": 1080
+      },
+      "main": {
+        "x": 500,
+        "y": 58,
+        "w": 1180,
+        "h": 1022,
+        "right": 1680,
+        "bottom": 1080
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 1660,
+        "h": 58,
+        "right": 1920,
+        "bottom": 58
+      },
+      "header": {
+        "x": 528,
+        "y": 66,
+        "w": 1124,
+        "h": 112,
+        "right": 1652,
+        "bottom": 178
+      },
+      "input": {
+        "x": 528,
+        "y": 183,
+        "w": 1124,
+        "h": 440,
+        "right": 1652,
+        "bottom": 623
+      },
+      "workbench": {
+        "x": 528,
+        "y": 629,
+        "w": 1124,
+        "h": 445,
+        "right": 1652,
+        "bottom": 1074
+      },
+      "stage": {
+        "x": 555,
+        "y": 813,
+        "w": 564,
+        "h": 98,
+        "right": 1119,
+        "bottom": 911
+      },
+      "plot": {
+        "x": 561,
+        "y": 820,
+        "w": 551,
+        "h": 127,
+        "right": 1113,
+        "bottom": 947
+      },
+      "svg": {
+        "x": 561,
+        "y": 820,
+        "w": 551,
+        "h": 127,
+        "right": 1113,
+        "bottom": 947
+      },
+      "arrays": null,
+      "code": {
+        "x": 1158,
+        "y": 669,
+        "w": 479,
+        "h": 270,
+        "right": 1637,
+        "bottom": 939
+      },
+      "cm": {
+        "x": 1158,
+        "y": 776,
+        "w": 479,
+        "h": 681,
+        "right": 1637,
+        "bottom": 1457
+      },
+      "transport": {
+        "x": 536,
+        "y": 956,
+        "w": 1108,
+        "h": 110,
+        "right": 1644,
+        "bottom": 1065
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": null,
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.615,
+        "mainW_vs_availBesideSidebar": 0.711,
+        "wbW_vs_main": 0.953,
+        "wbH_vs_viewport": 0.412,
+        "coreH_vs_viewport": 0.091,
+        "plotH": 127,
+        "stageH": 98,
+        "blankRight": 240,
+        "blankLeftOfMain": 500,
+        "unusedBesideSidebar": 480
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1180px",
+          "margin": "0px 240px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "1080px",
+          "overflow": "hidden",
+          "max-height": "1080px"
+        },
+        "workbench": {
+          "height": "444.984px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1124px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "fill",
+        "preview": "1",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 1022,
+          "clientH": 1022
+        },
+        {
+          "name": "wb",
+          "overflowY": "hidden",
+          "scrollH": 443,
+          "clientH": 443
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 270,
+          "clientH": 270
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 681,
+          "clientH": 681
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 140,
+          "clientH": 98
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 1080,
+          "clientH": 1080
+        }
+      ]
+    },
+    "withData": {
+      "label": "1920x1080-data-open",
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 1080,
+        "right": 260,
+        "bottom": 1080
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 1660,
+        "h": 1080,
+        "right": 1920,
+        "bottom": 1080
+      },
+      "main": {
+        "x": 500,
+        "y": 58,
+        "w": 1180,
+        "h": 1022,
+        "right": 1680,
+        "bottom": 1080
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 1660,
+        "h": 58,
+        "right": 1920,
+        "bottom": 58
+      },
+      "header": {
+        "x": 528,
+        "y": 66,
+        "w": 1124,
+        "h": 112,
+        "right": 1652,
+        "bottom": 178
+      },
+      "input": {
+        "x": 528,
+        "y": 183,
+        "w": 1124,
+        "h": 440,
+        "right": 1652,
+        "bottom": 623
+      },
+      "workbench": {
+        "x": 528,
+        "y": 629,
+        "w": 1124,
+        "h": 445,
+        "right": 1652,
+        "bottom": 1074
+      },
+      "stage": {
+        "x": 555,
+        "y": 813,
+        "w": 564,
+        "h": 98,
+        "right": 1119,
+        "bottom": 911
+      },
+      "plot": {
+        "x": 561,
+        "y": 820,
+        "w": 551,
+        "h": 127,
+        "right": 1113,
+        "bottom": 947
+      },
+      "svg": {
+        "x": 561,
+        "y": 820,
+        "w": 551,
+        "h": 127,
+        "right": 1113,
+        "bottom": 947
+      },
+      "arrays": null,
+      "code": {
+        "x": 1158,
+        "y": 669,
+        "w": 479,
+        "h": 270,
+        "right": 1637,
+        "bottom": 939
+      },
+      "cm": {
+        "x": 1158,
+        "y": 776,
+        "w": 479,
+        "h": 681,
+        "right": 1637,
+        "bottom": 1457
+      },
+      "transport": {
+        "x": 536,
+        "y": 956,
+        "w": 1108,
+        "h": 110,
+        "right": 1644,
+        "bottom": 1065
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": {
+        "x": 1560,
+        "y": 0,
+        "w": 360,
+        "h": 1080,
+        "right": 1920,
+        "bottom": 1080
+      },
+      "sheetOverlapsCode": true,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.615,
+        "mainW_vs_availBesideSidebar": 0.711,
+        "wbW_vs_main": 0.953,
+        "wbH_vs_viewport": 0.412,
+        "coreH_vs_viewport": 0.091,
+        "plotH": 127,
+        "stageH": 98,
+        "blankRight": 240,
+        "blankLeftOfMain": 500,
+        "unusedBesideSidebar": 480
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1180px",
+          "margin": "0px 240px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "1080px",
+          "overflow": "hidden",
+          "max-height": "1080px"
+        },
+        "workbench": {
+          "height": "444.984px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1124px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "fill",
+        "preview": "1",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 1022,
+          "clientH": 1022
+        },
+        {
+          "name": "wb",
+          "overflowY": "hidden",
+          "scrollH": 443,
+          "clientH": 443
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 270,
+          "clientH": 270
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 681,
+          "clientH": 681
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 140,
+          "clientH": 98
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 1080,
+          "clientH": 1080
+        }
+      ]
+    },
+    "afterRun": {
+      "label": "1920x1080-after-run",
+      "viewport": {
+        "w": 1920,
+        "h": 1080
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 1080,
+        "right": 260,
+        "bottom": 1080
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 1660,
+        "h": 1080,
+        "right": 1920,
+        "bottom": 1080
+      },
+      "main": {
+        "x": 500,
+        "y": 58,
+        "w": 1180,
+        "h": 1022,
+        "right": 1680,
+        "bottom": 1080
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 1660,
+        "h": 58,
+        "right": 1920,
+        "bottom": 58
+      },
+      "header": {
+        "x": 528,
+        "y": 66,
+        "w": 1124,
+        "h": 112,
+        "right": 1652,
+        "bottom": 178
+      },
+      "input": {
+        "x": 528,
+        "y": 183,
+        "w": 1124,
+        "h": 114,
+        "right": 1652,
+        "bottom": 297
+      },
+      "workbench": {
+        "x": 528,
+        "y": 303,
+        "w": 1124,
+        "h": 771,
+        "right": 1652,
+        "bottom": 1074
+      },
+      "stage": {
+        "x": 555,
+        "y": 488,
+        "w": 564,
+        "h": 414,
+        "right": 1119,
+        "bottom": 902
+      },
+      "plot": {
+        "x": 561,
+        "y": 494,
+        "w": 551,
+        "h": 401,
+        "right": 1113,
+        "bottom": 895
+      },
+      "svg": {
+        "x": 561,
+        "y": 494,
+        "w": 551,
+        "h": 401,
+        "right": 1113,
+        "bottom": 895
+      },
+      "arrays": null,
+      "code": {
+        "x": 1158,
+        "y": 344,
+        "w": 479,
+        "h": 596,
+        "right": 1637,
+        "bottom": 939
+      },
+      "cm": {
+        "x": 1158,
+        "y": 451,
+        "w": 479,
+        "h": 681,
+        "right": 1637,
+        "bottom": 1132
+      },
+      "transport": {
+        "x": 536,
+        "y": 956,
+        "w": 1108,
+        "h": 110,
+        "right": 1644,
+        "bottom": 1065
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": null,
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.615,
+        "mainW_vs_availBesideSidebar": 0.711,
+        "wbW_vs_main": 0.953,
+        "wbH_vs_viewport": 0.714,
+        "coreH_vs_viewport": 0.383,
+        "plotH": 401,
+        "stageH": 414,
+        "blankRight": 240,
+        "blankLeftOfMain": 500,
+        "unusedBesideSidebar": 480
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1180px",
+          "margin": "0px 240px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "1080px",
+          "overflow": "hidden",
+          "max-height": "1080px"
+        },
+        "workbench": {
+          "height": "770.578px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1124px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "fill",
+        "preview": "0",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 1022,
+          "clientH": 1022
+        },
+        {
+          "name": "wb",
+          "overflowY": "hidden",
+          "scrollH": 769,
+          "clientH": 769
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 596,
+          "clientH": 596
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 681,
+          "clientH": 681
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 414,
+          "clientH": 414
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 1080,
+          "clientH": 1080
+        }
+      ]
+    },
+    "dataOpened": true
+  },
+  "2560x1440": {
+    "before": {
+      "label": "2560x1440-closed",
+      "viewport": {
+        "w": 2560,
+        "h": 1440
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 1440,
+        "right": 260,
+        "bottom": 1440
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 2300,
+        "h": 1440,
+        "right": 2560,
+        "bottom": 1440
+      },
+      "main": {
+        "x": 820,
+        "y": 58,
+        "w": 1180,
+        "h": 1382,
+        "right": 2000,
+        "bottom": 1440
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 2300,
+        "h": 58,
+        "right": 2560,
+        "bottom": 58
+      },
+      "header": {
+        "x": 848,
+        "y": 66,
+        "w": 1124,
+        "h": 112,
+        "right": 1972,
+        "bottom": 178
+      },
+      "input": {
+        "x": 848,
+        "y": 183,
+        "w": 1124,
+        "h": 440,
+        "right": 1972,
+        "bottom": 623
+      },
+      "workbench": {
+        "x": 848,
+        "y": 629,
+        "w": 1124,
+        "h": 805,
+        "right": 1972,
+        "bottom": 1434
+      },
+      "stage": {
+        "x": 875,
+        "y": 813,
+        "w": 564,
+        "h": 450,
+        "right": 1439,
+        "bottom": 1263
+      },
+      "plot": {
+        "x": 881,
+        "y": 820,
+        "w": 551,
+        "h": 436,
+        "right": 1433,
+        "bottom": 1256
+      },
+      "svg": {
+        "x": 881,
+        "y": 820,
+        "w": 551,
+        "h": 436,
+        "right": 1433,
+        "bottom": 1256
+      },
+      "arrays": null,
+      "code": {
+        "x": 1478,
+        "y": 669,
+        "w": 479,
+        "h": 630,
+        "right": 1957,
+        "bottom": 1299
+      },
+      "cm": {
+        "x": 1478,
+        "y": 776,
+        "w": 479,
+        "h": 681,
+        "right": 1957,
+        "bottom": 1457
+      },
+      "transport": {
+        "x": 856,
+        "y": 1316,
+        "w": 1108,
+        "h": 110,
+        "right": 1964,
+        "bottom": 1425
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": null,
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.461,
+        "mainW_vs_availBesideSidebar": 0.513,
+        "wbW_vs_main": 0.953,
+        "wbH_vs_viewport": 0.559,
+        "coreH_vs_viewport": 0.313,
+        "plotH": 436,
+        "stageH": 450,
+        "blankRight": 560,
+        "blankLeftOfMain": 820,
+        "unusedBesideSidebar": 1120
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1180px",
+          "margin": "0px 560px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "1440px",
+          "overflow": "hidden",
+          "max-height": "1440px"
+        },
+        "workbench": {
+          "height": "804.984px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1124px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "fill",
+        "preview": "1",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 1382,
+          "clientH": 1382
+        },
+        {
+          "name": "wb",
+          "overflowY": "hidden",
+          "scrollH": 803,
+          "clientH": 803
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 630,
+          "clientH": 630
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 681,
+          "clientH": 681
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 450,
+          "clientH": 450
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 1440,
+          "clientH": 1440
+        }
+      ]
+    },
+    "withData": {
+      "label": "2560x1440-data-open",
+      "viewport": {
+        "w": 2560,
+        "h": 1440
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 1440,
+        "right": 260,
+        "bottom": 1440
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 2300,
+        "h": 1440,
+        "right": 2560,
+        "bottom": 1440
+      },
+      "main": {
+        "x": 820,
+        "y": 58,
+        "w": 1180,
+        "h": 1382,
+        "right": 2000,
+        "bottom": 1440
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 2300,
+        "h": 58,
+        "right": 2560,
+        "bottom": 58
+      },
+      "header": {
+        "x": 848,
+        "y": 66,
+        "w": 1124,
+        "h": 112,
+        "right": 1972,
+        "bottom": 178
+      },
+      "input": {
+        "x": 848,
+        "y": 183,
+        "w": 1124,
+        "h": 440,
+        "right": 1972,
+        "bottom": 623
+      },
+      "workbench": {
+        "x": 848,
+        "y": 629,
+        "w": 1124,
+        "h": 805,
+        "right": 1972,
+        "bottom": 1434
+      },
+      "stage": {
+        "x": 875,
+        "y": 813,
+        "w": 564,
+        "h": 450,
+        "right": 1439,
+        "bottom": 1263
+      },
+      "plot": {
+        "x": 881,
+        "y": 820,
+        "w": 551,
+        "h": 436,
+        "right": 1433,
+        "bottom": 1256
+      },
+      "svg": {
+        "x": 881,
+        "y": 820,
+        "w": 551,
+        "h": 436,
+        "right": 1433,
+        "bottom": 1256
+      },
+      "arrays": null,
+      "code": {
+        "x": 1478,
+        "y": 669,
+        "w": 479,
+        "h": 630,
+        "right": 1957,
+        "bottom": 1299
+      },
+      "cm": {
+        "x": 1478,
+        "y": 776,
+        "w": 479,
+        "h": 681,
+        "right": 1957,
+        "bottom": 1457
+      },
+      "transport": {
+        "x": 856,
+        "y": 1316,
+        "w": 1108,
+        "h": 110,
+        "right": 1964,
+        "bottom": 1425
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": {
+        "x": 2200,
+        "y": 0,
+        "w": 360,
+        "h": 1440,
+        "right": 2560,
+        "bottom": 1440
+      },
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.461,
+        "mainW_vs_availBesideSidebar": 0.513,
+        "wbW_vs_main": 0.953,
+        "wbH_vs_viewport": 0.559,
+        "coreH_vs_viewport": 0.313,
+        "plotH": 436,
+        "stageH": 450,
+        "blankRight": 560,
+        "blankLeftOfMain": 820,
+        "unusedBesideSidebar": 1120
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1180px",
+          "margin": "0px 560px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "1440px",
+          "overflow": "hidden",
+          "max-height": "1440px"
+        },
+        "workbench": {
+          "height": "804.984px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1124px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "fill",
+        "preview": "1",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 1382,
+          "clientH": 1382
+        },
+        {
+          "name": "wb",
+          "overflowY": "hidden",
+          "scrollH": 803,
+          "clientH": 803
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 630,
+          "clientH": 630
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 681,
+          "clientH": 681
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 450,
+          "clientH": 450
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 1440,
+          "clientH": 1440
+        }
+      ]
+    },
+    "afterRun": {
+      "label": "2560x1440-after-run",
+      "viewport": {
+        "w": 2560,
+        "h": 1440
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 1440,
+        "right": 260,
+        "bottom": 1440
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 2300,
+        "h": 1440,
+        "right": 2560,
+        "bottom": 1440
+      },
+      "main": {
+        "x": 820,
+        "y": 58,
+        "w": 1180,
+        "h": 1382,
+        "right": 2000,
+        "bottom": 1440
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 2300,
+        "h": 58,
+        "right": 2560,
+        "bottom": 58
+      },
+      "header": {
+        "x": 848,
+        "y": 66,
+        "w": 1124,
+        "h": 112,
+        "right": 1972,
+        "bottom": 178
+      },
+      "input": {
+        "x": 848,
+        "y": 183,
+        "w": 1124,
+        "h": 114,
+        "right": 1972,
+        "bottom": 297
+      },
+      "workbench": {
+        "x": 848,
+        "y": 303,
+        "w": 1124,
+        "h": 1131,
+        "right": 1972,
+        "bottom": 1434
+      },
+      "stage": {
+        "x": 875,
+        "y": 488,
+        "w": 564,
+        "h": 771,
+        "right": 1439,
+        "bottom": 1259
+      },
+      "plot": {
+        "x": 881,
+        "y": 494,
+        "w": 551,
+        "h": 758,
+        "right": 1433,
+        "bottom": 1252
+      },
+      "svg": {
+        "x": 881,
+        "y": 494,
+        "w": 551,
+        "h": 758,
+        "right": 1433,
+        "bottom": 1252
+      },
+      "arrays": null,
+      "code": {
+        "x": 1478,
+        "y": 344,
+        "w": 479,
+        "h": 956,
+        "right": 1957,
+        "bottom": 1299
+      },
+      "cm": {
+        "x": 1478,
+        "y": 451,
+        "w": 479,
+        "h": 681,
+        "right": 1957,
+        "bottom": 1132
+      },
+      "transport": {
+        "x": 856,
+        "y": 1316,
+        "w": 1108,
+        "h": 110,
+        "right": 1964,
+        "bottom": 1425
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": null,
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.461,
+        "mainW_vs_availBesideSidebar": 0.513,
+        "wbW_vs_main": 0.953,
+        "wbH_vs_viewport": 0.785,
+        "coreH_vs_viewport": 0.535,
+        "plotH": 758,
+        "stageH": 771,
+        "blankRight": 560,
+        "blankLeftOfMain": 820,
+        "unusedBesideSidebar": 1120
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "1180px",
+          "margin": "0px 560px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "1440px",
+          "overflow": "hidden",
+          "max-height": "1440px"
+        },
+        "workbench": {
+          "height": "1130.58px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "1124px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "split",
+        "wbHeightMode": "fill",
+        "preview": "0",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 1382,
+          "clientH": 1382
+        },
+        {
+          "name": "wb",
+          "overflowY": "hidden",
+          "scrollH": 1129,
+          "clientH": 1129
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 956,
+          "clientH": 956
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 681,
+          "clientH": 681
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 771,
+          "clientH": 771
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 1440,
+          "clientH": 1440
+        }
+      ]
+    },
+    "dataOpened": true
+  },
+  "1024x600": {
+    "before": {
+      "label": "1024x600-closed",
+      "viewport": {
+        "w": 1024,
+        "h": 600
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 600,
+        "right": 260,
+        "bottom": 600
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 764,
+        "h": 600,
+        "right": 1024,
+        "bottom": 600
+      },
+      "main": {
+        "x": 260,
+        "y": 58,
+        "w": 764,
+        "h": 542,
+        "right": 1024,
+        "bottom": 600
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 764,
+        "h": 58,
+        "right": 1024,
+        "bottom": 58
+      },
+      "header": {
+        "x": 288,
+        "y": 66,
+        "w": 708,
+        "h": 112,
+        "right": 996,
+        "bottom": 178
+      },
+      "input": {
+        "x": 288,
+        "y": 183,
+        "w": 708,
+        "h": 372,
+        "right": 996,
+        "bottom": 555
+      },
+      "workbench": {
+        "x": 288,
+        "y": 561,
+        "w": 708,
+        "h": 200,
+        "right": 996,
+        "bottom": 761
+      },
+      "stage": {
+        "x": 315,
+        "y": 792,
+        "w": 654,
+        "h": 50,
+        "right": 969,
+        "bottom": 842
+      },
+      "plot": {
+        "x": 321,
+        "y": 799,
+        "w": 641,
+        "h": 127,
+        "right": 963,
+        "bottom": 925
+      },
+      "svg": {
+        "x": 321,
+        "y": 799,
+        "w": 641,
+        "h": 127,
+        "right": 963,
+        "bottom": 925
+      },
+      "arrays": null,
+      "code": {
+        "x": 988,
+        "y": 641,
+        "w": 0,
+        "h": 0,
+        "right": 988,
+        "bottom": 641
+      },
+      "cm": {
+        "x": 988,
+        "y": 1281,
+        "w": 0,
+        "h": 12043,
+        "right": 988,
+        "bottom": 13324
+      },
+      "transport": {
+        "x": 296,
+        "y": 651,
+        "w": 692,
+        "h": 110,
+        "right": 988,
+        "bottom": 761
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": null,
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.746,
+        "mainW_vs_availBesideSidebar": 1,
+        "wbW_vs_main": 0.927,
+        "wbH_vs_viewport": 0.333,
+        "coreH_vs_viewport": 0.083,
+        "plotH": 127,
+        "stageH": 50,
+        "blankRight": 0,
+        "blankLeftOfMain": 260,
+        "unusedBesideSidebar": 0
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "764px",
+          "margin": "0px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "600px",
+          "overflow": "hidden",
+          "max-height": "600px"
+        },
+        "workbench": {
+          "height": "200px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "708px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "tabs",
+        "wbHeightMode": "scroll",
+        "preview": "1",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 542,
+          "clientH": 542
+        },
+        {
+          "name": "wb",
+          "overflowY": "auto",
+          "scrollH": 207,
+          "clientH": 198
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 635,
+          "clientH": 0
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 12043,
+          "clientH": 12043
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 140,
+          "clientH": 50
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 600,
+          "clientH": 600
+        }
+      ]
+    },
+    "withData": null,
+    "afterRun": {
+      "label": "1024x600-after-run",
+      "viewport": {
+        "w": 1024,
+        "h": 600
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 600,
+        "right": 260,
+        "bottom": 600
+      },
+      "mainWrap": {
+        "x": 260,
+        "y": 0,
+        "w": 764,
+        "h": 600,
+        "right": 1024,
+        "bottom": 600
+      },
+      "main": {
+        "x": 260,
+        "y": 58,
+        "w": 764,
+        "h": 542,
+        "right": 1024,
+        "bottom": 600
+      },
+      "topbar": {
+        "x": 260,
+        "y": 0,
+        "w": 764,
+        "h": 58,
+        "right": 1024,
+        "bottom": 58
+      },
+      "header": {
+        "x": 288,
+        "y": 66,
+        "w": 708,
+        "h": 112,
+        "right": 996,
+        "bottom": 178
+      },
+      "input": {
+        "x": 288,
+        "y": 183,
+        "w": 708,
+        "h": 114,
+        "right": 996,
+        "bottom": 297
+      },
+      "workbench": {
+        "x": 288,
+        "y": 303,
+        "w": 708,
+        "h": 291,
+        "right": 996,
+        "bottom": 594
+      },
+      "stage": {
+        "x": 315,
+        "y": 492,
+        "w": 654,
+        "h": 50,
+        "right": 969,
+        "bottom": 543
+      },
+      "plot": {
+        "x": 321,
+        "y": 499,
+        "w": 641,
+        "h": 127,
+        "right": 963,
+        "bottom": 626
+      },
+      "svg": {
+        "x": 321,
+        "y": 499,
+        "w": 641,
+        "h": 127,
+        "right": 963,
+        "bottom": 626
+      },
+      "arrays": null,
+      "code": {
+        "x": 988,
+        "y": 342,
+        "w": 0,
+        "h": 82,
+        "right": 988,
+        "bottom": 424
+      },
+      "cm": {
+        "x": 988,
+        "y": 1000,
+        "w": 0,
+        "h": 12043,
+        "right": 988,
+        "bottom": 13044
+      },
+      "transport": {
+        "x": 296,
+        "y": 476,
+        "w": 692,
+        "h": 110,
+        "right": 988,
+        "bottom": 585
+      },
+      "inspectorInline": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "sheet": null,
+      "sheetOverlapsCode": false,
+      "sheetOverlapsPlot": false,
+      "ratios": {
+        "mainW_vs_viewport": 0.746,
+        "mainW_vs_availBesideSidebar": 1,
+        "wbW_vs_main": 0.927,
+        "wbH_vs_viewport": 0.485,
+        "coreH_vs_viewport": 0.083,
+        "plotH": 127,
+        "stageH": 50,
+        "blankRight": 0,
+        "blankLeftOfMain": 260,
+        "unusedBesideSidebar": 0
+      },
+      "css": {
+        "main": {
+          "max-width": "1180px",
+          "width": "764px",
+          "margin": "0px",
+          "padding": "8px 28px 6.4px",
+          "display": "flex"
+        },
+        "mainWrap": {
+          "display": "flex",
+          "height": "600px",
+          "overflow": "hidden",
+          "max-height": "600px"
+        },
+        "workbench": {
+          "height": "290.578px",
+          "max-height": "none",
+          "flex": "1 1 0px",
+          "min-height": "200px",
+          "width": "708px"
+        },
+        "contentMax": "980px",
+        "vizMax": "1180px"
+      },
+      "attrs": {
+        "labFill": "1",
+        "heightFallback": "fill",
+        "wbLayout": "tabs",
+        "wbHeightMode": "scroll",
+        "preview": "0",
+        "inspectorLayout": "drawer"
+      },
+      "scrollOwners": [
+        {
+          "name": "main",
+          "overflowY": "hidden",
+          "scrollH": 542,
+          "clientH": 542
+        },
+        {
+          "name": "wb",
+          "overflowY": "auto",
+          "scrollH": 289,
+          "clientH": 289
+        },
+        {
+          "name": "code",
+          "overflowY": "hidden",
+          "scrollH": 654,
+          "clientH": 82
+        },
+        {
+          "name": "cmScroller",
+          "overflowY": "auto",
+          "scrollH": 12043,
+          "clientH": 12043
+        },
+        {
+          "name": "stage",
+          "overflowY": "hidden",
+          "scrollH": 140,
+          "clientH": 50
+        },
+        {
+          "name": "mainWrap",
+          "overflowY": "hidden",
+          "scrollH": 600,
+          "clientH": 600
+        }
+      ]
+    },
+    "dataOpened": false
+  }
+}

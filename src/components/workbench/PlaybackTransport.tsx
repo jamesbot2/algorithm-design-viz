@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { segmentGeometry, type StageSegment } from '../../utils/teachableStages'
+import { formatStepCounter } from '../../utils/stepDisplay'
 
 export interface PlaybackTransportProps {
   idx: number
@@ -276,9 +277,8 @@ export default function PlaybackTransport({
           播放设置
         </button>
         <span className="spacer" />
-        <span className="step-counter tabular-nums" data-testid="step-counter">
-          {stepsLen ? `${idx + 1} / ${stepsLen}` : '— / —'}
-          {phase ? ` · ${phase}` : ''}
+        <span className="step-counter tabular-nums" data-testid="step-counter" data-step-display="1-based">
+          {formatStepCounter({ idx, stepsLen, phase })}
         </span>
       </div>
 
