@@ -142,3 +142,14 @@
 - `npm run build` → tsc + vite build OK
 - `npm run test:e2e` → 10 passed（Playwright + /usr/bin/google-chrome）
 - 本轮 **未 push**
+
+
+## V14 Inspector / arrays / pan / visibility
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| V14-01 | 桌面 lab-fill 图算法检查器入口 | 已验证 | inspectorLayout inline/drawer；隐藏 inline 时 变量/结果 toggle；不 remount 双检查器；不压垮画布 |
+| V14-02 | 检查器展示 step.arrays（Dijkstra dist/parent/done） | 已验证 | 与光标同步；抽屉关闭后再点下一步；∞→10→2 / parent[1]=2 @1280/768/390 |
+| V14-03 | GraphView pan 使用 meet/CTM | 已验证 | getScreenCTM 逆变换；重置视图仅相机；pointer capture |
+| V14-04 | 严格可见性（topmost hit） | 已验证 | 共享 helper；任意 class 不透明遮罩 fault 必失败；正对照仍过 |
+| V14-T | 回归 | 已验证 | vitest 324；pw v14=30；v12+v13=17；mergeSort 6；**未 push** |
+

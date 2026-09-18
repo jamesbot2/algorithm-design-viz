@@ -17,22 +17,22 @@
   ],
   "plot": {
     "w": 463.125,
-    "h": 126.8125,
+    "h": 128.328125,
     "top": 494.296875,
-    "bottom": 621.109375
+    "bottom": 622.625
   },
   "stage": {
-    "h": 142.125,
+    "h": 141.515625,
     "top": 487.703125,
-    "bottom": 629.828125
+    "bottom": 629.21875
   },
   "warnH": 0,
-  "svgBottom": 621.109375,
+  "svgBottom": 622.625,
   "inspectorTop": 0,
   "nodes": [
     {
       "id": "0",
-      "cssH": 14.999969482421875,
+      "cssH": 15.000030517578125,
       "inPlot": true,
       "hitOk": true,
       "top": "text"
@@ -46,7 +46,7 @@
     },
     {
       "id": "2",
-      "cssH": 13.99993896484375,
+      "cssH": 14,
       "inPlot": true,
       "hitOk": true,
       "top": "text"
@@ -60,7 +60,7 @@
     },
     {
       "id": "4",
-      "cssH": 13.99993896484375,
+      "cssH": 14,
       "inPlot": true,
       "hitOk": true,
       "top": "text"

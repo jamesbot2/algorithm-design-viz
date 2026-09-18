@@ -236,7 +236,7 @@ export default function PlaybackTransport({
         <button type="button" onClick={onReset} title="重置播放（回到起点并暂停）" data-testid="reset-playback-btn">
           重置播放
         </button>
-        <button type="button" onClick={onPrev} disabled={idx <= 0 || isPreview} title="上一步 (←)">
+        <button type="button" onClick={onPrev} disabled={idx <= 0 || isPreview} title="上一步 (←)" data-testid="prev-step-btn">
           上一步
         </button>
         <button
@@ -249,7 +249,7 @@ export default function PlaybackTransport({
         >
           {primaryLabel}
         </button>
-        <button type="button" onClick={onNext} disabled={idx >= max || isPreview} title="下一步 (→)">
+        <button type="button" onClick={onNext} disabled={idx >= max || isPreview} title="下一步 (→)" data-testid="next-step-btn">
           下一步
         </button>
         <label className="speed-label">

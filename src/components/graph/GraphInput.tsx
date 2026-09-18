@@ -232,6 +232,8 @@ export default function GraphInput({
         边列表（每行：u v w，0-based）
         <textarea
           rows={6}
+          data-testid="graph-edges"
+          aria-label="边列表"
           value={edgeText}
           onChange={(e) => {
             const text = e.target.value

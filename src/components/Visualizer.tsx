@@ -163,9 +163,24 @@ function computeSignedDomain(steps: Step[]): Record<string, { hasPos: boolean; h
 function shouldIgnoreKeyboard(e: KeyboardEvent): boolean {
   const t = e.target as HTMLElement | null
   if (!t) return false
+  // V14-02: while reading vars in the drawer, arrows must still scrub the cursor.
+  // Escape is handled before this helper; do not trap step keys inside the sheet.
+  if (
+    (e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
+    t.closest('.inspector-sheet, [data-testid="inspector-sheet"]')
+  ) {
+    return false
+  }
   if (t.isContentEditable) return true
   const tag = t.tagName
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON') return true
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true
+  if (tag === 'BUTTON') {
+    // Transport / sheet-adjacent controls: allow arrows to reach window handler
+    if (t.closest('.viz-toolbar, .scrub-row, .phase-jump, .phase-track, .playback-transport, .inspector-sheet, [data-testid="inspector-sheet"]')) {
+      return e.key !== 'ArrowLeft' && e.key !== 'ArrowRight'
+    }
+    return true
+  }
   if (
     t.closest(
       'input, textarea, select, button, [contenteditable="true"], [role="slider"], [role="separator"], [data-panel-resize-handle], .cm-editor, .cm-content, .code-browser, .WorkbenchLayout',
@@ -174,6 +189,12 @@ function shouldIgnoreKeyboard(e: KeyboardEvent): boolean {
     // Allow Space/arrows on the visualizer's own transport buttons via explicit handling;
     // but do not steal from other buttons / editors / sliders / separators.
     if (t.closest('.viz-toolbar, .scrub-row, .phase-jump, .phase-track, .playback-transport')) return false
+    if (
+      (e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
+      t.closest('.inspector-sheet, [data-testid="inspector-sheet"]')
+    ) {
+      return false
+    }
     if (tag === 'BUTTON' || t.closest('button')) return true
     if (t.closest('.cm-editor, .cm-content, .code-browser')) return true
     if (t.closest('[role="slider"], input[type="range"]')) return true
@@ -207,6 +228,9 @@ export default function Visualizer({
   const [playPulse, setPlayPulse] = useState(false)
   const [answerOpen, setAnswerOpen] = useState(false)
   const [inspectorSheetOpen, setInspectorSheetOpen] = useState(false)
+  /** V14-01: single layout mode — inline | drawer. Drawer when CSS hides inline. */
+  const [inspectorLayout, setInspectorLayout] = useState<'inline' | 'drawer'>('inline')
+  const inlineInspectorRef = useRef<HTMLDivElement>(null)
   const timer = useRef<number | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const lastSeekReq = useRef<string | number | null>(null)
@@ -316,7 +340,41 @@ export default function Visualizer({
     onStepIndexChange?.(idx)
   }, [idx, onStepIndexChange])
 
+  // V14-01: whenever inline inspector is CSS-hidden, expose alternate entry (drawer toggle)
+  useEffect(() => {
+    const el = inlineInspectorRef.current
+    const root = rootRef.current
+    if (!el || !root) return
+    const measure = () => {
+      const cs = getComputedStyle(el)
+      const r = el.getBoundingClientRect()
+      const hidden =
+        cs.display === 'none' ||
+        cs.visibility === 'hidden' ||
+        r.width < 1 ||
+        r.height < 1
+      setInspectorLayout(hidden ? 'drawer' : 'inline')
+      // Close sheet when returning to inline so we never keep two open surfaces
+      if (!hidden) setInspectorSheetOpen(false)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(root)
+    if (el.parentElement) ro.observe(el.parentElement)
+    window.addEventListener('resize', measure)
+    // matchMedia covers short/narrow dock rule without waiting for resize of root
+    const mql = window.matchMedia('(max-height: 520px), (max-width: 400px)')
+    const onMql = () => measure()
+    mql.addEventListener?.('change', onMql)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+      mql.removeEventListener?.('change', onMql)
+    }
+  }, [step?.graph, steps.length])
+
   const goPrev = useCallback(() => {
+
     setPlaying(false)
     // V10-04: stepping creates a new FLIP via geometry change + new transitionId.
     // Do not bump transitionEpoch here — that is reserved for cancel-only
@@ -462,7 +520,7 @@ export default function Visualizer({
         : null
 
   return (
-    <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties} data-playing={playing ? '1' : '0'} data-step-index={idx} data-preview={isPreview ? '1' : '0'} data-testid="visualizer" data-chrome={chromePlacement}>
+    <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties} data-playing={playing ? '1' : '0'} data-step-index={idx} data-preview={isPreview ? '1' : '0'} data-testid="visualizer" data-chrome={chromePlacement} data-inspector-layout={inspectorLayout}>
       <div className="viz-banner viz-banner-slot" data-testid="viz-banner" role="status">
         <div className="viz-banner-text">{displayMessage}</div>
         {staleResult && <span className="stale-result-badge">上一轮结果</span>}
@@ -470,7 +528,11 @@ export default function Visualizer({
           type="button"
           className="ghost inspector-sheet-toggle"
           data-testid="inspector-sheet-toggle"
+          data-inspector-entry="1"
           aria-expanded={inspectorSheetOpen}
+          aria-label="变量与结果"
+          aria-controls="inspector-sheet-surface"
+          hidden={inspectorLayout !== 'drawer'}
           onClick={() => setInspectorSheetOpen((o) => !o)}
         >
           变量/结果
@@ -525,7 +587,7 @@ export default function Visualizer({
         >
           {/* Priority: graph | arrays | board/matrix — search tree is aux when board present */}
           {step?.graph && <GraphView graph={step.graph} />}
-          {step && (
+          {step && !step.graph && (
             <ArraysFromStep
               step={step}
               prevStep={prevStep}
@@ -546,7 +608,7 @@ export default function Visualizer({
           )}
           {!step && <div className="viz-empty soft">暂无画布内容</div>}
         </div>
-        <div className="viz-inspector" data-testid="viz-inspector">
+        <div className="viz-inspector" data-testid="viz-inspector" ref={inlineInspectorRef} data-inspector-surface="inline">
           {/* Primary step message lives in viz-banner only (UI-09) — inspector shows vars/delta */}
           <div className="inspector-delta" data-testid="step-explanation">
             <div className="panel-title">变量 / 变化</div>
@@ -564,7 +626,7 @@ export default function Visualizer({
             </div>
           )}
           <div className="viz-vars-stable">
-            {step ? <VarsPanel step={step} prevStep={prevStep} /> : null}
+            {step && !(inspectorLayout === 'drawer' && inspectorSheetOpen) ? <VarsPanel step={step} prevStep={prevStep} /> : null}
           </div>
           {finalAnswer !== undefined && finalAnswer !== null && (
             <details
@@ -594,7 +656,9 @@ export default function Visualizer({
         createPortal(
           <div
             className="inspector-sheet"
+            id="inspector-sheet-surface"
             data-testid="inspector-sheet"
+            data-inspector-surface="drawer"
             role="dialog"
             aria-modal="true"
             aria-label="变量与结果"

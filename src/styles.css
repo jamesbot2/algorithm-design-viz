@@ -2655,6 +2655,20 @@ html, body, #root {
 .inspector-sheet-toggle {
   display: none;
 }
+/* V14-01: JS sets [hidden] when inline inspector is visible; when drawer mode, force show */
+.inspector-sheet-toggle:not([hidden]) {
+  display: inline-flex !important;
+  align-items: center;
+}
+.visualizer[data-inspector-layout="drawer"] .inspector-sheet-toggle {
+  display: inline-flex !important;
+  align-items: center;
+}
+/* Also when lab-fill + graph hides inline inspector (desktop), keep entry reachable even before JS measures */
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .visualizer:has(.graph-view) .inspector-sheet-toggle {
+  display: inline-flex !important;
+  align-items: center;
+}
 .inspector-sheet {
   position: fixed;
   z-index: 60;
@@ -2873,4 +2887,104 @@ html, body, #root {
     flex-wrap: nowrap;
     gap: 0.2rem;
   }
+}
+
+
+/* V14-02: compact array tables inside inspector (cursor-synced) */
+.inspector-arrays {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.inspector-array-table {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.inspector-array-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.15rem;
+}
+.inspector-array-grid {
+  border-collapse: collapse;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+}
+.inspector-array-grid th,
+.inspector-array-grid td {
+  border: 1px solid var(--border-soft, #ddd);
+  padding: 0.12rem 0.35rem;
+  text-align: center;
+  min-width: 1.6rem;
+}
+.inspector-array-grid th {
+  background: var(--bg-soft, #f5f5f5);
+  color: var(--muted);
+  font-weight: 500;
+}
+.inspector-array-grid td.flash,
+.inspector-array-grid td[data-changed="1"] {
+  background: color-mix(in srgb, var(--sem-update, #f59e0b) 28%, transparent);
+}
+
+/* V14-03: graph reset toolbar — overlay; must not steal plot flex height */
+.graph-view {
+  position: relative;
+}
+.graph-view-toolbar {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.35rem;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  pointer-events: none;
+}
+.graph-view-toolbar > * {
+  pointer-events: auto;
+}
+.graph-reset-view {
+  font-size: 0.72rem;
+  padding: 0.12rem 0.45rem;
+}
+.graph-plot[data-pan-policy="pointer-capture-meet"] {
+  touch-action: none;
+  cursor: grab;
+}
+.graph-plot[data-pan-policy="pointer-capture-meet"]:active {
+  cursor: grabbing;
+}
+
+
+/* V14: keep graph readable on short / warn layouts — do not let chrome steal plot */
+.main-wrap[data-lab-fill="1"] .graph-view:has(.graph-neg-warning) .graph-plot {
+  min-height: 100px;
+}
+.main-wrap[data-lab-fill="1"] .graph-view:has(.graph-neg-warning) {
+  min-height: 0;
+}
+@media (max-height: 600px), (max-width: 360px) {
+  .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-view,
+  .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-plot {
+    min-height: 100px;
+  }
+  .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport,
+  .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main {
+    min-height: 140px;
+  }
+  /* Compact reset chip on tiny stages */
+  .graph-reset-view {
+    font-size: 0.65rem;
+    padding: 0.08rem 0.3rem;
+    opacity: 0.85;
+  }
+}
+/* Sheet must not permanently trap transport: leave bottom gap + Esc/close */
+.inspector-sheet {
+  max-height: min(50vh, 340px);
+  /* keep a strip of page above for awareness; transport is outside dialog */
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
