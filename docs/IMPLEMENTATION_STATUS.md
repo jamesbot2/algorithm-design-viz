@@ -153,3 +153,12 @@
 | V14-04 | 严格可见性（topmost hit） | 已验证 | 共享 helper；任意 class 不透明遮罩 fault 必失败；正对照仍过 |
 | V14-T | 回归 | 已验证 | vitest 324；pw v14=30；v12+v13=17；mergeSort 6；**未 push** |
 
+
+## V15 Keyboard / Dijkstra roles / continuous inspect / visibility
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| V15-01 | 抽屉内编辑控件拥有方向键 | 已验证 | keyboardGuard；GraphResultPanel target 不步进；Esc 恢复焦点不改 cursor |
+| V15-02 | Dijkstra 当前前驱 / 历史松弛 / focus 叠 settled | 已验证 | parent 派生 tree；success≠checking；数值求解不变；堆/BFS/Prim 回归 |
+| V15-03 | 数据面板打开连续 ≥10 步 | 已验证 | drawer-internal transport 同源 goPrev/goNext；aria-modal=false；侧栏 inspect |
+| V15-04 | strictGraphVisibility 字段分离 | 已验证 | geometry/hit/text/paint；pe:none / 细字 / 部分裁剪必败 |
+| V15-T | 回归 | 已验证 | vitest 350；pw v15=5；v13+v14=42；mergeSort 6；**未 push** |

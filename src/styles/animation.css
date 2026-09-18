@@ -216,6 +216,12 @@
   fill: color-mix(in srgb, var(--sem-settled) 35%, #2a2a2a);
   stroke: var(--sem-settled);
 }
+/* V15-02: focus ring overlays settled (and other non-current roles) */
+.graph-svg .node.role-focus {
+  stroke: var(--sem-focus, #3b82f6);
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--sem-focus, #3b82f6) 55%, transparent));
+}
 .graph-svg .node.role-neg-cycle {
   fill: color-mix(in srgb, var(--sem-error) 45%, #2a2a2a);
   stroke: var(--sem-error);

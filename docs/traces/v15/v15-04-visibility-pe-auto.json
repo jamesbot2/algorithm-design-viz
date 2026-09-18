@@ -1,0 +1,115 @@
+{
+  "ok": false,
+  "issues": [
+    "topmost-not-target",
+    "opaque-overlay"
+  ],
+  "details": [
+    {
+      "id": "0",
+      "kind": "node",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "0",
+      "kind": "label",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "1",
+      "kind": "node",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "1",
+      "kind": "label",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "2",
+      "kind": "node",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "2",
+      "kind": "label",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "3",
+      "kind": "node",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "3",
+      "kind": "label",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "4",
+      "kind": "node",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "4",
+      "kind": "label",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "5",
+      "kind": "node",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    },
+    {
+      "id": "5",
+      "kind": "label",
+      "issues": [
+        "topmost-not-target",
+        "opaque-overlay"
+      ]
+    }
+  ],
+  "nodesChecked": 6,
+  "edgeLabelsChecked": 0,
+  "plot": {
+    "w": 463.125,
+    "h": 128.328125
+  },
+  "stage": {
+    "w": 476.3125,
+    "h": 141.515625
+  }
+}

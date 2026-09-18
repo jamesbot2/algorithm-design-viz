@@ -1,0 +1,8 @@
+{
+  "ok": false,
+  "issues": [
+    "paint-occluded",
+    "opaque-overlay"
+  ],
+  "hitTopIsNode": true
+}

@@ -2988,3 +2988,38 @@ html, body, #root {
   /* keep a strip of page above for awareness; transport is outside dialog */
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
+
+
+/* V15-03: continuous inspect — drawer-internal transport + non-modal side on desktop */
+.inspector-sheet-transport {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0 0.55rem;
+  border-bottom: 1px solid var(--border-soft);
+  margin-bottom: 0.5rem;
+}
+.inspector-sheet-transport button:disabled {
+  opacity: 0.4;
+}
+.inspector-sheet[aria-modal="false"] {
+  /* Honest non-modal: does not trap page; transport outside still usable when side */
+  pointer-events: auto;
+}
+@media (min-width: 900px) and (min-height: 560px) {
+  .inspector-sheet[data-inspect-mode="side"] {
+    left: auto;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(360px, 38vw);
+    max-height: none;
+    height: 100vh;
+    border-radius: 0;
+    border-top: none;
+    border-left: 1px solid var(--border-soft);
+    box-shadow: -8px 0 24px rgba(0,0,0,.14);
+    overflow: auto;
+  }
+}

@@ -21,10 +21,13 @@ const ROLE_CLASS: Record<EdgeRole, string> = {
   relaxing: 'edge relaxing',
 }
 
+/** V15-02: focus ring overlays settled — highlightNodes keep a focus class. */
 function nodeClass(id: string, hlN: Set<string>, roles?: Record<string, NodeRole>): string {
   const role = roles?.[id]
-  if (role) return `node role-${role}`
-  if (hlN.has(id)) return 'node hot'
+  const focus = hlN.has(id)
+  if (role === 'settled' && focus) return 'node role-settled role-focus'
+  if (role) return focus && role !== 'current' ? `node role-${role} role-focus` : `node role-${role}`
+  if (focus) return 'node hot'
   return 'node'
 }
 
@@ -393,7 +396,12 @@ function GraphView({ graph }: { graph: GraphState }) {
                   : `url(#${markerId})`
                 : undefined
             return (
-              <g key={er.eid} data-edge-id={er.eid} data-self-loop={er.selfLoop ? '1' : '0'}>
+              <g
+                key={er.eid}
+                data-edge-id={er.eid}
+                data-edge-role={er.role ?? ''}
+                data-self-loop={er.selfLoop ? '1' : '0'}
+              >
                 <path d={er.pathD} className={er.cls} fill="none" markerEnd={marker} />
                 {er.weight !== undefined && (
                   <text
@@ -412,7 +420,10 @@ function GraphView({ graph }: { graph: GraphState }) {
           {nodes.map((n) => {
             const id = String(n.id)
             const cls = nodeClass(id, hlN, inferredRoles)
-            const scale = cls.includes('role-current') || cls.includes('hot') ? 1.12 : 1
+            const scale =
+              cls.includes('role-current') || cls.includes('role-focus') || cls.includes('hot')
+                ? 1.12
+                : 1
             return (
               <g
                 key={id}
