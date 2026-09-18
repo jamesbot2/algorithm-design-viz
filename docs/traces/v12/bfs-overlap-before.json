@@ -1,9 +1,9 @@
 {
   "ok": true,
   "svg": {
-    "top": 500.703125,
-    "bottom": 720.703125,
-    "height": 220
+    "top": 494.296875,
+    "bottom": 1001.0625,
+    "height": 506.765625
   },
   "stage": {
     "top": 487.703125,
@@ -11,14 +11,53 @@
     "height": 48
   },
   "inspector": {
-    "top": 546.09375,
-    "bottom": 642.09375,
-    "height": 96
+    "top": 0,
+    "bottom": 0,
+    "height": 0
   },
-  "overlapArea": 43230,
-  "overlapH": 96,
-  "hits": [],
-  "blockedHits": 0,
+  "overlapArea": 0,
+  "overlapH": 0,
+  "hits": [
+    {
+      "kind": "circle",
+      "blocked": true,
+      "top": null,
+      "inStage": false
+    },
+    {
+      "kind": "circle",
+      "blocked": true,
+      "top": null,
+      "inStage": false
+    },
+    {
+      "kind": "circle",
+      "blocked": true,
+      "top": null,
+      "inStage": false
+    },
+    {
+      "kind": "circle",
+      "blocked": true,
+      "top": null,
+      "inStage": false
+    },
+    {
+      "kind": "circle",
+      "blocked": true,
+      "top": null,
+      "inStage": false
+    },
+    {
+      "kind": "circle",
+      "blocked": true,
+      "top": null,
+      "inStage": false
+    }
+  ],
+  "blockedHits": 6,
+  "inStageHitCount": 0,
+  "outOfStage": 6,
   "nodeCount": 6,
-  "rawSvgBottom": 720.703125
+  "rawSvgBottom": 1001.0625
 }

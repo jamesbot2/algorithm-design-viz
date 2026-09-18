@@ -1,0 +1,54 @@
+{
+  "pass": false,
+  "reasons": [
+    "hit-not-graph"
+  ],
+  "nodeCount": 3,
+  "inPlotCount": 3,
+  "blockedHits": 0,
+  "emptySkip": 0,
+  "overlapArea": 0,
+  "readableLabelCount": 3,
+  "labelHeights": [
+    14,
+    14,
+    14
+  ],
+  "plot": {
+    "w": 641.25,
+    "h": 120,
+    "top": 335.765625,
+    "bottom": 455.765625
+  },
+  "stage": {
+    "h": 144.015625,
+    "top": 287.6875,
+    "bottom": 431.703125
+  },
+  "warnH": 35.890625,
+  "svgBottom": 455.765625,
+  "inspectorTop": 0,
+  "nodes": [
+    {
+      "id": "0",
+      "cssH": 14,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "1",
+      "cssH": 14,
+      "inPlot": true,
+      "hitOk": false,
+      "top": "DIV"
+    },
+    {
+      "id": "2",
+      "cssH": 14,
+      "inPlot": true,
+      "hitOk": false,
+      "top": "DIV"
+    }
+  ]
+}

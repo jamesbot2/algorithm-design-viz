@@ -1,0 +1,76 @@
+{
+  "pass": true,
+  "reasons": [],
+  "nodeCount": 6,
+  "inPlotCount": 6,
+  "blockedHits": 0,
+  "emptySkip": 0,
+  "overlapArea": 0,
+  "readableLabelCount": 6,
+  "labelHeights": [
+    14,
+    13,
+    13,
+    13,
+    13,
+    13
+  ],
+  "plot": {
+    "w": 230.875,
+    "h": 95.328125,
+    "top": 333.8125,
+    "bottom": 429.140625
+  },
+  "stage": {
+    "h": 108.515625,
+    "top": 327.21875,
+    "bottom": 435.734375
+  },
+  "warnH": 0,
+  "svgBottom": 429.140625,
+  "inspectorTop": 0,
+  "nodes": [
+    {
+      "id": "0",
+      "cssH": 14,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "1",
+      "cssH": 13,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "2",
+      "cssH": 13,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "3",
+      "cssH": 13,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "4",
+      "cssH": 13,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "5",
+      "cssH": 13,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    }
+  ]
+}
