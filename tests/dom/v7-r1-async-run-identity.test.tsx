@@ -12,6 +12,7 @@ import {
   installSolveBarrier,
   type SolveBarrierContext,
 } from '../../src/core/runner/solveBarrier'
+import { ensureInputEditing } from './helpers/ensureInputEditing'
 
 function renderApp(hashPath: string) {
   window.history.replaceState(null, '', '/algorithm-design-viz/')
@@ -103,42 +104,49 @@ describe('V7 R1 async run identity', () => {
     expect(screen.getByTestId('step-counter').textContent).toBe(stepsAfterB)
   })
 
-  it('submit n=8, edit draft to 9, resolve 8 → draft 9, dirty, snapshot 8', async () => {
-    const user = userEvent.setup()
-    const gate = createDeferred<void>()
-    installSolveBarrier(async (ctx) => {
-      if (ctx.algoId === 'nQueens') await gate.promise
-    })
+  it(
+    'submit n=8, edit draft to 9, resolve 8 → draft 9, dirty, snapshot 8',
+    async () => {
+      const user = userEvent.setup()
+      const gate = createDeferred<void>()
+      installSolveBarrier(async (ctx) => {
+        if (ctx.algoId === 'nQueens') await gate.promise
+      })
 
-    renderApp('#/algo/nQueens')
-    await screen.findByTestId('nqueens-n')
-    const nInput = screen.getByTestId('nqueens-n') as HTMLInputElement
-    await user.clear(nInput)
-    await user.type(nInput, '8')
+      renderApp('#/algo/nQueens')
+      await screen.findByTestId('input-edit-toggle')
+      // V16/V17: collapsed by default when height < 820 — expand before filling n
+      await ensureInputEditing(user)
+      const nInput = (await screen.findByTestId('nqueens-n')) as HTMLInputElement
+      await user.clear(nInput)
+      await user.type(nInput, '8')
 
-    await user.click(screen.getByTestId('run-btn'))
-    await screen.findByTestId('run-status')
+      await user.click(screen.getByTestId('run-btn'))
+      await screen.findByTestId('run-status')
 
-    await user.clear(nInput)
-    await user.type(nInput, '9')
-    expect(nInput.value).toBe('9')
+      await user.clear(nInput)
+      await user.type(nInput, '9')
+      expect(nInput.value).toBe('9')
 
-    gate.resolve()
+      gate.resolve()
 
-    // nQueens n=8 sync fallback (~0.8s) can exceed default 1s waitFor under CI CPU load
-    await waitFor(
-      () => {
-        expect(screen.queryByTestId('run-status')?.textContent ?? '').not.toMatch(/运行中/)
-      },
-      { timeout: 10_000 },
-    )
+      // nQueens n=8 sync fallback (~0.8s) can exceed default 1s waitFor under CI CPU load;
+      // it() timeout must exceed this waitFor budget (default 5s was too tight in CI).
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId('run-status')?.textContent ?? '').not.toMatch(/运行中/)
+        },
+        { timeout: 10_000 },
+      )
 
-    expect((screen.getByTestId('nqueens-n') as HTMLInputElement).value).toBe('9')
-    expect(document.querySelector('.dirty-banner')).toBeTruthy()
-    // Snapshot should reflect submitted n=8 in debug / run snapshot path
-    const debug = document.querySelector('.debug-details')?.textContent ?? ''
-    expect(debug).toMatch(/草稿已改/)
-  })
+      expect((screen.getByTestId('nqueens-n') as HTMLInputElement).value).toBe('9')
+      expect(document.querySelector('.dirty-banner')).toBeTruthy()
+      // Snapshot should reflect submitted n=8 in debug / run snapshot path
+      const debug = document.querySelector('.debug-details')?.textContent ?? ''
+      expect(debug).toMatch(/草稿已改/)
+    },
+    15_000,
+  )
 
   it('unmount then resolve does not write into a new page', async () => {
     const gate = createDeferred<void>()
