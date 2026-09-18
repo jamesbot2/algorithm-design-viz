@@ -63,6 +63,8 @@ export default function GraphResultPanel({ algoId, steps }: Props) {
             min={0}
             max={Math.max(0, n - 1)}
             value={target}
+            data-testid="graph-result-target"
+            aria-label="目标顶点"
             onChange={(e) => {
               const raw = e.target.value
               if (raw.trim() === '') return

@@ -71,7 +71,13 @@ export async function measureStrictGraphVisibility(page: Page) {
       if (top?.closest?.('.playback-transport, [data-testid="workbench-transport"], .transport-bar')) {
         local.push('transport-cover')
       }
-      if (isLabel && r.height < 10 && r.width < 10) local.push('unreadable-label')
+      if (isLabel) {
+        const attrFs = parseFloat((target as Element).getAttribute?.('font-size') || '')
+        const cssFs = parseFloat(getComputedStyle(target as Element).fontSize || '0')
+        const fs = attrFs > 0 ? attrFs : cssFs
+        // V15-04: font-size/height — NOT width. Wide tiny fonts fail; SVG bbox height alone is soft.
+        if ((fs > 0 && fs < 10) || (fs <= 0 && r.height < 10)) local.push('unreadable-label')
+      }
       if (local.length) {
         issues.push(...local)
         details.push({ id, kind, issues: local })

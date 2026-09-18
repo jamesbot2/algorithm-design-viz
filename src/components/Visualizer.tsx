@@ -14,6 +14,7 @@ import { coordinatedStepIntervalMs } from '../utils/playbackClock'
 import { useMotion } from '../theme/MotionContext'
 import PlaybackTransport from './workbench/PlaybackTransport'
 import { segmentGeometry, teachableStages } from '../utils/teachableStages'
+import { shouldIgnoreKeyboard } from '../utils/keyboardGuard'
 
 /** Parent sends this only on scene load / new run / explicit external seek — never from onStepIndexChange. */
 export type SeekCommand = { requestId: number | string; target: number }
@@ -160,51 +161,6 @@ function computeSignedDomain(steps: Step[]): Record<string, { hasPos: boolean; h
   return out
 }
 
-function shouldIgnoreKeyboard(e: KeyboardEvent): boolean {
-  const t = e.target as HTMLElement | null
-  if (!t) return false
-  // V14-02: while reading vars in the drawer, arrows must still scrub the cursor.
-  // Escape is handled before this helper; do not trap step keys inside the sheet.
-  if (
-    (e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
-    t.closest('.inspector-sheet, [data-testid="inspector-sheet"]')
-  ) {
-    return false
-  }
-  if (t.isContentEditable) return true
-  const tag = t.tagName
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true
-  if (tag === 'BUTTON') {
-    // Transport / sheet-adjacent controls: allow arrows to reach window handler
-    if (t.closest('.viz-toolbar, .scrub-row, .phase-jump, .phase-track, .playback-transport, .inspector-sheet, [data-testid="inspector-sheet"]')) {
-      return e.key !== 'ArrowLeft' && e.key !== 'ArrowRight'
-    }
-    return true
-  }
-  if (
-    t.closest(
-      'input, textarea, select, button, [contenteditable="true"], [role="slider"], [role="separator"], [data-panel-resize-handle], .cm-editor, .cm-content, .code-browser, .WorkbenchLayout',
-    )
-  ) {
-    // Allow Space/arrows on the visualizer's own transport buttons via explicit handling;
-    // but do not steal from other buttons / editors / sliders / separators.
-    if (t.closest('.viz-toolbar, .scrub-row, .phase-jump, .phase-track, .playback-transport')) return false
-    if (
-      (e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
-      t.closest('.inspector-sheet, [data-testid="inspector-sheet"]')
-    ) {
-      return false
-    }
-    if (tag === 'BUTTON' || t.closest('button')) return true
-    if (t.closest('.cm-editor, .cm-content, .code-browser')) return true
-    if (t.closest('[role="slider"], input[type="range"]')) return true
-    if (t.closest('[role="separator"], [data-panel-resize-handle]')) return true
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true
-    if (t.isContentEditable || t.closest('[contenteditable="true"]')) return true
-  }
-  return false
-}
-
 export default function Visualizer({
   steps: stepsProp,
   trace,
@@ -231,6 +187,7 @@ export default function Visualizer({
   /** V14-01: single layout mode — inline | drawer. Drawer when CSS hides inline. */
   const [inspectorLayout, setInspectorLayout] = useState<'inline' | 'drawer'>('inline')
   const inlineInspectorRef = useRef<HTMLDivElement>(null)
+  const inspectorToggleRef = useRef<HTMLButtonElement>(null)
   const timer = useRef<number | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const lastSeekReq = useRef<string | number | null>(null)
@@ -411,12 +368,18 @@ export default function Visualizer({
     setIdx(0)
   }, [bumpTransitionEpoch])
 
+  const closeInspectorSheet = useCallback(() => {
+    setInspectorSheetOpen(false)
+    // Restore focus to entry control; do not touch runId/cursor
+    queueMicrotask(() => inspectorToggleRef.current?.focus?.())
+  }, [])
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       // Escape must close the sheet even if focus is on a button inside it
       if (e.key === 'Escape' && inspectorSheetOpen) {
         e.preventDefault()
-        setInspectorSheetOpen(false)
+        closeInspectorSheet()
         return
       }
       if (shouldIgnoreKeyboard(e)) return
@@ -433,7 +396,7 @@ export default function Visualizer({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [togglePlay, goPrev, goNext, inspectorSheetOpen])
+  }, [togglePlay, goPrev, goNext, inspectorSheetOpen, closeInspectorSheet])
 
   const progress = useMemo(() => (max === 0 ? 0 : (idx / max) * 100), [idx, max])
   const previewStep = scrubPreview !== null ? steps[scrubPreview] : null
@@ -529,11 +492,19 @@ export default function Visualizer({
           className="ghost inspector-sheet-toggle"
           data-testid="inspector-sheet-toggle"
           data-inspector-entry="1"
+          ref={inspectorToggleRef}
           aria-expanded={inspectorSheetOpen}
           aria-label="变量与结果"
           aria-controls="inspector-sheet-surface"
           hidden={inspectorLayout !== 'drawer'}
-          onClick={() => setInspectorSheetOpen((o) => !o)}
+          onClick={() =>
+            setInspectorSheetOpen((o) => {
+              if (o) {
+                queueMicrotask(() => inspectorToggleRef.current?.focus?.())
+              }
+              return !o
+            })
+          }
         >
           变量/结果
         </button>
@@ -628,7 +599,7 @@ export default function Visualizer({
           <div className="viz-vars-stable">
             {step && !(inspectorLayout === 'drawer' && inspectorSheetOpen) ? <VarsPanel step={step} prevStep={prevStep} /> : null}
           </div>
-          {finalAnswer !== undefined && finalAnswer !== null && (
+          {finalAnswer !== undefined && finalAnswer !== null && !(inspectorLayout === 'drawer' && inspectorSheetOpen) && (
             <details
               className="final-answer-panel"
               open={answerOpen}
@@ -659,14 +630,41 @@ export default function Visualizer({
             id="inspector-sheet-surface"
             data-testid="inspector-sheet"
             data-inspector-surface="drawer"
+            data-inspect-mode="side"
             role="dialog"
-            aria-modal="true"
+            aria-modal="false"
             aria-label="变量与结果"
           >
             <div className="inspector-sheet-head">
               <strong>变量 / 结果</strong>
-              <button type="button" className="ghost" onClick={() => setInspectorSheetOpen(false)}>
+              <button type="button" className="ghost" data-testid="inspector-sheet-close" onClick={closeInspectorSheet}>
                 关闭
+              </button>
+            </div>
+            {/* V15-03: drawer-internal transport — SAME goPrev/goNext/idx controller; no second player */}
+            <div className="inspector-sheet-transport" data-testid="inspector-sheet-transport">
+              <button
+                type="button"
+                className="ghost"
+                data-testid="inspector-prev-btn"
+                disabled={idx <= 0 || isPreview}
+                onClick={goPrev}
+                title="上一步"
+              >
+                ← 上一步
+              </button>
+              <span className="tabular-nums" data-testid="inspector-step-counter">
+                {idx}/{max}
+              </span>
+              <button
+                type="button"
+                className="ghost"
+                data-testid="inspector-next-btn"
+                disabled={idx >= max || isPreview}
+                onClick={goNext}
+                title="下一步"
+              >
+                下一步 →
               </button>
             </div>
             <div className="viz-inspector inspector-sheet-body" data-testid="viz-inspector-sheet">

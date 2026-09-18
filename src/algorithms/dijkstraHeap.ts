@@ -179,12 +179,12 @@ export function generateSteps(
   dist[start] = 0
   const heap: HeapItem[] = []
   heapPush(heap, { u: start, d: 0 })
-  const accepted = new Set<string>()
-  const edgeRoles: Record<string, EdgeRole> = {}
+  const historicalSuccess = new Set<string>()
   let comparisons = 0
   let writes = 0
   let staleSkips = 0
 
+  /** V15-02: current preds from parent; success ≠ checking overwrite. */
   const snap = (
     message: string,
     hn: number[] = [],
@@ -193,12 +193,31 @@ export function generateSteps(
     phase?: string,
     result?: unknown,
     codeRefs?: { documentId: string; anchorId: string }[],
+    successEdge?: string,
   ) => {
     if (!heavy && !result && phase !== 'init' && phase !== 'done' && phase !== 'error') return
-    const roles: Record<string, EdgeRole> = { ...edgeRoles }
-    for (const eid of accepted) roles[eid] = roles[eid] ?? 'accepted'
-    const highlightEdgeIds = [...Array.from(accepted), ...(checking ? [checking] : [])]
-    if (checking) roles[checking] = 'checking'
+    const roles: Record<string, EdgeRole> = {}
+    const currentPreds = new Set<string>()
+    for (let v = 0; v < n; v++) {
+      if (parent[v] >= 0) {
+        const pe = directedEdgeId(parent[v], v)
+        currentPreds.add(pe)
+        roles[pe] = 'tree'
+      }
+    }
+    void historicalSuccess
+    if (successEdge) roles[successEdge] = 'accepted'
+    if (checking && checking !== successEdge) roles[checking] = 'checking'
+    const highlightEdgeIds = [
+      ...Array.from(currentPreds),
+      ...(checking ? [checking] : []),
+      ...(successEdge ? [successEdge] : []),
+    ]
+    const nodeRoles: Record<string, import('../types/step').NodeRole> = {}
+    for (const x of hn) {
+      nodeRoles[String(x)] = 'current'
+    }
+    nodeRoles[String(start)] = nodeRoles[String(start)] ?? 'source'
     steps.push({
       id: id++,
       message,
@@ -216,6 +235,7 @@ export function generateSteps(
         highlightNodes: hn,
         highlightEdgeIds,
         edgeRoles: roles,
+        nodeRoles,
       },
       result,
       codeRefs: codeRefs ?? (phase && PHASE_ANCHOR[phase] ? ref(PHASE_ANCHOR[phase]) : undefined),
@@ -249,11 +269,10 @@ export function generateSteps(
         dist[v] = dist[cur.u]! + w
         parent[v] = cur.u
         writes++
-        accepted.add(eid)
-        edgeRoles[eid] = 'accepted'
+        historicalSuccess.add(eid)
         heapPush(heap, { u: v, d: dist[v]! })
         if (heavy) {
-          snap(`松弛：dist[${v}]=${dist[v]}，入堆`, [v], eid, { v, newDist: dist[v]! }, 'relax')
+          snap(`松弛：dist[${v}]=${dist[v]}，入堆`, [v], undefined, { v, newDist: dist[v]! }, 'relax', undefined, undefined, eid)
         }
       }
     }

@@ -62,48 +62,84 @@ export function generateSteps(
   const done = Array(n).fill(false)
   const parent = Array(n).fill(-1)
   dist[start] = 0
-  const accepted = new Set<string>()
-  const edgeRoles: Record<string, EdgeRole> = {}
+  /** Edges that once successfully relaxed (historical); may no longer be current preds. */
+  const historicalSuccess = new Set<string>()
 
   const DOC = 'dijkstra.naive.ts'
   const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
 
+  /**
+   * V15-02 visual roles:
+   * - current predecessors derived from parent[] → edgeRoles 'tree'
+   * - historical successful relax (superseded) → NOT current accepted/path style
+   * - checking → temporary examine (must not overwrite success snap)
+   * - successful update → 'accepted' on that frame (not 'checking')
+   * - highlightNodes keep focus overlay even when node is settled
+   */
   const snap = (
     message: string,
     hn: number[] = [],
-    checking?: string,
-    vars: Record<string, string | number | boolean | null> = {},
-    result?: unknown,
-    phase?: string,
-    codeRefs?: { documentId: string; anchorId: string }[],
+    opts: {
+      checking?: string
+      successEdge?: string
+      vars?: Record<string, string | number | boolean | null>
+      result?: unknown
+      phase?: string
+      codeRefs?: { documentId: string; anchorId: string }[]
+    } = {},
   ) => {
-    const roles: Record<string, EdgeRole> = { ...edgeRoles }
-    for (const eid of accepted) roles[eid] = roles[eid] ?? 'accepted'
+    const roles: Record<string, EdgeRole> = {}
+    const currentPreds = new Set<string>()
+    for (let v = 0; v < n; v++) {
+      if (parent[v] >= 0) {
+        const eid = directedEdgeId(parent[v], v)
+        currentPreds.add(eid)
+        roles[eid] = 'tree'
+      }
+    }
+    // Historical successful relaxes that are no longer current preds: leave unmarked
+    // (must not share tree/accepted/path). Tracked for clarity / future dim styles.
+    void historicalSuccess
+
+    if (opts.successEdge) {
+      roles[opts.successEdge] = 'accepted'
+    }
+    // Checking only when not a success frame for the same edge
+    if (opts.checking && opts.checking !== opts.successEdge) {
+      roles[opts.checking] = 'checking'
+    }
+
     const highlightEdgeIds = [
-      ...Array.from(accepted),
-      ...(checking ? [checking] : []),
+      ...Array.from(currentPreds),
+      ...(opts.checking ? [opts.checking] : []),
+      ...(opts.successEdge ? [opts.successEdge] : []),
     ]
-    if (checking) roles[checking] = 'checking'
+
     const nodeRoles: Record<string, import('../types/step').NodeRole> = {}
     for (let i = 0; i < n; i++) {
       if (done[i]) nodeRoles[String(i)] = 'settled'
     }
-    if (hn.length) {
-      for (const x of hn) nodeRoles[String(x)] = nodeRoles[String(x)] ?? 'current'
+    // Do NOT swallow highlightNodes into settled-only: GraphView overlays focus via hlN.
+    // Still mark non-settled highlights as current for role legend.
+    for (const x of hn) {
+      if (nodeRoles[String(x)] !== 'settled') {
+        nodeRoles[String(x)] = 'current'
+      }
     }
     nodeRoles[String(start)] = nodeRoles[String(start)] ?? 'source'
+
     steps.push({
       id: id++,
       message,
-      phase,
-      codeRefs,
+      phase: opts.phase,
+      codeRefs: opts.codeRefs,
       arrays: {
         dist: dist.map((d) => (d === Infinity ? '∞' : d)),
         done: done.map((d) => (d ? 1 : 0)),
         parent: parent.map((p) => (p < 0 ? '-' : p)),
       },
       highlights: { dist: hn },
-      vars,
+      vars: opts.vars ?? {},
       graph: {
         nodes,
         edges,
@@ -112,11 +148,15 @@ export function generateSteps(
         edgeRoles: roles,
         nodeRoles,
       },
-      result,
+      result: opts.result,
     })
   }
 
-  snap(`初始化：dist[${start}]=0，其余 ∞`, [start], undefined, { start }, undefined, 'init', ref('init'))
+  snap(`初始化：dist[${start}]=0，其余 ∞`, [start], {
+    vars: { start },
+    phase: 'init',
+    codeRefs: ref('init'),
+  })
   for (let iter = 0; iter < n; iter++) {
     let u = -1
     let best = Infinity
@@ -128,34 +168,45 @@ export function generateSteps(
     }
     if (u < 0 || best === Infinity) break
     done[u] = true
-    snap(`选定顶点 ${u}（dist=${dist[u]}）`, [u], undefined, { u, dist_u: dist[u] }, undefined, 'extract', ref('selectMin'))
+    snap(`选定顶点 ${u}（dist=${dist[u]}）`, [u], {
+      vars: { u, dist_u: dist[u] },
+      phase: 'extract',
+      codeRefs: ref('selectMin'),
+    })
     for (const { v, w, id: eid } of adj[u]) {
-      snap(`松弛边 ${u}→${v} (w=${w})`, [u, v], eid, {
-        u,
-        v,
-        w,
-        dist_u: dist[u],
-        dist_v: dist[v] === Infinity ? '∞' : dist[v],
-      }, undefined, 'relax', ref('relax.condition'))
+      snap(`松弛边 ${u}→${v} (w=${w})`, [u, v], {
+        checking: eid,
+        vars: {
+          u,
+          v,
+          w,
+          dist_u: dist[u],
+          dist_v: dist[v] === Infinity ? '∞' : dist[v],
+        },
+        phase: 'relax',
+        codeRefs: ref('relax.condition'),
+      })
       if (dist[u] + w < dist[v]) {
         dist[v] = dist[u] + w
         parent[v] = u
-        accepted.add(eid)
-        edgeRoles[eid] = 'accepted'
-        snap(`更新 dist[${v}] = ${dist[v]}`, [v], eid, { u, v, newDist: dist[v] }, undefined, 'relax', ref('relax.update'))
+        historicalSuccess.add(eid)
+        // Success frame: accepted, NOT checking overwrite
+        snap(`更新 dist[${v}] = ${dist[v]}`, [v], {
+          successEdge: eid,
+          vars: { u, v, newDist: dist[v] },
+          phase: 'relax',
+          codeRefs: ref('relax.update'),
+        })
       }
     }
   }
   const distOut = dist.map((d) => (d === Infinity ? null : d))
-  snap(
-    '朴素 Dijkstra 完成',
-    [],
-    undefined,
-    { dist: dist.map((d) => (d === Infinity ? '∞' : d)).join(',') },
-    { ok: true, dist: distOut, parent: [...parent], impl: 'naiveDijkstraScan', start },
-    'done',
-    ref('done'),
-  )
+  snap('朴素 Dijkstra 完成', [], {
+    vars: { dist: dist.map((d) => (d === Infinity ? '∞' : d)).join(',') },
+    result: { ok: true, dist: distOut, parent: [...parent], impl: 'naiveDijkstraScan', start },
+    phase: 'done',
+    codeRefs: ref('done'),
+  })
   return steps
 }
 

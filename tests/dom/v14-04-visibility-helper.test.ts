@@ -36,7 +36,7 @@ describe('V14-04 strict topmost visibility helper', () => {
     expect(isTopmostTarget(overlay, node)).toBe(false)
     expect(isOpaqueOverlay(overlay, node)).toBe(true)
     const sample: HitSample = { x: 0, y: 0, top: overlay, stack: [overlay, node] }
-    const r = evaluateTargetVisibility(node, sample)
+    const r = evaluateTargetVisibility(node, sample, { skipPaintCheck: true })
     expect(r.ok).toBe(false)
     expect(r.issues).toContain('opaque-overlay')
     expect(r.issues).toContain('topmost-not-target')
@@ -58,7 +58,7 @@ describe('V14-04 strict topmost visibility helper', () => {
     ).toBe(true)
     // Strict helper must fail
     expect(isTopmostTarget(transport, node)).toBe(false)
-    const r = evaluateTargetVisibility(node, { x: 0, y: 0, top: transport, stack })
+    const r = evaluateTargetVisibility(node, { x: 0, y: 0, top: transport, stack }, { skipPaintCheck: true })
     expect(r.ok).toBe(false)
     expect(
       r.issues.some((i) => i === 'topmost-not-target' || i === 'opaque-overlay' || i === 'transport-cover'),
