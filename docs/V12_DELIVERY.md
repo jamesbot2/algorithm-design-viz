@@ -2,7 +2,7 @@
 
 **Branch:** `v12-stage-overlap`  
 **Baseline HEAD:** `0d5b12f` (V11 on `main` — **already live / deployed**)  
-**Tip:** see `git rev-parse HEAD` on this branch after local commits.  
+**Tip:** `52541e7` on `v12-stage-overlap` (local only).  
 **Not pushed. Not deployed.**
 
 Chrome: `/usr/bin/google-chrome`.
