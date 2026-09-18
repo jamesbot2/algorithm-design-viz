@@ -138,7 +138,8 @@ export function generateSteps(input: number[]): Step[] {
         { left: [...left], right: [...right] },
         { left: [...leftIds], right: [...rightIds] },
       )
-      if (left[i]! <= right[j]!) {
+      const takeLeft = left[i]! <= right[j]!
+      if (takeLeft) {
         a[k] = left[i]!
         elementIds[k] = leftIds[i]!
         i++
@@ -157,7 +158,7 @@ export function generateSteps(input: number[]): Step[] {
         { L, mid, R, k },
         [{ type: 'write', indices: [k], elementIds: [elementIds[k]!] }],
         'merge',
-        ref('mergePush'),
+        ref(takeLeft ? 'mergeWriteLeft' : 'mergeWriteRight'),
         { left: [...left], right: [...right] },
         { left: [...leftIds], right: [...rightIds] },
       )
@@ -177,7 +178,7 @@ export function generateSteps(input: number[]): Step[] {
         { L, mid, R, k },
         [{ type: 'copy', indices: [k], elementIds: [elementIds[k]!] }],
         'merge',
-        ref('mergePush'),
+        ref('mergeCopyLeft'),
         { left: [...left], right: [...right] },
         { left: [...leftIds], right: [...rightIds] },
       )
@@ -197,7 +198,7 @@ export function generateSteps(input: number[]): Step[] {
         { L, mid, R, k },
         [{ type: 'copy', indices: [k], elementIds: [elementIds[k]!] }],
         'merge',
-        ref('mergePush'),
+        ref('mergeCopyRight'),
         { left: [...left], right: [...right] },
         { left: [...leftIds], right: [...rightIds] },
       )

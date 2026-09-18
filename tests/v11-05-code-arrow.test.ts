@@ -48,10 +48,12 @@ describe('V11-05 code arrow = this step', () => {
     expect(aid === 'done' || aid === 'return').toBe(true)
   })
 
-  it('merge write snaps use mergePush not only mergeCompare', () => {
+  it('merge write snaps use side-specific write/copy anchors not only mergeCompare', () => {
     const steps = mergeSteps([2, 1])
     const write = steps.find((s) => s.arrayOps?.a?.some((o) => o.type === 'write' || o.type === 'copy'))
     expect(write).toBeTruthy()
-    expect(write!.codeRefs?.[0]?.anchorId).toBe('mergePush')
+    const aid = write!.codeRefs?.[0]?.anchorId
+    expect(['mergeWriteLeft', 'mergeWriteRight', 'mergeCopyLeft', 'mergeCopyRight']).toContain(aid)
+    expect(aid).not.toBe('mergeCompare')
   })
 })

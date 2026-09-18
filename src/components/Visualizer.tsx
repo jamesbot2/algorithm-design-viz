@@ -141,6 +141,25 @@ function computeScaleMax(steps: Step[]): Record<string, number> {
   return max
 }
 
+/** Run-level signedness — keep half-span for value 1 across [1,-1] → mid [1,1]. */
+function computeSignedDomain(steps: Step[]): Record<string, { hasPos: boolean; hasNeg: boolean }> {
+  const out: Record<string, { hasPos: boolean; hasNeg: boolean }> = {}
+  for (const s of steps) {
+    if (!s.arrays) continue
+    for (const [name, vals] of Object.entries(s.arrays)) {
+      const cur = out[name] ?? { hasPos: false, hasNeg: false }
+      for (const v of vals) {
+        if (typeof v === 'number' && Number.isFinite(v)) {
+          if (v > 0) cur.hasPos = true
+          if (v < 0) cur.hasNeg = true
+        }
+      }
+      out[name] = cur
+    }
+  }
+  return out
+}
+
 function shouldIgnoreKeyboard(e: KeyboardEvent): boolean {
   const t = e.target as HTMLElement | null
   if (!t) return false
@@ -208,19 +227,26 @@ export default function Visualizer({
     })
   }, [steps, stageInfo])
   const scaleMaxByArray = useMemo(() => computeScaleMax(steps), [steps])
+  const signedDomainByArray = useMemo(() => computeSignedDomain(steps), [steps])
 
   const stepHasSwapMotion = useMemo(() => {
     if (!step?.arrayOps) return false
     return Object.values(step.arrayOps).some((ops) => ops.some((o) => o.type === 'swap'))
   }, [step])
 
+  const stepHasMoveMotion = useMemo(() => {
+    if (!step?.arrayOps) return false
+    return Object.values(step.arrayOps).some((ops) => ops.some((o) => o.type === 'move'))
+  }, [step])
+
   const effectiveInterval = useMemo(
     () =>
       coordinatedStepIntervalMs(speed, mode, {
         hasSwapMotion: stepHasSwapMotion,
+        hasMoveMotion: stepHasMoveMotion,
         baseSwapMs: 280,
       }),
-    [speed, mode, stepHasSwapMotion],
+    [speed, mode, stepHasSwapMotion, stepHasMoveMotion],
   )
 
   // Keep motion tokens / FLIP durations on the same clock as playback
@@ -504,6 +530,7 @@ export default function Visualizer({
               step={step}
               prevStep={prevStep}
               scaleMaxByArray={scaleMaxByArray}
+              signedDomainByArray={signedDomainByArray}
               snapSwap={snapSwap}
             />
           )}

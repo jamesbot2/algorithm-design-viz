@@ -700,7 +700,23 @@ button.icon-btn {
 .lt { white-space: pre; color: #d4d4d4; }
 
 /* Graph */
-.graph-svg { width: 100%; height: auto; background: #141414; border-radius: 10px; }
+.graph-svg {
+  width: 100%;
+  /* V12-01: default fill; scroll-fallback overrides to height:auto */
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  background: #141414;
+  border-radius: 10px;
+}
+.graph-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+}
 .edge { stroke: #555; stroke-width: 2; }
 .edge.hot { stroke: var(--warn); stroke-width: 3; }
 .edge-label { fill: var(--muted); font-size: 11px; font-family: var(--mono); }
@@ -1002,9 +1018,13 @@ button.icon-btn {
 .range-band-abs {
   position: absolute;
   top: 0;
+  /* height from measured segment when set; else stretch above labels */
   bottom: 1.8rem;
   pointer-events: none;
   z-index: 0;
+}
+.range-band-abs[style*="height"] {
+  bottom: auto;
 }
 .bars-wrap .bar {
   /* width from slot; never shrink-wrap label */
@@ -1018,7 +1038,7 @@ button.icon-btn {
   white-space: nowrap;
 }
 .playback-settings-panel {
-  /* V11-08: overlay popover — must not crush stage */
+  /* V12-04: when portaled to body, use fixed top-layer; in-flow fallback stays absolute */
   position: absolute;
   z-index: 55;
   left: 0.5rem;
@@ -1027,6 +1047,18 @@ button.icon-btn {
   max-height: min(40vh, 280px);
   overflow: auto;
   box-shadow: 0 8px 24px rgba(0,0,0,.18);
+}
+.playback-settings-panel[data-portaled="1"] {
+  position: fixed;
+  z-index: 80;
+  left: max(0.5rem, env(safe-area-inset-left, 0px));
+  right: max(0.5rem, env(safe-area-inset-right, 0px));
+  bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+  top: auto;
+  max-height: min(70vh, 360px);
+  max-width: 420px;
+  margin-left: auto;
+  box-shadow: 0 12px 32px rgba(0,0,0,.28);
 }
 .playback-transport {
   position: relative;
@@ -2126,10 +2158,66 @@ html, body, #root {
   line-height: 1.3;
 }
 
-/* V9 stage min visible — avoid 0-height flex crush under short viewports */
+/* V12-01: ONE strategy for fill — stage is a fixed flex slot that owns overflow.
+ * Graph SVG must fit the slot (height 100%, no intrinsic height:auto bleed into inspector).
+ * Scroll-fallback uses the OTHER strategy — natural flow (stage grows; inspector below).
+ * Never mix: shrink stage + unconstrained SVG + overflow:visible ancestors.
+ */
 .stage-viewport {
-  min-height: 140px;
   flex: 1 1 auto;
+  min-height: 180px;
+  overflow: auto;
+  position: relative;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport,
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main {
+  flex: 1 1 auto;
+  min-height: 180px;
+  overflow: auto;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-view {
+  height: 100%;
+  min-height: 160px;
+  max-height: 100%;
+  overflow: hidden; /* fit host — not a z-index hide */
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-svg {
+  width: 100%;
+  height: 100%;
+  min-height: 0; /* allow shrink into stage slot */
+  max-height: 100%;
+}
+
+/* Scroll fallback: content height participates; inspector is a following sibling — no paint-through */
+.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport,
+.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-main {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 220px;
+  overflow: visible;
+}
+.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .graph-view {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .graph-svg {
+  height: auto;
+  max-height: none;
+  min-height: 220px;
+}
+/* In scroll mode, do NOT leave a flex-shrunk stage with visible overflow (the hybrid bug). */
+.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-body-single {
+  overflow: visible;
+  flex: 0 0 auto;
+  height: auto;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .visualizer {
+  overflow: hidden;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-body-single {
+  overflow: hidden; /* stage owns scroll; body must not let svg bleed */
+  min-height: 0;
 }
 .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport {
   min-height: 160px;

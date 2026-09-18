@@ -1,0 +1,75 @@
+{
+  "ok": true,
+  "svg": {
+    "top": 500.703125,
+    "bottom": 634.703125,
+    "height": 134
+  },
+  "stage": {
+    "top": 487.703125,
+    "bottom": 667.703125,
+    "height": 180
+  },
+  "inspector": {
+    "top": 678.09375,
+    "bottom": 774.09375,
+    "height": 96
+  },
+  "overlapArea": 0,
+  "overlapH": 0,
+  "hits": [
+    {
+      "kind": "circle",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "circle",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "circle",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "circle",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "circle",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "circle",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "text",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "text",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "text",
+      "blocked": false,
+      "top": "text"
+    },
+    {
+      "kind": "text",
+      "blocked": false,
+      "top": "text"
+    }
+  ],
+  "blockedHits": 0,
+  "nodeCount": 6,
+  "rawSvgBottom": 634.703125
+}

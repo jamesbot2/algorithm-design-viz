@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { segmentGeometry, type StageSegment } from '../../utils/teachableStages'
 
 export interface PlaybackTransportProps {
@@ -71,6 +72,23 @@ export default function PlaybackTransport({
   const [moreOpen, setMoreOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const settingsRef = useRef<HTMLDivElement>(null)
+  const settingsToggleRef = useRef<HTMLButtonElement>(null)
+  const [settingsPos, setSettingsPos] = useState<{ left: number; bottom: number; width: number } | null>(null)
+  useLayoutEffect(() => {
+    if (!settingsOpen) return
+    const place = () => {
+      const btn = settingsToggleRef.current
+      if (!btn) return
+      const r = btn.getBoundingClientRect()
+      const width = Math.min(420, Math.max(280, window.innerWidth - 16))
+      const left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8))
+      const bottom = Math.max(8, window.innerHeight - r.top + 8)
+      setSettingsPos({ left, bottom, width })
+    }
+    place()
+    window.addEventListener('resize', place)
+    return () => window.removeEventListener('resize', place)
+  }, [settingsOpen])
   useEffect(() => {
     if (!settingsOpen) return
     const panel = settingsRef.current
@@ -142,6 +160,7 @@ export default function PlaybackTransport({
           data-testid="playback-settings-toggle"
           aria-expanded={settingsOpen}
           aria-controls="playback-settings-panel"
+          ref={settingsToggleRef}
           onClick={() => setSettingsOpen((o) => !o)}
         >
           播放设置
@@ -256,15 +275,27 @@ export default function PlaybackTransport({
         </div>
       )}
 
+      {settingsOpen &&
+        createPortal(
       <div
         id="playback-settings-panel"
         className="playback-settings-panel"
         data-testid="playback-settings-panel"
+        data-portaled="1"
         role="dialog"
         aria-label="播放设置"
         aria-modal="true"
         ref={settingsRef}
-        hidden={!settingsOpen}
+                style={
+          settingsPos
+            ? {
+                left: settingsPos.left,
+                bottom: settingsPos.bottom,
+                width: settingsPos.width,
+                right: 'auto',
+              }
+            : undefined
+        }
       >
         <label className="speed-label">
           速度 {speedMultiplier(speed)}
@@ -325,7 +356,9 @@ export default function PlaybackTransport({
             )}
           </div>
         )}
-      </div>
+      </div>,
+          document.body,
+        )}
     </div>
   )
 }

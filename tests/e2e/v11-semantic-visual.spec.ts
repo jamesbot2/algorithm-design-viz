@@ -76,22 +76,52 @@ async function assertBarsPainted(page: Page, vpName: string) {
   const metrics = await page.evaluate(() => {
     const canvas = document.querySelector('[data-testid="viz-canvas"]') as HTMLElement | null
     const cr = canvas?.getBoundingClientRect()
+    const inspector = document.querySelector('[data-testid="viz-inspector"]') as HTMLElement | null
+    const ir = inspector?.getBoundingClientRect()
     const bars = [...document.querySelectorAll('.bar-col .bar, .bar-col [data-data-height]')] as HTMLElement[]
+
+    const clipChain = (el: HTMLElement) => {
+      const clips: DOMRect[] = []
+      let n: HTMLElement | null = el
+      while (n) {
+        const st = getComputedStyle(n)
+        const o = st.overflow + st.overflowX + st.overflowY
+        if (/(auto|scroll|hidden)/.test(o)) clips.push(n.getBoundingClientRect())
+        n = n.parentElement
+      }
+      return clips
+    }
+
+    const visibleH = (el: HTMLElement, r: DOMRect) => {
+      let top = r.top
+      let bottom = r.bottom
+      if (cr) {
+        top = Math.max(top, cr.top)
+        bottom = Math.min(bottom, cr.bottom)
+      }
+      // panel occlusion (inspector sits below stage in column — subtract overlap)
+      if (ir && ir.top < bottom && ir.bottom > top && ir.left < r.right && ir.right > r.left) {
+        bottom = Math.min(bottom, ir.top)
+      }
+      for (const c of clipChain(el)) {
+        top = Math.max(top, c.top)
+        bottom = Math.min(bottom, c.bottom)
+      }
+      top = Math.max(top, 0)
+      bottom = Math.min(bottom, window.innerHeight)
+      return Math.max(0, bottom - top)
+    }
+
     const painted = bars
       .map((el) => {
         const r = el.getBoundingClientRect()
         const dh = Number(el.getAttribute('data-data-height') || 0)
         const label = el.querySelector('.bar-val')?.textContent ?? el.textContent ?? ''
-        return { h: r.height, dh, top: r.top, bottom: r.bottom, label: label.trim() }
+        const vh = visibleH(el, r)
+        return { h: r.height, vh, dh, top: r.top, bottom: r.bottom, label: label.trim() }
       })
       .filter((b) => b.h > 4 || b.dh > 0)
-    const vh = window.innerHeight
-    const visibleInStage = painted.filter((b) => {
-      if (!cr || b.h <= 4) return false
-      const top = Math.max(b.top, cr.top, 0)
-      const bottom = Math.min(b.bottom, cr.bottom, vh)
-      return bottom - top > 4
-    })
+    const visibleInStage = painted.filter((b) => b.vh > 4)
     const labeled = visibleInStage.filter((b) => /^-?\d/.test(b.label))
     const neg = document.querySelectorAll('.bar-col.neg').length
     const pos = document.querySelectorAll('.bar-col.pos').length
@@ -101,7 +131,8 @@ async function assertBarsPainted(page: Page, vpName: string) {
       paintedCount: painted.length,
       visibleCount: visibleInStage.length,
       labeledCount: labeled.length,
-      maxVisibleH: visibleInStage.reduce((m, b) => Math.max(m, b.h), 0),
+      // V12-06: use visible intersection height, not full bar h (false-green)
+      maxVisibleH: visibleInStage.reduce((m, b) => Math.max(m, b.vh), 0),
       neg,
       pos,
       stageH: cr?.height ?? 0,
