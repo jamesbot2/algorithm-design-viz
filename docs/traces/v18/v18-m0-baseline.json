@@ -1,0 +1,178 @@
+{
+  "1366x768": {
+    "sheetBodyH": 0,
+    "sheetH": 0,
+    "stageH": 229,
+    "stageOverflow": "auto",
+    "matrixInStage": 0,
+    "matrixRect": {
+      "x": 297,
+      "y": 553,
+      "w": 543,
+      "h": 410,
+      "top": 553,
+      "bottom": 964
+    },
+    "arraysRect": {
+      "x": 297,
+      "y": 253,
+      "w": 543,
+      "h": 288,
+      "top": 253,
+      "bottom": 541
+    },
+    "currentCellVisibleH": 0,
+    "currentCell": "1,4",
+    "currentRect": {
+      "x": 476,
+      "y": 654,
+      "w": 37,
+      "h": 36,
+      "top": 654,
+      "bottom": 690
+    },
+    "rowsVisible": 0,
+    "editHit": {
+      "ok": true,
+      "top": 113,
+      "topTest": "input-edit-toggle",
+      "topClass": "ghost",
+      "x": 383,
+      "y": 113,
+      "w": 87,
+      "h": 36,
+      "bottom": 150
+    },
+    "runHit": {
+      "ok": true,
+      "top": 129,
+      "topTest": "run-btn",
+      "topClass": "primary",
+      "x": 476,
+      "y": 129,
+      "w": 59,
+      "h": 40,
+      "bottom": 169
+    },
+    "theoryHit": {
+      "ok": false,
+      "top": 97,
+      "topTest": "input-panel",
+      "topClass": "input-panel input-panel-v4 input-panel-v9",
+      "x": 270,
+      "y": 97,
+      "w": 105,
+      "h": 28,
+      "bottom": 125
+    },
+    "playClip": 1,
+    "settingsClip": 0,
+    "varsClip": 0,
+    "headerR": {
+      "x": 270,
+      "y": 66,
+      "w": 1085,
+      "h": 38,
+      "top": 66,
+      "bottom": 104
+    },
+    "inputR": {
+      "x": 270,
+      "y": 112,
+      "w": 1085,
+      "h": 38,
+      "top": 112,
+      "bottom": 151
+    },
+    "sheetR": null,
+    "wbMargin": "0px"
+  },
+  "1920x1080": {
+    "sheetBodyH": 0,
+    "sheetH": 0,
+    "stageH": 311,
+    "stageOverflow": "auto",
+    "matrixInStage": 10.25,
+    "matrixRect": {
+      "x": 297,
+      "y": 782,
+      "w": 848,
+      "h": 390,
+      "top": 782,
+      "bottom": 1172
+    },
+    "arraysRect": {
+      "x": 297,
+      "y": 482,
+      "w": 848,
+      "h": 288,
+      "top": 482,
+      "bottom": 770
+    },
+    "currentCellVisibleH": 0,
+    "currentCell": "1,4",
+    "currentRect": {
+      "x": 476,
+      "y": 883,
+      "w": 37,
+      "h": 36,
+      "top": 883,
+      "bottom": 919
+    },
+    "rowsVisible": 0,
+    "editHit": {
+      "ok": true,
+      "top": 188,
+      "topTest": "input-edit-toggle",
+      "topClass": "ghost",
+      "x": 1814,
+      "y": 188,
+      "w": 87,
+      "h": 36,
+      "bottom": 224
+    },
+    "runHit": {
+      "ok": true,
+      "top": 246,
+      "topTest": "run-btn",
+      "topClass": "primary",
+      "x": 279,
+      "y": 246,
+      "w": 59,
+      "h": 40,
+      "bottom": 286
+    },
+    "theoryHit": {
+      "ok": true,
+      "top": 144,
+      "topTest": null,
+      "topClass": "ghost theory-toggle",
+      "x": 270,
+      "y": 144,
+      "w": 105,
+      "h": 28,
+      "bottom": 172
+    },
+    "playClip": 1,
+    "settingsClip": 0,
+    "varsClip": 0,
+    "headerR": {
+      "x": 270,
+      "y": 66,
+      "w": 1639,
+      "h": 108,
+      "top": 66,
+      "bottom": 174
+    },
+    "inputR": {
+      "x": 270,
+      "y": 182,
+      "w": 1639,
+      "h": 110,
+      "top": 182,
+      "bottom": 292
+    },
+    "sheetR": null,
+    "wbMargin": "0px"
+  }
+}
