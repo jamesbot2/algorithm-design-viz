@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test'
+import { ensureInputEditing } from './ensureInputEditing'
 
 /**
  * V16-02: Wait for a submitted run to be ready — not merely play-btn visible.
@@ -54,11 +55,7 @@ export async function waitForRunReady(page: Page, opts: RunReadyOpts = {}) {
 export async function prepareDijkstraN3Ready(page: Page) {
   await page.goto('#/algo/dijkstra')
   await expect(page.getByTestId('workbench-layout')).toBeVisible({ timeout: 15_000 })
-  const edit = page.getByTestId('input-edit-toggle')
-  if (await edit.count()) {
-    const t = await edit.textContent()
-    if (t?.includes('编辑输入')) await edit.click()
-  }
+  await ensureInputEditing(page)
   await page.getByTestId('graph-n').fill('3')
   await page.getByTestId('graph-start').fill('0')
   await page.getByTestId('graph-edges').fill('0 1 10\n0 2 1\n2 1 1')

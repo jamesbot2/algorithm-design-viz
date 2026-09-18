@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { ensureInputEditing } from './helpers/ensureInputEditing'
 
 test.describe('V5 M3/M4 workbench + expand e2e', () => {
   test('binarySearch TS↔pseudo mid lines differ by document', async ({ page }) => {
@@ -49,10 +50,7 @@ test.describe('V5 M3/M4 workbench + expand e2e', () => {
 
   test('quickSort play advances steps', async ({ page }) => {
     await page.goto('#/algo/quickSort')
-    // V10-01: simple array algos fold input until「编辑输入」
-    const edit = page.getByTestId('input-edit-toggle')
-    await expect(edit).toBeVisible()
-    if ((await edit.textContent())?.includes('编辑输入')) await edit.click()
+    await ensureInputEditing(page)
     const arrayInput = page.locator('[data-testid="array-input"], label.field-array input').first()
     await expect(arrayInput).toBeVisible({ timeout: 5_000 })
     await arrayInput.fill('3,1,2')
@@ -68,10 +66,11 @@ test.describe('V5 M3/M4 workbench + expand e2e', () => {
 
   test('cancel enabled while heavy nQueens running', async ({ page }) => {
     await page.goto('#/algo/nQueens')
-    const nInput = page.locator('input').filter({ hasText: '' }).first()
-    // Prefer labeled n field
+    // V16-05: nQueens may start collapsed on short viewports — expand before fill
+    await ensureInputEditing(page)
     const nField = page.locator('label:has-text("n") input, [data-testid="nqueens-n"]').first()
-    if (await nField.count()) await nField.fill('8')
+    await expect(nField).toBeVisible({ timeout: 5_000 })
+    await nField.fill('8')
     const cancel = page.getByTestId('cancel-btn')
     await expect(cancel).toBeDisabled()
     await page.getByTestId('run-btn').click()

@@ -1,8 +1,11 @@
 import { test, expect } from '@playwright/test'
+import { ensureInputEditing } from './helpers/ensureInputEditing'
 
 test.describe('V7 state regressions', () => {
   test('R2 dijkstra illegal n blocks run and keeps raw text', async ({ page }) => {
     await page.goto('#/algo/dijkstra')
+    // V16-05: graph input collapsed by default on short viewports
+    await ensureInputEditing(page)
     await expect(page.getByTestId('graph-input')).toBeVisible()
     const n = page.getByTestId('graph-n')
     await n.fill('abc')
