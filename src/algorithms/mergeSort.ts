@@ -13,7 +13,7 @@ export const meta = {
   merge(a, L, mid, R)`,
 
   implName: 'mergeSortTopDown',
-  implVersion: '1.2.0',
+  implVersion: '1.3.0',
   timeComplexity: 'Θ(n log n)',
   spaceComplexity: 'O(n) 辅助数组 + O(log n) 栈',
   spaceNotes: '合并需要 O(n) 临时空间。',
@@ -66,10 +66,36 @@ export function generateSteps(input: number[]): Step[] {
     extraArrays?: Record<string, number[] | string[]>,
     extraIds?: Record<string, string[]>,
   ) => {
-    const ptrs: Record<string, number> = { ...(pointers ?? {}) }
-    for (const k of ['L', 'R', 'mid', 'i', 'j', 'k'] as const) {
-      if (ptrs[k] === undefined && typeof vars[k] === 'number' && (vars[k] as number) >= 0) {
-        ptrs[k] = vars[k] as number
+    const hasBuffers = Boolean(extraArrays && ('left' in extraArrays || 'right' in extraArrays))
+    const aPtr: Record<string, number> = {}
+    for (const name of ['L', 'mid', 'R', 'k'] as const) {
+      const fromPtr = pointers?.[name]
+      const fromVar = vars[name]
+      if (typeof fromPtr === 'number' && fromPtr >= 0) aPtr[name] = fromPtr
+      else if (typeof fromVar === 'number' && fromVar >= 0) aPtr[name] = fromVar
+    }
+    // Legacy global pointers: a-scoped only when buffers visible (avoid i/j on main a)
+    const ptrs: Record<string, number> = { ...aPtr }
+    if (!hasBuffers) {
+      for (const name of ['i', 'j'] as const) {
+        const fromPtr = pointers?.[name]
+        const fromVar = vars[name]
+        if (typeof fromPtr === 'number' && fromPtr >= 0) ptrs[name] = fromPtr
+        else if (typeof fromVar === 'number' && fromVar >= 0) ptrs[name] = fromVar
+      }
+    }
+    const arrayPointers: Record<string, Record<string, number>> = {}
+    if (Object.keys(aPtr).length) arrayPointers.a = { ...aPtr }
+    if (hasBuffers) {
+      if (typeof vars.i === 'number' && (vars.i as number) >= 0) {
+        arrayPointers.left = { i: vars.i as number }
+      } else if (typeof pointers?.i === 'number' && pointers.i >= 0) {
+        arrayPointers.left = { i: pointers.i }
+      }
+      if (typeof vars.j === 'number' && (vars.j as number) >= 0) {
+        arrayPointers.right = { j: vars.j as number }
+      } else if (typeof pointers?.j === 'number' && pointers.j >= 0) {
+        arrayPointers.right = { j: pointers.j }
       }
     }
     const cloneTree = (n: import('../types/step').SearchTreeNode): import('../types/step').SearchTreeNode => ({
@@ -90,6 +116,7 @@ export function generateSteps(input: number[]): Step[] {
       arrayOps: arrayOps?.length ? { a: arrayOps } : undefined,
       vars: { ...vars, callStack: callStack.join(' › ') || '(empty)' },
       pointers: Object.keys(ptrs).length ? ptrs : undefined,
+      arrayPointers: Object.keys(arrayPointers).length ? arrayPointers : undefined,
       stats: { comparisons, writes, swaps: 0 },
       codeLine,
       codeRefs: codeRefs ?? (phase && PHASE_ANCHOR[phase] ? ref(PHASE_ANCHOR[phase]) : undefined),
@@ -142,32 +169,47 @@ export function generateSteps(input: number[]): Step[] {
       if (takeLeft) {
         a[k] = left[i]!
         elementIds[k] = leftIds[i]!
+        writes++
+        // Snapshot BEFORE i++/k++ so pointers match `a[k] = left[i]`
+        snap(
+          `写入 a[${k}] = ${a[k]}（write-back）`,
+          [k],
+          { L, mid, R, i, j, k },
+          5,
+          { [k]: 'update' },
+          { L, mid, R, k },
+          [{ type: 'write', indices: [k], elementIds: [elementIds[k]!] }],
+          'merge',
+          ref('mergeWriteLeft'),
+          { left: [...left], right: [...right] },
+          { left: [...leftIds], right: [...rightIds] },
+        )
         i++
+        k++
       } else {
         a[k] = right[j]!
         elementIds[k] = rightIds[j]!
+        writes++
+        snap(
+          `写入 a[${k}] = ${a[k]}（write-back）`,
+          [k],
+          { L, mid, R, i, j, k },
+          5,
+          { [k]: 'update' },
+          { L, mid, R, k },
+          [{ type: 'write', indices: [k], elementIds: [elementIds[k]!] }],
+          'merge',
+          ref('mergeWriteRight'),
+          { left: [...left], right: [...right] },
+          { left: [...leftIds], right: [...rightIds] },
+        )
         j++
+        k++
       }
-      writes++
-      snap(
-        `写入 a[${k}] = ${a[k]}（write-back）`,
-        [k],
-        { L, mid, R, i, j, k },
-        5,
-        { [k]: 'update' },
-        { L, mid, R, k },
-        [{ type: 'write', indices: [k], elementIds: [elementIds[k]!] }],
-        'merge',
-        ref(takeLeft ? 'mergeWriteLeft' : 'mergeWriteRight'),
-        { left: [...left], right: [...right] },
-        { left: [...leftIds], right: [...rightIds] },
-      )
-      k++
     }
     while (i < left.length) {
       a[k] = left[i]!
       elementIds[k] = leftIds[i]!
-      i++
       writes++
       snap(
         `拷贝剩余左半 a[${k}] = ${a[k]}`,
@@ -182,12 +224,12 @@ export function generateSteps(input: number[]): Step[] {
         { left: [...left], right: [...right] },
         { left: [...leftIds], right: [...rightIds] },
       )
+      i++
       k++
     }
     while (j < right.length) {
       a[k] = right[j]!
       elementIds[k] = rightIds[j]!
-      j++
       writes++
       snap(
         `拷贝剩余右半 a[${k}] = ${a[k]}`,
@@ -202,6 +244,7 @@ export function generateSteps(input: number[]): Step[] {
         { left: [...left], right: [...right] },
         { left: [...leftIds], right: [...rightIds] },
       )
+      j++
       k++
     }
   }
@@ -232,6 +275,7 @@ export function generateSteps(input: number[]): Step[] {
         { L, R },
         undefined,
         'split',
+        ref('return'),
       )
       callStack.pop()
       nodeStack.pop()
@@ -247,6 +291,7 @@ export function generateSteps(input: number[]): Step[] {
       { L, mid, R },
       undefined,
       'split',
+      ref('divide'),
     )
     sort(L, mid)
     sort(mid + 1, R)
@@ -257,9 +302,13 @@ export function generateSteps(input: number[]): Step[] {
   }
 
   snap('开始归并排序', [], {}, 0, undefined, undefined, undefined, 'init')
+  if (a.length === 0) {
+    snap('空数组，排序完成', [], {}, 0, undefined, undefined, undefined, 'done', ref('done'))
+    return steps
+  }
   sort(0, a.length - 1)
   const allSorted: Record<number, HighlightRole> = {}
   for (let s = 0; s < a.length; s++) allSorted[s] = 'sorted'
-  snap('排序完成', [], {}, 0, allSorted, undefined, undefined, 'done')
+  snap('排序完成', [], {}, 0, allSorted, undefined, undefined, 'done', ref('done'))
   return steps
 }

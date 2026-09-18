@@ -1,0 +1,76 @@
+{
+  "pass": true,
+  "reasons": [],
+  "nodeCount": 6,
+  "inPlotCount": 6,
+  "blockedHits": 0,
+  "emptySkip": 0,
+  "overlapArea": 0,
+  "readableLabelCount": 6,
+  "labelHeights": [
+    15,
+    14,
+    14,
+    14,
+    14,
+    14
+  ],
+  "plot": {
+    "w": 510.421875,
+    "h": 126.8125,
+    "top": 487.296875,
+    "bottom": 614.109375
+  },
+  "stage": {
+    "h": 111,
+    "top": 487.703125,
+    "bottom": 598.703125
+  },
+  "warnH": 0,
+  "svgBottom": 614.109375,
+  "inspectorTop": 0,
+  "nodes": [
+    {
+      "id": "0",
+      "cssH": 14.999969482421875,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "1",
+      "cssH": 14,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "2",
+      "cssH": 13.99993896484375,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "3",
+      "cssH": 14,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "4",
+      "cssH": 13.99993896484375,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    },
+    {
+      "id": "5",
+      "cssH": 14,
+      "inPlot": true,
+      "hitOk": true,
+      "top": "text"
+    }
+  ]
+}

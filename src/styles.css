@@ -717,12 +717,31 @@ button.icon-btn {
   min-height: 0;
   flex: 1 1 auto;
 }
+/* V13-01: warn is auto-sized; plot is the measured SVG viewport (no height:100% clip under warn) */
+.graph-plot {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+}
+.graph-plot:active {
+  cursor: grabbing;
+}
+.graph-view > .graph-neg-warning {
+  flex: 0 0 auto;
+}
+.main-wrap[data-lab-fill="1"] .graph-view {
+  padding: 0.35rem;
+}
 .edge { stroke: #555; stroke-width: 2; }
 .edge.hot { stroke: var(--warn); stroke-width: 3; }
-.edge-label { fill: var(--muted); font-size: 11px; font-family: var(--mono); }
+.edge-label { fill: var(--muted); font-family: var(--mono); /* size from GraphView camera */ }
 .node { fill: #2a2a2a; stroke: var(--accent); stroke-width: 2; transition: fill 180ms ease, stroke 180ms ease; }
 .node.hot { fill: rgba(16, 163, 127, 0.35); stroke: var(--warn); }
-.node-label { fill: var(--text); font-size: 12px; font-family: var(--mono); }
+.node-label { fill: var(--text); font-family: var(--mono); /* size from GraphView camera (user units) */ }
 
 .viz-empty {
   padding: 2.5rem; text-align: center; color: var(--muted);
@@ -1047,6 +1066,13 @@ button.icon-btn {
   max-height: min(40vh, 280px);
   overflow: auto;
   box-shadow: 0 8px 24px rgba(0,0,0,.18);
+}
+.playback-settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
 }
 .playback-settings-panel[data-portaled="1"] {
   position: fixed;
@@ -2158,6 +2184,93 @@ html, body, #root {
   line-height: 1.3;
 }
 
+
+/* V13-01: graph + companion arrays share stage — prefer plot; cap arrays so nodes stay hittable. */
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-body-single:has(.graph-view) {
+  overflow: hidden;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-body-single:has(.graph-view) > .viz-inspector:not(.inspector-sheet-body) {
+  display: none; /* free ~96px for stage; sheet toggle covers short viewports */
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport:has(.graph-view),
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main:has(.graph-view) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .graph-view {
+  flex: 1 1 auto;
+  min-height: 140px;
+  height: auto !important;
+  max-height: none;
+  overflow: hidden;
+  padding: 0.35rem;
+}
+.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .graph-plot {
+  flex: 1 1 auto;
+  min-height: 120px;
+  overflow: hidden;
+}
+.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .arrays-panel {
+  flex: 0 0 auto;
+  max-height: 88px;
+  overflow: auto;
+  margin-top: 0.25rem;
+}
+.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .array-view {
+  padding: 0.35rem;
+}
+.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .bars-wrap {
+  min-height: 48px;
+  max-height: 64px;
+}
+
+
+@media (max-width: 360px) {
+  .main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .arrays-panel {
+    display: none;
+  }
+  .main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .graph-view,
+  .main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .graph-plot {
+    min-height: 0;
+  }
+  /* Tabs: panels + transport must share column — do not let panel min-height:220 overflow transport */
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] {
+    overflow: hidden !important;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] .workbench-panels-stable {
+    flex: 1 1 0 !important;
+    min-height: 120px !important;
+    overflow: hidden !important;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] {
+    min-height: 120px !important;
+    height: auto !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] .workbench-panel-inner,
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] .visualizer {
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] .workbench-transport {
+    flex: 0 0 auto !important;
+    position: relative;
+    z-index: 3;
+    background: var(--lab-surface, var(--bg-elev));
+  }
+}
+
+
+.workbench-layout[data-layout="tabs"] .stage-viewport:has(.graph-view) .arrays-panel {
+  display: none;
+}
+
 /* V12-01: ONE strategy for fill — stage is a fixed flex slot that owns overflow.
  * Graph SVG must fit the slot (height 100%, no intrinsic height:auto bleed into inspector).
  * Scroll-fallback uses the OTHER strategy — natural flow (stage grows; inspector below).
@@ -2165,14 +2278,14 @@ html, body, #root {
  */
 .stage-viewport {
   flex: 1 1 auto;
-  min-height: 180px;
+  min-height: 220px;
   overflow: auto;
   position: relative;
 }
 .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport,
 .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main {
   flex: 1 1 auto;
-  min-height: 180px;
+  min-height: 220px;
   overflow: auto;
 }
 .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-view {
@@ -2180,6 +2293,11 @@ html, body, #root {
   min-height: 160px;
   max-height: 100%;
   overflow: hidden; /* fit host — not a z-index hide */
+}
+.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-plot {
+  flex: 1 1 auto;
+  min-height: 160px;
+  overflow: hidden;
 }
 .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-svg {
   width: 100%;
@@ -2201,10 +2319,16 @@ html, body, #root {
   max-height: none;
   overflow: visible;
 }
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .graph-svg {
-  height: auto;
-  max-height: none;
+.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .graph-plot {
+  flex: 0 0 auto;
   min-height: 220px;
+  height: 220px;
+  overflow: hidden;
+}
+.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .graph-svg {
+  height: 100%;
+  max-height: none;
+  min-height: 0;
 }
 /* In scroll mode, do NOT leave a flex-shrunk stage with visible overflow (the hybrid bug). */
 .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-body-single {
@@ -2297,6 +2421,19 @@ html, body, #root {
   overflow: auto;
   overscroll-behavior: contain;
 }
+[data-scroll-owner="viz"] {
+  overflow: auto;
+  overscroll-behavior: contain;
+  position: relative;
+  z-index: 0;
+  min-height: 0;
+}
+.main-wrap[data-lab-fill="1"] .workbench-transport {
+  position: relative;
+  z-index: 2;
+  background: var(--lab-surface, var(--bg-elev));
+}
+
 
 .main-wrap[data-lab-fill="1"] .workbench-transport {
   flex: 0 0 auto;
@@ -2396,7 +2533,7 @@ html, body, #root {
 
 
 /* V10-02: short-height docks features — never delete results/vars/speed/phase with no entry */
-@media (max-height: 520px) {
+@media (max-height: 520px), (max-width: 400px) {
   .main-wrap[data-lab-fill="1"] > .main {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
@@ -2697,6 +2834,11 @@ html, body, #root {
   }
   .main-wrap[data-lab-fill="1"] .visualizer {
     min-height: 240px !important;
+    /* V13: keep hidden for graphs so SVG does not paint under transport;
+       array bars still get room via bars-wrap / panels overflow rules */
+    overflow: hidden !important;
+  }
+  .main-wrap[data-lab-fill="1"] .visualizer:has(.bars-wrap) {
     overflow: visible !important;
   }
   .main-wrap[data-lab-fill="1"] .stage-viewport,

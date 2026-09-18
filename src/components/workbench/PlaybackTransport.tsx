@@ -42,6 +42,25 @@ function speedMultiplier(intervalMs: number): string {
   return `${Math.round(mult * 10) / 10}×`
 }
 
+function toggleIsVisible(btn: HTMLElement): boolean {
+  const r = btn.getBoundingClientRect()
+  if (r.width < 1 || r.height < 1) return false
+  const st = getComputedStyle(btn)
+  if (st.display === 'none' || st.visibility === 'hidden' || st.opacity === '0') return false
+  // Off-screen entirely
+  const vv = window.visualViewport
+  const top = vv?.offsetTop ?? 0
+  const left = vv?.offsetLeft ?? 0
+  const w = vv?.width ?? window.innerWidth
+  const h = vv?.height ?? window.innerHeight
+  if (r.bottom < top || r.top > top + h || r.right < left || r.left > left + w) return false
+  return true
+}
+
+type PanelPos =
+  | { mode: 'anchor'; left: number; bottom: number; width: number; maxHeight: number }
+  | { mode: 'sheet'; left: number; top: number; width: number; maxHeight: number }
+
 /** Unified play/pause/prev/next/scrub/speed chrome for Workbench transport. */
 export default function PlaybackTransport({
   idx,
@@ -73,25 +92,66 @@ export default function PlaybackTransport({
   const [settingsOpen, setSettingsOpen] = useState(false)
   const settingsRef = useRef<HTMLDivElement>(null)
   const settingsToggleRef = useRef<HTMLButtonElement>(null)
-  const [settingsPos, setSettingsPos] = useState<{ left: number; bottom: number; width: number } | null>(null)
+  const [settingsPos, setSettingsPos] = useState<PanelPos | null>(null)
+
   useLayoutEffect(() => {
     if (!settingsOpen) return
     const place = () => {
       const btn = settingsToggleRef.current
-      if (!btn) return
+      const vv = window.visualViewport
+      const vw = vv?.width ?? window.innerWidth
+      const vh = vv?.height ?? window.innerHeight
+      const vLeft = vv?.offsetLeft ?? 0
+      const vTop = vv?.offsetTop ?? 0
+
+      // Zero-rect / hidden toggle (e.g. 844→1280 dock hides): close + restore focus
+      if (!btn || !toggleIsVisible(btn)) {
+        setSettingsOpen(false)
+        return
+      }
+
       const r = btn.getBoundingClientRect()
-      const width = Math.min(420, Math.max(280, window.innerWidth - 16))
-      const left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8))
-      const bottom = Math.max(8, window.innerHeight - r.top + 8)
-      setSettingsPos({ left, bottom, width })
+      const width = Math.min(420, Math.max(280, vw - 16))
+      const panelEl = settingsRef.current
+      const panelH = Math.min(panelEl?.offsetHeight || 280, Math.min(vh * 0.7, 360))
+      let left = Math.max(vLeft + 8, Math.min(r.left, vLeft + vw - width - 8))
+      // Prefer above the toggle
+      let bottom = Math.max(8, window.innerHeight - r.top + 8)
+      // If that would push the panel above the visual viewport, clamp / use sheet
+      const topIfBottom = window.innerHeight - bottom - panelH
+      if (topIfBottom < vTop + 8 || bottom + panelH > vh) {
+        // Centered sheet within visualViewport
+        const sheetW = Math.min(width, vw - 16)
+        const sheetH = Math.min(panelH, vh - 24)
+        setSettingsPos({
+          mode: 'sheet',
+          left: vLeft + (vw - sheetW) / 2,
+          top: vTop + Math.max(12, (vh - sheetH) / 2),
+          width: sheetW,
+          maxHeight: sheetH,
+        })
+        return
+      }
+      setSettingsPos({ mode: 'anchor', left, bottom, width, maxHeight: Math.min(vh * 0.7, 360) })
     }
     place()
     window.addEventListener('resize', place)
-    return () => window.removeEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    const vv = window.visualViewport
+    vv?.addEventListener('resize', place)
+    vv?.addEventListener('scroll', place)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+      vv?.removeEventListener('resize', place)
+      vv?.removeEventListener('scroll', place)
+    }
   }, [settingsOpen])
+
   useEffect(() => {
     if (!settingsOpen) return
     const panel = settingsRef.current
+    const toggleBtn = settingsToggleRef.current
     const prev = document.activeElement as HTMLElement | null
     panel?.querySelector<HTMLElement>('input,button,select,[href]')?.focus()
     const onKey = (e: KeyboardEvent) => {
@@ -103,9 +163,12 @@ export default function PlaybackTransport({
     window.addEventListener('keydown', onKey, true)
     return () => {
       window.removeEventListener('keydown', onKey, true)
-      prev?.focus?.()
+      // Prefer toggle if still visible; else previous focus
+      if (toggleBtn && toggleIsVisible(toggleBtn)) toggleBtn.focus()
+      else prev?.focus?.()
     }
   }, [settingsOpen])
+
   const n = stepsLen
   const jumps = teachableStages ?? segments.filter((s) => s.kind !== 'event')
   const primaryLabel =
@@ -119,6 +182,53 @@ export default function PlaybackTransport({
           : idx > 0
             ? '继续'
             : '开始演示')
+
+  const overflowSelect = (testId: string) =>
+    moreOpen && overflowStages.length > 0 ? (
+      <div className="phase-jump-overflow" data-testid={testId}>
+        <label className="muted">
+          跳到阶段
+          <select
+            aria-label="更多阶段"
+            data-testid={testId === 'phase-jump-overflow-dock' ? 'overflow-stages-select-dock' : 'overflow-stages-select'}
+            defaultValue=""
+            onChange={(e) => {
+              const v = Number(e.target.value)
+              if (!Number.isNaN(v)) onSeek(v)
+            }}
+          >
+            <option value="" disabled>
+              选择…
+            </option>
+            {overflowStages.map((s) => (
+              <option key={`ov-${s.start}-${testId}`} value={s.start}>
+                {s.label} (#{s.start + 1}–#{s.end + 1})
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    ) : null
+
+  const panelStyle: CSSProperties | undefined = settingsPos
+    ? settingsPos.mode === 'anchor'
+      ? {
+          left: settingsPos.left,
+          bottom: settingsPos.bottom,
+          top: 'auto',
+          width: settingsPos.width,
+          right: 'auto',
+          maxHeight: settingsPos.maxHeight,
+        }
+      : {
+          left: settingsPos.left,
+          top: settingsPos.top,
+          bottom: 'auto',
+          width: settingsPos.width,
+          right: 'auto',
+          maxHeight: settingsPos.maxHeight,
+        }
+    : undefined
 
   return (
     <div className="playback-transport" data-testid="playback-transport" style={style}>
@@ -248,115 +358,98 @@ export default function PlaybackTransport({
               </button>
             ),
           )}
-          {moreOpen && overflowStages.length > 0 && (
-            <div className="phase-jump-overflow" data-testid="phase-jump-overflow">
-              <label className="muted">
-                跳到阶段
-                <select
-                  aria-label="更多阶段"
-                  defaultValue=""
-                  onChange={(e) => {
-                    const v = Number(e.target.value)
-                    if (!Number.isNaN(v)) onSeek(v)
-                  }}
-                >
-                  <option value="" disabled>
-                    选择…
-                  </option>
-                  {overflowStages.map((s) => (
-                    <option key={`ov-${s.start}`} value={s.start}>
-                      {s.label} (#{s.start + 1}–#{s.end + 1})
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          )}
+          {overflowSelect('phase-jump-overflow')}
         </div>
       )}
 
       {settingsOpen &&
         createPortal(
-      <div
-        id="playback-settings-panel"
-        className="playback-settings-panel"
-        data-testid="playback-settings-panel"
-        data-portaled="1"
-        role="dialog"
-        aria-label="播放设置"
-        aria-modal="true"
-        ref={settingsRef}
-                style={
-          settingsPos
-            ? {
-                left: settingsPos.left,
-                bottom: settingsPos.bottom,
-                width: settingsPos.width,
-                right: 'auto',
-              }
-            : undefined
-        }
-      >
-        <label className="speed-label">
-          速度 {speedMultiplier(speed)}
-          <input
-            type="range"
-            min={100}
-            max={1500}
-            step={50}
-            value={1600 - speed}
-            onChange={(e) => onSpeed(1600 - Number(e.target.value))}
-            aria-label="播放速度（设置面板）"
-          />
-        </label>
-        {segments.length > 0 && n > 0 && (
-          <div className="phase-track" data-testid="phase-track-dock" aria-hidden="true">
-            {segments.map((seg) => {
-              const g =
-                seg.leftPct != null && seg.widthPct != null
-                  ? { leftPct: seg.leftPct, widthPct: seg.widthPct }
-                  : segmentGeometry(seg.start, seg.end, n)
-              return (
-                <span
-                  key={`dock-seg-${seg.phase}-${seg.start}`}
-                  className="phase-segment"
-                  style={{ left: `${g.leftPct}%`, width: `${g.widthPct}%` }}
-                  data-phase={seg.phase}
-                  title={`${seg.label ?? seg.phase} (#${seg.start + 1}–${seg.end + 1})`}
-                />
-              )
-            })}
-          </div>
-        )}
-        {jumps.length > 0 && (
-          <div className="phase-jump" data-testid="phase-jump-dock">
-            <span className="muted">阶段跳转：</span>
-            {jumps.map((seg) =>
-              seg.phase === 'more' ? (
-                <button
-                  key={`dock-more-${seg.start}`}
-                  type="button"
-                  className={moreOpen ? 'active' : ''}
-                  aria-expanded={moreOpen}
-                  onClick={() => setMoreOpen((o) => !o)}
-                >
-                  {seg.label}
-                </button>
-              ) : (
-                <button
-                  key={`dock-btn-${seg.phase}-${seg.start}-${seg.label}`}
-                  type="button"
-                  className={idx >= seg.start && idx <= seg.end ? 'active' : ''}
-                  title={`${seg.label}（#${seg.start + 1}–${seg.end + 1}）`}
-                  onClick={() => onSeek(seg.start)}
-                >
-                  {seg.label}
-                </button>
-              ),
+          <div
+            id="playback-settings-panel"
+            className="playback-settings-panel"
+            data-testid="playback-settings-panel"
+            data-portaled="1"
+            data-placement={settingsPos?.mode ?? 'pending'}
+            role="dialog"
+            aria-label="播放设置"
+            aria-modal="true"
+            ref={settingsRef}
+            style={panelStyle}
+          >
+            <div className="playback-settings-head">
+              <strong>播放设置</strong>
+              <button
+                type="button"
+                className="ghost"
+                data-testid="playback-settings-close"
+                aria-label="关闭设置"
+                onClick={() => setSettingsOpen(false)}
+              >
+                关闭
+              </button>
+            </div>
+            <label className="speed-label">
+              速度 {speedMultiplier(speed)}
+              <input
+                type="range"
+                min={100}
+                max={1500}
+                step={50}
+                value={1600 - speed}
+                onChange={(e) => onSpeed(1600 - Number(e.target.value))}
+                aria-label="播放速度（设置面板）"
+              />
+            </label>
+            {segments.length > 0 && n > 0 && (
+              <div className="phase-track" data-testid="phase-track-dock" aria-hidden="true">
+                {segments.map((seg) => {
+                  const g =
+                    seg.leftPct != null && seg.widthPct != null
+                      ? { leftPct: seg.leftPct, widthPct: seg.widthPct }
+                      : segmentGeometry(seg.start, seg.end, n)
+                  return (
+                    <span
+                      key={`dock-seg-${seg.phase}-${seg.start}`}
+                      className="phase-segment"
+                      style={{ left: `${g.leftPct}%`, width: `${g.widthPct}%` }}
+                      data-phase={seg.phase}
+                      title={`${seg.label ?? seg.phase} (#${seg.start + 1}–${seg.end + 1})`}
+                    />
+                  )
+                })}
+              </div>
             )}
-          </div>
-        )}
-      </div>,
+            {jumps.length > 0 && (
+              <div className="phase-jump" data-testid="phase-jump-dock">
+                <span className="muted">阶段跳转：</span>
+                {jumps.map((seg) =>
+                  seg.phase === 'more' ? (
+                    <button
+                      key={`dock-more-${seg.start}`}
+                      type="button"
+                      className={moreOpen ? 'active' : ''}
+                      aria-expanded={moreOpen}
+                      data-testid="phase-more-dock"
+                      onClick={() => setMoreOpen((o) => !o)}
+                    >
+                      {seg.label}
+                    </button>
+                  ) : (
+                    <button
+                      key={`dock-btn-${seg.phase}-${seg.start}-${seg.label}`}
+                      type="button"
+                      className={idx >= seg.start && idx <= seg.end ? 'active' : ''}
+                      title={`${seg.label}（#${seg.start + 1}–${seg.end + 1}）`}
+                      onClick={() => onSeek(seg.start)}
+                    >
+                      {seg.label}
+                    </button>
+                  ),
+                )}
+                {overflowSelect('phase-jump-overflow-dock')}
+              </div>
+            )}
+          </div>,
           document.body,
         )}
     </div>

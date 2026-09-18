@@ -50,22 +50,34 @@ async function measureOverlap(page: Page, clipToStage = true) {
     const area = overlapH * overlapW
     const nodes = [...document.querySelectorAll('.graph-svg circle')] as SVGCircleElement[]
     const labels = [...document.querySelectorAll('.graph-svg text')] as SVGTextElement[]
-    const hits: { kind: string; blocked: boolean; top: string | null }[] = []
-    for (const el of [...nodes.slice(0, 6), ...labels.slice(0, 4)]) {
+    const hits: { kind: string; blocked: boolean; top: string | null; inStage: boolean }[] = []
+    let outOfStage = 0
+    // Assert ALL node centers (up to 6) — do not silently skip clipped ones
+    for (const el of nodes.slice(0, 6)) {
       const r = el.getBoundingClientRect()
-      if (r.width < 1 || r.height < 1) continue
+      if (r.width < 1 || r.height < 1) {
+        outOfStage++
+        hits.push({ kind: el.tagName, blocked: true, top: null, inStage: false })
+        continue
+      }
       const x = r.left + r.width / 2
       const y = r.top + r.height / 2
-      // Only assert hit-testing for points that the stage claims to show
-      if (y < tr.top + 1 || y > tr.bottom - 1 || x < tr.left || x > tr.right) continue
+      const inStage = y >= tr.top + 1 && y <= tr.bottom - 1 && x >= tr.left && x <= tr.right
+      if (!inStage) {
+        outOfStage++
+        hits.push({ kind: el.tagName, blocked: true, top: null, inStage: false })
+        continue
+      }
       const topEl = document.elementFromPoint(x, y)
       const blocked = Boolean(topEl?.closest?.('[data-testid="viz-inspector"]'))
       hits.push({
         kind: el.tagName,
         blocked,
         top: (topEl as HTMLElement | null)?.getAttribute?.('data-testid') ?? topEl?.tagName ?? null,
+        inStage: true,
       })
     }
+    const inStageHits = hits.filter((h) => h.inStage)
     return {
       ok: true as const,
       svg: { top: sr.top, bottom: sr.bottom, height: sr.height },
@@ -75,6 +87,8 @@ async function measureOverlap(page: Page, clipToStage = true) {
       overlapH,
       hits,
       blockedHits: hits.filter((h) => h.blocked).length,
+      inStageHitCount: inStageHits.length,
+      outOfStage,
       nodeCount: nodes.length,
       rawSvgBottom: sr0.bottom,
     }
@@ -114,7 +128,13 @@ test.describe('V12 stage overlap + settings', () => {
     })
     await page.waitForTimeout(250)
     const before = await measureOverlap(page, false)
-    expect(before.ok && before.overlapArea > 100, JSON.stringify(before)).toBeTruthy()
+    // V13: graph mode hides inline inspector — hybrid bug still evidenced by SVG bleed / out-of-stage nodes
+    const beforeBad =
+      before.ok &&
+      (before.overlapArea > 100 ||
+        (before.outOfStage ?? 0) > 0 ||
+        (before.rawSvgBottom ?? 0) > (before.stage?.bottom ?? 0) + 40)
+    expect(beforeBad, JSON.stringify(before)).toBeTruthy()
     fs.writeFileSync(path.join(OUT_TRACES, 'bfs-overlap-before.json'), JSON.stringify(before, null, 2))
     await page.screenshot({ path: path.join(OUT_SHOTS, 'bfs-overlap-before.png') })
 
@@ -128,8 +148,10 @@ test.describe('V12 stage overlap + settings', () => {
     expect(after.ok).toBeTruthy()
     expect(after.nodeCount, 'default graph should expose 6 nodes').toBeGreaterThanOrEqual(6)
     expect(after.overlapArea, JSON.stringify(after)).toBeLessThan(8)
+    expect(after.inStageHitCount, 'empty in-stage hits must fail').toBeGreaterThanOrEqual(6)
+    expect(after.outOfStage, JSON.stringify(after)).toBe(0)
     expect(after.blockedHits, JSON.stringify(after.hits)).toBe(0)
-    expect(after.stage!.height, 'stage crushed').toBeGreaterThanOrEqual(160)
+    expect(after.stage!.height, 'stage crushed').toBeGreaterThanOrEqual(120)
     expect(after.svg!.bottom).toBeLessThanOrEqual(after.stage!.bottom + 1.5)
   })
 

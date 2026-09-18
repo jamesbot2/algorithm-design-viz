@@ -35,6 +35,9 @@ describe('V12-02 code anchors match ops (assert source text)', () => {
       expect(text).not.toMatch(/^\s*else\b/)
     }
     const right = cat.anchors.find((a) => a.id === 'mergeWriteRight')!
-    expect(lineText(cat.source, right.range.startLine)).toMatch(/else/)
+    const rightText = lineText(cat.source, right.range.startLine)
+    // V13: split statements — write-right is `a[k] = right[j]`, still not the left branch
+    expect(rightText).toMatch(/a\[k\]\s*=\s*right\[j\]/)
+    expect(rightText).not.toMatch(/left\[i\]/)
   })
 })
