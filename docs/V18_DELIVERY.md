@@ -87,5 +87,6 @@ None for the four closes. **Not pushed / not deployed** (per brief).
 ## Tip SHAs
 
 - Fix tip: `cdba01082d638a224d89fda0675c5e468aab9d38`
-- Branch tip: `4a934a8ea8d1901537cfc1d525675cb094b90ad1`
+- Docs tip: `66a3e0c004efaf9b6b3e999f9ccebf7bcd3755cf`
+- Branch tip: `2ea099a7d0ae004843095d004f8200b433a13359`
 
