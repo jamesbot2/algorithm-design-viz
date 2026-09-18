@@ -2,6 +2,7 @@
 
 **Branch:** `v13-graph-mergesort-portal-asserts`  
 **Baseline HEAD:** `e38ee6f7c509ff1a702c7cf3f3858f7a2d7728e1` (main / V12)  
+**Tip SHAs:** fix `01a6f4c716620e0d947fd6af03ad78fd603736b4`; docs tip on branch HEAD (this file).  
 **Not pushed. Not deployed.**
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).
