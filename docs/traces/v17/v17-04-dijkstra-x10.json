@@ -1,0 +1,112 @@
+[
+  {
+    "i": 0,
+    "runId": "run_mu6yez4o_avtgqza",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 1,
+    "runId": "run_mu6yezxw_qrzm8ph",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 2,
+    "runId": "run_mu6yf0p7_nl3b187",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 3,
+    "runId": "run_mu6yf1fz_4e64qtq",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 4,
+    "runId": "run_mu6yf251_f4692h9",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 5,
+    "runId": "run_mu6yf2tz_p1frq6z",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 6,
+    "runId": "run_mu6yf3jh_na6nn8q",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 7,
+    "runId": "run_mu6yf4ab_9x6sg7d",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 8,
+    "runId": "run_mu6yf50o_a7o4q48",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  },
+  {
+    "i": 9,
+    "runId": "run_mu6yf5ri_o7h0hhv",
+    "ok": true,
+    "roles": {
+      "0->1": "",
+      "0->2": "tree",
+      "2->1": "tree"
+    },
+    "distText": "dist012021"
+  }
+]

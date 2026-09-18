@@ -1,0 +1,114 @@
+{
+  "withData": {
+    "codeSlot": {
+      "x": 681,
+      "y": 197,
+      "w": 300,
+      "h": 432
+    },
+    "codeBrowser": {
+      "x": 681,
+      "y": 197,
+      "w": 300,
+      "h": 432
+    },
+    "execLineW": 248,
+    "sheet": {
+      "x": 1006,
+      "y": 0,
+      "w": 360,
+      "h": 768
+    },
+    "sheetOverlapsCode": false,
+    "layout": "split",
+    "dataOpen": "1",
+    "profile": "laptop",
+    "stepIndex": "0",
+    "preview": "0",
+    "runId": "run_mu6yetty_vlahdis"
+  },
+  "zeroed": {
+    "codeSlot": {
+      "x": 681,
+      "y": 197,
+      "w": 0,
+      "h": 432
+    },
+    "codeBrowser": {
+      "x": 681,
+      "y": 197,
+      "w": 0,
+      "h": 432
+    },
+    "execLineW": 16,
+    "sheet": {
+      "x": 1006,
+      "y": 0,
+      "w": 360,
+      "h": 768
+    },
+    "sheetOverlapsCode": false,
+    "layout": "split",
+    "dataOpen": "1",
+    "profile": "laptop",
+    "stepIndex": "0",
+    "preview": "0",
+    "runId": "run_mu6yetty_vlahdis"
+  },
+  "restored": {
+    "codeSlot": {
+      "x": 681,
+      "y": 197,
+      "w": 300,
+      "h": 432
+    },
+    "codeBrowser": {
+      "x": 681,
+      "y": 197,
+      "w": 300,
+      "h": 432
+    },
+    "execLineW": 248,
+    "sheet": {
+      "x": 1006,
+      "y": 0,
+      "w": 360,
+      "h": 768
+    },
+    "sheetOverlapsCode": false,
+    "layout": "split",
+    "dataOpen": "1",
+    "profile": "laptop",
+    "stepIndex": "0",
+    "preview": "0",
+    "runId": "run_mu6yetty_vlahdis"
+  },
+  "after": {
+    "codeSlot": {
+      "x": 681,
+      "y": 197,
+      "w": 300,
+      "h": 432
+    },
+    "codeBrowser": {
+      "x": 681,
+      "y": 197,
+      "w": 300,
+      "h": 432
+    },
+    "execLineW": 0,
+    "sheet": {
+      "x": 1006,
+      "y": 0,
+      "w": 360,
+      "h": 768
+    },
+    "sheetOverlapsCode": false,
+    "layout": "split",
+    "dataOpen": "1",
+    "profile": "laptop",
+    "stepIndex": "10",
+    "preview": "0",
+    "runId": "run_mu6yetty_vlahdis"
+  }
+}

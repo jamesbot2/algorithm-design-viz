@@ -1,0 +1,23 @@
+{
+  "1366x768": {
+    "barChartH": "174.03125px",
+    "stageH": 229,
+    "compactBuffers": 0
+  },
+  "1920x1080": {
+    "barChartH": "256.03125px",
+    "stageH": 311,
+    "compactBuffers": 0
+  },
+  "2560x1440": {
+    "barChartH": "616.03125px",
+    "stageH": 671,
+    "compactBuffers": 0
+  },
+  "mergeSortBuffers": {
+    "barChartH": "178.625px",
+    "stageH": 229,
+    "compactBuffers": 2
+  },
+  "lcsMatrixMaxH": "525.094px"
+}
