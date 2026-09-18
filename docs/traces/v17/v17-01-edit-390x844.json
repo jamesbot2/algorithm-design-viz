@@ -1,0 +1,30 @@
+{
+  "m": {
+    "editing": "1",
+    "bodyH": 300,
+    "bodyW": 351,
+    "panelMaxH": "none",
+    "panelOverflow": "visible",
+    "runHit": true,
+    "editHit": true,
+    "theoryHit": true,
+    "viewport": {
+      "w": 390,
+      "h": 844
+    }
+  },
+  "afterErr": {
+    "editing": "1",
+    "bodyH": 300,
+    "bodyW": 351,
+    "panelMaxH": "none",
+    "panelOverflow": "visible",
+    "runHit": true,
+    "editHit": true,
+    "theoryHit": true,
+    "viewport": {
+      "w": 390,
+      "h": 844
+    }
+  }
+}

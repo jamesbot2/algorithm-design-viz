@@ -1172,7 +1172,11 @@ export default function AlgoPage() {
           {needsArray && (
             <label className="field-array">
               数组（逗号分隔）
-              <input value={draft.arrayText} onChange={(e) => patch({ arrayText: e.target.value })} />
+              <input
+                data-testid="array-input"
+                value={draft.arrayText}
+                onChange={(e) => patch({ arrayText: e.target.value })}
+              />
             </label>
           )}
           {id === 'binarySearch' && (

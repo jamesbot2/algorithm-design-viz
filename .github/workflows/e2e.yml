@@ -1,6 +1,7 @@
 # V11: Pages deploy (deploy-pages.yml) now requires E2E success on the *same* SHA
 # as CI before publish. Treat failures as hard release blockers.
 # Prefer failing fast with evidence (traces under docs/traces/) for hidden-input timeouts.
+# V17-04: upload THIS run's test-results / report / traces (not only v4 paths).
 name: E2E
 
 on:
@@ -37,8 +38,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v4-e2e-artifacts
+          name: e2e-artifacts-${{ github.run_id }}
           path: |
-            docs/screenshots/v4/
-            docs/traces/v4/
+            test-results/
+            playwright-report/
+            docs/screenshots/
+            docs/traces/
           if-no-files-found: ignore

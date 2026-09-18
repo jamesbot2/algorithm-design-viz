@@ -57,16 +57,10 @@ async function rects(page: Page) {
 }
 
 async function openDrawer(page: Page) {
+  // V17-04: no force:true / no secret viewport→390 swap to pass desktop cases
   const toggle = page.getByTestId('inspector-sheet-toggle')
   if ((await toggle.count()) && (await toggle.isVisible()) && !(await toggle.getAttribute('hidden'))) {
-    await toggle.click({ force: true })
-    await expect(page.getByTestId('inspector-sheet')).toBeVisible({ timeout: 8_000 })
-    return true
-  }
-  await page.setViewportSize({ width: 390, height: 720 })
-  await page.waitForTimeout(300)
-  if (await toggle.count()) {
-    await toggle.click({ force: true })
+    await toggle.click()
     await expect(page.getByTestId('inspector-sheet')).toBeVisible({ timeout: 8_000 })
     return true
   }
@@ -229,7 +223,7 @@ test.describe('V16 workbench space / keyboard / visibility', () => {
       // Open data — must not cover code on desktop side mode
       const toggle = page.getByTestId('inspector-sheet-toggle')
       if ((await toggle.count()) && (await toggle.isVisible())) {
-        await toggle.click({ force: true })
+        await toggle.click()
         await page.waitForTimeout(400)
         const withData = await rects(page)
         expect(withData.sheetOverlapsCode, JSON.stringify(withData)).toBe(false)
@@ -265,7 +259,7 @@ test.describe('V16 workbench space / keyboard / visibility', () => {
     expect(mid.preview).toBe('0')
     const toggle = page.getByTestId('inspector-sheet-toggle')
     if ((await toggle.count()) && (await toggle.isVisible())) {
-      await toggle.click({ force: true })
+      await toggle.click()
       await page.waitForTimeout(200)
       await page.keyboard.press('Escape')
     }

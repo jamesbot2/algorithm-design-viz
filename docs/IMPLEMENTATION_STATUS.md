@@ -175,3 +175,13 @@
 | V16-06 | 放大真实图/数据/代码 | 已验证 | flex 0-basis；标签 ~13px；1366 plot≈322 |
 | V16-07 | 布局不打断会话/动画 | 已验证 | resize+数据开关保持 cursor；单播放器 |
 | V16-T | 回归 | 已验证 | vitest 359；pw v16=10；v13+v15=17；mergeSort 6；**未 push** |
+
+
+## V17 输入编辑 / 数据+代码 / 数组预算 / 验收质量
+| ID | 项 | 状态 | 备注 |
+|----|----|------|------|
+| V17-01 | 编辑输入真实 body 高度 | 已验证 | max-height:900px 不再对 editing 套 4.5rem overflow:hidden；e2e 六分辨率 |
+| V17-02 | 数据打开保持代码可读 | 已验证 | 去掉 body gutter；Workbench data-data-open；1366 code.w 0→300 |
+| V17-03 | 数组/DP 用 stage 预算 | 已验证 | ArrayView 取消硬 160；matrix-scroll lab-fill 超 420；aux compact |
+| V17-04 | 验收质量 | 已验证 | runId 绑定；无 force/390 cheat；Dijkstra×10 roles+dist；e2e.yml 上传 test-results |
+| V17-docs | 交付文档 | 已验证 | V17_DELIVERY / COVERAGE_MATRIX / screenshots+traces under docs/*/v17/ |
