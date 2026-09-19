@@ -5,11 +5,17 @@
   "nodesChecked": 6,
   "edgeLabelsChecked": 0,
   "plot": {
-    "w": 463.125,
-    "h": 128.328125
+    "w": 482.484375,
+    "h": 337.296875
   },
   "stage": {
-    "w": 476.3125,
-    "h": 141.515625
+    "w": 495.671875,
+    "h": 350.484375
+  },
+  "fieldsSummary": {
+    "geometryVisible": true,
+    "hitReachable": true,
+    "textReadable": true,
+    "paintOcclusionChecked": true
   }
 }

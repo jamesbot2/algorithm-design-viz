@@ -1,0 +1,68 @@
+{
+  "14_1366": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 19,
+    "visibleH": 35,
+    "clientH": 120,
+    "offsetParent": "viz-main stage-viewport"
+  },
+  "end_1366": {
+    "counter": "95 / 95 · done",
+    "cell": "7,6",
+    "scrollTop": 188,
+    "visibleH": 35,
+    "clientH": 120,
+    "offsetParent": "viz-main stage-viewport"
+  },
+  "14_1920": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 0,
+    "visibleH": 35,
+    "clientH": 182,
+    "offsetParent": "viz-main stage-viewport"
+  },
+  "end_1920": {
+    "counter": "95 / 95 · done",
+    "cell": "7,6",
+    "scrollTop": 126,
+    "visibleH": 35,
+    "clientH": 182,
+    "offsetParent": "viz-main stage-viewport"
+  },
+  "14_390": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 0,
+    "visibleH": 35,
+    "clientH": 279,
+    "offsetParent": "viz-main stage-viewport"
+  },
+  "end_390": {
+    "counter": "95 / 95 · done",
+    "cell": "7,6",
+    "scrollTop": 7,
+    "visibleH": 35,
+    "clientH": 301,
+    "offsetParent": "viz-main stage-viewport"
+  },
+  "locateRestore": {
+    "paused": {
+      "counter": "14 / 95 · compare",
+      "cell": "2,1",
+      "scrollTop": 188,
+      "visibleH": 0,
+      "clientH": 120,
+      "offsetParent": "viz-main stage-viewport"
+    },
+    "restored": {
+      "counter": "14 / 95 · compare",
+      "cell": "2,1",
+      "scrollTop": 41,
+      "visibleH": 35,
+      "clientH": 120,
+      "offsetParent": "viz-main stage-viewport"
+    }
+  }
+}

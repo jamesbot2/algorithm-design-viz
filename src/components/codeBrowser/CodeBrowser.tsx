@@ -117,11 +117,14 @@ function buildExecGutter(): Extension {
   ]
 }
 
+/** Scroll only view.scrollDOM — the ONE real code scrollport after height-chain fix. */
 function scrollLineNearest(view: EditorView, line1: number) {
   if (line1 < 1 || line1 > view.state.doc.lines) return
+  const scrollDOM = view.scrollDOM
+  // If scroller is unconstrained (client≈scroll), scrolling is a no-op — bail cleanly
+  if (scrollDOM.clientHeight < 8) return
   const line = view.state.doc.line(line1)
   const block = view.lineBlockAt(line.from)
-  const scrollDOM = view.scrollDOM
   const margin = 40
   const top = block.top
   const bottom = block.bottom
@@ -130,16 +133,28 @@ function scrollLineNearest(view: EditorView, line1: number) {
   if (top < visTop + margin) {
     scrollDOM.scrollTop = Math.max(0, top - margin)
   } else if (bottom > visBottom - margin) {
-    scrollDOM.scrollTop = bottom - scrollDOM.clientHeight + margin
+    scrollDOM.scrollTop = Math.max(0, bottom - scrollDOM.clientHeight + margin)
   }
 }
 
 function scrollLineCenter(view: EditorView, line1: number) {
   if (line1 < 1 || line1 > view.state.doc.lines) return
+  const scrollDOM = view.scrollDOM
+  if (scrollDOM.clientHeight < 8) return
   const line = view.state.doc.line(line1)
   const block = view.lineBlockAt(line.from)
-  const scrollDOM = view.scrollDOM
   scrollDOM.scrollTop = Math.max(0, block.top - scrollDOM.clientHeight / 2 + block.height / 2)
+}
+
+function scheduleScrollAfterLayout(view: EditorView, fn: () => void) {
+  try {
+    view.requestMeasure()
+  } catch {
+    /* ignore */
+  }
+  requestAnimationFrame(() => {
+    requestAnimationFrame(fn)
+  })
 }
 
 function rangeLines(range: SourceRange | null): number[] {
@@ -306,11 +321,15 @@ export default function CodeBrowser({
     if (tab === 'ts') {
       const view = viewRef.current
       if (!view) return
-      markProgrammatic()
       view.dispatch({
         effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
       })
-      scrollLineCenter(view, execLine1)
+      const gen = ++scrollGen.current
+      scheduleScrollAfterLayout(view, () => {
+        if (scrollGen.current !== gen) return
+        markProgrammatic()
+        scrollLineCenter(view, execLine1)
+      })
     } else {
       scrollPseudoToLine(execLine1, true)
     }
@@ -326,8 +345,14 @@ export default function CodeBrowser({
         effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
       })
       if (followExec && !userScrolledAway && execLine1 != null) {
-        markProgrammatic()
-        scrollLineNearest(view, execLine1)
+        // Do NOT call markProgrammatic before schedule — it bumps scrollGen and
+        // cancels this follow. Only mark inside the post-layout callback.
+        const gen = ++scrollGen.current
+        scheduleScrollAfterLayout(view, () => {
+          if (scrollGen.current !== gen) return
+          markProgrammatic()
+          scrollLineNearest(view, execLine1)
+        })
       }
     } else if (followExec && !userScrolledAway && execLine1 != null) {
       scrollPseudoToLine(execLine1, false)
@@ -519,9 +544,7 @@ export default function CodeBrowser({
           style={{ fontSize }}
           data-testid="code-mirror-wrap"
           data-exec-line={execLine1 ?? ''}
-          onWheel={() => {
-            if (followExec) setUserScrolledAway(true)
-          }}
+          data-scroll-owner="code"
         >
           <CodeMirror
             value={source}

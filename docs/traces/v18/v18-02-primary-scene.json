@@ -2,24 +2,24 @@
   "1366x768": {
     "primaryScene": "matrix",
     "stageH": 226,
-    "matrixInStage": 171,
+    "matrixInStage": 185,
     "currentCellVisibleH": 36,
     "currentCell": "1,6",
     "hasLabels": true,
     "hasFullArrays": false,
-    "labelsH": 40,
-    "matrixH": 171
+    "labelsH": 25,
+    "matrixH": 185
   },
   "1920x1080": {
     "primaryScene": "matrix",
     "stageH": 311,
-    "matrixInStage": 256,
+    "matrixInStage": 270,
     "currentCellVisibleH": 36,
     "currentCell": "1,6",
     "hasLabels": true,
     "hasFullArrays": false,
-    "labelsH": 40,
-    "matrixH": 256
+    "labelsH": 25,
+    "matrixH": 270
   },
   "mergeSort": {
     "order": "primary-first",

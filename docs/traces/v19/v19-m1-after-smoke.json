@@ -1,0 +1,50 @@
+{
+  "lcs14": {
+    "counter": "1 / 1 · preview",
+    "scrollTop": 0,
+    "clientH": 137,
+    "offsetParent": "",
+    "cellVisibleH_inner": 0,
+    "cellVisibleH_scroller": 0
+  },
+  "lcsLabels": {
+    "stripH": 0,
+    "charCount": 0,
+    "readable": 0,
+    "sample": [],
+    "context": null
+  },
+  "dijkstraCode": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "wrapH": 322,
+    "cmClientH": 322,
+    "cmScrollH": 681,
+    "cmScrollTop": 0,
+    "execVisWrap": 0,
+    "execVisScroller": 0,
+    "canScroll": true
+  },
+  "dijkstraAfterGoto": {
+    "cmScrollTop": 212,
+    "execVisWrap": 18,
+    "execVisScroller": 18
+  },
+  "vars": {
+    "slotH": 46,
+    "btnH": 28,
+    "visibleFrac": 1,
+    "visibleH": 28,
+    "display": "flex"
+  },
+  "knapsack": {
+    "names": [
+      "weights",
+      "values"
+    ],
+    "readable": 8,
+    "total": 8,
+    "stripH": 25,
+    "matrixH": 120
+  }
+}

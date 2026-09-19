@@ -1,0 +1,24 @@
+{
+  "vars": {
+    "layout": "drawer",
+    "slotH": 32,
+    "slotCss": "32px",
+    "btnH": 36,
+    "btnW": 92,
+    "visibleFrac": 0.5223367697594502,
+    "visibleH": 19,
+    "hidden": null,
+    "display": "flex",
+    "counter": "1 / 11 · init"
+  },
+  "code": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "wrapH": 321.640625,
+    "cmClientH": 681,
+    "cmScrollH": 681,
+    "cmScrollTop": 0,
+    "execVisWrap": 0,
+    "execVisScroller": 18
+  }
+}

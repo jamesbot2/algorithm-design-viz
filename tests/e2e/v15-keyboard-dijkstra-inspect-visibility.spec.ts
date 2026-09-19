@@ -5,6 +5,7 @@ import {
   measureStrictGraphVisibility,
   injectOpaqueOverlayFault,
 } from './helpers/assertStrictGraphVisible'
+import { prepareDijkstraN3Ready } from './helpers/runReadiness'
 
 const OUT_SHOTS = path.join(process.cwd(), 'docs/screenshots/v15')
 const OUT_TRACES = path.join(process.cwd(), 'docs/traces/v15')
@@ -96,13 +97,39 @@ test.describe('V15 keyboard / Dijkstra roles / continuous inspect / visibility',
 
   test('V15-02 final edge roles: current preds only 0→2 and 2→1', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
-    await prepareDijkstraCase(page)
-    // Seek to end
-    for (let i = 0; i < 40; i++) {
-      const next = page.getByTestId('next-step-btn')
-      if (await next.isDisabled()) break
-      await next.click()
+    // V19-05: run-ready + layout-stable entry — not more retries
+    await prepareDijkstraN3Ready(page)
+    await expect(page.getByTestId('graph-plot')).toBeVisible({ timeout: 10_000 })
+    await page.waitForFunction(() => {
+      const plot = document.querySelector('[data-testid="graph-plot"]')
+      return !!(plot && plot.isConnected && plot.getBoundingClientRect().height > 40)
+    })
+    // Seek to terminal via product UI (phase jump / End) — not controlled range value=
+    const inlineDone = page.locator('[data-testid="phase-jump"] button', { hasText: '完成' })
+    if (await inlineDone.count()) {
+      await inlineDone.first().click()
+    } else {
+      const slider = page.locator('.scrub-row input[type=range]')
+      await slider.focus()
+      await page.keyboard.press('End')
     }
+    await expect.poll(async () => {
+      const txt = (await page.getByTestId('step-counter').textContent()) ?? ''
+      const m = txt.match(/(\d+)\s*\/\s*(\d+)/)
+      if (!m) return false
+      return Number(m[1]) === Number(m[2])
+    }).toBeTruthy()
+    // Wait until edge roles are present (not empty pre-terminal)
+    await page.waitForFunction(() => {
+      const edges = document.querySelectorAll('[data-edge-id]')
+      if (edges.length < 2) return false
+      let hasRole = 0
+      edges.forEach((g) => {
+        const r = g.getAttribute('data-edge-role') || ''
+        if (r) hasRole++
+      })
+      return hasRole > 0
+    }, { timeout: 10_000 })
     const roles = await page.evaluate(() => {
       const out: Record<string, string> = {}
       for (const g of document.querySelectorAll('[data-edge-id]')) {
@@ -112,6 +139,7 @@ test.describe('V15 keyboard / Dijkstra roles / continuous inspect / visibility',
       }
       return out
     })
+    expect(Object.keys(roles).length, JSON.stringify(roles)).toBeGreaterThan(0)
     expect(roles['0->2']).toMatch(/tree|accepted/)
     expect(roles['2->1']).toMatch(/tree|accepted/)
     expect(['tree', 'accepted', 'path']).not.toContain(roles['0->1'])
@@ -167,7 +195,16 @@ test.describe('V15 keyboard / Dijkstra roles / continuous inspect / visibility',
     const run = page.getByTestId('run-btn')
     if (await run.count()) await run.click()
     await expect(page.getByTestId('play-btn')).toBeVisible({ timeout: 20_000 })
-    await page.getByTestId('graph-plot').scrollIntoViewIfNeeded()
+    // V19-05: wait attached+layout-stable before any scrollIntoView
+    await expect(page.getByTestId('graph-plot')).toBeVisible({ timeout: 10_000 })
+    await page.waitForFunction(() => {
+      const plot = document.querySelector('[data-testid="graph-plot"]')
+      return !!(plot && plot.isConnected && document.contains(plot) && plot.getBoundingClientRect().height > 20)
+    })
+    const plot = page.getByTestId('graph-plot')
+    if (await plot.count()) {
+      await plot.scrollIntoViewIfNeeded()
+    }
     await page.waitForTimeout(300)
     const positive = await measureStrictGraphVisibility(page)
     fs.writeFileSync(path.join(OUT_TRACES, 'v15-04-visibility-positive.json'), JSON.stringify(positive, null, 2))

@@ -1,0 +1,23 @@
+{
+  "lcs14": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 19,
+    "visibleH": 35,
+    "cellValReadable": 13,
+    "cellValTotal": 13,
+    "stripH": 25
+  },
+  "dijkstra": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "cmClientH": 322,
+    "cmScrollH": 681,
+    "cmScrollTop": 264,
+    "execVisWrap": 18,
+    "varsFrac": 1,
+    "varsVisibleH": 28,
+    "varsBtnH": 28,
+    "slotH": 46
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "m": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "wrapH": 322,
+    "cmClientH": 322,
+    "cmScrollH": 681,
+    "cmScrollTop": 264,
+    "execVisWrap": 18,
+    "execVisScroller": 18,
+    "canScroll": true
+  },
+  "afterGoto": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "wrapH": 322,
+    "cmClientH": 322,
+    "cmScrollH": 681,
+    "cmScrollTop": 324,
+    "execVisWrap": 18,
+    "execVisScroller": 18,
+    "canScroll": true
+  },
+  "withData": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "wrapH": 233,
+    "cmClientH": 233,
+    "cmScrollH": 936,
+    "cmScrollTop": 488,
+    "execVisWrap": 36,
+    "execVisScroller": 36,
+    "canScroll": true
+  },
+  "withDataGoto": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "wrapH": 261,
+    "cmClientH": 261,
+    "cmScrollH": 936,
+    "cmScrollTop": 488,
+    "execVisWrap": 36,
+    "execVisScroller": 36,
+    "canScroll": true
+  },
+  "fault": {
+    "ok": true,
+    "clientH": 936,
+    "scrollH": 936,
+    "canScroll": false
+  }
+}

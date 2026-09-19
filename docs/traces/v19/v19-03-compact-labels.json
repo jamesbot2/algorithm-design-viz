@@ -1,0 +1,31 @@
+{
+  "lcs": {
+    "semantic": "1",
+    "stripH": 25,
+    "total": 13,
+    "readable": 13,
+    "context": "X[i=1]='B' · Y[j=0]='B'",
+    "matrixH": 120,
+    "names": [
+      "X",
+      "Y"
+    ]
+  },
+  "neg": {
+    "failDetected": true,
+    "vis": 0,
+    "stripH": 40
+  },
+  "kn": {
+    "semantic": "1",
+    "stripH": 25,
+    "total": 8,
+    "readable": 8,
+    "context": "weights[item=0]='2'",
+    "matrixH": 120,
+    "names": [
+      "weights",
+      "values"
+    ]
+  }
+}

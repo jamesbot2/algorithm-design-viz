@@ -1,115 +1,193 @@
 {
   "ok": false,
   "issues": [
-    "topmost-not-target",
-    "opaque-overlay"
+    "opaque-overlay",
+    "topmost-not-target"
   ],
   "details": [
     {
       "id": "0",
       "kind": "node",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "0",
       "kind": "label",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "1",
       "kind": "node",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "1",
       "kind": "label",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "2",
       "kind": "node",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "2",
       "kind": "label",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "3",
       "kind": "node",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "3",
       "kind": "label",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "4",
       "kind": "node",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "4",
       "kind": "label",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "5",
       "kind": "node",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     },
     {
       "id": "5",
       "kind": "label",
       "issues": [
-        "topmost-not-target",
-        "opaque-overlay"
-      ]
+        "opaque-overlay",
+        "topmost-not-target"
+      ],
+      "fields": {
+        "geometryVisible": true,
+        "hitReachable": false,
+        "textReadable": true,
+        "paintOcclusionChecked": true
+      }
     }
   ],
   "nodesChecked": 6,
   "edgeLabelsChecked": 0,
   "plot": {
-    "w": 463.125,
-    "h": 128.328125
+    "w": 482.484375,
+    "h": 337.296875
   },
   "stage": {
-    "w": 476.3125,
-    "h": 141.515625
+    "w": 495.671875,
+    "h": 350.484375
+  },
+  "fieldsSummary": {
+    "geometryVisible": true,
+    "hitReachable": false,
+    "textReadable": true,
+    "paintOcclusionChecked": true
   }
 }

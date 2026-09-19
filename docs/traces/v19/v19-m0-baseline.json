@@ -1,0 +1,257 @@
+{
+  "lcs_start": {
+    "counter": "1 / 95 · init"
+  },
+  "lcs_14_1366": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 141,
+    "scrollLeft": 0,
+    "scrollH": 308,
+    "clientH": 123,
+    "cellOffsetTop": 185,
+    "cellOffsetLeft": 68,
+    "offsetParentTag": "DIV",
+    "offsetParentClass": "viz-main stage-viewport",
+    "cellVisibleH_inScroller": 0,
+    "cellVisibleH_innerSticky": 0,
+    "cellVisibleH_inStage": 35,
+    "cellVisibleW_inScroller": 37,
+    "sRect": {
+      "top": 346,
+      "h": 123
+    },
+    "cRect": {
+      "top": 300,
+      "h": 35
+    },
+    "stickyH": 24,
+    "computedNextTopGuess": 140.9453125
+  },
+  "lcs_30ish_1366": {
+    "counter": "30 / 95 · compare",
+    "cell": "3,3",
+    "scrollTop": 176,
+    "scrollLeft": 0,
+    "scrollH": 308,
+    "clientH": 123,
+    "cellOffsetTop": 220,
+    "cellOffsetLeft": 142,
+    "offsetParentTag": "DIV",
+    "offsetParentClass": "viz-main stage-viewport",
+    "cellVisibleH_inScroller": 0,
+    "cellVisibleH_innerSticky": 0,
+    "cellVisibleH_inStage": 35,
+    "cellVisibleW_inScroller": 37,
+    "sRect": {
+      "top": 346,
+      "h": 123
+    },
+    "cRect": {
+      "top": 301,
+      "h": 35
+    },
+    "stickyH": 24,
+    "computedNextTopGuess": 175.9453125
+  },
+  "lcs_labels_1366": {
+    "stripH": 40,
+    "stripMaxH": "40px",
+    "stripOverflow": "hidden",
+    "cellValCount": 13,
+    "cellValVisibleHs": [
+      {
+        "text": "A",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "B",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "C",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "B",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "D",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "A",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "B",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "B",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      },
+      {
+        "text": "D",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      },
+      {
+        "text": "C",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      },
+      {
+        "text": "A",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      },
+      {
+        "text": "B",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      }
+    ],
+    "anyReadable": false
+  },
+  "vars_btn_1366": {
+    "slotH": 32,
+    "btnH": 0,
+    "btnW": 0,
+    "visibleFrac": 0,
+    "visibleH": 0,
+    "hiddenAttr": "",
+    "display": "none"
+  },
+  "dijkstra_code_16_1366": {
+    "counter": "11 / 11 · done",
+    "execLineAttr": "33",
+    "wrapH": 322,
+    "wrapClientH": 322,
+    "editorH": 681,
+    "cmClientH": 681,
+    "cmScrollH": 681,
+    "cmScrollTop": 0,
+    "execVisibleH_inScroller": 0,
+    "execVisibleH_inWrap": 0,
+    "line19Text": null
+  },
+  "dijkstra_code_data_open": {
+    "counter": "11 / 11 · done",
+    "wrapH": 261,
+    "cmClientH": 881,
+    "cmScrollH": 881,
+    "cmScrollTop": 0,
+    "execVisibleH_inWrap": 0,
+    "execVisibleH_inScroller": 0,
+    "codeW": 312.6875
+  },
+  "knapsack_labels_1366": {
+    "stripH": 40,
+    "stripMaxH": "40px",
+    "stripOverflow": "hidden",
+    "cellValCount": 8,
+    "cellValVisibleHs": [
+      {
+        "text": "2",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "3",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "4",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "5",
+        "h": 0,
+        "fullH": 24,
+        "top": 48
+      },
+      {
+        "text": "3",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      },
+      {
+        "text": "4",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      },
+      {
+        "text": "5",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      },
+      {
+        "text": "6",
+        "h": 0,
+        "fullH": 24,
+        "top": 162
+      }
+    ],
+    "anyReadable": false
+  },
+  "knapsack_array_names": [
+    "weights",
+    "values"
+  ],
+  "lcs_14_1920": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 0,
+    "scrollLeft": 0,
+    "scrollH": 308,
+    "clientH": 208,
+    "cellOffsetTop": 185,
+    "cellOffsetLeft": 68,
+    "offsetParentTag": "DIV",
+    "offsetParentClass": "viz-main stage-viewport",
+    "cellVisibleH_inScroller": 35,
+    "cellVisibleH_innerSticky": 35,
+    "cellVisibleH_inStage": 35,
+    "cellVisibleW_inScroller": 37,
+    "sRect": {
+      "top": 571,
+      "h": 208
+    },
+    "cRect": {
+      "top": 667,
+      "h": 35
+    },
+    "stickyH": 24,
+    "computedNextTopGuess": 98.4765625
+  }
+}

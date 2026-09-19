@@ -1467,7 +1467,7 @@ button.icon-btn {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 320px;
+  min-height: 0; /* V19-02: fill parent remainder; do not force 320 against flex clip */
 }
 .code-browser-toolbar {
   display: flex;
@@ -1475,6 +1475,7 @@ button.icon-btn {
   gap: 0.35rem;
   align-items: center;
   margin-bottom: 0.35rem;
+  flex: 0 0 auto;
 }
 .code-tabs button.active {
   background: var(--lab-accent, var(--accent));
@@ -1484,6 +1485,7 @@ button.icon-btn {
 .code-browser-meta {
   font-size: 0.72rem;
   margin-bottom: 0.25rem;
+  flex: 0 0 auto;
 }
 .cm-exec-arrow {
   color: var(--lab-accent, var(--accent));
@@ -1559,14 +1561,26 @@ button.icon-btn {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
+/* V19-02: ONE real scrollport = .cm-scroller; theme/editor must not expand to content */
+.code-browser-cm-wrap > div,
+.code-browser-cm-wrap .cm-theme-dark,
+.code-browser-cm-wrap .cm-theme-light,
 .code-browser-cm-wrap .cm-editor {
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 0 !important;
   height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box;
 }
 .code-browser-cm-wrap .cm-scroller {
-  min-height: 0;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  height: 100% !important;
+  overflow: auto !important;
+  overscroll-behavior: contain;
 }
 
 .visualizer {
@@ -1577,24 +1591,33 @@ button.icon-btn {
   overflow: hidden;
 }
 .viz-banner-slot {
-  /* V10-01: fixed slot height — message length must not shove canvas (was 3.2→4.6 ≈22px drift) */
+  /* V10-01 / V19-04: text may clip; controls (vars toggle) must keep full geometry */
   height: 3.6rem;
   min-height: 3.6rem;
   max-height: 3.6rem;
   overflow: hidden;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5rem;
   flex: 0 0 auto;
 }
 .viz-banner-text {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  overflow: auto;
-  max-height: 4.2rem;
+  overflow: hidden;
+  max-height: 100%;
+}
+.viz-banner-controls {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: center;
+  max-height: 100%;
 }
 .viz-body-single {
   display: flex;
@@ -2184,6 +2207,28 @@ html, body, #root {
   height: 2.8rem;
   min-height: 2.8rem;
   max-height: 2.8rem;
+}
+/* V19-04: when drawer toggle is shown, keep full button (not half-clipped by 2rem laptop rule) */
+.main-wrap[data-lab-fill="1"] .viz-banner-slot:has(.inspector-sheet-toggle:not([hidden])) {
+  height: auto;
+  min-height: 2.5rem;
+  max-height: 3rem;
+  overflow: visible;
+  align-items: center;
+}
+.main-wrap[data-lab-fill="1"] .viz-banner-slot:has(.inspector-sheet-toggle:not([hidden])) .viz-banner-text {
+  -webkit-line-clamp: 2;
+  max-height: 2.4rem;
+  overflow: hidden;
+}
+.main-wrap[data-lab-fill="1"] .viz-banner-controls .inspector-sheet-toggle {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  min-height: 1.75rem;
+  height: auto;
 }
 .main-wrap[data-lab-fill="1"] .kbd-hint {
   margin-top: 0.2rem;
@@ -3231,6 +3276,12 @@ html, body, #root {
     min-height: 2rem;
     max-height: 2rem;
   }
+  .main-wrap[data-lab-fill="1"] .viz-banner-slot:has(.inspector-sheet-toggle:not([hidden])) {
+    height: auto;
+    min-height: 2.35rem;
+    max-height: 2.85rem;
+    overflow: visible;
+  }
   .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
     max-height: 2.4rem;
     padding: 0.2rem 0.45rem;
@@ -3425,28 +3476,95 @@ html, body, #root {
   overflow: auto;
 }
 .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .arrays-panel.array-labels-strip,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .arrays-panel.array-labels-strip {
+.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .arrays-panel.array-labels-strip,
+.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="board"] .arrays-panel.array-labels-strip,
+.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="board"] .arrays-panel.array-labels-strip {
   flex: 0 0 auto;
-  max-height: 40px;
-  overflow: hidden;
-  margin: 0 0 0.15rem;
-  gap: 0.15rem;
+  /* V19-03: semantic compact strip — natural height, NOT 40px clip of full ArrayView cards */
+  max-height: none;
+  overflow: visible;
+  margin: 0 0 0.2rem;
+  gap: 0.2rem;
+  display: flex;
+  flex-direction: column;
 }
+.array-labels-strip .compact-seq-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  padding: 0.15rem 0.2rem;
+}
+.array-labels-strip .compact-seq {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.array-labels-strip .compact-seq-name {
+  font-weight: 600;
+  color: var(--muted);
+  margin-right: 0.15rem;
+}
+.array-labels-strip .compact-ch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.05rem;
+  padding: 0.05rem 0.2rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-soft, #1a1a1a);
+  font-variant-numeric: tabular-nums;
+}
+.array-labels-strip .compact-ch.is-focus,
+.array-labels-strip .compact-ch.is-compare {
+  border-color: var(--sem-focus, #3b82f6);
+  background: color-mix(in srgb, var(--sem-focus, #3b82f6) 22%, transparent);
+  font-weight: 700;
+}
+.array-labels-strip .compact-ch.is-ptr {
+  outline: 1px dashed var(--lab-accent, var(--accent));
+}
+.array-labels-strip .compact-context {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.array-labels-strip .array-buffers {
+  max-height: 56px;
+  overflow: auto;
+}
+/* Legacy full ArrayView inside strip (buffers only) stay compact */
 .main-wrap[data-lab-fill="1"] .array-labels-strip .array-view {
   padding: 0.1rem 0.25rem;
 }
 .main-wrap[data-lab-fill="1"] .array-labels-strip .array-view .bars-wrap {
   display: none;
 }
-.main-wrap[data-lab-fill="1"] .array-labels-strip .array-label {
+.main-wrap[data-lab-fill="1"] .array-labels-strip .array-view .array-label {
   font-size: 0.7rem;
   margin: 0;
 }
-.main-wrap[data-lab-fill="1"] .array-labels-strip .cells-row,
-.main-wrap[data-lab-fill="1"] .array-labels-strip .cell {
+.main-wrap[data-lab-fill="1"] .array-labels-strip .array-view .cell {
   font-size: 0.7rem;
   min-width: 1.1rem;
   padding: 0.05rem 0.2rem;
+}
+
+.matrix-follow-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.25rem;
+  flex: 0 0 auto;
+}
+.matrix-follow-bar .hint {
+  font-size: 0.72rem;
+  color: var(--muted);
 }
 .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-note,
 .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-note {

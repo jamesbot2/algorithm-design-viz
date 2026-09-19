@@ -1,0 +1,102 @@
+{
+  "#/algo/lcs": {
+    "ok": true,
+    "primary": "matrix",
+    "counter": "6 / 95 · compare",
+    "hasMatrix": true,
+    "hasGraph": false,
+    "hasArrays": true,
+    "codeW": 475,
+    "cmCanScroll": true
+  },
+  "#/algo/editDistance": {
+    "ok": true,
+    "primary": "matrix",
+    "counter": "6 / 44",
+    "hasMatrix": true,
+    "hasGraph": false,
+    "hasArrays": true,
+    "codeW": 475,
+    "cmCanScroll": true
+  },
+  "#/algo/knapsack01": {
+    "ok": true,
+    "primary": "matrix",
+    "counter": "1 / 1 · preview",
+    "hasMatrix": true,
+    "hasGraph": false,
+    "hasArrays": true,
+    "codeW": 475,
+    "cmCanScroll": true
+  },
+  "#/algo/matrixChain": {
+    "ok": true,
+    "primary": "matrix",
+    "counter": "6 / 9",
+    "hasMatrix": true,
+    "hasGraph": false,
+    "hasArrays": true,
+    "codeW": 475,
+    "cmCanScroll": true
+  },
+  "#/algo/nQueens": {
+    "ok": true,
+    "primary": "board",
+    "counter": "1 / 1 · preview",
+    "hasMatrix": true,
+    "hasGraph": false,
+    "hasArrays": false,
+    "codeW": 475,
+    "cmCanScroll": true
+  },
+  "#/algo/mergeSort": {
+    "ok": true,
+    "primary": "array",
+    "counter": "6 / 55 · split",
+    "hasMatrix": false,
+    "hasGraph": false,
+    "hasArrays": true,
+    "codeW": 475,
+    "cmCanScroll": true
+  },
+  "#/algo/insertionSort": {
+    "ok": true,
+    "primary": "array",
+    "counter": "6 / 32 · takeKey",
+    "hasMatrix": false,
+    "hasGraph": false,
+    "hasArrays": true,
+    "codeW": 475,
+    "cmCanScroll": false
+  },
+  "#/algo/dijkstra": {
+    "ok": true,
+    "primary": "graph",
+    "counter": "6 / 25 · relax",
+    "hasMatrix": false,
+    "hasGraph": true,
+    "hasArrays": false,
+    "codeW": 475,
+    "cmCanScroll": true
+  },
+  "#/algo/bfs": {
+    "ok": true,
+    "primary": "graph",
+    "counter": "6 / 25",
+    "hasMatrix": false,
+    "hasGraph": true,
+    "hasArrays": false,
+    "codeW": 475,
+    "cmCanScroll": true
+  },
+  "#/algo/prim": {
+    "ok": true,
+    "primary": "graph",
+    "counter": "6 / 25",
+    "hasMatrix": false,
+    "hasGraph": true,
+    "hasArrays": false,
+    "codeW": 475,
+    "cmCanScroll": true
+  }
+}

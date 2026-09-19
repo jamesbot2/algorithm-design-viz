@@ -1,10 +1,38 @@
-import { memo, useEffect, useMemo, useRef } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Step } from '../types/step'
 import { dpCellClassNames } from '../utils/dpCellRoles'
+
+/** Content-space offset of cell relative to scroller scrollport (not offsetParent). */
+function cellContentBox(cell: HTMLElement, scroller: HTMLElement) {
+  const sRect = scroller.getBoundingClientRect()
+  const cRect = cell.getBoundingClientRect()
+  return {
+    top: scroller.scrollTop + (cRect.top - sRect.top),
+    left: scroller.scrollLeft + (cRect.left - sRect.left),
+    width: cRect.width,
+    height: cRect.height,
+    sRect,
+    cRect,
+  }
+}
+
+function stickyInsets(scroller: HTMLElement) {
+  const topEl = scroller.querySelector('.sticky-top, thead th') as HTMLElement | null
+  const leftEl = scroller.querySelector('.sticky-left, tbody th.matrix-row-h') as HTMLElement | null
+  return {
+    top: topEl ? topEl.getBoundingClientRect().height : 0,
+    left: leftEl ? leftEl.getBoundingClientRect().width : 0,
+  }
+}
 
 function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
   const hints = step.labelHints
   const scrollRefs = useRef<Map<string, HTMLDivElement | null>>(new Map())
+  const followGen = useRef(0)
+  const programmaticScrollDepth = useRef(0)
+  const [followPaused, setFollowPaused] = useState(false)
+  const [followArmed, setFollowArmed] = useState(true)
+  const userScrollCleanup = useRef<Map<string, () => void>>(new Map())
 
   const syncRows = useMemo(() => {
     const set = new Set<number>()
@@ -28,45 +56,194 @@ function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
     return set
   }, [step.matrixTargets])
 
-  // V18-02: follow current cell inside matrix-scroll only (never window / stage scrollIntoView)
-  useEffect(() => {
-    if (!step.matrixTargets) return
-    // rAF: wait layout/flex settle after primary-scene resize
-    const raf = requestAnimationFrame(() => {
-      for (const [name, target] of Object.entries(step.matrixTargets!)) {
+  const scrollCellIntoView = useCallback(
+    (scroller: HTMLDivElement, cell: HTMLElement, center: boolean) => {
+      const box = cellContentBox(cell, scroller)
+      const insets = stickyInsets(scroller)
+      const pad = 8
+      const viewH = scroller.clientHeight
+      const viewW = scroller.clientWidth
+      if (viewH < 8 || viewW < 8) return false
+
+      const visTop = scroller.scrollTop + insets.top + pad
+      const visBottom = scroller.scrollTop + viewH - pad
+      const visLeft = scroller.scrollLeft + insets.left + pad
+      const visRight = scroller.scrollLeft + viewW - pad
+
+      const cellTop = box.top
+      const cellBottom = box.top + box.height
+      const cellLeft = box.left
+      const cellRight = box.left + box.width
+
+      let nextTop = scroller.scrollTop
+      let nextLeft = scroller.scrollLeft
+
+      if (center) {
+        const usableH = Math.max(1, viewH - insets.top)
+        const usableW = Math.max(1, viewW - insets.left)
+        nextTop = Math.max(0, cellTop - insets.top - usableH / 2 + box.height / 2)
+        nextLeft = Math.max(0, cellLeft - insets.left - usableW / 2 + box.width / 2)
+      } else {
+        if (cellTop < visTop || cellBottom > visBottom) {
+          if (cellTop < visTop) {
+            nextTop = Math.max(0, cellTop - insets.top - pad)
+          } else {
+            nextTop = Math.max(0, cellBottom - viewH + pad)
+          }
+        }
+        if (cellLeft < visLeft || cellRight > visRight) {
+          if (cellLeft < visLeft) {
+            nextLeft = Math.max(0, cellLeft - insets.left - pad)
+          } else {
+            nextLeft = Math.max(0, cellRight - viewW + pad)
+          }
+        }
+      }
+
+      if (Math.abs(nextTop - scroller.scrollTop) < 0.5 && Math.abs(nextLeft - scroller.scrollLeft) < 0.5) {
+        return false
+      }
+      const gen = ++followGen.current
+      programmaticScrollDepth.current += 1
+      scroller.scrollTo({ top: nextTop, left: nextLeft, behavior: 'auto' })
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (followGen.current === gen) {
+            programmaticScrollDepth.current = Math.max(0, programmaticScrollDepth.current - 1)
+          }
+        })
+      })
+      return true
+    },
+    [],
+  )
+
+  const followCurrentCells = useCallback(
+    (center: boolean) => {
+      if (!step.matrixTargets) return
+      for (const [name, target] of Object.entries(step.matrixTargets)) {
         const cur = target.current ?? target.writes?.[0]
         if (!cur) continue
         const scroller = scrollRefs.current.get(name)
         if (!scroller) continue
-        const cell = scroller.querySelector(`td[data-cell="${cur[0]},${cur[1]}"]`) as HTMLElement | null
+        const cell = scroller.querySelector(
+          `td[data-cell="${cur[0]},${cur[1]}"]`,
+        ) as HTMLElement | null
         if (!cell) continue
-        const sRect = scroller.getBoundingClientRect()
-        if (sRect.height < 8 || sRect.width < 8) continue
-        const cRect = cell.getBoundingClientRect()
-        const pad = 12
-        let nextTop = scroller.scrollTop
-        let nextLeft = scroller.scrollLeft
-        // Prefer keeping cell fully inside scroller; nudge toward center when far out
-        if (cRect.top < sRect.top + pad || cRect.bottom > sRect.bottom - pad) {
-          const cellMid = cell.offsetTop + cell.offsetHeight / 2
-          nextTop = Math.max(0, cellMid - sRect.height / 2)
-        }
-        if (cRect.left < sRect.left + pad || cRect.right > sRect.right - pad) {
-          const cellMidX = cell.offsetLeft + cell.offsetWidth / 2
-          nextLeft = Math.max(0, cellMidX - sRect.width / 2)
-        }
-        if (nextTop !== scroller.scrollTop || nextLeft !== scroller.scrollLeft) {
-          scroller.scrollTo({ top: nextTop, left: nextLeft, behavior: 'auto' })
-        }
+        scrollCellIntoView(scroller, cell, center)
       }
+    },
+    [step.matrixTargets, scrollCellIntoView],
+  )
+
+  // V19-01: follow current cell in matrix-scroll content coords (never offsetParent / window)
+  useEffect(() => {
+    if (!step.matrixTargets) return
+    if (!followArmed || followPaused) return
+    const gen = ++followGen.current
+    let raf1 = 0
+    let raf2 = 0
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        if (followGen.current !== gen) return
+        followCurrentCells(false)
+      })
     })
-    return () => cancelAnimationFrame(raf)
-  }, [step.id, step.matrixTargets])
+    return () => {
+      // Cancel pending rAF only — do NOT clear programmaticScroll or bump gen here.
+      // Clearing programmatic mid-scroll makes the scroll event look "user" and pauses follow.
+      cancelAnimationFrame(raf1)
+      cancelAnimationFrame(raf2)
+    }
+  }, [step.id, step.matrixTargets, followArmed, followPaused, followCurrentCells])
+
+  // Remeasure on scroller resize without changing cursor — re-follow if armed
+  useEffect(() => {
+    if (typeof ResizeObserver === 'undefined') return
+    const observers: ResizeObserver[] = []
+    for (const scroller of scrollRefs.current.values()) {
+      if (!scroller) continue
+      const ro = new ResizeObserver(() => {
+        if (!followArmed || followPaused) return
+        const gen = ++followGen.current
+        requestAnimationFrame(() => {
+          if (followGen.current !== gen) return
+          followCurrentCells(false)
+        })
+      })
+      ro.observe(scroller)
+      observers.push(ro)
+    }
+    return () => observers.forEach((o) => o.disconnect())
+  }, [step.id, followArmed, followPaused, followCurrentCells, step.matrices])
+
+  const bindScroller = useCallback((name: string, el: HTMLDivElement | null) => {
+    const prev = scrollRefs.current.get(name)
+    if (prev && prev !== el) {
+      userScrollCleanup.current.get(name)?.()
+      userScrollCleanup.current.delete(name)
+    }
+    scrollRefs.current.set(name, el)
+    if (!el) return
+    const onScroll = () => {
+      if (programmaticScrollDepth.current > 0) return
+      setFollowPaused(true)
+    }
+    el.addEventListener('scroll', onScroll, { passive: true })
+    userScrollCleanup.current.set(name, () => el.removeEventListener('scroll', onScroll))
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      for (const cleanup of userScrollCleanup.current.values()) cleanup()
+      userScrollCleanup.current.clear()
+      followGen.current += 1
+      programmaticScrollDepth.current = 0
+    }
+  }, [])
+
+  const locateCurrent = () => {
+    setFollowPaused(false)
+    setFollowArmed(true)
+    followCurrentCells(true)
+  }
+
+  const resumeFollow = () => {
+    setFollowPaused(false)
+    setFollowArmed(true)
+    followCurrentCells(false)
+  }
 
   if (!step.matrices) return null
 
   return (
     <div className="matrices-panel" data-testid="matrices-panel">
+      <div className="matrix-follow-bar" data-testid="matrix-follow-bar">
+        <button
+          type="button"
+          className="ghost"
+          data-testid="matrix-locate-btn"
+          onClick={locateCurrent}
+          title="将当前格滚入矩阵视口并居中"
+        >
+          定位当前格
+        </button>
+        <button
+          type="button"
+          className="ghost"
+          data-testid="matrix-resume-follow-btn"
+          onClick={resumeFollow}
+          disabled={!followPaused && followArmed}
+          title="恢复自动跟随当前格"
+        >
+          恢复跟随
+        </button>
+        {followPaused && (
+          <span className="hint" data-testid="matrix-follow-paused" role="status">
+            已暂停矩阵跟随
+          </span>
+        )}
+      </div>
       {Object.entries(step.matrices).map(([name, mat]) => {
         const target = step.matrixTargets?.[name]
         const prevMat = prevStep?.matrices?.[name]
@@ -111,9 +288,8 @@ function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
               className="matrix-scroll"
               data-scroll-owner="matrix"
               data-testid={`matrix-scroll-${name}`}
-              ref={(el) => {
-                scrollRefs.current.set(name, el)
-              }}
+              data-follow-paused={followPaused ? '1' : '0'}
+              ref={(el) => bindScroller(name, el)}
             >
               <table className={`matrix-table sticky-labels${anti ? ' matrix-anti-example' : ''}`}>
                 <thead>
@@ -146,7 +322,6 @@ function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
                             ? undefined
                             : String(prevCell)
                         const cls = dpCellClassNames(i, j, target)
-                        // Real prev from previous step state — never fake prev with current
                         const dataPrev =
                           prevDisplay !== undefined && prevDisplay !== display
                             ? prevDisplay

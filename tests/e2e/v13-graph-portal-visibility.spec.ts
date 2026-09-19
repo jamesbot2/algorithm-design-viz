@@ -181,6 +181,17 @@ async function measureGraphVisibility(page: Page) {
   })
 }
 
+
+/** V19-05: wait attached + layout-stable before scrollIntoView (avoid detached plot flaky). */
+async function scrollPlotStable(page: Page) {
+  await expect(page.getByTestId('graph-plot')).toBeVisible({ timeout: 10_000 })
+  await page.waitForFunction(() => {
+    const plot = document.querySelector('[data-testid="graph-plot"]')
+    return !!(plot && plot.isConnected && document.contains(plot) && plot.getBoundingClientRect().height > 20)
+  })
+  await page.getByTestId('graph-plot').scrollIntoViewIfNeeded()
+}
+
 test.describe('V13 graph readability + portal + real visibility asserts', () => {
   test.beforeAll(() => ensureDirs())
 
@@ -196,7 +207,7 @@ test.describe('V13 graph readability + portal + real visibility asserts', () => 
       await runAlgo(page, '#/algo/bfs')
       await expect(page.getByTestId('graph-view')).toBeVisible()
       await expect(page.getByTestId('graph-plot')).toBeVisible()
-      await page.getByTestId('graph-plot').scrollIntoViewIfNeeded()
+      await scrollPlotStable(page)
       await page.waitForTimeout(250)
       const m = await measureGraphVisibility(page)
       fs.writeFileSync(path.join(OUT_TRACES, `bfs-visibility-${vp.name}.json`), JSON.stringify(m, null, 2))
@@ -216,7 +227,7 @@ test.describe('V13 graph readability + portal + real visibility asserts', () => 
     await runAlgo(page, '#/algo/bfs')
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.waitForTimeout(300)
-    await page.getByTestId('graph-plot').scrollIntoViewIfNeeded()
+    await scrollPlotStable(page)
     const m = await measureGraphVisibility(page)
     fs.writeFileSync(path.join(OUT_TRACES, 'bfs-visibility-resize.json'), JSON.stringify(m, null, 2))
     expect(m.pass, JSON.stringify(m)).toBeTruthy()
@@ -227,7 +238,7 @@ test.describe('V13 graph readability + portal + real visibility asserts', () => 
       await page.setViewportSize({ width: 1280, height: 800 })
       await runAlgo(page, `#/algo/${algo}`)
       await expect(page.getByTestId('graph-view')).toBeVisible()
-      await page.getByTestId('graph-plot').scrollIntoViewIfNeeded()
+      await scrollPlotStable(page)
       await page.waitForTimeout(200)
       const m = await measureGraphVisibility(page)
       fs.writeFileSync(path.join(OUT_TRACES, `${algo}-visibility.json`), JSON.stringify(m, null, 2))

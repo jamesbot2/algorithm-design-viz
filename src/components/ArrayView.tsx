@@ -738,6 +738,66 @@ function ArrayView({
 
 export default memo(ArrayView)
 
+
+/** V19-03: semantic compact sequence — readable chars/values, not clipped full ArrayView cards. */
+function CompactSequenceStrip({
+  step,
+  entries,
+}: {
+  step: Step
+  entries: [string, (number | string)[]][]
+}) {
+  const ptrs = step.arrayPointers ?? {}
+  const highlights = step.highlights ?? {}
+  const roles = step.roles ?? {}
+  const contextBits: string[] = []
+  for (const [name, values] of entries) {
+    const p = ptrs[name]
+    if (!p) continue
+    for (const [lab, idx] of Object.entries(p)) {
+      if (typeof idx === 'number' && idx >= 0 && idx < values.length) {
+        contextBits.push(`${name}[${lab}=${idx}]='${values[idx]}'`)
+      }
+    }
+  }
+  return (
+    <div className="compact-seq-row" data-testid="compact-seq-row">
+      {entries.map(([name, values]) => {
+        const hl = new Set(highlights[name] ?? [])
+        const roleMap = roles[name] ?? {}
+        const p = ptrs[name] ?? {}
+        const ptrIdx = new Set(Object.values(p).filter((v): v is number => typeof v === 'number'))
+        return (
+          <div key={name} className="compact-seq" data-array={name} data-testid={`compact-seq-${name}`}>
+            <span className="compact-seq-name">{name}</span>
+            {values.map((v, i) => {
+              const role = roleMap[i]
+              const isFocus = role === 'focus' || role === 'compare' || hl.has(i)
+              const isPtr = ptrIdx.has(i)
+              return (
+                <span
+                  key={i}
+                  className={`compact-ch${isFocus ? ' is-focus is-compare' : ''}${isPtr ? ' is-ptr' : ''}`}
+                  data-idx={i}
+                  data-testid={`compact-ch-${name}-${i}`}
+                  title={`${name}[${i}]=${String(v)}`}
+                >
+                  {String(v)}
+                </span>
+              )
+            })}
+          </div>
+        )
+      })}
+      {contextBits.length > 0 && (
+        <span className="compact-context" data-testid="compact-context">
+          {contextBits.join(' · ')}
+        </span>
+      )}
+    </div>
+  )
+}
+
 /** Aux copy buffers shown as a compact strip (not full-height second bar chart). */
 const BUFFER_ARRAY_NAMES = new Set(['temp', 'left', 'right', 'key'])
 /** String / label arrays that accompany a DP matrix (LCS X/Y) — compact labels, not primary scene. */
@@ -807,9 +867,12 @@ export const ArraysFromStep = memo(function ArraysFromStep({
         className="arrays-panel array-labels-strip"
         data-testid="array-labels"
         data-companion="1"
+        data-compact-semantic="1"
         aria-label="输入序列"
       >
-        {companionEntries.map(([name, values]) => renderOne(name, values, true))}
+        {companionEntries.length > 0 && (
+          <CompactSequenceStrip step={step} entries={companionEntries} />
+        )}
         {buffers.length > 0 && (
           <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
             {buffers.map(([name, values]) => renderOne(name, values, true))}

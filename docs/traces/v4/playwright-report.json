@@ -4,9 +4,9 @@
       "/home/box/.local/node-v24.20.0-linux-x64/bin/node",
       "/workspace/algorithm-design-viz/node_modules/.bin/playwright",
       "test",
-      "tests/e2e/v9-viewport-motion.spec.ts",
-      "tests/e2e/v10-workflow.spec.ts",
-      "--project=chromium"
+      "tests/e2e/v15-keyboard-dijkstra-inspect-visibility.spec.ts",
+      "tests/e2e/v18-data-body-primary-scene-controls.spec.ts",
+      "--retries=0"
     ],
     "configFile": "/workspace/algorithm-design-viz/playwright.config.ts",
     "rootDir": "/workspace/algorithm-design-viz/tests/e2e",
@@ -73,20 +73,20 @@
   },
   "suites": [
     {
-      "title": "v10-workflow.spec.ts",
-      "file": "v10-workflow.spec.ts",
+      "title": "v15-keyboard-dijkstra-inspect-visibility.spec.ts",
+      "file": "v15-keyboard-dijkstra-inspect-visibility.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "V10-07 real workflow acceptance",
-          "file": "v10-workflow.spec.ts",
-          "line": 81,
+          "title": "V15 keyboard / Dijkstra roles / continuous inspect / visibility",
+          "file": "v15-keyboard-dijkstra-inspect-visibility.spec.ts",
+          "line": 51,
           "column": 6,
           "specs": [
             {
-              "title": "viewport matrix runs edit→run→mid→end with reachable chrome",
+              "title": "V15-01 GraphResultPanel target input arrows do not step playback",
               "ok": true,
               "tags": [],
               "tests": [
@@ -101,12 +101,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 9118,
+                      "duration": 1085,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T15:56:30.359Z",
+                      "startTime": "2026-09-19T01:40:02.062Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -114,13 +114,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "11564b3af0b60f751607-8482c2dc87147a2b21d1",
-              "file": "v10-workflow.spec.ts",
-              "line": 84,
+              "id": "ccf6415ba7b617bec623-05640224a60aca91f607",
+              "file": "v15-keyboard-dijkstra-inspect-visibility.spec.ts",
+              "line": 54,
               "column": 3
             },
             {
-              "title": "continuous short-height resize keeps vars/speed access",
+              "title": "V15-01 Esc closes sheet, restores focus, does not change step",
               "ok": true,
               "tags": [],
               "tests": [
@@ -135,12 +135,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1758,
+                      "duration": 957,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T15:56:39.668Z",
+                      "startTime": "2026-09-19T01:40:03.331Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -148,13 +148,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "11564b3af0b60f751607-713a307f606043771383",
-              "file": "v10-workflow.spec.ts",
-              "line": 138,
+              "id": "ccf6415ba7b617bec623-d4096060af8df2ef0b7a",
+              "file": "v15-keyboard-dijkstra-inspect-visibility.spec.ts",
+              "line": 82,
               "column": 3
             },
             {
-              "title": "theory drawer dialog Escape returns focus",
+              "title": "V15-02 final edge roles: current preds only 0→2 and 2→1",
               "ok": true,
               "tags": [],
               "tests": [
@@ -169,12 +169,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 772,
+                      "duration": 1167,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T15:56:41.433Z",
+                      "startTime": "2026-09-19T01:40:04.296Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -182,9 +182,77 @@
                   "status": "expected"
                 }
               ],
-              "id": "11564b3af0b60f751607-45559f1ff5c2e098b952",
-              "file": "v10-workflow.spec.ts",
-              "line": 178,
+              "id": "ccf6415ba7b617bec623-6029f64103d028d8c6a4",
+              "file": "v15-keyboard-dijkstra-inspect-visibility.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "V15-03 continuous ≥10 steps with data panel open (drawer-internal transport)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1710,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-19T01:40:05.472Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ccf6415ba7b617bec623-cfd47e1a75b2afc29508",
+              "file": "v15-keyboard-dijkstra-inspect-visibility.spec.ts",
+              "line": 150,
+              "column": 3
+            },
+            {
+              "title": "V15-04 strict visibility: pe:none fault fails; positive still ok",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1355,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-19T01:40:07.192Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ccf6415ba7b617bec623-b5a4590c2a3a023266e8",
+              "file": "v15-keyboard-dijkstra-inspect-visibility.spec.ts",
+              "line": 185,
               "column": 3
             }
           ]
@@ -192,22 +260,25 @@
       ]
     },
     {
-      "title": "v9-viewport-motion.spec.ts",
-      "file": "v9-viewport-motion.spec.ts",
+      "title": "v18-data-body-primary-scene-controls.spec.ts",
+      "file": "v18-data-body-primary-scene-controls.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "V9 viewport visibility + motion",
-          "file": "v9-viewport-motion.spec.ts",
-          "line": 14,
+          "title": "V18 data-body / primary-scene / controls / acceptance",
+          "file": "v18-data-body-primary-scene-controls.spec.ts",
+          "line": 124,
           "column": 6,
           "specs": [
             {
-              "title": "kadane stage operable @ 1366x768",
+              "title": "V18-01 sheet body height @1366 and @1920",
               "ok": true,
-              "tags": [],
+              "tags": [
+                "1366",
+                "1920"
+              ],
               "tests": [
                 {
                   "timeout": 120000,
@@ -220,12 +291,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 814,
+                      "duration": 2326,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T15:56:42.224Z",
+                      "startTime": "2026-09-19T01:40:08.565Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -233,285 +304,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "8eeaf8e2cc5ecb4d035b-9bf4242207e31abe2ca8",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 16,
-              "column": 5
-            },
-            {
-              "title": "kadane stage operable @ 1280x800",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 861,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T15:56:43.046Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8eeaf8e2cc5ecb4d035b-b959e060700e5dfebd6d",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 16,
-              "column": 5
-            },
-            {
-              "title": "kadane stage operable @ 1024x500",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 903,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T15:56:43.915Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8eeaf8e2cc5ecb4d035b-b2a652cab32ebb982504",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 16,
-              "column": 5
-            },
-            {
-              "title": "kadane stage operable @ 900x500",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 824,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T15:56:44.826Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8eeaf8e2cc5ecb4d035b-92f248830cc9e13b932a",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 16,
-              "column": 5
-            },
-            {
-              "title": "kadane stage operable @ 390x844",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 821,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T15:56:45.658Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8eeaf8e2cc5ecb4d035b-dd9d11540ef0a833f70c",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 16,
-              "column": 5
-            },
-            {
-              "title": "kadane stage operable @ 360x640",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 838,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T15:56:46.487Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8eeaf8e2cc5ecb4d035b-f5a867b660340938602e",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 16,
-              "column": 5
-            },
-            {
-              "title": "kadane stage operable @ 320x568",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 828,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T15:56:47.334Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8eeaf8e2cc5ecb4d035b-4382486ae53413d463bb",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 16,
-              "column": 5
-            },
-            {
-              "title": "kadane stage operable @ 844x390",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 826,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T15:56:48.168Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8eeaf8e2cc5ecb4d035b-48f952f1dcb053d9504d",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 16,
-              "column": 5
-            },
-            {
-              "title": "dijkstra: graph is main scene; result not above SVG fighting height",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 932,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-09-16T15:56:49.001Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8eeaf8e2cc5ecb4d035b-7e16000d56756e9091a9",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 81,
+              "id": "55e44485a589d364f218-947d3ad20b0777594c9d",
+              "file": "v18-data-body-primary-scene-controls.spec.ts",
+              "line": 128,
               "column": 3
             },
             {
-              "title": "nQueens: board before full search tree (tree aux collapsed)",
+              "title": "V18-02 LCS DP matrix primary in stage; current cell visible",
               "ok": true,
               "tags": [],
               "tests": [
@@ -526,12 +325,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 844,
+                      "duration": 5042,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T15:56:49.940Z",
+                      "startTime": "2026-09-19T01:40:10.906Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -539,15 +338,17 @@
                   "status": "expected"
                 }
               ],
-              "id": "8eeaf8e2cc5ecb4d035b-45382dda90c30d8d724a",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 111,
+              "id": "55e44485a589d364f218-f6977a2cbc66dcfe740d",
+              "file": "v18-data-body-primary-scene-controls.spec.ts",
+              "line": 151,
               "column": 3
             },
             {
-              "title": "V8 mobile tab selector still works",
+              "title": "V18-03 data open: edit/run/theory hittable; compact clip; real click edit @1920",
               "ok": true,
-              "tags": [],
+              "tags": [
+                "1920"
+              ],
               "tests": [
                 {
                   "timeout": 120000,
@@ -560,12 +361,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 657,
+                      "duration": 1761,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-09-16T15:56:50.793Z",
+                      "startTime": "2026-09-19T01:40:15.955Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -573,9 +374,53 @@
                   "status": "expected"
                 }
               ],
-              "id": "8eeaf8e2cc5ecb4d035b-eb19cee9b81689c7cfaa",
-              "file": "v9-viewport-motion.spec.ts",
-              "line": 138,
+              "id": "55e44485a589d364f218-a3a86eadbd6b8bb5b70f",
+              "file": "v18-data-body-primary-scene-controls.spec.ts",
+              "line": 210,
+              "column": 3
+            },
+            {
+              "title": "V18-04 mutation sanity must fail; no force/viewport swap; retries=0",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [
+                    {
+                      "type": "retries",
+                      "description": "0"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1738,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-19T01:40:17.723Z",
+                      "annotations": [
+                        {
+                          "type": "retries",
+                          "description": "0"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "55e44485a589d364f218-7bdfe389314bfdf370ea",
+              "file": "v18-data-body-primary-scene-controls.spec.ts",
+              "line": 255,
               "column": 3
             }
           ]
@@ -585,9 +430,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-16T15:56:29.910Z",
-    "duration": 21668.490999999998,
-    "expected": 14,
+    "startTime": "2026-09-19T01:40:01.530Z",
+    "duration": 18055.12,
+    "expected": 9,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
