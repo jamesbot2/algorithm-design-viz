@@ -2,8 +2,8 @@
 
 **Branch:** `v21-pseudo-pin-matrix`  
 **Baseline HEAD:** `46a8aaa2f014c4968b7a77a4cff9201841b459ca` (V20 live tip)  
-**Tip (fix):**   
-**Tip (docs):** 
+**Tip (fix):** `92b65b888c98d831d54f805c0b97baed359b0e29`  
+**Tip (docs):** `5be940d67d7831591357bd9bd2013ba31770c813`
 **Not pushed. Not deployed. No force-push.** Local branch commits only.
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).
