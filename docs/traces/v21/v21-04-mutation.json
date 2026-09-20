@@ -1,0 +1,20 @@
+{
+  "mutPseudo2": {
+    "ok": true,
+    "visH": 0,
+    "elH": 23,
+    "wrongTop": 264.234375
+  },
+  "pinMut": {
+    "ok": true,
+    "restored": 0,
+    "pinTop": 0
+  },
+  "mutMatrix": {
+    "ok": true,
+    "overhang": -13,
+    "sBottom": 469,
+    "vBottom": 482,
+    "applied": true
+  }
+}

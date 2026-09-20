@@ -1,0 +1,28 @@
+{
+  "short844x390": {
+    "ok": true,
+    "execLine": "2",
+    "text": "2dist[s]=0; 其余=∞; done[*]=false",
+    "offsetParent": "code-pre",
+    "offsetTop": 23,
+    "preScrollTop": 0,
+    "preClientH": 162,
+    "elH": 23,
+    "visH": 23,
+    "clipIntersect": 23,
+    "contentTop": 22.671875
+  },
+  "tall390x844": {
+    "ok": true,
+    "execLine": "2",
+    "text": "2dist[s]=0; 其余=∞; done[*]=false",
+    "offsetParent": "code-pre",
+    "offsetTop": 23,
+    "preScrollTop": 0,
+    "preClientH": 380,
+    "elH": 23,
+    "visH": 23,
+    "clipIntersect": 23,
+    "contentTop": 22.671875
+  }
+}

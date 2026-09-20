@@ -1,0 +1,377 @@
+{
+  "1024x600": {
+    "ok": true,
+    "counter": "14 / 95 · compare",
+    "paused": false,
+    "cell": "2,1",
+    "cellH": 35,
+    "scrollerClientH": 92,
+    "scrollerRectH": 92,
+    "intersectClip": 35,
+    "vsScroll": 35,
+    "minH": "min(64px, 100%)",
+    "chain": [
+      {
+        "cls": "matrix-scroll",
+        "ov": "auto",
+        "h": 92,
+        "top": 316,
+        "bottom": 407,
+        "clientH": 92,
+        "minH": "min(64px, 100%)"
+      },
+      {
+        "cls": "matrix-view",
+        "ov": "hidden",
+        "h": 118,
+        "top": 303,
+        "bottom": 420,
+        "clientH": 116,
+        "minH": "0px"
+      },
+      {
+        "cls": "matrices-panel",
+        "ov": "hidden",
+        "h": 127,
+        "top": 294,
+        "bottom": 420,
+        "clientH": 127,
+        "minH": "0px"
+      },
+      {
+        "cls": "viz-main stage-viewport",
+        "ov": "hidden",
+        "h": 158,
+        "top": 262,
+        "bottom": 420,
+        "clientH": 158,
+        "minH": "0px"
+      },
+      {
+        "cls": "viz-body viz-body-single",
+        "ov": "hidden",
+        "h": 158,
+        "top": 262,
+        "bottom": 420,
+        "clientH": 158,
+        "minH": "0px"
+      },
+      {
+        "cls": "visualizer",
+        "ov": "hidden",
+        "h": 274,
+        "top": 194,
+        "bottom": 468,
+        "clientH": 272,
+        "minH": "0px"
+      },
+      {
+        "cls": "workbench-panel-inner",
+        "ov": "auto",
+        "h": 274,
+        "top": 194,
+        "bottom": 468,
+        "clientH": 274,
+        "minH": "0px"
+      },
+      {
+        "cls": "workbench-viz-panel",
+        "ov": "auto",
+        "h": 274,
+        "top": 194,
+        "bottom": 468,
+        "clientH": 274,
+        "minH": "0px"
+      },
+      {
+        "cls": "workbench-panels workbench-panels-stable",
+        "ov": "hidden",
+        "h": 274,
+        "top": 194,
+        "bottom": 468,
+        "clientH": 274,
+        "minH": "0px"
+      },
+      {
+        "cls": "workbench-layout",
+        "ov": "hidden",
+        "h": 434,
+        "top": 160,
+        "bottom": 594,
+        "clientH": 432,
+        "minH": "200px"
+      },
+      {
+        "cls": "page algo-page",
+        "ov": "hidden",
+        "h": 528,
+        "top": 66,
+        "bottom": 594,
+        "clientH": 528,
+        "minH": "0px"
+      },
+      {
+        "cls": "main wide",
+        "ov": "hidden",
+        "h": 542,
+        "top": 58,
+        "bottom": 600,
+        "clientH": 542,
+        "minH": "0px"
+      },
+      {
+        "cls": "main-wrap",
+        "ov": "hidden",
+        "h": 600,
+        "top": 0,
+        "bottom": 600,
+        "clientH": 600,
+        "minH": "600px"
+      }
+    ]
+  },
+  "1920x1080": {
+    "ok": true,
+    "counter": "14 / 95 · compare",
+    "paused": false,
+    "cell": "2,1",
+    "cellH": 35,
+    "scrollerClientH": 218,
+    "scrollerRectH": 218,
+    "intersectClip": 35,
+    "vsScroll": 35,
+    "minH": "min(48px, 100%)",
+    "chain": [
+      {
+        "cls": "matrix-scroll",
+        "ov": "auto",
+        "h": 218,
+        "top": 562,
+        "bottom": 779,
+        "clientH": 218,
+        "minH": "min(48px, 100%)"
+      },
+      {
+        "cls": "matrix-view",
+        "ov": "hidden",
+        "h": 266,
+        "top": 526,
+        "bottom": 792,
+        "clientH": 264,
+        "minH": "0px"
+      },
+      {
+        "cls": "matrices-panel",
+        "ov": "hidden",
+        "h": 284,
+        "top": 509,
+        "bottom": 792,
+        "clientH": 284,
+        "minH": "0px"
+      },
+      {
+        "cls": "viz-main stage-viewport",
+        "ov": "hidden",
+        "h": 318,
+        "top": 475,
+        "bottom": 792,
+        "clientH": 318,
+        "minH": "0px"
+      },
+      {
+        "cls": "viz-body viz-body-single",
+        "ov": "hidden",
+        "h": 424,
+        "top": 475,
+        "bottom": 899,
+        "clientH": 424,
+        "minH": "0px"
+      },
+      {
+        "cls": "visualizer",
+        "ov": "hidden",
+        "h": 615,
+        "top": 331,
+        "bottom": 946,
+        "clientH": 613,
+        "minH": "0px"
+      },
+      {
+        "cls": "workbench-panel-inner",
+        "ov": "auto",
+        "h": 615,
+        "top": 331,
+        "bottom": 946,
+        "clientH": 615,
+        "minH": "0px"
+      },
+      {
+        "cls": "workbench-viz-panel",
+        "ov": "auto",
+        "h": 615,
+        "top": 331,
+        "bottom": 946,
+        "clientH": 615,
+        "minH": "0px"
+      },
+      {
+        "cls": "workbench-panels workbench-panels-stable",
+        "ov": "hidden",
+        "h": 615,
+        "top": 331,
+        "bottom": 946,
+        "clientH": 615,
+        "minH": "0px"
+      },
+      {
+        "cls": "workbench-layout",
+        "ov": "hidden",
+        "h": 776,
+        "top": 297,
+        "bottom": 1074,
+        "clientH": 774,
+        "minH": "200px"
+      },
+      {
+        "cls": "page algo-page",
+        "ov": "hidden",
+        "h": 1008,
+        "top": 66,
+        "bottom": 1074,
+        "clientH": 1008,
+        "minH": "0px"
+      },
+      {
+        "cls": "main wide",
+        "ov": "hidden",
+        "h": 1022,
+        "top": 58,
+        "bottom": 1080,
+        "clientH": 1022,
+        "minH": "0px"
+      },
+      {
+        "cls": "main-wrap",
+        "ov": "hidden",
+        "h": 1080,
+        "top": 0,
+        "bottom": 1080,
+        "clientH": 1080,
+        "minH": "1080px"
+      }
+    ]
+  },
+  "844x390": {
+    "ok": true,
+    "counter": "14 / 95 · compare",
+    "paused": false,
+    "cell": "2,1",
+    "cellH": 35,
+    "scrollerClientH": 93,
+    "scrollerRectH": 93,
+    "intersectClip": 35,
+    "vsScroll": 35,
+    "minH": "min(64px, 100%)",
+    "chain": [
+      {
+        "cls": "matrix-scroll",
+        "ov": "auto",
+        "h": 93,
+        "top": 202,
+        "bottom": 295,
+        "clientH": 93,
+        "minH": "min(64px, 100%)"
+      },
+      {
+        "cls": "matrix-view",
+        "ov": "hidden",
+        "h": 119,
+        "top": 189,
+        "bottom": 308,
+        "clientH": 117,
+        "minH": "0px"
+      },
+      {
+        "cls": "matrices-panel",
+        "ov": "hidden",
+        "h": 128,
+        "top": 181,
+        "bottom": 308,
+        "clientH": 128,
+        "minH": "0px"
+      },
+      {
+        "cls": "viz-main stage-viewport",
+        "ov": "hidden",
+        "h": 152,
+        "top": 156,
+        "bottom": 308,
+        "clientH": 152,
+        "minH": "0px"
+      },
+      {
+        "cls": "viz-body viz-body-single",
+        "ov": "hidden",
+        "h": 152,
+        "top": 156,
+        "bottom": 308,
+        "clientH": 152,
+        "minH": "0px"
+      },
+      {
+        "cls": "visualizer",
+        "ov": "hidden",
+        "h": 240,
+        "top": 88,
+        "bottom": 328,
+        "clientH": 238,
+        "minH": "240px"
+      },
+      {
+        "cls": "workbench-panel-inner",
+        "ov": "auto",
+        "h": 240,
+        "top": 88,
+        "bottom": 328,
+        "clientH": 240,
+        "minH": "200px"
+      },
+      {
+        "cls": "workbench-viz-panel",
+        "ov": "auto",
+        "h": 240,
+        "top": 88,
+        "bottom": 328,
+        "clientH": 240,
+        "minH": "0px"
+      },
+      {
+        "cls": "page algo-page",
+        "ov": "hidden",
+        "h": 347,
+        "top": 42,
+        "bottom": 388,
+        "clientH": 347,
+        "minH": "0px"
+      },
+      {
+        "cls": "main wide",
+        "ov": "hidden",
+        "h": 350,
+        "top": 40,
+        "bottom": 390,
+        "clientH": 350,
+        "minH": "0px"
+      },
+      {
+        "cls": "main-wrap",
+        "ov": "hidden",
+        "h": 390,
+        "top": 0,
+        "bottom": 390,
+        "clientH": 390,
+        "minH": "390px"
+      }
+    ]
+  }
+}

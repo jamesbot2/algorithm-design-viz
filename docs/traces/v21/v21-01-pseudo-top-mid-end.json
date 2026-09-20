@@ -1,0 +1,54 @@
+{
+  "mid": {
+    "ok": true,
+    "execLine": "8",
+    "text": "8    if dist[u]+w < dist[v]:",
+    "offsetParent": "code-pre",
+    "offsetTop": 159,
+    "preScrollTop": 50,
+    "preClientH": 154,
+    "elH": 23,
+    "visH": 23,
+    "clipIntersect": 23,
+    "contentTop": 158.703125
+  },
+  "end": {
+    "ok": true,
+    "execLine": "4",
+    "text": "4  u = argmin { dist[i] | not done[i] }",
+    "offsetParent": "code-pre",
+    "offsetTop": 68,
+    "preScrollTop": 50,
+    "preClientH": 154,
+    "elH": 23,
+    "visH": 23,
+    "clipIntersect": 23,
+    "contentTop": 68.015625
+  },
+  "restored": {
+    "ok": true,
+    "execLine": "4",
+    "text": "4  u = argmin { dist[i] | not done[i] }",
+    "offsetParent": "code-pre",
+    "offsetTop": 68,
+    "preScrollTop": 0,
+    "preClientH": 154,
+    "elH": 23,
+    "visH": 23,
+    "clipIntersect": 23,
+    "contentTop": 68.015625
+  },
+  "afterGoto": {
+    "ok": true,
+    "execLine": "4",
+    "text": "4  u = argmin { dist[i] | not done[i] }",
+    "offsetParent": "code-pre",
+    "offsetTop": 68,
+    "preScrollTop": 2,
+    "preClientH": 154,
+    "elH": 23,
+    "visH": 23,
+    "clipIntersect": 23,
+    "contentTop": 68.015625
+  }
+}

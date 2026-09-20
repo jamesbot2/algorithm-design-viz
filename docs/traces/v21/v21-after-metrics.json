@@ -1,0 +1,36 @@
+{
+  "label": "after",
+  "at": "2026-09-20T06:26:40.406Z",
+  "pseudo_1366x600": {
+    "visH": 23,
+    "elH": 23,
+    "offsetParent": "code-pre",
+    "preScrollTop": 0,
+    "contentTop": 22.671875
+  },
+  "pseudo_844x390": {
+    "visH": 23,
+    "elH": 23,
+    "offsetParent": "code-pre",
+    "preScrollTop": 0,
+    "contentTop": 22.671875
+  },
+  "pin": {
+    "at140": {
+      "scrollTop": 150,
+      "paused": true
+    },
+    "afterData": {
+      "scrollTop": 186,
+      "paused": true,
+      "clientH": 233
+    }
+  },
+  "matrix_14": {
+    "cellH": 35,
+    "intersectClip": 35,
+    "minH": "min(48px, 100%)",
+    "scrollerClientH": 133,
+    "overhang": -13
+  }
+}

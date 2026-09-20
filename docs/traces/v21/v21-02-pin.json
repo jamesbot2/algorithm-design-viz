@@ -1,0 +1,32 @@
+{
+  "at0": {
+    "scrollTop": 0,
+    "clientH": 322,
+    "paused": true,
+    "vh": 768
+  },
+  "at140": {
+    "scrollTop": 160,
+    "clientH": 322,
+    "paused": true,
+    "vh": 768
+  },
+  "afterData": {
+    "scrollTop": 196,
+    "clientH": 233,
+    "paused": true,
+    "vh": 768
+  },
+  "beforeH": {
+    "scrollTop": 160,
+    "clientH": 322,
+    "paused": true,
+    "vh": 768
+  },
+  "afterH": {
+    "scrollTop": 160,
+    "clientH": 334,
+    "paused": true,
+    "vh": 780
+  }
+}
