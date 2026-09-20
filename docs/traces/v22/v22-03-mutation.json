@@ -1,0 +1,189 @@
+{
+  "mutStrip": {
+    "ok": true,
+    "crushed": 13,
+    "total": 13
+  },
+  "mutBar": {
+    "ok": true,
+    "visH": 6,
+    "elH": 19,
+    "fail": true
+  },
+  "mutMatrix": {
+    "ok": true,
+    "overhang": 115.71875,
+    "fail": true
+  },
+  "mutCode": {
+    "ok": true,
+    "w": 0,
+    "fail": true
+  },
+  "before": {
+    "counter": "14 / 95 · compare",
+    "runId": "run_mu9k08y2_9tmhg2g",
+    "cursor": null,
+    "vp": {
+      "w": 1366,
+      "h": 768
+    },
+    "stripH": 25.21875,
+    "glyphs": {
+      "total": 13,
+      "fullReadable": 13,
+      "falsePos8": 0,
+      "minVisH": 20.4375,
+      "avgElH": 20.4375,
+      "sample": [
+        {
+          "full": true,
+          "falsePos8": false,
+          "visH": 20.4375,
+          "elH": 20.4375,
+          "text": "A"
+        },
+        {
+          "full": true,
+          "falsePos8": false,
+          "visH": 20.4375,
+          "elH": 20.4375,
+          "text": "B"
+        },
+        {
+          "full": true,
+          "falsePos8": false,
+          "visH": 20.4375,
+          "elH": 20.4375,
+          "text": "C"
+        },
+        {
+          "full": true,
+          "falsePos8": false,
+          "visH": 20.4375,
+          "elH": 20.4375,
+          "text": "B"
+        }
+      ]
+    },
+    "locate": {
+      "ok": true,
+      "elH": 19,
+      "visH": 19,
+      "elW": 70.765625,
+      "visW": 70.765625,
+      "hit": true,
+      "disabled": false
+    },
+    "resume": {
+      "ok": true,
+      "elH": 19,
+      "visH": 19,
+      "elW": 59.25,
+      "visW": 59.25,
+      "hit": true,
+      "disabled": true
+    },
+    "matrix": {
+      "cellOk": true,
+      "cellH": 35.4375,
+      "cellIntersect": 35.4375,
+      "neighborOk": true,
+      "scrollH": 111.28125,
+      "clientH": 111,
+      "minH": "min(48px, 100%)",
+      "overhang": -13,
+      "paused": false
+    },
+    "code": {
+      "wrapW": 461.5,
+      "execVisH": 18.1875,
+      "execElH": 18.1875,
+      "execLine": 10,
+      "cmClientH": 322
+    }
+  },
+  "after": {
+    "counter": "14 / 95 · compare",
+    "runId": "run_mu9k08y2_9tmhg2g",
+    "cursor": null,
+    "vp": {
+      "w": 1366,
+      "h": 768
+    },
+    "stripH": 25.21875,
+    "glyphs": {
+      "total": 13,
+      "fullReadable": 13,
+      "falsePos8": 0,
+      "minVisH": 20.4375,
+      "avgElH": 20.4375,
+      "sample": [
+        {
+          "full": true,
+          "falsePos8": false,
+          "visH": 20.4375,
+          "elH": 20.4375,
+          "text": "A"
+        },
+        {
+          "full": true,
+          "falsePos8": false,
+          "visH": 20.4375,
+          "elH": 20.4375,
+          "text": "B"
+        },
+        {
+          "full": true,
+          "falsePos8": false,
+          "visH": 20.4375,
+          "elH": 20.4375,
+          "text": "C"
+        },
+        {
+          "full": true,
+          "falsePos8": false,
+          "visH": 20.4375,
+          "elH": 20.4375,
+          "text": "B"
+        }
+      ]
+    },
+    "locate": {
+      "ok": true,
+      "elH": 19,
+      "visH": 19,
+      "elW": 70.765625,
+      "visW": 70.765625,
+      "hit": true,
+      "disabled": false
+    },
+    "resume": {
+      "ok": true,
+      "elH": 19,
+      "visH": 19,
+      "elW": 59.25,
+      "visW": 59.25,
+      "hit": true,
+      "disabled": true
+    },
+    "matrix": {
+      "cellOk": true,
+      "cellH": 35.4375,
+      "cellIntersect": 35.4375,
+      "neighborOk": true,
+      "scrollH": 111.28125,
+      "clientH": 111,
+      "minH": "min(48px, 100%)",
+      "overhang": -13,
+      "paused": false
+    },
+    "code": {
+      "wrapW": 461.5,
+      "execVisH": 18.1875,
+      "execElH": 18.1875,
+      "execLine": 10,
+      "cmClientH": 322
+    }
+  }
+}

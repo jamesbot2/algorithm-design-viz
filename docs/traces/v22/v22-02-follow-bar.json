@@ -1,0 +1,20 @@
+{
+  "1024": {
+    "ok": true,
+    "elH": 19,
+    "visH": 19,
+    "elW": 70.765625,
+    "visW": 70.765625,
+    "hit": true,
+    "disabled": false
+  },
+  "1366": {
+    "ok": true,
+    "elH": 19,
+    "visH": 19,
+    "elW": 70.765625,
+    "visW": 70.765625,
+    "hit": true,
+    "disabled": false
+  }
+}

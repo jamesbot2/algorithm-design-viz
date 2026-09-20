@@ -1,0 +1,52 @@
+{
+  "1366x768": {
+    "stripH": 25.21875,
+    "glyphMinVis": 20.4375,
+    "glyphAvgH": 20.4375,
+    "locateVis": 19,
+    "locateH": 19,
+    "cellIntersect": 35.4375,
+    "cellH": 35.4375,
+    "scrollH": 111.28125
+  },
+  "1024x600": {
+    "stripH": 44.25,
+    "glyphMinVis": 20.4375,
+    "glyphAvgH": 20.4375,
+    "locateVis": 19,
+    "locateH": 19,
+    "cellIntersect": 35.4375,
+    "cellH": 35.4375,
+    "scrollH": 50.828125
+  },
+  "1920x1080": {
+    "stripH": 25.21875,
+    "glyphMinVis": 20.4375,
+    "glyphAvgH": 20.4375,
+    "locateVis": 19,
+    "locateH": 19,
+    "cellIntersect": 35.4375,
+    "cellH": 35.4375,
+    "scrollH": 207.421875
+  },
+  "390x844": {
+    "stripH": 46.34375,
+    "glyphMinVis": 20.4375,
+    "glyphAvgH": 20.4375,
+    "locateVis": 19,
+    "locateH": 19,
+    "cellIntersect": 35.4375,
+    "cellH": 35.4375,
+    "scrollH": 313.9375
+  },
+  "844x390": {
+    "stripH": 25.21875,
+    "glyphMinVis": 20.4375,
+    "glyphAvgH": 20.4375,
+    "locateVis": 19,
+    "locateH": 19,
+    "cellIntersect": 35.4375,
+    "cellH": 35.4375,
+    "scrollH": 63.796875
+  }
+}

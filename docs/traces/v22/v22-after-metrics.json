@@ -1,0 +1,372 @@
+{
+  "lcs14_1366x768": {
+    "counter": "14 / 95 · compare",
+    "runId": "run_mu9jwcuf_fivyhin",
+    "vp": {
+      "w": 1366,
+      "h": 768
+    },
+    "strip": {
+      "h": 25.2,
+      "flex": "0 0 auto",
+      "minH": "23.248px",
+      "maxH": "min(72px, 40%)",
+      "overflow": "auto"
+    },
+    "glyphs": {
+      "total": 13,
+      "sample": [
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "C"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "D"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        }
+      ],
+      "avgH": 20.4,
+      "avgVis": 20.4,
+      "minVis": 20.4,
+      "fullReadable90": 13,
+      "falsePos8": 0
+    },
+    "followBar": {
+      "h": 19.4,
+      "flex": "0 0 auto",
+      "minH": "19.424px",
+      "maxH": "none",
+      "overflow": "visible",
+      "locateH": 19,
+      "locateVis": 19,
+      "resumeH": 19,
+      "resumeVis": 19
+    },
+    "matrix": {
+      "scrollH": 111,
+      "clientH": 111,
+      "cellH": 35,
+      "cellIntersect": 35,
+      "minH": "min(48px, 100%)",
+      "maxH": "100%"
+    }
+  },
+  "lcs14_1024x600": {
+    "counter": "14 / 95 · compare",
+    "runId": "run_mu9jweaa_jym38vx",
+    "vp": {
+      "w": 1024,
+      "h": 600
+    },
+    "strip": {
+      "h": 44.3,
+      "flex": "0 0 auto",
+      "minH": "23.248px",
+      "maxH": "min(51.2px, 28%)",
+      "overflow": "auto"
+    },
+    "glyphs": {
+      "total": 13,
+      "sample": [
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "C"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "D"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        }
+      ],
+      "avgH": 20.4,
+      "avgVis": 20.4,
+      "minVis": 20.4,
+      "fullReadable90": 13,
+      "falsePos8": 0
+    },
+    "followBar": {
+      "h": 19.4,
+      "flex": "0 0 auto",
+      "minH": "19.424px",
+      "maxH": "none",
+      "overflow": "visible",
+      "locateH": 19,
+      "locateVis": 19,
+      "resumeH": 19,
+      "resumeVis": 19
+    },
+    "matrix": {
+      "scrollH": 51,
+      "clientH": 51,
+      "cellH": 35,
+      "cellIntersect": 35,
+      "minH": "min(64px, 100%)",
+      "maxH": "100%"
+    }
+  },
+  "lcs14_1920x1080": {
+    "counter": "14 / 95 · compare",
+    "runId": "run_mu9jwfwm_5u92tnt",
+    "vp": {
+      "w": 1920,
+      "h": 1080
+    },
+    "strip": {
+      "h": 25.2,
+      "flex": "0 0 auto",
+      "minH": "23.248px",
+      "maxH": "min(72px, 40%)",
+      "overflow": "auto"
+    },
+    "glyphs": {
+      "total": 13,
+      "sample": [
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "C"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "D"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        }
+      ],
+      "avgH": 20.4,
+      "avgVis": 20.4,
+      "minVis": 20.4,
+      "fullReadable90": 13,
+      "falsePos8": 0
+    },
+    "followBar": {
+      "h": 19.4,
+      "flex": "0 0 auto",
+      "minH": "19.424px",
+      "maxH": "none",
+      "overflow": "visible",
+      "locateH": 19,
+      "locateVis": 19,
+      "resumeH": 19,
+      "resumeVis": 19
+    },
+    "matrix": {
+      "scrollH": 207,
+      "clientH": 207,
+      "cellH": 35,
+      "cellIntersect": 35,
+      "minH": "min(48px, 100%)",
+      "maxH": "100%"
+    }
+  },
+  "lcs14_390x844": {
+    "counter": "14 / 95 · compare",
+    "runId": "run_mu9jwhbg_xv2cwum",
+    "vp": {
+      "w": 390,
+      "h": 844
+    },
+    "strip": {
+      "h": 46.3,
+      "flex": "0 0 auto",
+      "minH": "23.248px",
+      "maxH": "min(72px, 40%)",
+      "overflow": "auto"
+    },
+    "glyphs": {
+      "total": 13,
+      "sample": [
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "C"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "D"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        }
+      ],
+      "avgH": 20.4,
+      "avgVis": 20.4,
+      "minVis": 20.4,
+      "fullReadable90": 13,
+      "falsePos8": 0
+    },
+    "followBar": {
+      "h": 19.4,
+      "flex": "0 0 auto",
+      "minH": "19.424px",
+      "maxH": "none",
+      "overflow": "visible",
+      "locateH": 19,
+      "locateVis": 19,
+      "resumeH": 19,
+      "resumeVis": 19
+    },
+    "matrix": {
+      "scrollH": 314,
+      "clientH": 314,
+      "cellH": 35,
+      "cellIntersect": 35,
+      "minH": "min(48px, 100%)",
+      "maxH": "100%"
+    }
+  },
+  "lcs14_844x390": {
+    "counter": "14 / 95 · compare",
+    "runId": "run_mu9jwin6_92l88am",
+    "vp": {
+      "w": 844,
+      "h": 390
+    },
+    "strip": {
+      "h": 25.2,
+      "flex": "0 0 auto",
+      "minH": "23.248px",
+      "maxH": "min(51.2px, 28%)",
+      "overflow": "auto"
+    },
+    "glyphs": {
+      "total": 13,
+      "sample": [
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "C"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "B"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "D"
+        },
+        {
+          "h": 20.4,
+          "vis": 20.4,
+          "t": "A"
+        }
+      ],
+      "avgH": 20.4,
+      "avgVis": 20.4,
+      "minVis": 20.4,
+      "fullReadable90": 13,
+      "falsePos8": 0
+    },
+    "followBar": {
+      "h": 19.4,
+      "flex": "0 0 auto",
+      "minH": "19.424px",
+      "maxH": "none",
+      "overflow": "visible",
+      "locateH": 19,
+      "locateVis": 19,
+      "resumeH": 19,
+      "resumeVis": 19
+    },
+    "matrix": {
+      "scrollH": 64,
+      "clientH": 64,
+      "cellH": 35,
+      "cellIntersect": 35,
+      "minH": "min(64px, 100%)",
+      "maxH": "100%"
+    }
+  }
+}

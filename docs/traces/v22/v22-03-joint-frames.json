@@ -1,0 +1,68 @@
+[
+  {
+    "algo": "lcs",
+    "frame": 1,
+    "glyphFull": 13,
+    "locateVis": 19,
+    "cellIntersect": 0,
+    "codeW": 461.5
+  },
+  {
+    "algo": "lcs",
+    "frame": 14,
+    "glyphFull": 13,
+    "locateVis": 19,
+    "cellIntersect": 35.4375,
+    "codeW": 461.5
+  },
+  {
+    "algo": "lcs",
+    "frame": 31,
+    "glyphFull": 13,
+    "locateVis": 19,
+    "cellIntersect": 35.86444091796875,
+    "codeW": 461.5
+  },
+  {
+    "algo": "lcs",
+    "frame": 74,
+    "glyphFull": 13,
+    "locateVis": 19,
+    "cellIntersect": 35.4375,
+    "codeW": 461.5
+  },
+  {
+    "algo": "lcs",
+    "frame": 75,
+    "glyphFull": 13,
+    "locateVis": 19,
+    "cellIntersect": 35.792236328125,
+    "codeW": 461.5
+  },
+  {
+    "algo": "lcs",
+    "frame": 94,
+    "glyphFull": 13,
+    "locateVis": 19,
+    "cellIntersect": 35.4375,
+    "codeW": 461.5
+  },
+  {
+    "algo": "lcs",
+    "frame": 95,
+    "glyphFull": 13,
+    "locateVis": 19,
+    "cellIntersect": 35.4375,
+    "codeW": 461.5
+  },
+  {
+    "algo": "editDistance",
+    "glyphs": 13,
+    "cell": 35.86395263671875
+  },
+  {
+    "algo": "knapsack01",
+    "glyphs": 8,
+    "cell": 35.4375
+  }
+]
