@@ -376,10 +376,11 @@ button.icon-btn {
   background: #262626;
   border: 1px solid var(--border-soft);
   border-radius: 12px;
-  padding: 0.75rem 1rem;
+  /* V20-02: vertical pad lives on .viz-banner-slot budget — avoid double-pad clip */
+  padding: 0;
   margin-bottom: 0.85rem;
   font-weight: 500;
-  min-height: 2.8rem;
+  min-height: 0;
   color: var(--text);
   font-size: 0.95rem;
 }
@@ -1591,25 +1592,35 @@ button.icon-btn {
   overflow: hidden;
 }
 .viz-banner-slot {
-  /* V10-01 / V19-04: text may clip; controls (vars toggle) must keep full geometry */
-  height: 3.6rem;
-  min-height: 3.6rem;
-  max-height: 3.6rem;
-  overflow: hidden;
+  /* V20-02: unified content-height budget ≥1 full glyph line always (not only :has(toggle)) */
+  --banner-line-h: 1.35em;
+  --banner-pad-y: 0.35rem;
+  --banner-font: 0.9rem;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex: 0 0 auto;
+  height: auto;
+  min-height: calc(var(--banner-pad-y) * 2 + var(--banner-line-h));
+  max-height: calc(var(--banner-pad-y) * 2 + var(--banner-line-h) * 3 + 0.25rem);
+  padding: var(--banner-pad-y) 0.75rem;
+  overflow: hidden;
+  font-size: var(--banner-font);
 }
 .viz-banner-text {
   flex: 1 1 auto;
   min-width: 0;
-  line-height: 1.35;
+  line-height: var(--banner-line-h);
+  font-size: inherit;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  max-height: 100%;
+  text-overflow: ellipsis;
+  /* Content box must fit ≥1 full line — never half-glyph clip */
+  min-height: var(--banner-line-h);
+  max-height: calc(var(--banner-line-h) * 3);
 }
 .viz-banner-controls {
   flex: 0 0 auto;
@@ -2204,21 +2215,19 @@ html, body, #root {
   min-height: 0 !important;
 }
 .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-  height: 2.8rem;
-  min-height: 2.8rem;
-  max-height: 2.8rem;
-}
-/* V19-04: when drawer toggle is shown, keep full button (not half-clipped by 2rem laptop rule) */
-.main-wrap[data-lab-fill="1"] .viz-banner-slot:has(.inspector-sheet-toggle:not([hidden])) {
+  --banner-pad-y: 0.3rem;
+  --banner-font: 0.88rem;
+  --banner-line-h: 1.3em;
   height: auto;
-  min-height: 2.5rem;
-  max-height: 3rem;
-  overflow: visible;
+  min-height: calc(var(--banner-pad-y) * 2 + max(var(--banner-line-h), 1.75rem));
+  max-height: calc(var(--banner-pad-y) * 2 + var(--banner-line-h) * 2 + 0.15rem);
+  overflow: hidden;
   align-items: center;
 }
-.main-wrap[data-lab-fill="1"] .viz-banner-slot:has(.inspector-sheet-toggle:not([hidden])) .viz-banner-text {
+.main-wrap[data-lab-fill="1"] .viz-banner-text {
   -webkit-line-clamp: 2;
-  max-height: 2.4rem;
+  min-height: var(--banner-line-h);
+  max-height: calc(var(--banner-line-h) * 2);
   overflow: hidden;
 }
 .main-wrap[data-lab-fill="1"] .viz-banner-controls .inspector-sheet-toggle {
@@ -2623,14 +2632,18 @@ html, body, #root {
     min-height: min(112px, 26vh);
   }
   .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-    max-height: 1.8rem;
-    min-height: 1.5rem;
-    height: 1.6rem;
+    --banner-pad-y: 0.2rem;
+    --banner-font: 0.78rem;
+    --banner-line-h: 1.25em;
+    height: auto;
+    min-height: calc(var(--banner-pad-y) * 2 + max(1.25em, 1.6rem));
+    max-height: calc(var(--banner-pad-y) * 2 + 1.25em + 0.15rem);
   }
   .main-wrap[data-lab-fill="1"] .viz-banner-text {
     -webkit-line-clamp: 1;
-    max-height: 1.5rem;
-    font-size: 0.78rem;
+    min-height: var(--banner-line-h);
+    max-height: var(--banner-line-h);
+    font-size: var(--banner-font);
   }
   /* V11 fix: NEVER hide Run on short height (preview + after-run).
      Collapse idle Cancel / status chrome only; keep [data-testid=run-btn] operable. */
@@ -2816,10 +2829,13 @@ html, body, #root {
     height: auto;
     min-height: 0;
   }
-  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-    max-height: 1.35rem;
-    min-height: 1.2rem;
-    height: 1.25rem;
+    .main-wrap[data-lab-fill="1"] .viz-banner-slot {
+    --banner-pad-y: 0.15rem;
+    --banner-font: 0.75rem;
+    --banner-line-h: 1.2em;
+    height: auto;
+    min-height: calc(var(--banner-pad-y) * 2 + max(1.2em, 1.5rem));
+    max-height: calc(var(--banner-pad-y) * 2 + 1.2em + 0.1rem);
   }
 }
 
@@ -2862,10 +2878,13 @@ html, body, #root {
   .main-wrap[data-lab-fill="1"] .bars-wrap:not(.signed) {
     min-height: min(130px, 34vh);
   }
-  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-    max-height: 1.5rem;
-    min-height: 1.25rem;
-    height: 1.35rem;
+    .main-wrap[data-lab-fill="1"] .viz-banner-slot {
+    --banner-pad-y: 0.15rem;
+    --banner-font: 0.75rem;
+    --banner-line-h: 1.2em;
+    height: auto;
+    min-height: calc(var(--banner-pad-y) * 2 + max(1.2em, 1.5rem));
+    max-height: calc(var(--banner-pad-y) * 2 + 1.2em + 0.1rem);
   }
   .main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar button {
     padding: 0.15rem 0.35rem;
@@ -3272,15 +3291,14 @@ html, body, #root {
     display: none;
   }
   .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-    height: 2rem;
-    min-height: 2rem;
-    max-height: 2rem;
-  }
-  .main-wrap[data-lab-fill="1"] .viz-banner-slot:has(.inspector-sheet-toggle:not([hidden])) {
+    /* V20-02: never 32px+12+12 → 6px text; budget ≥1 glyph line + controls */
+    --banner-pad-y: 0.25rem;
+    --banner-font: 0.82rem;
+    --banner-line-h: 1.25em;
     height: auto;
-    min-height: 2.35rem;
-    max-height: 2.85rem;
-    overflow: visible;
+    min-height: calc(var(--banner-pad-y) * 2 + max(1.25em, 1.75rem));
+    max-height: calc(var(--banner-pad-y) * 2 + 1.25em * 2 + 0.2rem);
+    overflow: hidden;
   }
   .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
     max-height: 2.4rem;

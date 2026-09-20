@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { EditorView, Decoration, gutter, GutterMarker, keymap } from '@codemirror/view'
-import { RangeSetBuilder, StateEffect, StateField, type Extension, type Range } from '@codemirror/state'
+import { Compartment, RangeSetBuilder, StateEffect, StateField, type Extension, type Range } from '@codemirror/state'
+import { createScrollFollowIntent } from '../../utils/scrollFollowIntent'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { highlightSelectionMatches, searchKeymap, search } from '@codemirror/search'
 import type { CodeDocument, SourceRange } from '../../codeCatalog/types'
@@ -182,12 +183,18 @@ export default function CodeBrowser({
   const [lineWrap, setLineWrap] = useState(true)
   const viewRef = useRef<EditorView | null>(null)
   const pseudoPreRef = useRef<HTMLPreElement | null>(null)
-  const programmaticScroll = useRef(false)
   const scrollGen = useRef(0)
   const pseudoScrollCleanup = useRef<(() => void) | null>(null)
+  const intentRef = useRef(createScrollFollowIntent())
+  const wrapCompartment = useRef(new Compartment())
+  const followExecRef = useRef(true)
+  const userScrolledAwayRef = useRef(false)
+  const execLine1Ref = useRef<number | null>(null)
   const { theme } = useLabTheme()
   const { mode: motionMode } = useMotion()
   const reduceMotion = motionMode === 'reduced'
+  followExecRef.current = followExec
+  userScrolledAwayRef.current = userScrolledAway
 
   const cmTheme = theme === 'lab-light' ? 'light' : 'dark'
 
@@ -228,6 +235,7 @@ export default function CodeBrowser({
     }
     return null
   }, [execRange, activeLine, tab, execAnchorId])
+  execLine1Ref.current = execLine1
 
   const contextLines = useMemo(() => {
     if (!activeDoc || unmapped) return [] as number[]
@@ -252,7 +260,8 @@ export default function CodeBrowser({
       keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
       buildExecGutter(),
       EditorView.editable.of(false),
-      EditorView.lineWrapping,
+      // V20-03: line wrap via Compartment — toggled without remount
+      wrapCompartment.current.of(EditorView.lineWrapping),
       EditorView.domEventHandlers({
         mousedown: () => false,
       }),
@@ -260,14 +269,8 @@ export default function CodeBrowser({
     return exts
   }, [])
 
-  const markProgrammatic = useCallback(() => {
-    programmaticScroll.current = true
-    const gen = ++scrollGen.current
-    // Clear on next frames instead of fixed 80/120ms guess
-    const clear = () => {
-      if (scrollGen.current === gen) programmaticScroll.current = false
-    }
-    requestAnimationFrame(() => requestAnimationFrame(clear))
+  const beginScrollTxn = useCallback((kind: 'follow' | 'layout' | 'locate' = 'follow') => {
+    return intentRef.current.beginTransaction(kind)
   }, [])
 
   /**
@@ -303,12 +306,13 @@ export default function CodeBrowser({
     if (Math.abs(target - pre.scrollTop) < 1) return
 
     const gen = ++scrollGen.current
-    programmaticScroll.current = true
+    const txn = intentRef.current.beginTransaction('follow')
     // Instant scroll (honor reduced-motion — never force smooth)
     void reduceMotion
     pre.scrollTop = target
     const done = () => {
-      if (scrollGen.current === gen) programmaticScroll.current = false
+      if (scrollGen.current === gen) txn.end()
+      else txn.end()
     }
     const raf = requestAnimationFrame(() => requestAnimationFrame(done))
     pseudoScrollCleanup.current = () => cancelAnimationFrame(raf)
@@ -327,15 +331,16 @@ export default function CodeBrowser({
       const gen = ++scrollGen.current
       scheduleScrollAfterLayout(view, () => {
         if (scrollGen.current !== gen) return
-        markProgrammatic()
+        const txn = beginScrollTxn('locate')
         scrollLineCenter(view, execLine1)
+        requestAnimationFrame(() => requestAnimationFrame(() => txn.end()))
       })
     } else {
       scrollPseudoToLine(execLine1, true)
     }
     setUserScrolledAway(false)
     setFollowExec(true)
-  }, [canGotoExec, execLine1, tab, contextLines, markProgrammatic, scrollPseudoToLine])
+  }, [canGotoExec, execLine1, tab, contextLines, beginScrollTxn, scrollPseudoToLine])
 
   useEffect(() => {
     if (tab === 'ts') {
@@ -345,19 +350,20 @@ export default function CodeBrowser({
         effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
       })
       if (followExec && !userScrolledAway && execLine1 != null) {
-        // Do NOT call markProgrammatic before schedule — it bumps scrollGen and
-        // cancels this follow. Only mark inside the post-layout callback.
+        // Do NOT begin txn before schedule — bumps cancel via scrollGen.
+        // Open layout/follow txn only inside the post-layout callback.
         const gen = ++scrollGen.current
         scheduleScrollAfterLayout(view, () => {
           if (scrollGen.current !== gen) return
-          markProgrammatic()
+          const txn = beginScrollTxn('follow')
           scrollLineNearest(view, execLine1)
+          requestAnimationFrame(() => requestAnimationFrame(() => txn.end()))
         })
       }
     } else if (followExec && !userScrolledAway && execLine1 != null) {
       scrollPseudoToLine(execLine1, false)
     }
-  }, [execLine1, contextLines, followExec, userScrolledAway, markProgrammatic, tab, scrollPseudoToLine])
+  }, [execLine1, contextLines, followExec, userScrolledAway, beginScrollTxn, tab, scrollPseudoToLine])
 
   // Clear CM viewRef when leaving TS tab so we never dispatch to destroyed editor
   useEffect(() => {
@@ -368,7 +374,7 @@ export default function CodeBrowser({
     }
     // Cancel stale pseudo scrolls on tab change
     scrollGen.current += 1
-    programmaticScroll.current = false
+    intentRef.current.cancelAll()
     pseudoScrollCleanup.current?.()
     pseudoScrollCleanup.current = null
   }, [tab])
@@ -380,24 +386,64 @@ export default function CodeBrowser({
         effects: [setExecLine.of(execLine1), setContextLines.of(contextLines)],
       })
       const scrollDOM = view.scrollDOM
-      const onScroll = () => {
-        if (programmaticScroll.current) return
-        if (followExec) setUserScrolledAway(true)
+      if (!scrollDOM.hasAttribute('tabindex')) scrollDOM.tabIndex = -1
+      const unbind = intentRef.current.bind(scrollDOM, () => {
+        if (followExecRef.current) setUserScrolledAway(true)
+      })
+      // V20-01: when follow paused, pin scrollTop across layout/data reflow
+      let pinTop = scrollDOM.scrollTop
+      const onScrollPin = () => {
+        if (!userScrolledAwayRef.current) pinTop = scrollDOM.scrollTop
       }
-      scrollDOM.addEventListener('scroll', onScroll, { passive: true })
+      scrollDOM.addEventListener('scroll', onScrollPin, { passive: true })
+      let ro: ResizeObserver | null = null
+      if (typeof ResizeObserver !== 'undefined') {
+        ro = new ResizeObserver(() => {
+          if (!userScrolledAwayRef.current) return
+          const txn = intentRef.current.beginTransaction('layout')
+          const max = Math.max(0, scrollDOM.scrollHeight - scrollDOM.clientHeight)
+          scrollDOM.scrollTop = Math.min(pinTop, max)
+          requestAnimationFrame(() => requestAnimationFrame(() => txn.end()))
+        })
+        ro.observe(scrollDOM)
+      }
       ;(view as unknown as { __advScrollCleanup?: () => void }).__advScrollCleanup = () => {
-        scrollDOM.removeEventListener('scroll', onScroll)
+        unbind()
+        scrollDOM.removeEventListener('scroll', onScrollPin)
+        ro?.disconnect()
       }
     },
-    [execLine1, contextLines, followExec],
+    [execLine1, contextLines],
   )
+
+  // V20-03: reconfigure wrap compartment — layout txn so reflow scroll ≠ user pause
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view || tab !== 'ts') return
+    const txn = intentRef.current.beginTransaction('layout')
+    view.dispatch({
+      effects: wrapCompartment.current.reconfigure(lineWrap ? EditorView.lineWrapping : []),
+    })
+    // After wrap reflow, keep follow if armed; do not move if user paused
+    const gen = ++scrollGen.current
+    scheduleScrollAfterLayout(view, () => {
+      txn.end()
+      if (scrollGen.current !== gen) return
+      if (!followExecRef.current || userScrolledAwayRef.current) return
+      const line = execLine1Ref.current
+      if (line == null) return
+      const followTxn = intentRef.current.beginTransaction('follow')
+      scrollLineNearest(view, line)
+      requestAnimationFrame(() => requestAnimationFrame(() => followTxn.end()))
+    })
+  }, [lineWrap, tab])
 
   useEffect(() => {
     return () => {
       const view = viewRef.current as unknown as { __advScrollCleanup?: () => void } | null
       view?.__advScrollCleanup?.()
       scrollGen.current += 1
-      programmaticScroll.current = false
+      intentRef.current.cancelAll()
       pseudoScrollCleanup.current?.()
       pseudoScrollCleanup.current = null
     }
@@ -521,7 +567,12 @@ export default function CodeBrowser({
           </span>
         )}
         <label className="muted" style={{ fontSize: '0.72rem' }}>
-          <input type="checkbox" checked={lineWrap} onChange={(e) => setLineWrap(e.target.checked)} />{' '}
+          <input
+            type="checkbox"
+            data-testid="line-wrap-checkbox"
+            checked={lineWrap}
+            onChange={(e) => setLineWrap(e.target.checked)}
+          />{' '}
           软换行
         </label>
       </div>
@@ -568,8 +619,11 @@ export default function CodeBrowser({
           data-testid="pseudo-pre"
           data-exec-line={execLine1 ?? ''}
           ref={pseudoPreRef}
+          onWheel={() => intentRef.current.noteUserGesture()}
+          onTouchStart={() => intentRef.current.noteUserGesture()}
           onScroll={() => {
-            if (programmaticScroll.current) return
+            if (intentRef.current.isAbsorbing()) return
+            if (!intentRef.current.hasRecentUserGesture()) return
             if (followExec) setUserScrolledAway(true)
           }}
         >

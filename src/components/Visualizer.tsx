@@ -510,7 +510,7 @@ export default function Visualizer({
   return (
     <div className="visualizer" ref={rootRef} style={speedVars as CSSProperties} data-playing={playing ? '1' : '0'} data-step-index={idx} data-preview={isPreview ? '1' : '0'} data-run-id={runId !== undefined && runId !== null ? String(runId) : undefined} data-testid="visualizer" data-chrome={chromePlacement} data-inspector-layout={inspectorLayout}>
       <div className="viz-banner viz-banner-slot" data-testid="viz-banner" role="status">
-        <div className="viz-banner-text">{displayMessage}</div>
+        <div className="viz-banner-text" data-testid="viz-banner-text" title={displayMessage}>{displayMessage}</div>
         <div className="viz-banner-controls" data-testid="viz-banner-controls">
           {staleResult && <span className="stale-result-badge">上一轮结果</span>}
           <button
