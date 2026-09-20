@@ -37,6 +37,17 @@ async function prepareLcsReady(page: Page) {
   return waitForRunReady(page, { expectRunId: runId ?? undefined, minSteps: 90 })
 }
 
+
+async function userWheelAway(page: Page, selector: string) {
+  const box = await page.locator(selector).boundingBox()
+  if (!box) throw new Error(`no box for ${selector}`)
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  await page.mouse.wheel(0, 600)
+  await page.waitForTimeout(80)
+  await page.mouse.wheel(0, 600)
+  await page.waitForTimeout(100)
+}
+
 async function measureMatrixInner(page: Page) {
   return page.evaluate(() => {
     const scroller = document.querySelector('.matrix-scroll') as HTMLElement | null
@@ -198,17 +209,13 @@ test.describe('V19 matrix follow / CM scroll / compact / vars / acceptance', () 
       })
     }
 
-    // Manual pause + resume locate
+    // Manual pause + resume locate (V20-01: real wheel; evaluate scrollTop must not pause)
     await page.setViewportSize({ width: 1366, height: 768 })
     await prepareLcsReady(page)
     for (let i = 0; i < 13; i++) await page.getByTestId('next-step-btn').click()
     await page.waitForTimeout(150)
-    await page.evaluate(() => {
-      const s = document.querySelector('.matrix-scroll') as HTMLElement | null
-      if (s) s.scrollTop = s.scrollHeight
-    })
-    await page.waitForTimeout(100)
-    await expect(page.getByTestId('matrix-follow-paused')).toBeVisible()
+    await userWheelAway(page, '.matrix-scroll')
+    await expect(page.getByTestId('matrix-follow-paused')).toBeVisible({ timeout: 3_000 })
     const paused = await measureMatrixInner(page)
     expect(paused.visibleH, 'after manual scroll away').toBeLessThan(8)
     await page.getByTestId('matrix-locate-btn').click()
@@ -244,12 +251,9 @@ test.describe('V19 matrix follow / CM scroll / compact / vars / acceptance', () 
     expect(m.cmClientH, 'real scrollport clientH').toBeLessThan(m.cmScrollH - 2)
     expect(m.execVisWrap, JSON.stringify(m)).toBeGreaterThan(12)
 
-    // Wheel to end then restore
-    await page.locator('.cm-scroller').evaluate((el) => {
-      ;(el as HTMLElement).scrollTop = (el as HTMLElement).scrollHeight
-    })
-    await page.waitForTimeout(100)
-    await expect(page.getByTestId('follow-paused')).toBeVisible()
+    // Real wheel leave then restore (V20-01: evaluate scrollTop must not pause)
+    await userWheelAway(page, '.cm-scroller')
+    await expect(page.getByTestId('follow-paused')).toBeVisible({ timeout: 3_000 })
     await page.getByTestId('goto-exec-btn').click()
     await page.waitForTimeout(200)
     const afterGoto = await measureCodeScroll(page)
