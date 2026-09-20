@@ -33,6 +33,10 @@ describe('V18-02 primary scene (LCS DP / merge main)', () => {
   })
 
   it('lab-fill matrix primary stage does not early-cap at 420', () => {
-    expect(css).toMatch(/data-primary-scene="matrix"[\s\S]*?\.matrix-scroll[\s\S]*?max-height:\s*none/s)
+    // V18 used max-height:none; V21-03 caps at 100% of parent (blocks overhang) — still not 420 early-cap
+    expect(css).toMatch(/data-primary-scene="matrix"[\s\S]*?\.matrix-scroll[\s\S]*?max-height:\s*100%/s)
+    expect(css).not.toMatch(
+      /\[data-primary-scene="matrix"\]\s*\.matrix-scroll[\s\S]{0,200}?max-height:\s*420px/,
+    )
   })
 })
