@@ -107,14 +107,35 @@ async function measureCompact(page: Page) {
     const vis = (el: Element) => {
       if (!strip) return 0
       const a = el.getBoundingClientRect()
-      const c = strip.getBoundingClientRect()
-      return Math.max(0, Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top))
+      let top = a.top
+      let bottom = a.bottom
+      // V22-03: clip vs strip + overflow ancestors (not strip-only ≥8px false positive)
+      let node: HTMLElement | null = el as HTMLElement
+      while (node && node !== document.body) {
+        const r = node.getBoundingClientRect()
+        const cs = getComputedStyle(node)
+        if (
+          node === strip ||
+          ['hidden', 'auto', 'scroll'].includes(cs.overflowY) ||
+          cs.overflow === 'hidden'
+        ) {
+          top = Math.max(top, r.top)
+          bottom = Math.min(bottom, r.bottom)
+        }
+        node = node.parentElement
+      }
+      return Math.max(0, Math.min(bottom, a.bottom) - Math.max(top, a.top))
     }
     return {
       semantic: strip?.getAttribute('data-compact-semantic'),
       stripH: strip ? Math.round(strip.getBoundingClientRect().height) : 0,
       total: chars.length,
-      readable: chars.filter((el) => vis(el) >= 8).length,
+      // Nearly full glyph — ≥8px alone accepted mid-crush (V22-03)
+      readable: chars.filter((el) => {
+        const h = el.getBoundingClientRect().height
+        if (h < 1) return false
+        return vis(el) >= Math.min(h * 0.9, h - 0.5)
+      }).length,
       context: document.querySelector('[data-testid="compact-context"]')?.textContent ?? null,
       matrixH: Math.round(
         document.querySelector('.matrix-scroll')?.getBoundingClientRect().height ?? 0,

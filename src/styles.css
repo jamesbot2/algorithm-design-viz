@@ -3514,10 +3514,11 @@ html, body, #root {
 .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .arrays-panel.array-labels-strip,
 .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="board"] .arrays-panel.array-labels-strip,
 .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="board"] .arrays-panel.array-labels-strip {
-  /* V21-03: yield vertical space to DP matrix; shrink before collapsing matrix-scroll to 0 */
-  flex: 0 1 auto;
-  min-height: 0;
-  max-height: min(4.5rem, 35%);
+  /* V22-01: intrinsic compact strip — do not flex-shrink below one glyph line.
+   * Long inputs scroll inside the strip; matrix still owns remaining space (flex sibling). */
+  flex: 0 0 auto;
+  min-height: calc(0.78rem * 1.35 + 0.4rem); /* ≥ one .compact-ch line + padding */
+  max-height: min(4.5rem, 40%);
   overflow: auto;
   margin: 0 0 0.2rem;
   gap: 0.2rem;
@@ -3596,24 +3597,27 @@ html, body, #root {
   align-items: center;
   gap: 0.25rem;
   margin: 0 0 0.15rem;
-  flex: 0 1 auto;
-  min-height: 0;
+  /* V22-02: toolbar keeps intrinsic button height — never mid-slice locate/resume */
+  flex: 0 0 auto;
+  min-height: calc(0.72rem * 1.2 + 0.35rem);
 }
 .matrix-follow-bar .hint {
   font-size: 0.72rem;
   color: var(--muted);
 }
-/* V21-03: on short stages, keep follow controls compact so matrix-scroll gets remainder */
+/* V22-02: compact buttons OK; never clip with max-height/overflow:hidden */
 .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar,
 .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-follow-bar {
-  max-height: 1.7rem;
-  overflow: hidden;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  overflow: visible;
+  max-height: none;
 }
 .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar button,
 .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-follow-bar button {
   padding: 0.1rem 0.35rem;
   font-size: 0.72rem;
+  line-height: 1.2;
+  flex: 0 0 auto;
 }
 @media (max-height: 700px) {
   .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar .hint,
@@ -3689,15 +3693,12 @@ html, body, #root {
 }
 
 
-/* V21-03: short laptop height — prefer DP matrix over companion strip + chrome */
+/* V22: short height — compress chrome, but keep strip glyphs + follow buttons fully visible.
+ * Matrix still owns remainder via flex; soft floor stays (no hard 120px). */
 @media (max-height: 640px) {
   .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .arrays-panel.array-labels-strip,
   .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .arrays-panel.array-labels-strip {
-    max-height: 1.6rem;
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar,
-  .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-follow-bar {
-    max-height: 1.35rem;
+    max-height: min(3.2rem, 28%);
   }
   .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-view > .array-label,
   .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-view > .array-label {
