@@ -17,6 +17,48 @@ function cellContentBox(cell: HTMLElement, scroller: HTMLElement) {
   }
 }
 
+/**
+ * V21-03: effective visible scrollport through overflow clip ancestors.
+ * When min-height / flex mis-size makes .matrix-scroll taller than its parent,
+ * clientHeight overstates the readable area — follow must use the intersect.
+ */
+function effectiveScrollport(scroller: HTMLElement) {
+  const sRect = scroller.getBoundingClientRect()
+  let top = sRect.top
+  let bottom = sRect.bottom
+  let left = sRect.left
+  let right = sRect.right
+  let node: HTMLElement | null = scroller.parentElement
+  while (node && node !== document.documentElement) {
+    const cs = getComputedStyle(node)
+    const clipY = cs.overflowY === 'hidden' || cs.overflowY === 'auto' || cs.overflowY === 'scroll'
+    const clipX = cs.overflowX === 'hidden' || cs.overflowX === 'auto' || cs.overflowX === 'scroll'
+    if (clipY || clipX || cs.overflow === 'hidden') {
+      const r = node.getBoundingClientRect()
+      if (clipY || cs.overflow === 'hidden') {
+        top = Math.max(top, r.top)
+        bottom = Math.min(bottom, r.bottom)
+      }
+      if (clipX || cs.overflow === 'hidden') {
+        left = Math.max(left, r.left)
+        right = Math.min(right, r.right)
+      }
+    }
+    node = node.parentElement
+  }
+  const visH = Math.max(0, bottom - top)
+  const visW = Math.max(0, right - left)
+  // Prefer layout client size when not clipped; otherwise use intersect.
+  const viewH = visH > 0 && visH < scroller.clientHeight - 0.5 ? visH : scroller.clientHeight
+  const viewW = visW > 0 && visW < scroller.clientWidth - 0.5 ? visW : scroller.clientWidth
+  return {
+    viewH,
+    viewW,
+    topInset: Math.max(0, top - sRect.top),
+    leftInset: Math.max(0, left - sRect.left),
+  }
+}
+
 function stickyInsets(scroller: HTMLElement) {
   const topEl = scroller.querySelector('.sticky-top, thead th') as HTMLElement | null
   const leftEl = scroller.querySelector('.sticky-left, tbody th.matrix-row-h') as HTMLElement | null
@@ -66,14 +108,16 @@ function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
       const box = cellContentBox(cell, scroller)
       const insets = stickyInsets(scroller)
       const pad = 8
-      const viewH = scroller.clientHeight
-      const viewW = scroller.clientWidth
+      const eff = effectiveScrollport(scroller)
+      const viewH = eff.viewH
+      const viewW = eff.viewW
       if (viewH < 8 || viewW < 8) return false
 
-      const visTop = scroller.scrollTop + insets.top + pad
-      const visBottom = scroller.scrollTop + viewH - pad
-      const visLeft = scroller.scrollLeft + insets.left + pad
-      const visRight = scroller.scrollLeft + viewW - pad
+      // Content clip only (not glow/outline) — sticky + clip-top inset
+      const visTop = scroller.scrollTop + eff.topInset + insets.top + pad
+      const visBottom = scroller.scrollTop + eff.topInset + viewH - pad
+      const visLeft = scroller.scrollLeft + eff.leftInset + insets.left + pad
+      const visRight = scroller.scrollLeft + eff.leftInset + viewW - pad
 
       const cellTop = box.top
       const cellBottom = box.top + box.height
@@ -86,28 +130,28 @@ function MatrixView({ step, prevStep }: { step: Step; prevStep?: Step }) {
       if (center) {
         const usableH = Math.max(1, viewH - insets.top)
         const usableW = Math.max(1, viewW - insets.left)
-        nextTop = Math.max(0, cellTop - insets.top - usableH / 2 + box.height / 2)
-        nextLeft = Math.max(0, cellLeft - insets.left - usableW / 2 + box.width / 2)
+        nextTop = Math.max(0, cellTop - eff.topInset - insets.top - usableH / 2 + box.height / 2)
+        nextLeft = Math.max(0, cellLeft - eff.leftInset - insets.left - usableW / 2 + box.width / 2)
       } else {
         if (cellTop < visTop || cellBottom > visBottom) {
           if (cellTop < visTop) {
-            nextTop = Math.max(0, cellTop - insets.top - pad)
+            nextTop = Math.max(0, cellTop - eff.topInset - insets.top - pad)
           } else {
-            nextTop = Math.max(0, cellBottom - viewH + pad)
+            nextTop = Math.max(0, cellBottom - (eff.topInset + viewH) + pad)
           }
         }
         if (cellLeft < visLeft || cellRight > visRight) {
           if (cellLeft < visLeft) {
-            nextLeft = Math.max(0, cellLeft - insets.left - pad)
+            nextLeft = Math.max(0, cellLeft - eff.leftInset - insets.left - pad)
           } else {
-            nextLeft = Math.max(0, cellRight - viewW + pad)
+            nextLeft = Math.max(0, cellRight - (eff.leftInset + viewW) + pad)
           }
         }
       }
 
-      // Clamp to real scroll range to avoid browser clamp thrash (scrollHeight ±1).
-      const maxTop = Math.max(0, scroller.scrollHeight - viewH)
-      const maxLeft = Math.max(0, scroller.scrollWidth - viewW)
+      // Clamp to real scroll range (layout client box), not clipped intersect.
+      const maxTop = Math.max(0, scroller.scrollHeight - scroller.clientHeight)
+      const maxLeft = Math.max(0, scroller.scrollWidth - scroller.clientWidth)
       nextTop = Math.min(Math.max(0, nextTop), maxTop)
       nextLeft = Math.min(Math.max(0, nextLeft), maxLeft)
 

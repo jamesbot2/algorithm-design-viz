@@ -288,21 +288,28 @@ export default function CodeBrowser({
     const el = pre.querySelector(`[data-line="${line1}"]`) as HTMLElement | null
     if (!el) return
 
+    // V21-01: content coords relative to pre scrollport (offsetParent may be
+    // .page.algo-page because pre is not positioned — offsetTop ≠ pre content Y).
+    const preRect = pre.getBoundingClientRect()
+    const elRect = el.getBoundingClientRect()
+    const elTop = pre.scrollTop + (elRect.top - preRect.top)
+    const elHeight = elRect.height || el.offsetHeight
+    const elBottom = elTop + elHeight
     const margin = 12
-    const elTop = el.offsetTop
-    const elBottom = elTop + el.offsetHeight
     const visTop = pre.scrollTop
     const visBottom = visTop + pre.clientHeight
 
     let target = pre.scrollTop
     if (center) {
-      target = Math.max(0, elTop - pre.clientHeight / 2 + el.offsetHeight / 2)
+      target = Math.max(0, elTop - pre.clientHeight / 2 + elHeight / 2)
     } else {
-      // Already visible → no-op
+      // Already fully readable in scrollport → no-op (no meaningless relocate)
       if (elTop >= visTop + margin && elBottom <= visBottom - margin) return
       if (elTop < visTop + margin) target = Math.max(0, elTop - margin)
       else target = Math.max(0, elBottom - pre.clientHeight + margin)
     }
+    const maxTop = Math.max(0, pre.scrollHeight - pre.clientHeight)
+    target = Math.min(Math.max(0, target), maxTop)
     if (Math.abs(target - pre.scrollTop) < 1) return
 
     const gen = ++scrollGen.current
@@ -377,7 +384,22 @@ export default function CodeBrowser({
     intentRef.current.cancelAll()
     pseudoScrollCleanup.current?.()
     pseudoScrollCleanup.current = null
-  }, [tab])
+    // V21-01: remasure pseudo scrollport after tab restore (pre may layout async)
+    if (tab === 'pseudo' && followExecRef.current && !userScrolledAwayRef.current) {
+      const line = execLine1Ref.current
+      if (line != null) {
+        const gen = scrollGen.current
+        const raf = requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (scrollGen.current !== gen) return
+            if (!followExecRef.current || userScrolledAwayRef.current) return
+            scrollPseudoToLine(line, false)
+          })
+        })
+        pseudoScrollCleanup.current = () => cancelAnimationFrame(raf)
+      }
+    }
+  }, [tab, scrollPseudoToLine])
 
   const onCreate = useCallback(
     (view: EditorView) => {
@@ -390,10 +412,13 @@ export default function CodeBrowser({
       const unbind = intentRef.current.bind(scrollDOM, () => {
         if (followExecRef.current) setUserScrolledAway(true)
       })
-      // V20-01: when follow paused, pin scrollTop across layout/data reflow
+      // V20-01 / V21-02: pin scrollTop across layout/data reflow while paused.
+      // Keep updating pin on real user browse (not only pre-pause); absorb layout/follow
+      // txn scrolls so restore does not overwrite the user's latest reading position.
       let pinTop = scrollDOM.scrollTop
       const onScrollPin = () => {
-        if (!userScrolledAwayRef.current) pinTop = scrollDOM.scrollTop
+        if (intentRef.current.isAbsorbing()) return
+        pinTop = scrollDOM.scrollTop
       }
       scrollDOM.addEventListener('scroll', onScrollPin, { passive: true })
       let ro: ResizeObserver | null = null
@@ -411,6 +436,7 @@ export default function CodeBrowser({
         unbind()
         scrollDOM.removeEventListener('scroll', onScrollPin)
         ro?.disconnect()
+        pinTop = 0
       }
     },
     [execLine1, contextLines],
