@@ -3,8 +3,8 @@
 **Branch:** `v22-joint-matrix-input-controls`  
 **Baseline HEAD:** `efa23a512281cf0c5f86bd33ccff77d5626fbb77` (V21)  
 **Tip (fix+test):** `e2a958d1e14b104e2b0337b9e731d7800df13d05`  
-**Tip (docs):** `2c65e9bc3293d84429570f187dbefffc6f4d513a`  
-**Tip (branch HEAD):** `4c1aefd8e94c8f6fe8b84ca7e6626552923a8a4c`  
+**Tip (docs):** `3543b66a676dc00bd409e15c5d40374363f6cb1d`  
+**Tip (branch HEAD):** `3543b66a676dc00bd409e15c5d40374363f6cb1d`  
 **Not pushed. Not deployed. No force-push.** Local branch commits only.
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).
