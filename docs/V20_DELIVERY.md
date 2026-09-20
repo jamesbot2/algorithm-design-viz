@@ -2,6 +2,8 @@
 
 **Branch:** `v20-follow-banner-wrap`  
 **Baseline HEAD:** `7925a2bfc16003c168334d0d6576a0e8c13c5419` (V19)  
+**Tip (docs):** `47d399483d5405623d41dbe4c886af35ab2950b8`  
+**Tip (fix):** `b5c2994fe67440007a31683613f1e36d99031b38`  
 **Not pushed. Not deployed. No force-push.** Local branch commits only.
 
 Chrome: `/usr/bin/google-chrome`. Asia/Shanghai (UTC+8).
