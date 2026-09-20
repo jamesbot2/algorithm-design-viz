@@ -292,12 +292,33 @@ test.describe('V17 input-edit / code+data / arrays / acceptance', () => {
     await ensureInputEditing(page)
     await page.getByTestId('run-btn').click()
     await waitForRunReady(page, { minSteps: 2 })
-    const matrixMax = await page.evaluate(() => {
+    // V21-03: lab-fill matrix uses max-height:100% (computed often as parent px, may be ≤420).
+    // Assert fill mode + usable scrollport — not legacy fixed early-cap without lab-fill.
+    const matrixInfo = await page.evaluate(() => {
       const sc = document.querySelector('.matrix-scroll') as HTMLElement | null
-      return sc ? getComputedStyle(sc).maxHeight : null
+      const wrap = document.querySelector('.main-wrap')
+      if (!sc) return null
+      return {
+        maxHeight: getComputedStyle(sc).maxHeight,
+        clientH: sc.clientHeight,
+        labFill: wrap?.getAttribute('data-lab-fill'),
+        primaryMatrix: !!document.querySelector('[data-primary-scene="matrix"]'),
+      }
     })
-    results.lcsMatrixMaxH = matrixMax
-    expect(matrixMax === 'none' || (matrixMax && parseFloat(matrixMax) > 420) || matrixMax?.includes('vh')).toBeTruthy()
+    results.lcsMatrixMaxH = matrixInfo
+    expect(matrixInfo, 'matrix-scroll present').toBeTruthy()
+    expect(matrixInfo!.labFill).toBe('1')
+    expect(matrixInfo!.primaryMatrix).toBe(true)
+    expect(matrixInfo!.clientH).toBeGreaterThan(64)
+    const mh = matrixInfo!.maxHeight
+    expect(
+      mh === 'none' ||
+        mh.includes('%') ||
+        mh.includes('vh') ||
+        (parseFloat(mh) > 0 && mh !== '420px') ||
+        // coincidence: parent happens to be 420px under 100% fill — still lab-fill
+        (mh === '420px' && matrixInfo!.labFill === '1' && matrixInfo!.clientH > 64),
+    ).toBeTruthy()
 
     fs.writeFileSync(path.join(OUT_TRACES, 'v17-03-array-stage.json'), JSON.stringify(results, null, 2))
     await page.screenshot({ path: path.join(OUT_SHOTS, 'v17-03-array-stage.png') })
