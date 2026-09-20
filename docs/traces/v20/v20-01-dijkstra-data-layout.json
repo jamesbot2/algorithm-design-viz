@@ -1,0 +1,47 @@
+{
+  "at16": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "lineWrapping": true,
+    "cmHasWrapClass": true,
+    "paused": false,
+    "lineVisScroller": 18,
+    "lineVisWrap": 18,
+    "cmClientH": 322,
+    "cmScrollH": 681,
+    "cmScrollTop": 264
+  },
+  "afterData": {
+    "counter": "16 / 25 · extract",
+    "execLine": "19",
+    "lineWrapping": true,
+    "cmHasWrapClass": true,
+    "paused": false,
+    "lineVisScroller": 36,
+    "lineVisWrap": 36,
+    "cmClientH": 261,
+    "cmScrollH": 936,
+    "cmScrollTop": 391
+  },
+  "at22": {
+    "counter": "22 / 25 · relax",
+    "execLine": "27",
+    "lineWrapping": true,
+    "cmHasWrapClass": true,
+    "paused": false,
+    "lineVisScroller": 36,
+    "lineVisWrap": 36,
+    "cmClientH": 261,
+    "cmScrollH": 936,
+    "cmScrollTop": 561
+  },
+  "pausedSnap": {
+    "scrollTop": 702,
+    "execVis": 36
+  },
+  "afterToggle": {
+    "scrollTop": 703,
+    "execVis": 36,
+    "paused": true
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "paused": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 188,
+    "visibleH": 0,
+    "clientH": 120,
+    "scrollHeight": 308,
+    "paused": true
+  },
+  "located": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 41,
+    "visibleH": 35,
+    "clientH": 120,
+    "scrollHeight": 308,
+    "paused": false
+  },
+  "resumed": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 63,
+    "visibleH": 35,
+    "clientH": 120,
+    "scrollHeight": 308,
+    "paused": false
+  },
+  "afterProg": {
+    "counter": "14 / 95 · compare",
+    "cell": "2,1",
+    "scrollTop": 103,
+    "visibleH": 3,
+    "clientH": 120,
+    "scrollHeight": 308,
+    "paused": false
+  }
+}

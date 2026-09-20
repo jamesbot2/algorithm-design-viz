@@ -1,0 +1,24 @@
+
+Running 17 tests using 1 worker
+
+(node:2348736) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:174:3 › V20 follow intent / banner / wrap / unassisted acceptance › V20-01a LCS unassisted full 95 — no resume/locate rescue (1920) (8.2s)
+  ✓   2 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:227:3 › V20 follow intent / banner / wrap / unassisted acceptance › V20-01b LCS frame 14 + last row + path restore samples @1366 unassisted (7.8s)
+  ✓   3 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:271:3 › V20 follow intent / banner / wrap / unassisted acceptance › V20-01c manual leave (real wheel) + locate/resume restore (3.5s)
+  ✓   4 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:316:3 › V20 follow intent / banner / wrap / unassisted acceptance › V20-01d Dijkstra data-open layout without user leave — still follows line 27 @22 (4.8s)
+  ✓   5 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:403:3 › V20 follow intent / banner / wrap / unassisted acceptance › V20-02 banner text contentH ≥1 glyph line (with/without vars) @1366 (2.5s)
+  ✓   6 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:455:3 › V20 follow intent / banner / wrap / unassisted acceptance › V20-03 soft wrap Compartment on/off without remount (1.5s)
+  ✓   7 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:527:3 › V20 follow intent / banner / wrap / unassisted acceptance › V20-04 mutation sanity: false-pause / 6px text / wrap-not-wired must fail contract (1.2s)
+  ✓   8 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #1 (6.3s)
+  ✓   9 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #2 (6.1s)
+  ✓  10 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #3 (6.2s)
+  ✓  11 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #4 (6.1s)
+  ✓  12 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #5 (6.1s)
+  ✓  13 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #6 (8.4s)
+  ✓  14 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #7 (6.2s)
+  ✓  15 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #8 (6.0s)
+  ✓  16 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #9 (6.0s)
+  ✓  17 [chromium] › tests/e2e/v20-follow-banner-wrap-acceptance.spec.ts:582:5 › V20 key unassisted paths ×10 retries=0 › keypath LCS 73–95 unassisted #10 (6.3s)
+
+  17 passed (1.6m)

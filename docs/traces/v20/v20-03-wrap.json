@@ -1,0 +1,20 @@
+{
+  "before": {
+    "hasClass": true,
+    "editorKey": "<div class=\"cm-editor ͼ1 ͼ3 ͼ4 ͼ19 ͼ16 ͼ",
+    "scrollTop": 9
+  },
+  "off": {
+    "hasClass": false,
+    "probe": "1",
+    "lineH": 18.1875,
+    "scrollWidth": 630,
+    "clientWidth": 462,
+    "paused": false
+  },
+  "on": {
+    "hasClass": true,
+    "probe": "1",
+    "paused": false
+  }
+}

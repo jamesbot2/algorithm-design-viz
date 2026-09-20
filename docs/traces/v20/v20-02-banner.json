@@ -1,0 +1,71 @@
+{
+  "lcs_vars": "toggle-hidden-skipped",
+  "lcs": {
+    "slotH": 36,
+    "textH": 16.4,
+    "contentH": 16.4,
+    "padY": 8,
+    "lineH": 16.4,
+    "fontSize": 13.1,
+    "title": "计算 LCS(\"ABCBDAB\", \"BDCABA\")",
+    "textSample": "计算 LCS(\"ABCBDAB\", \"BDCABA\")",
+    "hasToggle": false
+  },
+  "kadane_vars": "toggle-hidden-skipped",
+  "kadane": {
+    "slotH": 36,
+    "textH": 16.4,
+    "contentH": 16.4,
+    "padY": 8,
+    "lineH": 16.4,
+    "fontSize": 13.1,
+    "title": "初始化 best = cur = a[0] = -2",
+    "textSample": "初始化 best = cur = a[0] = -2",
+    "hasToggle": false
+  },
+  "dijkstra_vars": {
+    "slotH": 38,
+    "textH": 16.4,
+    "contentH": 16.4,
+    "padY": 8,
+    "lineH": 16.4,
+    "fontSize": 13.1,
+    "title": "初始化：dist[0]=0，其余 ∞",
+    "textSample": "初始化：dist[0]=0，其余 ∞",
+    "hasToggle": true
+  },
+  "dijkstra": {
+    "slotH": 38,
+    "textH": 16.4,
+    "contentH": 16.4,
+    "padY": 8,
+    "lineH": 16.4,
+    "fontSize": 13.1,
+    "title": "初始化：dist[0]=0，其余 ∞",
+    "textSample": "初始化：dist[0]=0，其余 ∞",
+    "hasToggle": true
+  },
+  "knapsack01_vars": "toggle-hidden-skipped",
+  "knapsack01": {
+    "slotH": 36,
+    "textH": 16.4,
+    "contentH": 16.4,
+    "padY": 8,
+    "lineH": 16.4,
+    "fontSize": 13.1,
+    "title": "初始化 dp 表为 0（行 i=物品件数 0..n，列 w=容量 0..W；物品本身 0-based）",
+    "textSample": "初始化 dp 表为 0（行 i=物品件数 0..n，列 w=容量 0..W；物品本身 0-based）",
+    "hasToggle": false
+  },
+  "laptop768": {
+    "slotH": 36,
+    "textH": 16.4,
+    "contentH": 16.4,
+    "padY": 8,
+    "lineH": 16.4,
+    "fontSize": 13.1,
+    "title": "计算 LCS(\"ABCBDAB\", \"BDCABA\")",
+    "textSample": "计算 LCS(\"ABCBDAB\", \"BDCABA\")",
+    "hasToggle": false
+  }
+}

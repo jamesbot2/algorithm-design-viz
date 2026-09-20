@@ -1,0 +1,308 @@
+{
+  "beforePauses": 0,
+  "afterPauses": 0,
+  "after73_95": [
+    {
+      "i": 70,
+      "counter": "71 / 95 · fill",
+      "paused": false,
+      "visibleH": 38,
+      "scrollHeight": 308,
+      "scrollTop": 92,
+      "clientH": 189,
+      "cell": "6,5"
+    },
+    {
+      "i": 71,
+      "counter": "72 / 95 · compare",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 92,
+      "clientH": 189,
+      "cell": "6,6"
+    },
+    {
+      "i": 72,
+      "counter": "73 / 95 · fill",
+      "paused": false,
+      "visibleH": 38,
+      "scrollHeight": 308,
+      "scrollTop": 92,
+      "clientH": 189,
+      "cell": "6,6"
+    },
+    {
+      "i": 73,
+      "counter": "74 / 95 · compare",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,1"
+    },
+    {
+      "i": 74,
+      "counter": "75 / 95 · fill",
+      "paused": false,
+      "visibleH": 38,
+      "scrollHeight": 309,
+      "scrollTop": 120,
+      "clientH": 189,
+      "cell": "7,1"
+    },
+    {
+      "i": 75,
+      "counter": "76 / 95 · compare",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,2"
+    },
+    {
+      "i": 76,
+      "counter": "77 / 95 · fill",
+      "paused": false,
+      "visibleH": 36,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,2"
+    },
+    {
+      "i": 77,
+      "counter": "78 / 95 · compare",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,3"
+    },
+    {
+      "i": 78,
+      "counter": "79 / 95 · fill",
+      "paused": false,
+      "visibleH": 37,
+      "scrollHeight": 309,
+      "scrollTop": 120,
+      "clientH": 189,
+      "cell": "7,3"
+    },
+    {
+      "i": 79,
+      "counter": "80 / 95 · compare",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,4"
+    },
+    {
+      "i": 80,
+      "counter": "81 / 95 · fill",
+      "paused": false,
+      "visibleH": 37,
+      "scrollHeight": 309,
+      "scrollTop": 120,
+      "clientH": 189,
+      "cell": "7,4"
+    },
+    {
+      "i": 81,
+      "counter": "82 / 95 · compare",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,5"
+    },
+    {
+      "i": 82,
+      "counter": "83 / 95 · fill",
+      "paused": false,
+      "visibleH": 37,
+      "scrollHeight": 309,
+      "scrollTop": 120,
+      "clientH": 189,
+      "cell": "7,5"
+    },
+    {
+      "i": 83,
+      "counter": "84 / 95 · compare",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,6"
+    },
+    {
+      "i": 84,
+      "counter": "85 / 95 · fill",
+      "paused": false,
+      "visibleH": 38,
+      "scrollHeight": 309,
+      "scrollTop": 120,
+      "clientH": 189,
+      "cell": "7,6"
+    },
+    {
+      "i": 85,
+      "counter": "86 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,6"
+    },
+    {
+      "i": 86,
+      "counter": "87 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "6,6"
+    },
+    {
+      "i": 87,
+      "counter": "88 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "5,5"
+    },
+    {
+      "i": 88,
+      "counter": "89 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "4,5"
+    },
+    {
+      "i": 89,
+      "counter": "90 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 98,
+      "clientH": 189,
+      "cell": "3,4"
+    },
+    {
+      "i": 90,
+      "counter": "91 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 98,
+      "clientH": 189,
+      "cell": "3,3"
+    },
+    {
+      "i": 91,
+      "counter": "92 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 63,
+      "clientH": 189,
+      "cell": "2,2"
+    },
+    {
+      "i": 92,
+      "counter": "93 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 63,
+      "clientH": 189,
+      "cell": "2,1"
+    },
+    {
+      "i": 93,
+      "counter": "94 / 95 · reconstruct",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 27,
+      "clientH": 189,
+      "cell": "1,0"
+    },
+    {
+      "i": 94,
+      "counter": "95 / 95 · done",
+      "paused": false,
+      "visibleH": 35,
+      "scrollHeight": 308,
+      "scrollTop": 119,
+      "clientH": 189,
+      "cell": "7,6"
+    }
+  ],
+  "beforeBanner1366": {
+    "slotH": 32,
+    "textH": 6,
+    "contentH": 6,
+    "padY": 24,
+    "fontSize": 15.2,
+    "lineH": 20.52
+  },
+  "afterBanner1366": {
+    "slotH": 36,
+    "textH": 16.4,
+    "contentH": 16.4,
+    "padY": 8,
+    "fontSize": 13.12,
+    "lineH": 16.4,
+    "title": "计算 LCS(\"ABCBDAB\", \"BDCABA\")"
+  },
+  "wrapBefore": {
+    "checked": true,
+    "hasLineWrapping": true,
+    "afterUncheck": {
+      "hasLineWrapping": true
+    }
+  },
+  "wrapAfter": {
+    "before": {
+      "checked": true,
+      "hasClass": true
+    },
+    "afterUncheck": {
+      "hasClass": false,
+      "paused": false
+    }
+  },
+  "dijkstraBefore": {
+    "paused": true,
+    "counter": "16 / 25 · extract",
+    "execLine": "19"
+  },
+  "dijkstraAfter": {
+    "afterData": {
+      "paused": false,
+      "counter": "16 / 25 · extract",
+      "execLine": "19"
+    },
+    "at22": {
+      "paused": false,
+      "counter": "22 / 25 · relax",
+      "execLine": "27",
+      "line27Vis": 36.375
+    }
+  }
+}
