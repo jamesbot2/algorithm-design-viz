@@ -11,8 +11,12 @@ describe('V19-04 vars button banner geometry', () => {
     expect(viz).toMatch(/inspector-sheet-toggle/)
   })
 
-  it('when toggle visible, banner allows full button height', () => {
-    expect(css).toMatch(/viz-banner-slot:has\(\.inspector-sheet-toggle:not\(\[hidden\]\)\)/)
+  it('banner always budgets ≥1 full glyph line (V20 supersedes :has(toggle)-only raise)', () => {
+    // V20-02: unified --banner-line-h / --banner-pad-y; no longer only when toggle visible
+    expect(css).toMatch(/--banner-line-h/)
+    expect(css).toMatch(/--banner-pad-y/)
     expect(css).toMatch(/viz-banner-controls/)
+    expect(css).toMatch(/inspector-sheet-toggle/)
+    expect(css).not.toMatch(/viz-banner-slot:has\(\.inspector-sheet-toggle:not\(\[hidden\]\)\)/)
   })
 })

@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 
 const mv = readFileSync(resolve(__dirname, '../src/components/MatrixView.tsx'), 'utf8')
 const css = readFileSync(resolve(__dirname, '../src/styles.css'), 'utf8')
+const intent = readFileSync(resolve(__dirname, '../src/utils/scrollFollowIntent.ts'), 'utf8')
 
 describe('V19-01 matrix follow content coords', () => {
   it('uses content-space scroll (scrollTop + screen delta), not bare offsetTop as scroller coords', () => {
@@ -18,7 +19,10 @@ describe('V19-01 matrix follow content coords', () => {
     expect(mv).toMatch(/matrix-locate-btn/)
     expect(mv).toMatch(/matrix-resume-follow-btn/)
     expect(mv).toMatch(/matrix-follow-paused|followPaused/)
-    expect(mv).toMatch(/programmaticScroll/)
+    // V20-01: programmaticScroll replaced by createScrollFollowIntent transactions
+    expect(mv).toMatch(/createScrollFollowIntent|beginTransaction/)
+    expect(intent).toMatch(/beginTransaction/)
+    expect(intent).toMatch(/noteUserGesture/)
     expect(mv).toMatch(/followGen/)
   })
 
