@@ -12,8 +12,15 @@ describe('V17-03 array/DP stage budget', () => {
     expect(av).not.toMatch(
       /const maxBudget = landscape && ultra \? 240 : landscape && short \? 220 : short \? 180 : 160/,
     )
-    expect(av).toMatch(/stageBudget/)
-    expect(av).toMatch(/V17-03/)
+    // V24-01A migration: the budget is no longer derived from the whole stage /
+    // viewport ("stageBudget", window.innerHeight*0.5) — that produced giant bars
+    // clipped inside a ~50px card. It now comes from the box the ArrayView is actually
+    // allotted, with chrome measured from the DOM (stronger than the old text check).
+    const fit = av.slice(av.indexOf('V24-01A: bar geometry'), av.indexOf('const geometryGen'))
+    expect(fit.length).toBeGreaterThan(100)
+    expect(fit).toMatch(/self\.getBoundingClientRect\(\)\.height/)
+    expect(fit).not.toMatch(/window\.innerHeight/)
+    expect(fit).not.toMatch(/closest\('\[data-testid="viz-canvas"\]'\)/)
   })
 
   it('aux buffers stay compact (BUFFER_ARRAY_NAMES + compact=true)', () => {

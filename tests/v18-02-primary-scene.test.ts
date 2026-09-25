@@ -3,7 +3,11 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { readAllCss } from './helpers/readCss'
 
-const viz = readFileSync(resolve(__dirname, '../src/components/Visualizer.tsx'), 'utf8')
+// V24 migration: the legacy inference (graph → board → matrix → array → tree) moved
+// verbatim into presentation.ts; Visualizer resolves the declared contract first.
+const viz =
+  readFileSync(resolve(__dirname, '../src/components/Visualizer.tsx'), 'utf8') +
+  readFileSync(resolve(__dirname, '../src/components/presentation/presentation.ts'), 'utf8')
 const av = readFileSync(resolve(__dirname, '../src/components/ArrayView.tsx'), 'utf8')
 const mv = readFileSync(resolve(__dirname, '../src/components/MatrixView.tsx'), 'utf8')
 // V23: rules moved into src/styles/scene.css — read all production CSS.
