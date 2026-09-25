@@ -369,7 +369,7 @@ test.describe('V24 Huffman — forest is the primary', () => {
       expect(m.frame.runId).toBe(rid)
       expect(m.frame.primary, 'forest primary is stable on every frame').toBe('forest')
       expect(m.frame.execLine).toBeGreaterThan(0)
-      for (const g of ['forestNodes', 'forestLabels', 'inputSymbols'] as const) {
+      for (const g of ['forestNodes', 'forestLabels', 'inputSymbols', 'inputGlyphs'] as const) {
         expect(notFullyVisible(m.groups[g]!), `huffman ${m.frame.counter} ${g} fully visible`).toEqual([])
       }
       expect(m.groups.inputSymbols!.length).toBe(5)
@@ -566,7 +566,7 @@ for (const [w, h] of [
     await nextN(page, 3)
     await showDemo(page)
     const hm = await measureStageObjects(page, HUFFMAN_GROUPS)
-    for (const g of ['forestNodes', 'forestLabels', 'inputSymbols'] as const) {
+    for (const g of ['forestNodes', 'forestLabels', 'inputSymbols', 'inputGlyphs'] as const) {
       expect(notFullyVisible(hm.groups[g]!), `huffman ${w}x${h} ${g}`).toEqual([])
     }
     expect(hm.groups.forestLeaves!.length).toBe(5)
@@ -727,6 +727,7 @@ test.describe('V24 negative controls — the SAME detector must fail while injec
       return [
         ...notFullyVisible(m.groups.forestLabels!).map((x) => `forest:${x.text}`),
         ...notFullyVisible(m.groups.inputSymbols!).map((x) => `input:${x.text}`),
+        ...notFullyVisible(m.groups.inputGlyphs!).map((x) => `glyph:${x.text}`),
       ]
     }
     const handle = await page.addStyleTag({
@@ -735,6 +736,8 @@ test.describe('V24 negative controls — the SAME detector must fail while injec
     await page.waitForTimeout(200)
     const bad = await check()
     expect(bad.length, `squeezed symbol cards must fail: ${JSON.stringify(bad)}`).toBeGreaterThan(0)
+    expect(bad.some((b) => b.startsWith('forest:')), 'squeezed forest nodes must fail').toBe(true)
+    expect(bad.some((b) => b.startsWith('glyph:')), 'squeezed input chips must fail on their glyphs').toBe(true)
     await page.screenshot({ path: path.join(SHOTS, 'FAULT-INJECTED-huffman-cards-squeezed-1366x768.png') })
     await handle.evaluate((el) => el.remove())
     await page.waitForTimeout(200)

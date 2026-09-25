@@ -152,6 +152,8 @@ export const HUFFMAN_GROUPS: GroupSelectors = {
   forestLeaves: '[data-forest-node][data-leaf="1"]',
   forestLabels: '[data-forest-node] .fn-label',
   inputSymbols: '[data-testid="huffman-input-table"] [data-sym]',
+  // the glyphs inside each chip (symbol + frequency): a chip box can be visible while its text is cut
+  inputGlyphs: '[data-testid="huffman-input-table"] [data-sym] > b, [data-testid="huffman-input-table"] [data-sym] > .fh-freq',
   // legacy (V23) array presentation — measured so before/after compare the same objects
   legacySymbols: '.array-view[data-array="symbols"] .cell-val',
   legacyFreqs: '.array-view[data-array="freqs"] .bar-val, .array-view[data-array="freqs"] .cell-val',
