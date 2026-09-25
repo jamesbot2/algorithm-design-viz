@@ -1,0 +1,56 @@
+{
+  "F": {
+    "1366x768-strip-10px": {
+      "whileInjected": [
+        "glyphs:clipped 13/13"
+      ],
+      "afterRestore": []
+    },
+    "1366x768-toolbar-6px": {
+      "whileInjected": [
+        "locate:clipped",
+        "resume:clipped",
+        "locate:not-hit"
+      ],
+      "afterRestore": []
+    },
+    "1366x768-matrix-overhang": {
+      "whileInjected": [
+        "matrix:overhang 1760.5"
+      ],
+      "afterRestore": []
+    },
+    "1366x768-code-w0": {
+      "whileInjected": [
+        "code:width 0"
+      ],
+      "afterRestore": []
+    },
+    "1024x600-strip-10px": {
+      "whileInjected": [
+        "glyphs:clipped 13/13"
+      ],
+      "afterRestore": []
+    },
+    "1024x600-toolbar-6px": {
+      "whileInjected": [
+        "locate:clipped",
+        "resume:clipped",
+        "locate:not-hit"
+      ],
+      "afterRestore": []
+    },
+    "1024x600-matrix-overhang": {
+      "whileInjected": [
+        "matrix:overhang 1834.8"
+      ],
+      "afterRestore": []
+    },
+    "1024x600-code-w0": {
+      "whileInjected": [
+        "code:width 0"
+      ],
+      "afterRestore": []
+    }
+  }
+}

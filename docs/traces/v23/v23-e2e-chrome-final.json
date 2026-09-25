@@ -1,0 +1,5166 @@
+{
+  "A": {
+    "bfs-1366x768-preview": {
+      "vp": {
+        "w": 1366,
+        "h": 768
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 787,
+          "h": 461.109375,
+          "r": 859,
+          "b": 580.171875
+        },
+        "data": {
+          "x": 72,
+          "y": 588.171875,
+          "w": 787,
+          "h": 102,
+          "r": 859,
+          "b": 690.171875
+        },
+        "code": {
+          "x": 867,
+          "y": 119.0625,
+          "w": 487,
+          "h": 571.109375,
+          "r": 1354,
+          "b": 690.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 698.171875,
+          "w": 1282,
+          "h": 60.234375,
+          "r": 1354,
+          "b": 758.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1282,
+          "h": 56.46875,
+          "r": 1354,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 180.25,
+          "w": 744.625,
+          "h": 378.734375,
+          "r": 837.8125,
+          "b": 558.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 249.49932861328125,
+          "h": 284.4372253417969
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 18
+      },
+      "code": {
+        "visible": true,
+        "width": 487,
+        "cmWidth": 470.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 70,
+          "scroll": 70
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 721,
+      "pageClientH": 721
+    },
+    "bfs-1366x768-mid": {
+      "vp": {
+        "w": 1366,
+        "h": 768
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 787,
+          "h": 392.109375,
+          "r": 859,
+          "b": 511.171875
+        },
+        "data": {
+          "x": 72,
+          "y": 519.171875,
+          "w": 787,
+          "h": 171,
+          "r": 859,
+          "b": 690.171875
+        },
+        "code": {
+          "x": 867,
+          "y": 119.0625,
+          "w": 487,
+          "h": 571.109375,
+          "r": 1354,
+          "b": 690.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 698.171875,
+          "w": 1282,
+          "h": 60.234375,
+          "r": 1354,
+          "b": 758.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1282,
+          "h": 56.46875,
+          "r": 1354,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 185.4375,
+          "w": 744.625,
+          "h": 304.546875,
+          "r": 837.8125,
+          "b": 489.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 202.49136352539062,
+          "h": 226.85633850097656
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 16.999969482421875
+      },
+      "code": {
+        "visible": true,
+        "width": 487,
+        "cmWidth": 470.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 139,
+          "scroll": 146
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtwlde_dk5dhy9",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 721,
+      "pageClientH": 721
+    },
+    "dijkstra-1366x768-preview": {
+      "vp": {
+        "w": 1366,
+        "h": 768
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 787,
+          "h": 461.109375,
+          "r": 859,
+          "b": 580.171875
+        },
+        "data": {
+          "x": 72,
+          "y": 588.171875,
+          "w": 787,
+          "h": 102,
+          "r": 859,
+          "b": 690.171875
+        },
+        "code": {
+          "x": 867,
+          "y": 119.0625,
+          "w": 487,
+          "h": 571.109375,
+          "r": 1354,
+          "b": 690.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 698.171875,
+          "w": 1282,
+          "h": 60.234375,
+          "r": 1354,
+          "b": 758.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1282,
+          "h": 56.46875,
+          "r": 1354,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 180.25,
+          "w": 744.625,
+          "h": 378.734375,
+          "r": 837.8125,
+          "b": 558.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 249.49932861328125,
+          "h": 284.4372253417969
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 17.999969482421875
+      },
+      "code": {
+        "visible": true,
+        "width": 487,
+        "cmWidth": 470.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 70,
+          "scroll": 70
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 721,
+      "pageClientH": 721
+    },
+    "dijkstra-1366x768-mid": {
+      "vp": {
+        "w": 1366,
+        "h": 768
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 787,
+          "h": 392.109375,
+          "r": 859,
+          "b": 511.171875
+        },
+        "data": {
+          "x": 72,
+          "y": 519.171875,
+          "w": 787,
+          "h": 171,
+          "r": 859,
+          "b": 690.171875
+        },
+        "code": {
+          "x": 867,
+          "y": 119.0625,
+          "w": 487,
+          "h": 571.109375,
+          "r": 1354,
+          "b": 690.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 698.171875,
+          "w": 1282,
+          "h": 60.234375,
+          "r": 1354,
+          "b": 758.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1282,
+          "h": 56.46875,
+          "r": 1354,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 185.4375,
+          "w": 744.625,
+          "h": 304.546875,
+          "r": 837.8125,
+          "b": 489.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 202.49136352539062,
+          "h": 226.85633850097656
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 13.999969482421875
+      },
+      "code": {
+        "visible": true,
+        "width": 487,
+        "cmWidth": 470.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 139,
+          "scroll": 146
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtwnij_ejxkk6i",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 721,
+      "pageClientH": 721
+    },
+    "bfs-1440x900-preview": {
+      "vp": {
+        "w": 1440,
+        "h": 900
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 833,
+          "h": 561.109375,
+          "r": 905,
+          "b": 680.171875
+        },
+        "data": {
+          "x": 72,
+          "y": 688.171875,
+          "w": 833,
+          "h": 102,
+          "r": 905,
+          "b": 790.171875
+        },
+        "code": {
+          "x": 913,
+          "y": 119.0625,
+          "w": 515,
+          "h": 671.109375,
+          "r": 1428,
+          "b": 790.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 798.171875,
+          "w": 1356,
+          "h": 92.234375,
+          "r": 1428,
+          "b": 890.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1356,
+          "h": 56.46875,
+          "r": 1428,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 180.25,
+          "w": 790.625,
+          "h": 478.734375,
+          "r": 883.8125,
+          "b": 658.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 315.3764953613281,
+          "h": 359.5392303466797
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 21.999969482421875
+      },
+      "code": {
+        "visible": true,
+        "width": 515,
+        "cmWidth": 498.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 70,
+          "scroll": 70
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 853,
+      "pageClientH": 853
+    },
+    "bfs-1440x900-mid": {
+      "vp": {
+        "w": 1440,
+        "h": 900
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 833,
+          "h": 483.109375,
+          "r": 905,
+          "b": 602.171875
+        },
+        "data": {
+          "x": 72,
+          "y": 610.171875,
+          "w": 833,
+          "h": 180,
+          "r": 905,
+          "b": 790.171875
+        },
+        "code": {
+          "x": 913,
+          "y": 119.0625,
+          "w": 515,
+          "h": 671.109375,
+          "r": 1428,
+          "b": 790.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 798.171875,
+          "w": 1356,
+          "h": 92.234375,
+          "r": 1428,
+          "b": 890.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1356,
+          "h": 56.46875,
+          "r": 1428,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 185.4375,
+          "w": 790.625,
+          "h": 395.546875,
+          "r": 883.8125,
+          "b": 580.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 262.9966735839844,
+          "h": 294.64207458496094
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 21.999984741210938
+      },
+      "code": {
+        "visible": true,
+        "width": 515,
+        "cmWidth": 498.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 148,
+          "scroll": 148
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtwp7h_i2r2y8y",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 853,
+      "pageClientH": 853
+    },
+    "dijkstra-1440x900-preview": {
+      "vp": {
+        "w": 1440,
+        "h": 900
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 833,
+          "h": 561.109375,
+          "r": 905,
+          "b": 680.171875
+        },
+        "data": {
+          "x": 72,
+          "y": 688.171875,
+          "w": 833,
+          "h": 102,
+          "r": 905,
+          "b": 790.171875
+        },
+        "code": {
+          "x": 913,
+          "y": 119.0625,
+          "w": 515,
+          "h": 671.109375,
+          "r": 1428,
+          "b": 790.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 798.171875,
+          "w": 1356,
+          "h": 92.234375,
+          "r": 1428,
+          "b": 890.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1356,
+          "h": 56.46875,
+          "r": 1428,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 180.25,
+          "w": 790.625,
+          "h": 478.734375,
+          "r": 883.8125,
+          "b": 658.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 315.3764953613281,
+          "h": 359.5392303466797
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 21.999969482421875
+      },
+      "code": {
+        "visible": true,
+        "width": 515,
+        "cmWidth": 498.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 70,
+          "scroll": 70
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 853,
+      "pageClientH": 853
+    },
+    "dijkstra-1440x900-mid": {
+      "vp": {
+        "w": 1440,
+        "h": 900
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 833,
+          "h": 483.109375,
+          "r": 905,
+          "b": 602.171875
+        },
+        "data": {
+          "x": 72,
+          "y": 610.171875,
+          "w": 833,
+          "h": 180,
+          "r": 905,
+          "b": 790.171875
+        },
+        "code": {
+          "x": 913,
+          "y": 119.0625,
+          "w": 515,
+          "h": 671.109375,
+          "r": 1428,
+          "b": 790.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 798.171875,
+          "w": 1356,
+          "h": 92.234375,
+          "r": 1428,
+          "b": 890.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1356,
+          "h": 56.46875,
+          "r": 1428,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 185.4375,
+          "w": 790.625,
+          "h": 395.546875,
+          "r": 883.8125,
+          "b": 580.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 262.9966735839844,
+          "h": 294.64207458496094
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 17.999969482421875
+      },
+      "code": {
+        "visible": true,
+        "width": 515,
+        "cmWidth": 498.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 148,
+          "scroll": 148
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtwqx7_y7c8z7b",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 853,
+      "pageClientH": 853
+    },
+    "bfs-1920x1080-preview": {
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      },
+      "mode": "wide",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 865,
+          "h": 851.109375,
+          "r": 937,
+          "b": 970.171875
+        },
+        "data": {
+          "x": 945,
+          "y": 119.0625,
+          "w": 404,
+          "h": 851.109375,
+          "r": 1349,
+          "b": 970.171875
+        },
+        "code": {
+          "x": 1357,
+          "y": 119.0625,
+          "w": 551,
+          "h": 851.109375,
+          "r": 1908,
+          "b": 970.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 978.171875,
+          "w": 1836,
+          "h": 92.234375,
+          "r": 1908,
+          "b": 1070.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1836,
+          "h": 56.46875,
+          "r": 1908,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 180.25,
+          "w": 822.625,
+          "h": 768.734375,
+          "r": 915.8125,
+          "b": 948.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 506.4202117919922,
+          "h": 577.3351440429688
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 35.99993896484375
+      },
+      "code": {
+        "visible": true,
+        "width": 551,
+        "cmWidth": 534.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 819,
+          "scroll": 819
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 1033,
+      "pageClientH": 1033
+    },
+    "bfs-1920x1080-mid": {
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      },
+      "mode": "wide",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 865,
+          "h": 851.109375,
+          "r": 937,
+          "b": 970.171875
+        },
+        "data": {
+          "x": 945,
+          "y": 119.0625,
+          "w": 404,
+          "h": 851.109375,
+          "r": 1349,
+          "b": 970.171875
+        },
+        "code": {
+          "x": 1357,
+          "y": 119.0625,
+          "w": 551,
+          "h": 851.109375,
+          "r": 1908,
+          "b": 970.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 978.171875,
+          "w": 1836,
+          "h": 92.234375,
+          "r": 1908,
+          "b": 1070.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1836,
+          "h": 56.46875,
+          "r": 1908,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 185.4375,
+          "w": 822.625,
+          "h": 763.546875,
+          "r": 915.8125,
+          "b": 948.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 507.6775817871094,
+          "h": 568.7644653320312
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 41
+      },
+      "code": {
+        "visible": true,
+        "width": 551,
+        "cmWidth": 534.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 819,
+          "scroll": 819
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtwskg_1aypvu3",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 1033,
+      "pageClientH": 1033
+    },
+    "dijkstra-1920x1080-preview": {
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      },
+      "mode": "wide",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 865,
+          "h": 851.109375,
+          "r": 937,
+          "b": 970.171875
+        },
+        "data": {
+          "x": 945,
+          "y": 119.0625,
+          "w": 404,
+          "h": 851.109375,
+          "r": 1349,
+          "b": 970.171875
+        },
+        "code": {
+          "x": 1357,
+          "y": 119.0625,
+          "w": 551,
+          "h": 851.109375,
+          "r": 1908,
+          "b": 970.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 978.171875,
+          "w": 1836,
+          "h": 92.234375,
+          "r": 1908,
+          "b": 1070.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1836,
+          "h": 56.46875,
+          "r": 1908,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 180.25,
+          "w": 822.625,
+          "h": 768.734375,
+          "r": 915.8125,
+          "b": 948.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 506.4202117919922,
+          "h": 577.3351440429688
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 36
+      },
+      "code": {
+        "visible": true,
+        "width": 551,
+        "cmWidth": 534.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 819,
+          "scroll": 819
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 1033,
+      "pageClientH": 1033
+    },
+    "dijkstra-1920x1080-mid": {
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      },
+      "mode": "wide",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 865,
+          "h": 851.109375,
+          "r": 937,
+          "b": 970.171875
+        },
+        "data": {
+          "x": 945,
+          "y": 119.0625,
+          "w": 404,
+          "h": 851.109375,
+          "r": 1349,
+          "b": 970.171875
+        },
+        "code": {
+          "x": 1357,
+          "y": 119.0625,
+          "w": 551,
+          "h": 851.109375,
+          "r": 1908,
+          "b": 970.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 978.171875,
+          "w": 1836,
+          "h": 92.234375,
+          "r": 1908,
+          "b": 1070.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 1836,
+          "h": 56.46875,
+          "r": 1908,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 185.4375,
+          "w": 822.625,
+          "h": 763.546875,
+          "r": 915.8125,
+          "b": 948.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 507.6775817871094,
+          "h": 568.7644653320312
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 34.99993896484375
+      },
+      "code": {
+        "visible": true,
+        "width": 551,
+        "cmWidth": 534.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 819,
+          "scroll": 819
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtwugz_3z96d65",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 1033,
+      "pageClientH": 1033
+    },
+    "bfs-2560x1440-preview": {
+      "vp": {
+        "w": 2560,
+        "h": 1440
+      },
+      "mode": "wide",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 1195,
+          "h": 1211.109375,
+          "r": 1267,
+          "b": 1330.171875
+        },
+        "data": {
+          "x": 1275,
+          "y": 119.0625,
+          "w": 545,
+          "h": 1211.109375,
+          "r": 1820,
+          "b": 1330.171875
+        },
+        "code": {
+          "x": 1828,
+          "y": 119.0625,
+          "w": 720,
+          "h": 1211.109375,
+          "r": 2548,
+          "b": 1330.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 1338.171875,
+          "w": 2476,
+          "h": 92.234375,
+          "r": 2548,
+          "b": 1430.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 2476,
+          "h": 56.46875,
+          "r": 2548,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 180.25,
+          "w": 1152.625,
+          "h": 1128.734375,
+          "r": 1245.8125,
+          "b": 1308.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 743.5779418945312,
+          "h": 847.7024536132812
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 52.99993896484375
+      },
+      "code": {
+        "visible": true,
+        "width": 720,
+        "cmWidth": 703.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 1179,
+          "scroll": 1179
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 1393,
+      "pageClientH": 1393
+    },
+    "bfs-2560x1440-mid": {
+      "vp": {
+        "w": 2560,
+        "h": 1440
+      },
+      "mode": "wide",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 1195,
+          "h": 1211.109375,
+          "r": 1267,
+          "b": 1330.171875
+        },
+        "data": {
+          "x": 1275,
+          "y": 119.0625,
+          "w": 545,
+          "h": 1211.109375,
+          "r": 1820,
+          "b": 1330.171875
+        },
+        "code": {
+          "x": 1828,
+          "y": 119.0625,
+          "w": 720,
+          "h": 1211.109375,
+          "r": 2548,
+          "b": 1330.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 1338.171875,
+          "w": 2476,
+          "h": 92.234375,
+          "r": 2548,
+          "b": 1430.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 2476,
+          "h": 56.46875,
+          "r": 2548,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 185.4375,
+          "w": 1152.625,
+          "h": 1123.546875,
+          "r": 1245.8125,
+          "b": 1308.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 747.0392761230469,
+          "h": 836.927734375
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 62
+      },
+      "code": {
+        "visible": true,
+        "width": 720,
+        "cmWidth": 703.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 1179,
+          "scroll": 1179
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtww62_0vqava2",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 1393,
+      "pageClientH": 1393
+    },
+    "dijkstra-2560x1440-preview": {
+      "vp": {
+        "w": 2560,
+        "h": 1440
+      },
+      "mode": "wide",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 1195,
+          "h": 1211.109375,
+          "r": 1267,
+          "b": 1330.171875
+        },
+        "data": {
+          "x": 1275,
+          "y": 119.0625,
+          "w": 545,
+          "h": 1211.109375,
+          "r": 1820,
+          "b": 1330.171875
+        },
+        "code": {
+          "x": 1828,
+          "y": 119.0625,
+          "w": 720,
+          "h": 1211.109375,
+          "r": 2548,
+          "b": 1330.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 1338.171875,
+          "w": 2476,
+          "h": 92.234375,
+          "r": 2548,
+          "b": 1430.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 2476,
+          "h": 56.46875,
+          "r": 2548,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 180.25,
+          "w": 1152.625,
+          "h": 1128.734375,
+          "r": 1245.8125,
+          "b": 1308.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 743.5779418945312,
+          "h": 847.7024536132812
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 52.99993896484375
+      },
+      "code": {
+        "visible": true,
+        "width": 720,
+        "cmWidth": 703.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 1179,
+          "scroll": 1179
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 1393,
+      "pageClientH": 1393
+    },
+    "dijkstra-2560x1440-mid": {
+      "vp": {
+        "w": 2560,
+        "h": 1440
+      },
+      "mode": "wide",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 119.0625,
+          "w": 1195,
+          "h": 1211.109375,
+          "r": 1267,
+          "b": 1330.171875
+        },
+        "data": {
+          "x": 1275,
+          "y": 119.0625,
+          "w": 545,
+          "h": 1211.109375,
+          "r": 1820,
+          "b": 1330.171875
+        },
+        "code": {
+          "x": 1828,
+          "y": 119.0625,
+          "w": 720,
+          "h": 1211.109375,
+          "r": 2548,
+          "b": 1330.171875
+        },
+        "transport": {
+          "x": 72,
+          "y": 1338.171875,
+          "w": 2476,
+          "h": 92.234375,
+          "r": 2548,
+          "b": 1430.40625
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 54.59375,
+          "w": 2476,
+          "h": 56.46875,
+          "r": 2548,
+          "b": 111.0625
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 93.1875,
+          "y": 185.4375,
+          "w": 1152.625,
+          "h": 1123.546875,
+          "r": 1245.8125,
+          "b": 1308.984375
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 747.0392761230469,
+          "h": 836.927734375
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 52
+      },
+      "code": {
+        "visible": true,
+        "width": 720,
+        "cmWidth": 703.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 1179,
+          "scroll": 1179
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtwy1n_8fpezjc",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 1393,
+      "pageClientH": 1393
+    },
+    "bfs-1024x600-preview": {
+      "vp": {
+        "w": 1024,
+        "h": 600
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 86.1875,
+          "w": 567,
+          "h": 336.953125,
+          "r": 639,
+          "b": 423.140625
+        },
+        "data": {
+          "x": 72,
+          "y": 439.140625,
+          "w": 567,
+          "h": 96,
+          "r": 639,
+          "b": 535.140625
+        },
+        "code": {
+          "x": 655,
+          "y": 86.1875,
+          "w": 357,
+          "h": 448.953125,
+          "r": 1012,
+          "b": 535.140625
+        },
+        "transport": {
+          "x": 72,
+          "y": 547.140625,
+          "w": 940,
+          "h": 48.859375,
+          "r": 1012,
+          "b": 596
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 38.1875,
+          "w": 940,
+          "h": 44,
+          "r": 1012,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 81.1875,
+          "y": 130.171875,
+          "w": 548.625,
+          "h": 283.78125,
+          "r": 629.8125,
+          "b": 413.953125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 186.94699096679688,
+          "h": 213.12550354003906
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": true,
+        "width": 357,
+        "cmWidth": 340.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 64,
+          "scroll": 68
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 566,
+      "pageClientH": 566
+    },
+    "bfs-1024x600-mid": {
+      "vp": {
+        "w": 1024,
+        "h": 600
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 86.1875,
+          "w": 567,
+          "h": 336.953125,
+          "r": 639,
+          "b": 423.140625
+        },
+        "data": {
+          "x": 72,
+          "y": 439.140625,
+          "w": 567,
+          "h": 96,
+          "r": 639,
+          "b": 535.140625
+        },
+        "code": {
+          "x": 655,
+          "y": 86.1875,
+          "w": 357,
+          "h": 448.953125,
+          "r": 1012,
+          "b": 535.140625
+        },
+        "transport": {
+          "x": 72,
+          "y": 547.140625,
+          "w": 940,
+          "h": 48.859375,
+          "r": 1012,
+          "b": 596
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 38.1875,
+          "w": 940,
+          "h": 44,
+          "r": 1012,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 81.1875,
+          "y": 132.546875,
+          "w": 548.625,
+          "h": 281.40625,
+          "r": 629.8125,
+          "b": 413.953125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 187.10528564453125,
+          "h": 209.61892700195312
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 17
+      },
+      "code": {
+        "visible": true,
+        "width": 357,
+        "cmWidth": 340.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 64,
+          "scroll": 146
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtwznv_ov1bcx5",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 566,
+      "pageClientH": 566
+    },
+    "dijkstra-1024x600-preview": {
+      "vp": {
+        "w": 1024,
+        "h": 600
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 86.1875,
+          "w": 567,
+          "h": 336.953125,
+          "r": 639,
+          "b": 423.140625
+        },
+        "data": {
+          "x": 72,
+          "y": 439.140625,
+          "w": 567,
+          "h": 96,
+          "r": 639,
+          "b": 535.140625
+        },
+        "code": {
+          "x": 655,
+          "y": 86.1875,
+          "w": 357,
+          "h": 448.953125,
+          "r": 1012,
+          "b": 535.140625
+        },
+        "transport": {
+          "x": 72,
+          "y": 547.140625,
+          "w": 940,
+          "h": 48.859375,
+          "r": 1012,
+          "b": 596
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 38.1875,
+          "w": 940,
+          "h": 44,
+          "r": 1012,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 81.1875,
+          "y": 130.171875,
+          "w": 548.625,
+          "h": 283.78125,
+          "r": 629.8125,
+          "b": 413.953125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 186.94699096679688,
+          "h": 213.12550354003906
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": true,
+        "width": 357,
+        "cmWidth": 340.625,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 64,
+          "scroll": 68
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 566,
+      "pageClientH": 566
+    },
+    "dijkstra-1024x600-mid": {
+      "vp": {
+        "w": 1024,
+        "h": 600
+      },
+      "mode": "docked",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 72,
+          "y": 86.1875,
+          "w": 567,
+          "h": 336.953125,
+          "r": 639,
+          "b": 423.140625
+        },
+        "data": {
+          "x": 72,
+          "y": 439.140625,
+          "w": 567,
+          "h": 96,
+          "r": 639,
+          "b": 535.140625
+        },
+        "code": {
+          "x": 655,
+          "y": 86.1875,
+          "w": 357,
+          "h": 448.953125,
+          "r": 1012,
+          "b": 535.140625
+        },
+        "transport": {
+          "x": 72,
+          "y": 547.140625,
+          "w": 940,
+          "h": 48.859375,
+          "r": 1012,
+          "b": 596
+        },
+        "toolbar": {
+          "x": 72,
+          "y": 38.1875,
+          "w": 940,
+          "h": 44,
+          "r": 1012,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 81.1875,
+          "y": 132.546875,
+          "w": 548.625,
+          "h": 281.40625,
+          "r": 629.8125,
+          "b": 413.953125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 187.10528564453125,
+          "h": 209.61892700195312
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": true,
+        "width": 357,
+        "cmWidth": 340.625,
+        "execFully": true,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 64,
+          "scroll": 146
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtx1ad_aw7t4x5",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 566,
+      "pageClientH": 566
+    },
+    "bfs-900x500-preview": {
+      "vp": {
+        "w": 900,
+        "h": 500
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 12,
+          "y": 86.1875,
+          "w": 876,
+          "h": 349.578125,
+          "r": 888,
+          "b": 435.765625
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 174.09375,
+          "y": 442.15625,
+          "w": 713.90625,
+          "h": 53.84375,
+          "r": 888,
+          "b": 496
+        },
+        "toolbar": {
+          "x": 12,
+          "y": 38.1875,
+          "w": 876,
+          "h": 44,
+          "r": 888,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 21.1875,
+          "y": 130.171875,
+          "w": 857.625,
+          "h": 296.40625,
+          "r": 878.8125,
+          "b": 426.578125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 195.26394653320312,
+          "h": 222.60711669921875
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 466,
+      "pageClientH": 466
+    },
+    "bfs-900x500-mid": {
+      "vp": {
+        "w": 900,
+        "h": 500
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 12,
+          "y": 86.1875,
+          "w": 876,
+          "h": 349.578125,
+          "r": 888,
+          "b": 435.765625
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 174.09375,
+          "y": 442.15625,
+          "w": 713.90625,
+          "h": 53.84375,
+          "r": 888,
+          "b": 496
+        },
+        "toolbar": {
+          "x": 12,
+          "y": 38.1875,
+          "w": 876,
+          "h": 44,
+          "r": 888,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 21.1875,
+          "y": 132.546875,
+          "w": 857.625,
+          "h": 294.03125,
+          "r": 878.8125,
+          "b": 426.578125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 195.49954223632812,
+          "h": 219.0232696533203
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 17
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": false,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtx2vk_5o0bwb0",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 466,
+      "pageClientH": 466
+    },
+    "dijkstra-900x500-preview": {
+      "vp": {
+        "w": 900,
+        "h": 500
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 12,
+          "y": 86.1875,
+          "w": 876,
+          "h": 349.578125,
+          "r": 888,
+          "b": 435.765625
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 174.09375,
+          "y": 442.15625,
+          "w": 713.90625,
+          "h": 53.84375,
+          "r": 888,
+          "b": 496
+        },
+        "toolbar": {
+          "x": 12,
+          "y": 38.1875,
+          "w": 876,
+          "h": 44,
+          "r": 888,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 21.1875,
+          "y": 130.171875,
+          "w": 857.625,
+          "h": 296.40625,
+          "r": 878.8125,
+          "b": 426.578125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 195.26394653320312,
+          "h": 222.60711669921875
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 466,
+      "pageClientH": 466
+    },
+    "dijkstra-900x500-mid": {
+      "vp": {
+        "w": 900,
+        "h": 500
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 12,
+          "y": 86.1875,
+          "w": 876,
+          "h": 349.578125,
+          "r": 888,
+          "b": 435.765625
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 174.09375,
+          "y": 442.15625,
+          "w": 713.90625,
+          "h": 53.84375,
+          "r": 888,
+          "b": 496
+        },
+        "toolbar": {
+          "x": 12,
+          "y": 38.1875,
+          "w": 876,
+          "h": 44,
+          "r": 888,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 21.1875,
+          "y": 132.546875,
+          "w": 857.625,
+          "h": 294.03125,
+          "r": 878.8125,
+          "b": 426.578125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 195.49954223632812,
+          "h": 219.0232696533203
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtx4da_q1662mw",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 466,
+      "pageClientH": 466
+    },
+    "bfs-390x844-preview": {
+      "vp": {
+        "w": 390,
+        "h": 844
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 6.390625,
+          "y": 227.375,
+          "w": 377.21875,
+          "h": 516.203125,
+          "r": 383.609375,
+          "b": 743.578125
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 6.390625,
+          "y": 749.96875,
+          "w": 377.21875,
+          "h": 87.640625,
+          "r": 383.609375,
+          "b": 837.609375
+        },
+        "toolbar": {
+          "x": 6.390625,
+          "y": 54.1875,
+          "w": 377.21875,
+          "h": 125.609375,
+          "r": 383.609375,
+          "b": 179.796875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 27.578125,
+          "y": 288.5625,
+          "w": 334.84375,
+          "h": 433.828125,
+          "r": 362.421875,
+          "b": 722.390625
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 241.37421417236328,
+          "h": 275.1742248535156
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 17
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 795,
+      "pageClientH": 795
+    },
+    "bfs-390x844-mid": {
+      "vp": {
+        "w": 390,
+        "h": 844
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 6.390625,
+          "y": 220.3125,
+          "w": 377.21875,
+          "h": 523.265625,
+          "r": 383.609375,
+          "b": 743.578125
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 6.390625,
+          "y": 749.96875,
+          "w": 377.21875,
+          "h": 87.640625,
+          "r": 383.609375,
+          "b": 837.609375
+        },
+        "toolbar": {
+          "x": 6.390625,
+          "y": 54.1875,
+          "w": 377.21875,
+          "h": 118.546875,
+          "r": 383.609375,
+          "b": 172.734375
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 27.578125,
+          "y": 286.6875,
+          "w": 334.84375,
+          "h": 435.703125,
+          "r": 362.421875,
+          "b": 722.390625
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 243.61743927001953,
+          "h": 272.93096923828125
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 20
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": false,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtx5uh_pzof4l9",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 795,
+      "pageClientH": 795
+    },
+    "dijkstra-390x844-preview": {
+      "vp": {
+        "w": 390,
+        "h": 844
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 6.390625,
+          "y": 200.578125,
+          "w": 377.21875,
+          "h": 543,
+          "r": 383.609375,
+          "b": 743.578125
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 6.390625,
+          "y": 749.96875,
+          "w": 377.21875,
+          "h": 87.640625,
+          "r": 383.609375,
+          "b": 837.609375
+        },
+        "toolbar": {
+          "x": 6.390625,
+          "y": 54.1875,
+          "w": 377.21875,
+          "h": 98.8125,
+          "r": 383.609375,
+          "b": 153
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 27.578125,
+          "y": 261.765625,
+          "w": 334.84375,
+          "h": 460.625,
+          "r": 362.421875,
+          "b": 722.390625
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 241.37421417236328,
+          "h": 275.1742248535156
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 17
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 795,
+      "pageClientH": 795
+    },
+    "dijkstra-390x844-mid": {
+      "vp": {
+        "w": 390,
+        "h": 844
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 6.390625,
+          "y": 200.578125,
+          "w": 377.21875,
+          "h": 543,
+          "r": 383.609375,
+          "b": 743.578125
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 6.390625,
+          "y": 749.96875,
+          "w": 377.21875,
+          "h": 87.640625,
+          "r": 383.609375,
+          "b": 837.609375
+        },
+        "toolbar": {
+          "x": 6.390625,
+          "y": 54.1875,
+          "w": 377.21875,
+          "h": 98.8125,
+          "r": 383.609375,
+          "b": 153
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 27.578125,
+          "y": 266.953125,
+          "w": 334.84375,
+          "h": 455.4375,
+          "r": 362.421875,
+          "b": 722.390625
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 243.61743927001953,
+          "h": 272.93096923828125
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 17
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtx7bf_8fojrun",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 795,
+      "pageClientH": 795
+    },
+    "bfs-360x640-preview": {
+      "vp": {
+        "w": 360,
+        "h": 640
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 6.390625,
+          "y": 202.90625,
+          "w": 347.21875,
+          "h": 341.46875,
+          "r": 353.609375,
+          "b": 544.375
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 6.390625,
+          "y": 550.765625,
+          "w": 347.21875,
+          "h": 85.234375,
+          "r": 353.609375,
+          "b": 636
+        },
+        "toolbar": {
+          "x": 6.390625,
+          "y": 46.1875,
+          "w": 347.21875,
+          "h": 113.140625,
+          "r": 353.609375,
+          "b": 159.328125
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 15.578125,
+          "y": 246.890625,
+          "w": 328.84375,
+          "h": 288.296875,
+          "r": 344.421875,
+          "b": 535.1875
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 189.92172241210938,
+          "h": 216.51681518554688
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 598,
+      "pageClientH": 598
+    },
+    "bfs-360x640-mid": {
+      "vp": {
+        "w": 360,
+        "h": 640
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 6.390625,
+          "y": 202.90625,
+          "w": 347.21875,
+          "h": 341.46875,
+          "r": 353.609375,
+          "b": 544.375
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 6.390625,
+          "y": 550.765625,
+          "w": 347.21875,
+          "h": 85.234375,
+          "r": 353.609375,
+          "b": 636
+        },
+        "toolbar": {
+          "x": 6.390625,
+          "y": 46.1875,
+          "w": 347.21875,
+          "h": 113.140625,
+          "r": 353.609375,
+          "b": 159.328125
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 15.578125,
+          "y": 249.265625,
+          "w": 328.84375,
+          "h": 285.921875,
+          "r": 344.421875,
+          "b": 535.1875
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 190.1076889038086,
+          "h": 212.98257446289062
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 17
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": false,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtx8nz_ppavq2j",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 598,
+      "pageClientH": 598
+    },
+    "dijkstra-360x640-preview": {
+      "vp": {
+        "w": 360,
+        "h": 640
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 6.390625,
+          "y": 202.90625,
+          "w": 347.21875,
+          "h": 341.46875,
+          "r": 353.609375,
+          "b": 544.375
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 6.390625,
+          "y": 550.765625,
+          "w": 347.21875,
+          "h": 85.234375,
+          "r": 353.609375,
+          "b": 636
+        },
+        "toolbar": {
+          "x": 6.390625,
+          "y": 46.1875,
+          "w": 347.21875,
+          "h": 113.140625,
+          "r": 353.609375,
+          "b": 159.328125
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 15.578125,
+          "y": 246.890625,
+          "w": 328.84375,
+          "h": 288.296875,
+          "r": 344.421875,
+          "b": 535.1875
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 189.92172241210938,
+          "h": 216.51681518554688
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 598,
+      "pageClientH": 598
+    },
+    "dijkstra-360x640-mid": {
+      "vp": {
+        "w": 360,
+        "h": 640
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 6.390625,
+          "y": 202.90625,
+          "w": 347.21875,
+          "h": 341.46875,
+          "r": 353.609375,
+          "b": 544.375
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 6.390625,
+          "y": 550.765625,
+          "w": 347.21875,
+          "h": 85.234375,
+          "r": 353.609375,
+          "b": 636
+        },
+        "toolbar": {
+          "x": 6.390625,
+          "y": 46.1875,
+          "w": 347.21875,
+          "h": 113.140625,
+          "r": 353.609375,
+          "b": 159.328125
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 15.578125,
+          "y": 249.265625,
+          "w": 328.84375,
+          "h": 285.921875,
+          "r": 344.421875,
+          "b": 535.1875
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 190.1076889038086,
+          "h": 212.98257446289062
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 14
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtxa61_jeen9a6",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 598,
+      "pageClientH": 598
+    },
+    "bfs-844x390-preview": {
+      "vp": {
+        "w": 844,
+        "h": 390
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 12,
+          "y": 86.1875,
+          "w": 820,
+          "h": 239.578125,
+          "r": 832,
+          "b": 325.765625
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 174.09375,
+          "y": 332.15625,
+          "w": 657.90625,
+          "h": 53.84375,
+          "r": 832,
+          "b": 386
+        },
+        "toolbar": {
+          "x": 12,
+          "y": 38.1875,
+          "w": 820,
+          "h": 44,
+          "r": 832,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 21.1875,
+          "y": 130.171875,
+          "w": 801.625,
+          "h": 186.40625,
+          "r": 822.8125,
+          "b": 316.578125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 122.79910278320312,
+          "h": 139.99490356445312
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 6,
+        "minLabelPx": 13.999984741210938
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "6 个顶点 · 起点 0 · 无向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 356,
+      "pageClientH": 356
+    },
+    "bfs-844x390-mid": {
+      "vp": {
+        "w": 844,
+        "h": 390
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 12,
+          "y": 86.1875,
+          "w": 820,
+          "h": 239.578125,
+          "r": 832,
+          "b": 325.765625
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 174.09375,
+          "y": 332.15625,
+          "w": 657.90625,
+          "h": 53.84375,
+          "r": 832,
+          "b": 386
+        },
+        "toolbar": {
+          "x": 12,
+          "y": 38.1875,
+          "w": 820,
+          "h": 44,
+          "r": 832,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 21.1875,
+          "y": 132.546875,
+          "w": 801.625,
+          "h": 184.03125,
+          "r": 822.8125,
+          "b": 316.578125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 122.36123657226562,
+          "h": 137.08448791503906
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 0,
+        "edgeLabels": 0,
+        "minLabelPx": 16.999984741210938
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": false,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25",
+      "runId": "run_mugtxbkz_cpydncv",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 356,
+      "pageClientH": 356
+    },
+    "dijkstra-844x390-preview": {
+      "vp": {
+        "w": 844,
+        "h": 390
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 12,
+          "y": 86.1875,
+          "w": 820,
+          "h": 239.578125,
+          "r": 832,
+          "b": 325.765625
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 174.09375,
+          "y": 332.15625,
+          "w": 657.90625,
+          "h": 53.84375,
+          "r": 832,
+          "b": 386
+        },
+        "toolbar": {
+          "x": 12,
+          "y": 38.1875,
+          "w": 820,
+          "h": 44,
+          "r": 832,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 21.1875,
+          "y": 130.171875,
+          "w": 801.625,
+          "h": 186.40625,
+          "r": 822.8125,
+          "b": 316.578125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 122.79910278320312,
+          "h": 139.99490356445312
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 13.999984741210938
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "6 个顶点 · 起点 0 · 有向图 · 就绪",
+        "pills": []
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "1 / 1 · preview",
+      "runId": "preview",
+      "stepIndex": "0",
+      "solveCount": 0,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 356,
+      "pageClientH": 356
+    },
+    "dijkstra-844x390-mid": {
+      "vp": {
+        "w": 844,
+        "h": 390
+      },
+      "mode": "tabbed",
+      "activeView": "demo",
+      "regions": {
+        "scene": {
+          "x": 12,
+          "y": 86.1875,
+          "w": 820,
+          "h": 239.578125,
+          "r": 832,
+          "b": 325.765625
+        },
+        "data": null,
+        "code": null,
+        "transport": {
+          "x": 174.09375,
+          "y": 332.15625,
+          "w": 657.90625,
+          "h": 53.84375,
+          "r": 832,
+          "b": 386
+        },
+        "toolbar": {
+          "x": 12,
+          "y": 38.1875,
+          "w": 820,
+          "h": 44,
+          "r": 832,
+          "b": 82.1875
+        }
+      },
+      "overlaps": [],
+      "graph": {
+        "plot": {
+          "x": 21.1875,
+          "y": 132.546875,
+          "w": 801.625,
+          "h": 184.03125,
+          "r": 822.8125,
+          "b": 316.578125
+        },
+        "nodes": 6,
+        "bbox": {
+          "w": 122.36123657226562,
+          "h": 137.08448791503906
+        },
+        "outside": [],
+        "occluded": [],
+        "arrows": 9,
+        "edgeLabels": 9,
+        "minLabelPx": 13.999984741210938
+      },
+      "code": {
+        "visible": false,
+        "width": 0,
+        "cmWidth": 0,
+        "execFully": null,
+        "editors": 1
+      },
+      "data": {
+        "bodyScroll": {
+          "client": 0,
+          "scroll": 0
+        },
+        "summary": "",
+        "pills": [
+          "u",
+          "v",
+          "newDist"
+        ]
+      },
+      "stepTextFully": true,
+      "transportBtns": [
+        [
+          "reset-playback-btn",
+          true
+        ],
+        [
+          "prev-step-btn",
+          true
+        ],
+        [
+          "play-btn",
+          true
+        ],
+        [
+          "next-step-btn",
+          true
+        ],
+        [
+          "playback-settings-toggle",
+          true
+        ]
+      ],
+      "toolbarBtns": [
+        [
+          "input-edit-toggle",
+          true
+        ],
+        [
+          "run-btn",
+          true
+        ],
+        [
+          "cancel-btn",
+          true
+        ]
+      ],
+      "theoryFully": true,
+      "counter": "6 / 25 · relax",
+      "runId": "run_mugtxd0h_ixop1nz",
+      "stepIndex": "5",
+      "solveCount": 1,
+      "visualizers": 1,
+      "transports": 1,
+      "pageScrollH": 356,
+      "pageClientH": 356
+    }
+  },
+  "A2-1366x768": {
+    "vp": {
+      "w": 1366,
+      "h": 768
+    },
+    "mode": "docked",
+    "activeView": "demo",
+    "regions": {
+      "scene": {
+        "x": 72,
+        "y": 277.921875,
+        "w": 787,
+        "h": 317.765625,
+        "r": 859,
+        "b": 595.6875
+      },
+      "data": {
+        "x": 72,
+        "y": 603.6875,
+        "w": 787,
+        "h": 96,
+        "r": 859,
+        "b": 699.6875
+      },
+      "code": {
+        "x": 867,
+        "y": 277.921875,
+        "w": 487,
+        "h": 421.765625,
+        "r": 1354,
+        "b": 699.6875
+      },
+      "transport": {
+        "x": 72,
+        "y": 707.6875,
+        "w": 1282,
+        "h": 60.234375,
+        "r": 1354,
+        "b": 767.921875
+      },
+      "toolbar": {
+        "x": 72,
+        "y": -225.40625,
+        "w": 1282,
+        "h": 495.328125,
+        "r": 1354,
+        "b": 269.921875
+      }
+    },
+    "overlaps": [],
+    "graph": {
+      "plot": {
+        "x": 93.1875,
+        "y": 344.296875,
+        "w": 744.625,
+        "h": 230.203125,
+        "r": 837.8125,
+        "b": 574.5
+      },
+      "nodes": 6,
+      "bbox": {
+        "w": 153.06060791015625,
+        "h": 172.88723754882812
+      },
+      "outside": [],
+      "occluded": [],
+      "arrows": 0,
+      "edgeLabels": 0,
+      "minLabelPx": 17
+    },
+    "code": {
+      "visible": true,
+      "width": 487,
+      "cmWidth": 470.625,
+      "execFully": true,
+      "editors": 1
+    },
+    "data": {
+      "bodyScroll": {
+        "client": 64,
+        "scroll": 146
+      },
+      "summary": "",
+      "pills": [
+        "u",
+        "v",
+        "visited_v"
+      ]
+    },
+    "stepTextFully": true,
+    "transportBtns": [
+      [
+        "reset-playback-btn",
+        true
+      ],
+      [
+        "prev-step-btn",
+        true
+      ],
+      [
+        "play-btn",
+        true
+      ],
+      [
+        "next-step-btn",
+        true
+      ],
+      [
+        "playback-settings-toggle",
+        true
+      ]
+    ],
+    "toolbarBtns": [
+      [
+        "input-edit-toggle",
+        false
+      ],
+      [
+        "run-btn",
+        false
+      ],
+      [
+        "cancel-btn",
+        false
+      ]
+    ],
+    "theoryFully": false,
+    "counter": "9 / 25",
+    "runId": "run_mugtxf13_b3ed5qn",
+    "stepIndex": "8",
+    "solveCount": 1,
+    "visualizers": 1,
+    "transports": 1,
+    "pageScrollH": 1011,
+    "pageClientH": 721
+  },
+  "A2-1920x1080": {
+    "vp": {
+      "w": 1920,
+      "h": 1080
+    },
+    "mode": "wide",
+    "activeView": "demo",
+    "regions": {
+      "scene": {
+        "x": 72,
+        "y": 557.921875,
+        "w": 865,
+        "h": 444.25,
+        "r": 937,
+        "b": 1002.171875
+      },
+      "data": {
+        "x": 945,
+        "y": 557.921875,
+        "w": 404,
+        "h": 444.25,
+        "r": 1349,
+        "b": 1002.171875
+      },
+      "code": {
+        "x": 1357,
+        "y": 557.921875,
+        "w": 551,
+        "h": 444.25,
+        "r": 1908,
+        "b": 1002.171875
+      },
+      "transport": {
+        "x": 72,
+        "y": 1010.171875,
+        "w": 1836,
+        "h": 60.234375,
+        "r": 1908,
+        "b": 1070.40625
+      },
+      "toolbar": {
+        "x": 72,
+        "y": 54.59375,
+        "w": 1836,
+        "h": 495.328125,
+        "r": 1908,
+        "b": 549.921875
+      }
+    },
+    "overlaps": [],
+    "graph": {
+      "plot": {
+        "x": 93.1875,
+        "y": 624.296875,
+        "w": 822.625,
+        "h": 356.6875,
+        "r": 915.8125,
+        "b": 980.984375
+      },
+      "nodes": 6,
+      "bbox": {
+        "w": 237.15927124023438,
+        "h": 267.8795166015625
+      },
+      "outside": [],
+      "occluded": [],
+      "arrows": 0,
+      "edgeLabels": 0,
+      "minLabelPx": 19
+    },
+    "code": {
+      "visible": true,
+      "width": 551,
+      "cmWidth": 534.625,
+      "execFully": true,
+      "editors": 1
+    },
+    "data": {
+      "bodyScroll": {
+        "client": 412,
+        "scroll": 412
+      },
+      "summary": "",
+      "pills": [
+        "u",
+        "v",
+        "visited_v"
+      ]
+    },
+    "stepTextFully": true,
+    "transportBtns": [
+      [
+        "reset-playback-btn",
+        true
+      ],
+      [
+        "prev-step-btn",
+        true
+      ],
+      [
+        "play-btn",
+        true
+      ],
+      [
+        "next-step-btn",
+        true
+      ],
+      [
+        "playback-settings-toggle",
+        true
+      ]
+    ],
+    "toolbarBtns": [
+      [
+        "input-edit-toggle",
+        true
+      ],
+      [
+        "run-btn",
+        true
+      ],
+      [
+        "cancel-btn",
+        true
+      ]
+    ],
+    "theoryFully": true,
+    "counter": "9 / 25",
+    "runId": "run_mugtxg2l_isd2ppy",
+    "stepIndex": "8",
+    "solveCount": 1,
+    "visualizers": 1,
+    "transports": 1,
+    "pageScrollH": 1033,
+    "pageClientH": 1033
+  },
+  "A2-390x844": {
+    "vp": {
+      "w": 390,
+      "h": 844
+    },
+    "mode": "tabbed",
+    "activeView": "demo",
+    "regions": {
+      "scene": {
+        "x": 6.390625,
+        "y": 463.71875,
+        "w": 377.21875,
+        "h": 286.390625,
+        "r": 383.609375,
+        "b": 750.109375
+      },
+      "data": null,
+      "code": null,
+      "transport": {
+        "x": 6.390625,
+        "y": 756.5,
+        "w": 377.21875,
+        "h": 87.640625,
+        "r": 383.609375,
+        "b": 844.140625
+      },
+      "toolbar": {
+        "x": 6.390625,
+        "y": -295.8125,
+        "w": 377.21875,
+        "h": 711.953125,
+        "r": 383.609375,
+        "b": 416.140625
+      }
+    },
+    "overlaps": [],
+    "graph": {
+      "plot": {
+        "x": 27.578125,
+        "y": 530.09375,
+        "w": 334.84375,
+        "h": 198.828125,
+        "r": 362.421875,
+        "b": 728.921875
+      },
+      "nodes": 6,
+      "bbox": {
+        "w": 132.1995849609375,
+        "h": 149.323974609375
+      },
+      "outside": [],
+      "occluded": [],
+      "arrows": 0,
+      "edgeLabels": 0,
+      "minLabelPx": 17
+    },
+    "code": {
+      "visible": false,
+      "width": 0,
+      "cmWidth": 0,
+      "execFully": false,
+      "editors": 1
+    },
+    "data": {
+      "bodyScroll": {
+        "client": 0,
+        "scroll": 0
+      },
+      "summary": "",
+      "pills": [
+        "u",
+        "v",
+        "visited_v"
+      ]
+    },
+    "stepTextFully": true,
+    "transportBtns": [
+      [
+        "reset-playback-btn",
+        true
+      ],
+      [
+        "prev-step-btn",
+        true
+      ],
+      [
+        "play-btn",
+        true
+      ],
+      [
+        "next-step-btn",
+        true
+      ],
+      [
+        "playback-settings-toggle",
+        true
+      ]
+    ],
+    "toolbarBtns": [
+      [
+        "input-edit-toggle",
+        false
+      ],
+      [
+        "run-btn",
+        false
+      ],
+      [
+        "cancel-btn",
+        false
+      ]
+    ],
+    "theoryFully": false,
+    "counter": "9 / 25",
+    "runId": "run_mugtxh1w_5qyo0qp",
+    "stepIndex": "8",
+    "solveCount": 1,
+    "visualizers": 1,
+    "transports": 1,
+    "pageScrollH": 1152,
+    "pageClientH": 795
+  },
+  "B": {
+    "seq": [
+      "∞",
+      "10",
+      "2"
+    ],
+    "tree": [
+      "0->2",
+      "2->1"
+    ],
+    "total": 11
+  },
+  "C": [
+    {
+      "counter": "1 / 95 · init",
+      "chars": 13,
+      "charsFull": 13,
+      "cell": null,
+      "locate": true,
+      "resume": true,
+      "chipsFull": 1,
+      "chips": 1,
+      "exec": true,
+      "step": true,
+      "codeW": 487
+    },
+    {
+      "counter": "14 / 95 · compare",
+      "chars": 13,
+      "charsFull": 13,
+      "cell": true,
+      "locate": true,
+      "resume": true,
+      "chipsFull": 3,
+      "chips": 3,
+      "exec": true,
+      "step": true,
+      "codeW": 487
+    },
+    {
+      "counter": "31 / 95 · fill",
+      "chars": 13,
+      "charsFull": 13,
+      "cell": true,
+      "locate": true,
+      "resume": true,
+      "chipsFull": 3,
+      "chips": 3,
+      "exec": true,
+      "step": true,
+      "codeW": 487
+    },
+    {
+      "counter": "74 / 95 · compare",
+      "chars": 13,
+      "charsFull": 13,
+      "cell": true,
+      "locate": true,
+      "resume": true,
+      "chipsFull": 3,
+      "chips": 3,
+      "exec": true,
+      "step": true,
+      "codeW": 487
+    },
+    {
+      "counter": "75 / 95 · fill",
+      "chars": 13,
+      "charsFull": 13,
+      "cell": true,
+      "locate": true,
+      "resume": true,
+      "chipsFull": 3,
+      "chips": 3,
+      "exec": true,
+      "step": true,
+      "codeW": 487
+    },
+    {
+      "counter": "94 / 95 · reconstruct",
+      "chars": 13,
+      "charsFull": 13,
+      "cell": true,
+      "locate": true,
+      "resume": true,
+      "chipsFull": 3,
+      "chips": 3,
+      "exec": true,
+      "step": true,
+      "codeW": 487
+    },
+    {
+      "counter": "95 / 95 · done",
+      "chars": 13,
+      "charsFull": 13,
+      "cell": true,
+      "locate": true,
+      "resume": true,
+      "chipsFull": 2,
+      "chips": 2,
+      "exec": true,
+      "step": true,
+      "codeW": 487
+    }
+  ],
+  "F": {
+    "1366x768-strip-10px": {
+      "whileInjected": [
+        "glyphs:clipped 13/13"
+      ],
+      "afterRestore": []
+    },
+    "1366x768-toolbar-6px": {
+      "whileInjected": [
+        "locate:clipped",
+        "resume:clipped",
+        "locate:not-hit"
+      ],
+      "afterRestore": []
+    },
+    "1366x768-matrix-overhang": {
+      "whileInjected": [
+        "matrix:overhang 1760.5"
+      ],
+      "afterRestore": []
+    },
+    "1366x768-code-w0": {
+      "whileInjected": [
+        "code:width 0"
+      ],
+      "afterRestore": []
+    },
+    "1024x600-strip-10px": {
+      "whileInjected": [
+        "glyphs:clipped 13/13"
+      ],
+      "afterRestore": []
+    },
+    "1024x600-toolbar-6px": {
+      "whileInjected": [
+        "locate:clipped",
+        "resume:clipped",
+        "locate:not-hit"
+      ],
+      "afterRestore": []
+    },
+    "1024x600-matrix-overhang": {
+      "whileInjected": [
+        "matrix:overhang 1799.6"
+      ],
+      "afterRestore": []
+    },
+    "1024x600-code-w0": {
+      "whileInjected": [
+        "code:width 0"
+      ],
+      "afterRestore": []
+    }
+  },
+  "D-mergeSort": {
+    "total": 25,
+    "sawDup": true,
+    "sawBuf": true
+  },
+  "D-insertionSort": {
+    "total": 6,
+    "sawDup": true,
+    "sawBuf": true
+  },
+  "E": {
+    "rid": "run_mugtxuqo_t0sckne",
+    "cursor": 6,
+    "read1": 233,
+    "read2": 113,
+    "codeW0": 487,
+    "codeW1": 547
+  }
+}
