@@ -35,7 +35,7 @@ interface Props {
 const GUTTER = 8
 const SCENE_MIN_H = 240
 /** Demo region height that gives a ~300px graph plot (banner + plot + padding). */
-const SCENE_PREFERRED_H = 380
+const SCENE_PREFERRED_H = 392
 const VIEW_LABEL: Record<ActiveView, string> = { demo: '演示', data: '数据', code: '代码' }
 
 /**
@@ -140,9 +140,18 @@ export default function WorkbenchLayout({
         })
       : 0
 
+  const lowTabs = mode === 'tabbed' && viewportHeight > 0 && viewportHeight < 560 && box.w >= 640
   const grid = useMemo(() => {
     const t = (rows: string[]) => rows.map((r) => `"${r}"`).join(' ')
     if (mode === 'tabbed') {
+      // Short landscape: tabs share the transport row so the scene keeps the height.
+      if (lowTabs) {
+        return {
+          gridTemplateColumns: 'auto minmax(0, 1fr)',
+          gridTemplateRows: 'minmax(0, 1fr) auto',
+          gridTemplateAreas: t(['view view', 'tabs transport']),
+        }
+      }
       return {
         gridTemplateColumns: 'minmax(0, 1fr)',
         gridTemplateRows: 'auto minmax(0, 1fr) auto',
@@ -172,14 +181,14 @@ export default function WorkbenchLayout({
         : `minmax(${SCENE_MIN_H}px, 1fr) 0px auto auto`,
       gridTemplateAreas: t([row('demo'), row('split-a'), row('data'), full('transport')]),
     }
-  }, [mode, hasCode, hasData, prefs.dataVisible, codeW, wideDataW, dockedDataH])
+  }, [mode, lowTabs, hasCode, hasData, prefs.dataVisible, codeW, wideDataW, dockedDataH])
 
-  // Low-height tabs: the workbench claims the whole scroll viewport (toolbar scrolls away above it)
-  // instead of squeezing the scene under toolbar + tabs + transport.
+  // Low-height tabs fill the remaining page height (no page scroll at first view);
+  // the floor only protects against a collapsed scene.
   const minH =
     mode === 'tabbed'
       ? viewportHeight > 0 && viewportHeight < 560
-        ? Math.max(300, viewportHeight - 8)
+        ? 240
         : 420
       : mode === 'wide'
         ? 480
@@ -273,6 +282,7 @@ export default function WorkbenchLayout({
       data-data-visible={hasData && (tabbed ? active === 'data' : prefs.dataVisible) ? '1' : '0'}
       data-fill={fill}
       data-transport={!tabbed && box.h >= 700 ? 'roomy' : 'compact'}
+      data-low-tabs={lowTabs ? '1' : undefined}
       ref={rootRef}
       style={style}
     >

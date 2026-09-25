@@ -120,6 +120,7 @@ function VarsPanel({ step, prevStep, graph = false }: { step: Step; prevStep?: S
               className={`var-chip${changed.has(k) ? ' flash' : ''}`}
               data-changed={changed.has(k) ? '1' : undefined}
               data-var={k}
+              data-testid="var-chip"
             >
               <span className="var-key">
                 {friendlyLabel(k, graph) !== k && <span className="field-label">{friendlyLabel(k, graph)}</span>}

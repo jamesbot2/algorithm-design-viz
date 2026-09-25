@@ -479,6 +479,17 @@
 .workbench-layout[data-layout-mode="tabbed"] .playback-transport .speed-label {
   display: none;
 }
+/* Short landscape tabs share the transport row (grid areas "tabs transport"). */
+.workbench-layout[data-low-tabs="1"] {
+  column-gap: 0.4rem;
+}
+.workbench-layout[data-low-tabs="1"] .workbench-tabs {
+  align-self: center;
+}
+.workbench-layout[data-low-tabs="1"] .workbench-tabs [role="tab"] {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.6rem;
+}
 /* Short landscape tabs: enough width for ONE transport row. */
 @media (min-width: 600px) {
   .workbench-layout[data-layout-mode="tabbed"] .playback-transport {
@@ -548,6 +559,32 @@
 }
 .data-stats .stat-chip {
   font-family: var(--mono);
+}
+.data-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.3rem 0.8rem;
+}
+/* Collapsed secondary details share one line; an opened one takes the full row. */
+.data-secondary > details[open] {
+  flex: 1 0 100%;
+}
+.current-step-data .final-answer-panel {
+  margin: 0;
+  padding: 0.15rem 0.5rem;
+}
+/* The region header already says 当前数据; keep the arrays title for AT only. */
+.current-step-data .inspector-arrays > .data-section-title:first-child {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.current-step-data .inspector-arrays {
+  margin-top: 0;
 }
 .data-raw-fields > summary,
 .current-step-data .final-answer-panel > summary {

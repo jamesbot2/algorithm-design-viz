@@ -44,11 +44,6 @@ export default function CurrentStepData({ step, prevStep, isPreview, atEnd, fina
 
   return (
     <div className="current-step-data" data-testid="current-step-data" data-step-id={step.id}>
-      {summary && (
-        <p className="data-config-summary" data-testid="data-config-summary">
-          {summary}
-        </p>
-      )}
       {isPreview && <p className="data-hint muted">尚未运行：点击「运行」后这里显示每一步的关键数据。</p>}
       <VarsPanel step={step} prevStep={prevStep} graph={graph} />
       {frameId !== undefined && frameId !== null && (
@@ -67,32 +62,42 @@ export default function CurrentStepData({ step, prevStep, isPreview, atEnd, fina
           ))}
         </div>
       )}
-      {hasFinal && (
-        <details
-          className="final-answer-panel"
-          data-testid="final-answer-panel"
-          open={finalOpen}
-          onToggle={(e) => setFinalOpen((e.target as HTMLDetailsElement).open)}
-        >
-          <summary>最终结果{atEnd ? '' : '（整轮运行的结论，非当前步）'}</summary>
-          <div className="final-answer-body">{finalAnswer}</div>
-        </details>
-      )}
-      {rawEntries.length > 0 && (
-        <details className="data-raw-fields" data-testid="data-raw-fields">
-          <summary>全部字段（{rawEntries.length}）</summary>
-          <dl>
-            {rawEntries.map(([k, v]) => (
-              <div key={k} className="data-raw-row" data-config={CONFIG_KEYS.has(k) ? '1' : undefined}>
-                <dt>
-                  <code>{k}</code>
-                  {friendlyLabel(k, graph) !== k ? <span className="muted"> {friendlyLabel(k, graph)}</span> : null}
-                </dt>
-                <dd>{serialize(v)}</dd>
-              </div>
-            ))}
-          </dl>
-        </details>
+      {(summary || hasFinal || rawEntries.length > 0) && (
+        // Low-frequency config summary + collapsed secondary details share one row.
+        <div className="data-secondary" data-testid="data-secondary">
+          {summary && (
+            <p className="data-config-summary" data-testid="data-config-summary">
+              {summary}
+            </p>
+          )}
+          {hasFinal && (
+            <details
+              className="final-answer-panel"
+              data-testid="final-answer-panel"
+              open={finalOpen}
+              onToggle={(e) => setFinalOpen((e.target as HTMLDetailsElement).open)}
+            >
+              <summary>最终结果{atEnd ? '' : '（整轮运行的结论，非当前步）'}</summary>
+              <div className="final-answer-body">{finalAnswer}</div>
+            </details>
+          )}
+          {rawEntries.length > 0 && (
+            <details className="data-raw-fields" data-testid="data-raw-fields">
+              <summary>全部字段（{rawEntries.length}）</summary>
+              <dl>
+                {rawEntries.map(([k, v]) => (
+                  <div key={k} className="data-raw-row" data-config={CONFIG_KEYS.has(k) ? '1' : undefined}>
+                    <dt>
+                      <code>{k}</code>
+                      {friendlyLabel(k, graph) !== k ? <span className="muted"> {friendlyLabel(k, graph)}</span> : null}
+                    </dt>
+                    <dd>{serialize(v)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+          )}
+        </div>
       )}
     </div>
   )

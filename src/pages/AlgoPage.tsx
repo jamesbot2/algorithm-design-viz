@@ -135,6 +135,7 @@ export default function AlgoPage() {
   const [steps, setSteps] = useState<Step[]>([])
   const [trace, setTrace] = useState<Trace | undefined>(undefined)
   const [runId, setRunId] = useState(0)
+  const [solveCount, setSolveCount] = useState(0)
   const [runSnapshot, setRunSnapshot] = useState<RunSnapshot | null>(null)
   const [hasRun, setHasRun] = useState(false)
   const [sceneWarn, setSceneWarn] = useState<string | null>(null)
@@ -560,6 +561,8 @@ export default function AlgoPage() {
           implVersion: entry.meta.implVersion,
           validate: entry.validate,
           solveAsync: async (input, ctx) => {
+            // V23 observability: every solver invocation is counted (e2e asserts layout never re-solves).
+            setSolveCount((c) => c + 1)
             await maybeAwaitSolveBarrier({
               algoId: algoIdAtStart,
               runId: identity.runId,
@@ -1124,6 +1127,7 @@ export default function AlgoPage() {
     <div
       className="page algo-page"
       data-theory-open={theoryOpen ? '1' : '0'}
+      data-solve-count={solveCount}
       data-input-editing={inputEditing ? '1' : '0'}
     >
       {theoryOpen && (
