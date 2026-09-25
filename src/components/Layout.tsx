@@ -1,16 +1,23 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { chapters } from '../data/chapters'
 import { algorithms } from '../algorithms'
 import { byDesignThought, byProblemType, completionLabel } from '../data/curriculum'
 import { useMotion } from '../theme/MotionContext'
 import { useLabTheme, type LabThemeId } from '../theme/LabThemeContext'
+import { BUILD_INFO, buildInfoLabel } from '../buildInfo'
+import { WorkspaceBudgetContext, type WorkspaceBudget } from './workbench/WorkspaceBudget'
 
 export default function Layout() {
-  const [desktopCollapsed, setDesktopCollapsed] = useState(false)
+  // V23: compact nav rail by default when the desktop is too narrow for nav + demo + code
+  // (the user never has to collapse nav / shrink the browser); the toggle still wins.
+  const [desktopCollapsed, setDesktopCollapsed] = useState(
+    () => typeof window !== 'undefined' && !!window.matchMedia?.('(min-width: 961px) and (max-width: 1439px)').matches,
+  )
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [heightFallback, setHeightFallback] = useState<'fill' | 'scroll'>('fill')
+  const mainRef = useRef<HTMLElement>(null)
+  const [budget, setBudget] = useState<WorkspaceBudget>({ viewportHeight: 0, viewportWidth: 0 })
   const [navMode, setNavMode] = useState<'design' | 'problem'>('design')
   const [algoFilter, setAlgoFilter] = useState('')
   const { userPref, setUserPref, density, setDensity } = useMotion()
@@ -78,41 +85,24 @@ export default function Layout() {
   }, [mobileModalOpen])
 
 
-  // V10-03: single height-budget owner — visualViewport + chrome + edit state
-  useEffect(() => {
-    const apply = () => {
-      const vv = window.visualViewport
-      const h = vv?.height ?? window.innerHeight
-      const w = vv?.width ?? window.innerWidth
-      const editing = !!document.querySelector('.algo-page[data-input-editing="1"]')
-      const topbar = document.querySelector('.topbar') as HTMLElement | null
-      const chrome = (topbar?.getBoundingClientRect().height ?? 48) + 24
-      const remain = h - chrome
-      // Soft keyboard / tiny portrait / expanded input on short view → scroll escape.
-      // Demo (collapsed input) on moderate short landscape stays fill+compact.
-      const scroll =
-        h < 360 ||
-        (h < 560 && w < 700) ||
-        (editing && remain < 420) ||
-        remain < 280
-      setHeightFallback(scroll ? 'scroll' : 'fill')
-      document.documentElement.dataset.heightBudget = scroll ? 'scroll' : 'fill'
+  // V23: measure the REAL page scroll viewport (ResizeObserver) and publish it.
+  // Replaces the V10 visualViewport + body MutationObserver height guess.
+  useLayoutEffect(() => {
+    const el = mainRef.current
+    if (!el) return
+    const read = () => {
+      // Lab pages: <main> is the scroll viewport (fixed height). Document pages: the window scrolls.
+      const own = el.clientHeight
+      const scrolls = getComputedStyle(el).overflowY !== 'visible'
+      const h = scrolls ? own : (window.visualViewport?.height ?? window.innerHeight) - el.offsetTop
+      setBudget((b) => (b.viewportHeight === h && b.viewportWidth === el.clientWidth ? b : { viewportHeight: h, viewportWidth: el.clientWidth }))
     }
-    apply()
-    window.visualViewport?.addEventListener('resize', apply)
-    window.addEventListener('resize', apply)
-    const mo = new MutationObserver(apply)
-    mo.observe(document.body, {
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['data-input-editing'],
-    })
-    return () => {
-      window.visualViewport?.removeEventListener('resize', apply)
-      window.removeEventListener('resize', apply)
-      mo.disconnect()
-    }
-  }, [])
+    read()
+    if (typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(read)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [location.pathname])
 
   // Unmount: always release lock
   useEffect(() => {
@@ -367,10 +357,21 @@ export default function Layout() {
             <span className="nav-item-label">实验讲义</span>
           </NavLink>
         </nav>
-        <footer className="side-foot">GitHub Pages · 本地可视化</footer>
+        <footer className="side-foot">
+          GitHub Pages · 本地可视化
+          <div
+            className="build-info muted"
+            data-testid="build-info"
+            data-build-sha={BUILD_INFO.sha}
+            data-build-time={BUILD_INFO.time}
+            title={`构建时间 ${BUILD_INFO.time}`}
+          >
+            {buildInfoLabel()}
+          </div>
+        </footer>
       </aside>
 
-      <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'} data-height-fallback={isAlgo ? heightFallback : undefined}>
+      <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'}>
         <header className="topbar">
           <button
             type="button"
@@ -426,8 +427,10 @@ export default function Layout() {
             {density === 'projection' ? '密' : '投'}
           </button>
         </header>
-        <main className={`main${isWide ? ' wide' : ''}`}>
-          <Outlet />
+        <main className={`main${isWide ? ' wide' : ''}`} ref={mainRef}>
+          <WorkspaceBudgetContext.Provider value={budget}>
+            <Outlet />
+          </WorkspaceBudgetContext.Provider>
         </main>
       </div>
     </div>
