@@ -10,6 +10,7 @@ import * as path from 'node:path'
 import { waitForRunReady } from './helpers/runReadiness'
 import { ensureInputEditing } from './helpers/ensureInputEditing'
 import { measureWorkbench, type WorkbenchMetrics } from './helpers/v23Geometry'
+import { measureJoint, jointFailures } from './helpers/jointReadable'
 
 const SHOTS = path.join(process.cwd(), 'docs/screenshots/v23/after')
 const TRACES = path.join(process.cwd(), 'docs/traces/v23')
@@ -309,6 +310,68 @@ test.describe('V23 workbench layout', () => {
     const fin = (await page.getByTestId('final-answer-panel').textContent()) ?? ''
     expect(fin).toMatch(/4/)
     record('C', rows)
+  })
+
+  test('F: V22 joint detector vs the four fault injections (same detector; fail while injected, pass after restore)', async ({ page }) => {
+    const out: Record<string, unknown> = {}
+    for (const [w, h] of [
+      [1366, 768],
+      [1024, 600],
+    ] as const) {
+      await page.setViewportSize({ width: w, height: h })
+      await openAlgo(page, 'lcs')
+      await run(page, 90)
+      await next(page, 13)
+      const vp = `${w}x${h}`
+      const clean = jointFailures(await measureJoint(page))
+      expect(clean, `${vp} clean page passes the joint detector`).toEqual([])
+      const faults: Record<string, { apply: string; expect: RegExp }> = {
+        'strip-10px': {
+          apply: `(() => { const e = document.querySelector('[data-testid="array-labels"]'); e.style.maxHeight = '10px'; e.style.minHeight = '10px'; e.style.overflow = 'hidden' })()`,
+          expect: /^glyphs:/,
+        },
+        'toolbar-6px': {
+          apply: `(() => { const e = document.querySelector('[data-testid="matrix-follow-bar"]'); e.style.maxHeight = '6px'; e.style.minHeight = '6px'; e.style.overflow = 'hidden' })()`,
+          expect: /^(locate|resume):/,
+        },
+        'matrix-overhang': {
+          apply: `(() => { const e = document.querySelector('.matrix-scroll'); e.style.maxHeight = 'none'; e.style.minHeight = '0'; e.style.flex = '0 0 auto'; e.style.height = '2000px' })()`,
+          expect: /^matrix:overhang/,
+        },
+        'code-w0': {
+          apply: `(() => { const e = document.querySelector('[data-testid="code-mirror-wrap"]'); e.style.width = '0px' })()`,
+          expect: /^code:width/,
+        },
+      }
+      const restore = `(() => {
+        for (const sel of ['[data-testid="array-labels"]', '[data-testid="matrix-follow-bar"]', '.matrix-scroll', '[data-testid="code-mirror-wrap"]']) {
+          const e = document.querySelector(sel); if (!e) continue
+          for (const p of ['max-height', 'min-height', 'overflow', 'flex', 'height', 'width']) e.style.removeProperty(p)
+        }
+      })()`
+      for (const [name, fault] of Object.entries(faults)) {
+        await page.evaluate(fault.apply)
+        await page.waitForTimeout(80)
+        const bad = jointFailures(await measureJoint(page))
+        // Visible label painted AFTER measuring (fixed, pointer-events none), removed before restore
+        await page.evaluate((txt) => {
+          const d = document.createElement('div')
+          d.id = 'v23-fault-label'
+          d.textContent = txt
+          Object.assign(d.style, { position: 'fixed', left: '8px', bottom: '8px', zIndex: '99', padding: '4px 10px', background: '#b91c1c', color: '#fff', font: '600 14px sans-serif', borderRadius: '4px', pointerEvents: 'none' })
+          document.body.appendChild(d)
+        }, `FAULT INJECTED: ${name} (${vp}) — detector: ${bad.join(', ')}`)
+        await page.screenshot({ path: path.join(SHOTS, `v23-F-FAULT-INJECTED-${name}-${vp}.png`) })
+        await page.evaluate(() => document.getElementById('v23-fault-label')?.remove())
+        expect(bad.some((x) => fault.expect.test(x)), `${vp} ${name} must fail the detector: ${JSON.stringify(bad)}`).toBe(true)
+        await page.evaluate(restore)
+        await page.waitForTimeout(120)
+        const ok = jointFailures(await measureJoint(page))
+        expect(ok, `${vp} ${name} restored page passes`).toEqual([])
+        out[`${vp}-${name}`] = { whileInjected: bad, afterRestore: ok }
+      }
+    }
+    record('F', out)
   })
 
   test('D: merge [4,1,3,2] + insertion [2,1] — main array, buffers, duplicates kept', async ({ page }) => {

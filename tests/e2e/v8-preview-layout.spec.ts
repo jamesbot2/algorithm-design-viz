@@ -1,5 +1,13 @@
 import { test, expect } from '@playwright/test'
 
+/*
+ * V23 replacement note: the react-resizable-panels `[data-panel][data-tab-active]`
+ * markers no longer exist (the workbench is one CSS grid). The single-pane contract
+ * is now asserted on the real a11y structure: exactly one visible [role=tabpanel],
+ * every inactive tabpanel is `hidden` with a null box, and switching tabs swaps them.
+ * Same thresholds as before (active > 280 wide, inactive < 12, viz > 240 high).
+ */
+
 test.describe('V8 preview layout', () => {
   test('mobile tabs is single-pane with usable preview height', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
@@ -9,9 +17,10 @@ test.describe('V8 preview layout', () => {
     await expect(wb).toHaveAttribute('data-layout', 'tabs')
 
     const metrics = await page.evaluate(() => {
-      const panels = [...document.querySelectorAll('[data-panel]')] as HTMLElement[]
-      const active = panels.find((p) => p.getAttribute('data-tab-active') === '1')
-      const inactive = panels.find((p) => p.getAttribute('data-tab-active') === '0')
+      const panels = [...document.querySelectorAll('[data-testid="workbench-layout"] [role="tabpanel"]')] as HTMLElement[]
+      const active = panels.find((p) => !p.hidden)
+      const inactive = panels.find((p) => p.hidden)
+      const visibleCount = panels.filter((p) => !p.hidden && p.getBoundingClientRect().width > 0).length
       const viz = document.querySelector('[data-testid="workbench-viz-slot"]') as HTMLElement | null
       const transport = document.querySelector('[data-testid="playback-transport"]') as HTMLElement | null
       const layout = document.querySelector('[data-testid="workbench-layout"]') as HTMLElement | null
@@ -22,7 +31,9 @@ test.describe('V8 preview layout', () => {
       const lr = layout?.getBoundingClientRect()
       return {
         activeW: ar?.width ?? 0,
-        inactiveW: ir?.width ?? 0,
+        inactiveW: ir?.width ?? 999,
+        panelCount: panels.length,
+        visibleCount,
         vizH: vr?.height ?? 0,
         transportH: tr?.height ?? 0,
         wbH: lr?.height ?? 0,
@@ -38,6 +49,8 @@ test.describe('V8 preview layout', () => {
 
     expect(metrics.layout).toBe('tabs')
     expect(metrics.legacyHits).toBe(0)
+    expect(metrics.panelCount).toBeGreaterThanOrEqual(2)
+    expect(metrics.visibleCount).toBe(1)
     expect(metrics.inactiveW).toBeLessThan(12)
     expect(metrics.activeW).toBeGreaterThan(280)
     expect(metrics.vizH).toBeGreaterThan(240)
@@ -49,8 +62,13 @@ test.describe('V8 preview layout', () => {
     await page.getByRole('tab', { name: '代码' }).click()
     const codeMetrics = await page.evaluate(() => {
       const code = document.querySelector('[data-testid="workbench-code-slot"]') as HTMLElement | null
-      const active = document.querySelector('[data-panel][data-tab-active="1"]') as HTMLElement | null
+      const panels = [...document.querySelectorAll('[data-testid="workbench-layout"] [role="tabpanel"]')] as HTMLElement[]
+      const active = panels.find((p) => !p.hidden) ?? null
+      const viz = document.querySelector('[data-testid="workbench-viz-slot"]') as HTMLElement | null
       return {
+        activeIsCode: active === code,
+        vizHidden: viz?.hidden ?? false,
+        vizW: viz?.getBoundingClientRect().width ?? -1,
         codeHidden: code?.hasAttribute('hidden') ?? true,
         codeW: code?.getBoundingClientRect().width ?? 0,
         activeW: active?.getBoundingClientRect().width ?? 0,
@@ -59,6 +77,9 @@ test.describe('V8 preview layout', () => {
     expect(codeMetrics.codeHidden).toBe(false)
     expect(codeMetrics.codeW).toBeGreaterThan(280)
     expect(codeMetrics.activeW).toBeGreaterThan(280)
+    expect(codeMetrics.activeIsCode).toBe(true)
+    expect(codeMetrics.vizHidden).toBe(true)
+    expect(codeMetrics.vizW).toBe(0)
   })
 
   test('desktop split panes have usable min height', async ({ page }) => {

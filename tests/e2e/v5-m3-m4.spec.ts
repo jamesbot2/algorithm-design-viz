@@ -20,7 +20,9 @@ test.describe('V5 M3/M4 workbench + expand e2e', () => {
     expect(tsLine).not.toBe(pseudoLine)
 
     // Transport lives in workbench slot spanning panels
-    await expect(page.getByTestId('workbench-transport')).toBeVisible()
+    // V23 replacement note: the transport lives in the workbench grid slot
+    // `workbench-transport-slot` (the old portal target id `workbench-transport` is gone).
+    await expect(page.getByTestId('workbench-transport-slot')).toBeVisible()
     await expect(page.getByTestId('playback-transport')).toBeVisible()
     await expect(page.getByTestId('play-btn')).toBeVisible()
   })

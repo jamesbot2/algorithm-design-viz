@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { waitForRunReady } from './helpers/runReadiness'
+import { measureJoint } from './helpers/jointReadable'
 import { ensureInputEditing } from './helpers/ensureInputEditing'
 
 const OUT_SHOTS = path.join(process.cwd(), 'docs/screenshots/v22')
@@ -50,147 +51,6 @@ async function advanceTo(page: Page, frame: number) {
     await next.click()
   }
   await page.waitForTimeout(180)
-}
-
-/** Same-frame joint: input glyphs + DP cell + locate/resume + code — BEFORE focus/scrollIntoView. */
-async function measureJoint(page: Page) {
-  return page.evaluate(() => {
-    const clipIntersect = (el: Element | null) => {
-      if (!el) return { ok: false as const, elH: 0, visH: 0, elW: 0, visW: 0 }
-      const a = el.getBoundingClientRect()
-      let top = a.top
-      let bottom = a.bottom
-      let left = a.left
-      let right = a.right
-      let node: HTMLElement | null = el as HTMLElement
-      while (node && node !== document.body) {
-        const r = node.getBoundingClientRect()
-        const cs = getComputedStyle(node)
-        const oy = cs.overflowY
-        const ox = cs.overflowX
-        if (
-          ['hidden', 'auto', 'scroll'].includes(oy) ||
-          ['hidden', 'auto', 'scroll'].includes(ox) ||
-          cs.overflow === 'hidden'
-        ) {
-          top = Math.max(top, r.top)
-          bottom = Math.min(bottom, r.bottom)
-          left = Math.max(left, r.left)
-          right = Math.min(right, r.right)
-        }
-        node = node.parentElement
-      }
-      const visH = Math.max(0, Math.min(bottom, a.bottom) - Math.max(top, a.top))
-      const visW = Math.max(0, Math.min(right, a.right) - Math.max(left, a.left))
-      return {
-        ok: true as const,
-        elH: a.height,
-        visH,
-        elW: a.width,
-        visW,
-      }
-    }
-
-    const strip = document.querySelector('[data-testid="array-labels"]') as HTMLElement | null
-    const chars = [...document.querySelectorAll('[data-testid="array-labels"] .compact-ch')]
-    const glyphStats = chars.map((el) => {
-      const m = clipIntersect(el)
-      const full = m.elH > 0 && m.visH >= Math.min(m.elH * 0.9, m.elH - 0.5)
-      const falsePos8 = m.visH >= 8 && !full
-      return { full, falsePos8, visH: m.visH, elH: m.elH, text: (el.textContent || '').slice(0, 4) }
-    })
-
-    const locate = document.querySelector('[data-testid="matrix-locate-btn"]') as HTMLElement | null
-    const resume = document.querySelector(
-      '[data-testid="matrix-resume-follow-btn"]',
-    ) as HTMLElement | null
-    const locateM = clipIntersect(locate)
-    const resumeM = clipIntersect(resume)
-    const hit = (el: HTMLElement | null) => {
-      if (!el) return false
-      const b = el.getBoundingClientRect()
-      if (b.width < 2 || b.height < 2) return false
-      const top = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2)
-      return !!(top && (top === el || el.contains(top)))
-    }
-
-    const scroller = document.querySelector('.matrix-scroll') as HTMLElement | null
-    const cell = document.querySelector(
-      '.matrix-table td.hl-focus, .matrix-table td.hl-write',
-    ) as HTMLElement | null
-    const cellM = clipIntersect(cell)
-    // Neighbors (optional)
-    let neighborOk = true
-    if (cell) {
-      const tr = cell.parentElement
-      const idx = tr ? [...tr.children].indexOf(cell) : -1
-      const neigh = [tr?.children[idx - 1], tr?.children[idx + 1]].filter(Boolean) as Element[]
-      for (const n of neigh) {
-        const nm = clipIntersect(n)
-        if (nm.elH > 0 && nm.visH < nm.elH * 0.5) neighborOk = false
-      }
-    }
-
-    const wrap = document.querySelector('[data-testid="code-mirror-wrap"]') as HTMLElement | null
-    const cmScroller = document.querySelector('.cm-scroller') as HTMLElement | null
-    const execLine = Number(wrap?.getAttribute('data-exec-line') || 0)
-    const lines = [...document.querySelectorAll('.cm-line')]
-    const execEl = execLine > 0 ? (lines[execLine - 1] as HTMLElement | undefined) : undefined
-    const execM = clipIntersect(execEl ?? null)
-    const codeW = wrap?.getBoundingClientRect().width ?? 0
-
-    const view = document.querySelector('.matrix-view') as HTMLElement | null
-    let overhang = 0
-    if (scroller && view) {
-      overhang = scroller.getBoundingClientRect().bottom - view.getBoundingClientRect().bottom
-    }
-
-    return {
-      counter: document.querySelector('[data-testid="step-counter"]')?.textContent ?? '',
-      runId: document.querySelector('[data-testid="visualizer"]')?.getAttribute('data-run-id'),
-      cursor: document.querySelector('[data-testid="visualizer"]')?.getAttribute('data-cursor'),
-      vp: { w: window.innerWidth, h: window.innerHeight },
-      stripH: strip ? strip.getBoundingClientRect().height : 0,
-      glyphs: {
-        total: chars.length,
-        fullReadable: glyphStats.filter((g) => g.full).length,
-        falsePos8: glyphStats.filter((g) => g.falsePos8).length,
-        minVisH: glyphStats.length ? Math.min(...glyphStats.map((g) => g.visH)) : 0,
-        avgElH: glyphStats.length
-          ? glyphStats.reduce((s, g) => s + g.elH, 0) / glyphStats.length
-          : 0,
-        sample: glyphStats.slice(0, 4),
-      },
-      locate: {
-        ...locateM,
-        hit: hit(locate),
-        disabled: locate?.hasAttribute('disabled') ?? false,
-      },
-      resume: {
-        ...resumeM,
-        hit: hit(resume),
-        disabled: resume?.hasAttribute('disabled') ?? false,
-      },
-      matrix: {
-        cellOk: cellM.ok,
-        cellH: cellM.elH,
-        cellIntersect: cellM.visH,
-        neighborOk,
-        scrollH: scroller?.getBoundingClientRect().height ?? 0,
-        clientH: scroller?.clientHeight ?? 0,
-        minH: scroller ? getComputedStyle(scroller).minHeight : '',
-        overhang: Math.round(overhang * 10) / 10,
-        paused: !!document.querySelector('[data-testid="matrix-follow-paused"]'),
-      },
-      code: {
-        wrapW: codeW,
-        execVisH: execM.visH,
-        execElH: execM.elH,
-        execLine,
-        cmClientH: cmScroller?.clientHeight ?? 0,
-      },
-    }
-  })
 }
 
 function assertJointReadable(
@@ -427,11 +287,14 @@ test.describe('V22 joint matrix + input + controls', () => {
         h: scroller.style.height,
         flex: scroller.style.flex,
       }
-      // Force scrollport taller than stage/panel (same “taller than parent” fail class as V21 hard 120)
+      // Force scrollport taller than stage/panel (same “taller than parent” fail class as V21 hard 120).
+      // V23 replacement note: the fixed 240px no longer exceeded V23's taller stage
+      // (overhang 0.45 → the fault did not manifest), so the forced height is now
+      // derived from the stage: stage height + 200px always overhangs it.
       scroller.style.maxHeight = 'none'
       scroller.style.minHeight = '0'
       scroller.style.flex = '0 0 auto'
-      scroller.style.height = '240px'
+      scroller.style.height = `${Math.ceil(stage.getBoundingClientRect().height) + 200}px`
       void scroller.offsetHeight
       const sBottom = scroller.getBoundingClientRect().bottom
       const overhang = Math.max(
