@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react'
 import type { Step } from '../types/step'
 import { formatFinalAnswer } from '../utils/formatAnswer'
+import { CONFIG_KEYS, friendlyLabel } from './data/friendlyFields'
 
 function serialize(v: string | number | boolean | null | undefined): string {
   if (v === null || v === undefined) return 'null'
@@ -43,7 +44,7 @@ function ArraysInInspector({
 
   return (
     <div className="inspector-arrays" data-testid="inspector-arrays">
-      <div className="panel-title">数组（当前步）</div>
+      <div className="data-section-title">数组（当前步）</div>
       {Object.entries(arrays).map(([name, values]) => (
         <div
           key={name}
@@ -51,7 +52,10 @@ function ArraysInInspector({
           data-testid={`inspector-array-${name}`}
           data-array-name={name}
         >
-          <div className="inspector-array-name">{name}</div>
+          <div className="inspector-array-name">
+            {friendlyLabel(name) !== name && <span className="field-label">{friendlyLabel(name)}</span>}
+            <code className="field-code">{name}</code>
+          </div>
           <table className="inspector-array-grid">
             <thead>
               <tr>
@@ -81,10 +85,14 @@ function ArraysInInspector({
   )
 }
 
-/** Diff vars from adjacent step; flash only changed chips. No ancestor remount. */
-function VarsPanel({ step, prevStep }: { step: Step; prevStep?: Step }) {
+/**
+ * Diff vars from adjacent step; flash only changed chips. No ancestor remount.
+ * V23: runtime fields get friendly labels (code name kept); low-frequency config
+ * (ready/n/start/directed…) is summarized by CurrentStepData, not rendered as pills.
+ */
+function VarsPanel({ step, prevStep, graph = false }: { step: Step; prevStep?: Step; graph?: boolean }) {
   const vars = step.vars ?? {}
-  const entries = Object.entries(vars)
+  const entries = Object.entries(vars).filter(([k]) => !CONFIG_KEYS.has(k) && k !== 'frameId')
 
   const changed = useMemo(() => {
     const prev = prevStep?.vars ?? {}
@@ -104,10 +112,7 @@ function VarsPanel({ step, prevStep }: { step: Step; prevStep?: Step }) {
 
   return (
     <div className="vars-panel" data-testid="vars-panel">
-      <div className="panel-title">变量</div>
-      {entries.length === 0 ? (
-        <div className="vars-empty">暂无变量</div>
-      ) : (
+      {entries.length === 0 ? null : (
         <div className="vars-grid">
           {entries.map(([k, v]) => (
             <div
@@ -116,7 +121,10 @@ function VarsPanel({ step, prevStep }: { step: Step; prevStep?: Step }) {
               data-changed={changed.has(k) ? '1' : undefined}
               data-var={k}
             >
-              <span className="var-key">{k}</span>
+              <span className="var-key">
+                {friendlyLabel(k, graph) !== k && <span className="field-label">{friendlyLabel(k, graph)}</span>}
+                <code className="field-code">{k}</code>
+              </span>
               <span className="var-val">{serialize(v)}</span>
             </div>
           ))}
@@ -124,9 +132,9 @@ function VarsPanel({ step, prevStep }: { step: Step; prevStep?: Step }) {
       )}
       <ArraysInInspector step={step} prevStep={prevStep} />
       {hasInlineResult && (
-        <div className="result-panel-enter" style={{ marginTop: '0.65rem' }} data-testid="inspector-mid-result">
-          <div className="panel-title">中间结果</div>
-          <div className="result-snap muted" style={{ fontSize: '0.82rem' }}>
+        <div className="result-panel-enter data-mid-result" data-testid="inspector-mid-result">
+          <div className="data-section-title">中间结果（当前步）</div>
+          <div className="result-snap muted">
             {formatFinalAnswer(step.result, step.vars)}
           </div>
         </div>

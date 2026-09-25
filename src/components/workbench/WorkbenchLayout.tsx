@@ -1,283 +1,382 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Group, Panel, Separator } from 'react-resizable-panels'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { useWorkspaceBudget } from './WorkspaceBudget'
+import {
+  MIN_CODE_W,
+  clamp,
+  resolveCodeWidth,
+  resolveDockedDataHeight,
+  resolveLayoutMode,
+  resolveWideDataWidth,
+  type ActiveView,
+  type LayoutMode,
+  type WorkbenchLayoutPrefs,
+} from './layoutModel'
 
 interface Props {
-  title?: string
-  inputSummary?: ReactNode
-  viz: ReactNode
+  /** Demo column: step text + main scene (Visualizer). */
+  scene: ReactNode
+  /** Current-step data (CurrentStepData) — a real sibling region, never a portal. */
+  data?: ReactNode
+  /** Code browser (the ONE CodeMirror instance). */
   code?: ReactNode
-  inspector?: ReactNode
-  /** Unified transport spanning both panels (play/pause/scrub + optional inspector strip) */
+  /** The ONE shared transport. */
   transport?: ReactNode
-  /** Hide duplicate title when page header already shows it */
-  hideTitle?: boolean
+  /** Page-owned layout intent (single source). */
+  prefs: WorkbenchLayoutPrefs
+  onPrefsChange: (patch: Partial<WorkbenchLayoutPrefs>) => void
+  /** Resets content-calibrated data height (new run). */
+  runKey?: string | number
+  /** 'viewport' = lab page fills the scroll viewport; 'section' = inside a document page. */
+  fill?: 'viewport' | 'section'
+  /** Reports the resolved mode to the page (for summaries / tests). */
+  onModeChange?: (mode: LayoutMode) => void
 }
 
-type LayoutMode = 'split' | 'tabs'
-type TabId = 'demo' | 'code' | 'inspector'
-type HeightMode = 'fill' | 'scroll'
-
-const NARROW_PX = 720
-/** Absolute readable mins — not only percentage floors */
-const MIN_VIZ_PX = 180
-const MIN_CODE_PX = 160
-/** V17-02: below this viewport width, data-open may honestly use tabs */
-const DATA_OPEN_SPLIT_MIN_VW = 1100
-const WIDE_PROFILE_VW = 1600
+const GUTTER = 8
+const SCENE_MIN_H = 240
+/** Demo region height that gives a ~300px graph plot (banner + plot + padding). */
+const SCENE_PREFERRED_H = 380
+const VIEW_LABEL: Record<ActiveView, string> = { demo: '演示', data: '数据', code: '代码' }
 
 /**
- * Shared workbench shell.
- * Layout mode from container width (ResizeObserver) — NOT a dual React tree.
- * Split and tabs share one stable panel tree so crossing 720px does not remount
- * Visualizer / CodeBrowser session state (runId, cursor, play, speed, font, follow).
+ * V23 learning workbench: ONE stable component tree laid out by CSS grid.
  *
- * Height budget comes from measured available space (contentRect), not a fixed 14rem guess.
+ *   docked (desktop):  [ step text + scene ] | [ code ]
+ *                      [ current data      ] | [ code ]
+ *                      [ transport ─────────────────── ]
+ *   wide:              [ scene | data | code ] + transport
+ *   tabbed (narrow / low height): tabs 演示 / 数据 / 代码 + transport
+ *
+ * Mode comes from the real container budget (ResizeObserver) + the shell's
+ * measured viewport height. Switching modes only changes grid placement and
+ * `hidden`; children never remount, so cursor/runId/speed/reading state survive.
  */
 export default function WorkbenchLayout({
-  title,
-  inputSummary,
-  viz,
+  scene,
+  data,
   code,
-  inspector,
   transport,
-  hideTitle = false,
+  prefs,
+  onPrefsChange,
+  runKey,
+  fill = 'viewport',
+  onModeChange,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const [mode, setMode] = useState<LayoutMode>('split')
-  const [tab, setTab] = useState<TabId>('demo')
-  const [heightMode, setHeightMode] = useState<HeightMode>('fill')
-  const [budget, setBudget] = useState({ w: 0, h: 0 })
-  /** V17-02: workbench-owned data-open (inspector side sheet) */
-  const [dataOpen, setDataOpen] = useState(false)
-  const [layoutProfile, setLayoutProfile] = useState<'wide' | 'laptop' | 'narrow'>('laptop')
-
-  useEffect(() => {
-    const syncAlgoPageAttr = (open: boolean) => {
-      // V18-03: reserve sheet on whole algo page (header+input+workbench), not workbench alone
-      const algo = rootRef.current?.closest('.algo-page') as HTMLElement | null
-      if (algo) {
-        if (open) algo.setAttribute('data-data-open', '1')
-        else algo.removeAttribute('data-data-open')
-      }
-    }
-    const readDataOpen = () => {
-      // Portal mounts only while open; fixed sheets often have offsetParent=null
-      const sheet = document.querySelector('[data-testid="inspector-sheet"]')
-      const open = !!sheet
-      setDataOpen(open)
-      syncAlgoPageAttr(open)
-      return open
-    }
-    readDataOpen()
-    const mo = new MutationObserver(() => readDataOpen())
-    mo.observe(document.body, {
-      subtree: true,
-      childList: true,
-      attributes: true,
-      attributeFilter: ['hidden', 'data-inspect-mode', 'class'],
-    })
-    return () => {
-      mo.disconnect()
-      syncAlgoPageAttr(false)
-    }
+  const dataContentRef = useRef<HTMLDivElement>(null)
+  const { viewportHeight } = useWorkspaceBudget()
+  const [box, setBox] = useState({ w: 0, h: 0 })
+  const [dataContentH, setDataContentH] = useState(0)
+  const transportRef = useRef<HTMLDivElement>(null)
+  const [transportH, setTransportH] = useState(56)
+  useLayoutEffect(() => {
+    const el = transportRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const read = () => setTransportH(el.offsetHeight || 56)
+    read()
+    const ro = new ResizeObserver(read)
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = rootRef.current
-    if (!el || typeof ResizeObserver === 'undefined') return
-    const apply = (w: number, h: number) => {
-      const vw = typeof window !== 'undefined' ? window.innerWidth : w
-      const vh = typeof window !== 'undefined' ? window.innerHeight : h
-      const ultraShortLandscape = vh <= 400 && vw > vh
-      const shortLandscape = vh <= 520 && vw > vh
-      const open = !!document.querySelector('[data-testid="inspector-sheet"]')
-      // V17-02: when data is open on laptop+, keep split even if reserved sheet
-      // shrinks container below NARROW_PX (that was the code.w=0 fault).
-      const forceSplitForData = open && vw >= DATA_OPEN_SPLIT_MIN_VW
-      const nextMode: LayoutMode =
-        forceSplitForData ? 'split' : w < NARROW_PX || ultraShortLandscape ? 'tabs' : 'split'
-      setMode(nextMode)
-      const profile: 'wide' | 'laptop' | 'narrow' =
-        nextMode === 'tabs' || vw < DATA_OPEN_SPLIT_MIN_VW
-          ? 'narrow'
-          : vw >= WIDE_PROFILE_VW
-            ? 'wide'
-            : 'laptop'
-      setLayoutProfile(profile)
-      setBudget({ w, h })
-      const parent = el.closest('[data-height-fallback]') as HTMLElement | null
-      const parentMode = parent?.getAttribute('data-height-fallback') as HeightMode | null
-      const need = shortLandscape ? MIN_VIZ_PX + 40 : MIN_VIZ_PX + 120
-      const localScroll = h > 0 && h < need
-      const next: HeightMode =
-        parentMode === 'scroll' || (localScroll && !shortLandscape) ? 'scroll' : 'fill'
-      setHeightMode(next)
-      el.style.setProperty('--wb-measured-h', `${Math.max(0, h)}px`)
-      el.style.setProperty('--wb-measured-w', `${Math.max(0, w)}px`)
-    }
+    if (!el) return
+    const read = () => setBox((b) => (b.w === el.clientWidth && b.h === el.clientHeight ? b : { w: el.clientWidth, h: el.clientHeight }))
+    read()
+    if (typeof ResizeObserver === 'undefined') return
+    // Budget = the observed contentRect of the real grid container (not window.innerWidth).
     const ro = new ResizeObserver((entries) => {
-      const cr = entries[0]?.contentRect
-      const w = cr?.width ?? el.clientWidth
-      const h = cr?.height ?? el.clientHeight
-      apply(w, h)
+      const cr = entries.find((e) => e.target === el)?.contentRect
+      if (cr && cr.width > 0) {
+        const w = Math.round(cr.width)
+        const h = Math.round(cr.height)
+        setBox((b) => (b.w === w && b.h === h ? b : { w, h }))
+      } else read()
     })
     ro.observe(el)
-    const onWin = () => apply(el.clientWidth, el.clientHeight)
-    window.addEventListener('resize', onWin)
-    apply(el.clientWidth, el.clientHeight)
-    return () => {
-      ro.disconnect()
-      window.removeEventListener('resize', onWin)
+    return () => ro.disconnect()
+  }, [])
+
+  // Content-calibrated data height: monotonic within a run so stepping never
+  // makes the scene (and graph camera) jitter; resets on a new run.
+  useEffect(() => {
+    setDataContentH(0)
+  }, [runKey])
+  useLayoutEffect(() => {
+    const el = dataContentRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const read = () => {
+      const h = el.scrollHeight
+      setDataContentH((prev) => (h > prev ? h : prev))
     }
-  }, [dataOpen])
+    read()
+    const ro = new ResizeObserver(read)
+    ro.observe(el)
+    for (const c of Array.from(el.children)) ro.observe(c)
+    return () => ro.disconnect()
+  }, [runKey])
 
   const hasCode = code !== undefined && code !== null
-  const hasInspector = inspector !== undefined && inspector !== null
+  const hasData = data !== undefined && data !== null
+  const mode: LayoutMode = resolveLayoutMode({ width: box.w, viewportHeight: fill === 'viewport' ? viewportHeight : 0 })
 
-  const vizActive = mode === 'split' || tab === 'demo'
-  const codeActive = mode === 'split' || tab === 'code'
-  const inspectorActive = mode === 'split' || tab === 'inspector'
+  useEffect(() => {
+    onModeChange?.(mode)
+  }, [mode, onModeChange])
 
-  // Convert absolute px mins to % for the panel library when we know width
-  const vizMinPct =
-    budget.w > 0 ? Math.min(40, Math.max(15, (MIN_VIZ_PX / budget.w) * 100)) : 20
-  const codeMinPct =
-    budget.w > 0 ? Math.min(35, Math.max(12, (MIN_CODE_PX / budget.w) * 100)) : 15
+  const codeW = hasCode && mode !== 'tabbed' ? resolveCodeWidth(mode, box.w, prefs.codeWidthPx) : 0
+  const wideDataW = mode === 'wide' && hasData ? resolveWideDataWidth(box.w, codeW, prefs.dataSizePx) : 0
+  const DATA_HEAD_H = 30
+  // Column height available to scene+data in docked mode (transport row excluded).
+  const columnH = Math.max(0, box.h - transportH - 16)
+  const dockedDataH =
+    mode === 'docked' && hasData && prefs.dataVisible
+      ? resolveDockedDataHeight({
+          columnHeight: columnH,
+          contentHeight: dataContentH + DATA_HEAD_H + 4,
+          pref: prefs.dataSizePx,
+          sceneMin: SCENE_PREFERRED_H,
+        })
+      : 0
 
-  const panels = (
-    <Group
-      orientation="horizontal"
-      className="workbench-panels workbench-panels-stable"
-      data-testid="workbench-panels"
-    >
-      <Panel
-        defaultSize={hasCode ? '55' : '100'}
-        minSize={String(Math.round(vizMinPct))}
-        className="workbench-viz-panel"
-        data-tab-active={vizActive ? '1' : '0'}
-        style={{ minWidth: mode === 'split' ? MIN_VIZ_PX : undefined }}
-      >
-        {/* Keep mounted; hide only via attribute/CSS — never unmount on layout switch */}
-        <div
-          className="workbench-panel-inner"
-          hidden={mode === 'tabs' && !vizActive}
-          data-testid="workbench-viz-slot"
-          data-scroll-owner="viz"
-        >
-          {viz}
-        </div>
-      </Panel>
-      {hasCode && (
-        <>
-          <Separator
-            className="workbench-resize"
-            data-panel-resize-handle=""
-            style={mode === 'tabs' ? { display: 'none' } : undefined}
-          />
-          <Panel
-            defaultSize="45"
-            minSize={String(Math.round(codeMinPct))}
-            className="workbench-code-panel"
-            data-tab-active={codeActive ? '1' : '0'}
-            style={{ minWidth: mode === 'split' ? MIN_CODE_PX : undefined }}
-          >
-            <div
-              className="workbench-panel-inner workbench-code-inner"
-              hidden={mode === 'tabs' && !codeActive}
-              data-testid="workbench-code-slot"
-              data-scroll-owner="code"
-            >
-              {code}
-            </div>
-          </Panel>
-        </>
-      )}
-      {hasInspector && (
-        <>
-          <Separator
-            className="workbench-resize"
-            data-panel-resize-handle=""
-            style={mode === 'tabs' ? { display: 'none' } : undefined}
-          />
-          <Panel
-            defaultSize="30"
-            minSize="10"
-            className="workbench-inspector-panel"
-            data-tab-active={inspectorActive ? '1' : '0'}
-          >
-            <div
-              className="workbench-panel-inner"
-              hidden={mode === 'tabs' && !inspectorActive}
-              data-testid="workbench-inspector-slot"
-              data-scroll-owner="inspector"
-            >
-              {inspector}
-            </div>
-          </Panel>
-        </>
-      )}
-    </Group>
+  const grid = useMemo(() => {
+    const t = (rows: string[]) => rows.map((r) => `"${r}"`).join(' ')
+    if (mode === 'tabbed') {
+      return {
+        gridTemplateColumns: 'minmax(0, 1fr)',
+        gridTemplateRows: 'auto minmax(0, 1fr) auto',
+        gridTemplateAreas: t(['tabs', 'view', 'transport']),
+      }
+    }
+    if (mode === 'wide' && hasData && prefs.dataVisible) {
+      return {
+        gridTemplateColumns: `minmax(0, 1fr) ${GUTTER}px ${wideDataW}px ${GUTTER}px ${codeW}px`,
+        gridTemplateRows: 'minmax(0, 1fr) auto',
+        gridTemplateAreas: t([
+          'demo split-a data split-b code',
+          'transport transport transport transport transport',
+        ]),
+      }
+    }
+    const cols = hasCode ? `minmax(0, 1fr) ${GUTTER}px ${codeW}px` : 'minmax(0, 1fr)'
+    const row = (a: string) => (hasCode ? `${a} split-b code` : a)
+    const full = (a: string) => (hasCode ? `${a} ${a} ${a}` : a)
+    if (!hasData) {
+      return { gridTemplateColumns: cols, gridTemplateRows: 'minmax(0, 1fr) auto', gridTemplateAreas: t([row('demo'), full('transport')]) }
+    }
+    return {
+      gridTemplateColumns: cols,
+      gridTemplateRows: prefs.dataVisible
+        ? `minmax(${SCENE_MIN_H}px, 1fr) ${GUTTER}px ${dockedDataH}px auto`
+        : `minmax(${SCENE_MIN_H}px, 1fr) 0px auto auto`,
+      gridTemplateAreas: t([row('demo'), row('split-a'), row('data'), full('transport')]),
+    }
+  }, [mode, hasCode, hasData, prefs.dataVisible, codeW, wideDataW, dockedDataH])
+
+  // Low-height tabs: the workbench claims the whole scroll viewport (toolbar scrolls away above it)
+  // instead of squeezing the scene under toolbar + tabs + transport.
+  const minH =
+    mode === 'tabbed'
+      ? viewportHeight > 0 && viewportHeight < 560
+        ? Math.max(300, viewportHeight - 8)
+        : 420
+      : mode === 'wide'
+        ? 480
+        : 490
+
+  const style = {
+    ...grid,
+    '--wb-min-h': `${minH}px`,
+    '--wb-code-w': `${codeW}px`,
+  } as CSSProperties
+
+  // ---- split drags (pointer + keyboard). Only write page-owned prefs. ----
+  const dragRef = useRef<{ kind: 'code' | 'data' | 'wide-data'; start: number; base: number } | null>(null)
+  const onSplitDown = (kind: 'code' | 'data' | 'wide-data') => (e: ReactPointerEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
+    const base = kind === 'code' ? codeW : kind === 'data' ? dockedDataH : wideDataW
+    dragRef.current = { kind, start: kind === 'data' ? e.clientY : e.clientX, base }
+  }
+  const applyDrag = useCallback(
+    (kind: 'code' | 'data' | 'wide-data', value: number) => {
+      if (kind === 'code') onPrefsChange({ codeWidthPx: clamp(Math.round(value), MIN_CODE_W, Math.max(MIN_CODE_W, box.w - 440)) })
+      else if (kind === 'data') onPrefsChange({ dataSizePx: clamp(Math.round(value), 96, Math.max(96, columnH - SCENE_MIN_H)) })
+      else onPrefsChange({ dataSizePx: clamp(Math.round(value), 260, Math.max(260, box.w - codeW - 440)) })
+    },
+    [onPrefsChange, box.w, columnH, codeW],
   )
+  const onSplitMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current
+    if (!d) return
+    if (d.kind === 'data') applyDrag('data', d.base - (e.clientY - d.start))
+    else applyDrag(d.kind, d.base - (e.clientX - d.start))
+  }
+  const onSplitUp = () => {
+    dragRef.current = null
+  }
+  const onSplitKey = (kind: 'code' | 'data' | 'wide-data') => (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    const step = e.shiftKey ? 48 : 16
+    const base = kind === 'code' ? codeW : kind === 'data' ? dockedDataH : wideDataW
+    const grow = kind === 'data' ? ['ArrowUp'] : ['ArrowLeft']
+    const shrink = kind === 'data' ? ['ArrowDown'] : ['ArrowRight']
+    if (grow.includes(e.key)) {
+      e.preventDefault()
+      e.stopPropagation()
+      applyDrag(kind, base + step)
+    } else if (shrink.includes(e.key)) {
+      e.preventDefault()
+      e.stopPropagation()
+      applyDrag(kind, base - step)
+    }
+  }
+  const split = (kind: 'code' | 'data' | 'wide-data', area: string, label: string, value: number, orientation: 'vertical' | 'horizontal') => (
+    <div
+      className={`wb-split wb-split-${orientation}`}
+      style={{ gridArea: area }}
+      role="separator"
+      aria-orientation={orientation}
+      aria-label={label}
+      aria-valuenow={Math.round(value)}
+      tabIndex={0}
+      data-testid={`workbench-split-${kind}`}
+      onPointerDown={onSplitDown(kind)}
+      onPointerMove={onSplitMove}
+      onPointerUp={onSplitUp}
+      onPointerCancel={onSplitUp}
+      onKeyDown={onSplitKey(kind)}
+    />
+  )
+
+  const tabbed = mode === 'tabbed'
+  const views: ActiveView[] = ['demo', ...(hasData ? (['data'] as const) : []), ...(hasCode ? (['code'] as const) : [])]
+  const active: ActiveView = views.includes(prefs.activeView) ? prefs.activeView : 'demo'
+  const tabRefs = useRef<Partial<Record<ActiveView, HTMLButtonElement | null>>>({})
+  const onTabKey = (e: ReactKeyboardEvent<HTMLButtonElement>) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+    e.preventDefault()
+    e.stopPropagation()
+    const i = views.indexOf(active)
+    const next = views[(i + (e.key === 'ArrowRight' ? 1 : views.length - 1)) % views.length]
+    onPrefsChange({ activeView: next })
+    tabRefs.current[next]?.focus()
+  }
 
   return (
     <div
       className="workbench-layout"
       data-testid="workbench-layout"
-      data-layout={mode}
-      data-tab={tab}
-      data-height-mode={heightMode}
-      data-data-open={dataOpen ? '1' : '0'}
-      data-layout-profile={layoutProfile}
+      data-layout-mode={mode}
+      data-layout={tabbed ? 'tabs' : 'split'}
+      data-active-view={active}
+      data-data-visible={hasData && (tabbed ? active === 'data' : prefs.dataVisible) ? '1' : '0'}
+      data-fill={fill}
+      data-transport={!tabbed && box.h >= 700 ? 'roomy' : 'compact'}
       ref={rootRef}
+      style={style}
     >
-      <div className="workbench-header">
-        {!hideTitle && title && <h2 className="workbench-title">{title}</h2>}
-        {inputSummary && <div className="workbench-input-summary">{inputSummary}</div>}
+      <div className="workbench-tabs" role="tablist" aria-label="工作台视图" hidden={!tabbed} style={{ gridArea: 'tabs' }}>
+        {views.map((v) => (
+          <button
+            key={v}
+            type="button"
+            role="tab"
+            id={`wb-tab-${v}`}
+            data-testid={`workbench-tab-${v}`}
+            aria-selected={active === v}
+            aria-controls={`wb-panel-${v}`}
+            tabIndex={active === v ? 0 : -1}
+            className={active === v ? 'active' : ''}
+            ref={(el) => {
+              tabRefs.current[v] = el
+            }}
+            onKeyDown={onTabKey}
+            onClick={() => onPrefsChange({ activeView: v })}
+          >
+            {VIEW_LABEL[v]}
+          </button>
+        ))}
       </div>
 
-      <div
-        className="workbench-tabs"
-        role="tablist"
-        aria-label="工作台视图"
-        hidden={mode !== 'tabs'}
+      <section
+        className="wb-region wb-demo"
+        id="wb-panel-demo"
+        role={tabbed ? 'tabpanel' : 'region'}
+        aria-label="演示"
+        aria-labelledby={tabbed ? 'wb-tab-demo' : undefined}
+        data-testid="workbench-viz-slot"
+        data-scroll-owner="viz"
+        hidden={tabbed && active !== 'demo'}
+        style={{ gridArea: tabbed ? 'view' : 'demo' }}
       >
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === 'demo'}
-          className={tab === 'demo' ? 'active' : ''}
-          onClick={() => setTab('demo')}
-        >
-          演示
-        </button>
-        {hasCode && (
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'code'}
-            className={tab === 'code' ? 'active' : ''}
-            onClick={() => setTab('code')}
-          >
-            代码
-          </button>
-        )}
-        {hasInspector && (
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'inspector'}
-            className={tab === 'inspector' ? 'active' : ''}
-            onClick={() => setTab('inspector')}
-          >
-            检查器
-          </button>
-        )}
-      </div>
+        {scene}
+      </section>
 
-      {panels}
+      {hasData && mode === 'docked' && prefs.dataVisible && split('data', 'split-a', '调整演示与数据高度', dockedDataH, 'horizontal')}
+      {hasData && mode === 'wide' && prefs.dataVisible && split('wide-data', 'split-a', '调整数据列宽度', wideDataW, 'vertical')}
+
+      {hasData && (
+        <section
+          className="wb-region wb-data"
+          id="wb-panel-data"
+          role={tabbed ? 'tabpanel' : 'region'}
+          aria-label="当前数据"
+          aria-labelledby={tabbed ? 'wb-tab-data' : undefined}
+          data-testid="workbench-data-slot"
+          data-expanded={tabbed ? '1' : prefs.dataVisible ? '1' : '0'}
+          hidden={tabbed && active !== 'data'}
+          style={{ gridArea: tabbed ? 'view' : 'data' }}
+        >
+          {!tabbed && (
+            <header className="wb-data-head">
+              <span className="wb-data-title">当前数据</span>
+              <button
+                type="button"
+                className="ghost wb-data-toggle"
+                data-testid="data-toggle"
+                aria-expanded={prefs.dataVisible}
+                aria-controls="wb-data-body"
+                onClick={() => onPrefsChange({ dataVisible: !prefs.dataVisible })}
+              >
+                {prefs.dataVisible ? '收起' : '展开'}
+              </button>
+            </header>
+          )}
+          <div
+            className="wb-data-body"
+            id="wb-data-body"
+            data-scroll-owner="data"
+            data-testid="workbench-data-body"
+            hidden={!tabbed && !prefs.dataVisible}
+          >
+            <div className="wb-data-content" ref={dataContentRef}>
+              {data}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {hasCode && !tabbed && split('code', 'split-b', '调整代码列宽度', codeW, 'vertical')}
+
+      {hasCode && (
+        <section
+          className="wb-region wb-code"
+          id="wb-panel-code"
+          role={tabbed ? 'tabpanel' : 'region'}
+          aria-label="代码"
+          aria-labelledby={tabbed ? 'wb-tab-code' : undefined}
+          data-testid="workbench-code-slot"
+          data-scroll-owner="code"
+          hidden={tabbed && active !== 'code'}
+          style={{ gridArea: tabbed ? 'view' : 'code' }}
+        >
+          {code}
+        </section>
+      )}
 
       {transport && (
-        <div className="workbench-transport" data-testid="workbench-transport-slot">
+        <div className="workbench-transport" data-testid="workbench-transport-slot" ref={transportRef} style={{ gridArea: 'transport' }}>
           {transport}
         </div>
       )}

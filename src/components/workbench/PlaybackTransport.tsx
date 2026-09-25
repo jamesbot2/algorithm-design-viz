@@ -233,7 +233,10 @@ export default function PlaybackTransport({
 
   return (
     <div className="playback-transport" data-testid="playback-transport" style={style}>
-      <div className="viz-toolbar workbench-transport-toolbar">
+      {/* V23: one compact row — controls | progress (+ phase track) | counter · speed · settings.
+          Full phase list + keyboard help live in the settings popover; inline phase chips
+          appear only when the workbench has room (data-transport="roomy"). */}
+      <div className="viz-toolbar workbench-transport-toolbar transport-controls">
         <button type="button" onClick={onReset} title="重置播放（回到起点并暂停）" data-testid="reset-playback-btn">
           重置播放
         </button>
@@ -253,6 +256,57 @@ export default function PlaybackTransport({
         <button type="button" onClick={onNext} disabled={idx >= max || isPreview} title="下一步 (→)" data-testid="next-step-btn">
           下一步
         </button>
+      </div>
+
+      <div className="transport-scrub">
+        <div className="scrub-row">
+          <span className="scrub-label">进度</span>
+          <input
+            type="range"
+            min={0}
+            max={Math.max(0, max)}
+            step={1}
+            value={stepsLen ? idx : 0}
+            disabled={!stepsLen || isPreview}
+            onChange={(e) => {
+              onSeek(Number(e.target.value))
+              onScrubPreview(null)
+            }}
+            onInput={(e) => onScrubPreview(Number((e.target as HTMLInputElement).value))}
+            onMouseUp={() => onScrubPreview(null)}
+            onTouchEnd={() => onScrubPreview(null)}
+            onPointerUp={() => onScrubPreview(null)}
+            onPointerCancel={() => onScrubPreview(null)}
+            aria-label="步骤进度"
+            role="slider"
+          />
+          <span className="scrub-pct tabular-nums">{Math.round(progress)}%</span>
+        </div>
+        {segments.length > 0 && n > 0 && (
+          <div className="phase-track" data-testid="phase-track" aria-hidden="true">
+            {segments.map((seg) => {
+              const g =
+                seg.leftPct != null && seg.widthPct != null
+                  ? { leftPct: seg.leftPct, widthPct: seg.widthPct }
+                  : segmentGeometry(seg.start, seg.end, n)
+              return (
+                <span
+                  key={`seg-${seg.phase}-${seg.start}`}
+                  className="phase-segment"
+                  style={{ left: `${g.leftPct}%`, width: `${g.widthPct}%` }}
+                  data-phase={seg.phase}
+                  title={`${seg.label ?? seg.phase} (#${seg.start + 1}–${seg.end + 1})`}
+                />
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className="transport-meta">
+        <span className="step-counter tabular-nums" data-testid="step-counter" data-step-display="1-based">
+          {formatStepCounter({ idx, stepsLen, phase })}
+        </span>
         <label className="speed-label">
           速度 {speedMultiplier(speed)}
           <input
@@ -274,57 +328,9 @@ export default function PlaybackTransport({
           ref={settingsToggleRef}
           onClick={() => setSettingsOpen((o) => !o)}
         >
-          播放设置
+          阶段 / 设置
         </button>
-        <span className="spacer" />
-        <span className="step-counter tabular-nums" data-testid="step-counter" data-step-display="1-based">
-          {formatStepCounter({ idx, stepsLen, phase })}
-        </span>
       </div>
-
-      <div className="scrub-row">
-        <span className="scrub-label">进度</span>
-        <input
-          type="range"
-          min={0}
-          max={Math.max(0, max)}
-          step={1}
-          value={stepsLen ? idx : 0}
-          disabled={!stepsLen || isPreview}
-          onChange={(e) => {
-            onSeek(Number(e.target.value))
-            onScrubPreview(null)
-          }}
-          onInput={(e) => onScrubPreview(Number((e.target as HTMLInputElement).value))}
-          onMouseUp={() => onScrubPreview(null)}
-          onTouchEnd={() => onScrubPreview(null)}
-          onPointerUp={() => onScrubPreview(null)}
-          onPointerCancel={() => onScrubPreview(null)}
-          aria-label="步骤进度"
-          role="slider"
-        />
-        <span className="scrub-pct tabular-nums">{Math.round(progress)}%</span>
-      </div>
-
-      {segments.length > 0 && n > 0 && (
-        <div className="phase-track" data-testid="phase-track" aria-hidden="true">
-          {segments.map((seg) => {
-            const g =
-              seg.leftPct != null && seg.widthPct != null
-                ? { leftPct: seg.leftPct, widthPct: seg.widthPct }
-                : segmentGeometry(seg.start, seg.end, n)
-            return (
-              <span
-                key={`seg-${seg.phase}-${seg.start}`}
-                className="phase-segment"
-                style={{ left: `${g.leftPct}%`, width: `${g.widthPct}%` }}
-                data-phase={seg.phase}
-                title={`${seg.label ?? seg.phase} (#${seg.start + 1}–${seg.end + 1})`}
-              />
-            )
-          })}
-        </div>
-      )}
 
       {scrubPreview !== null && scrubPreview !== idx && previewMessage && (
         <div className="scrub-preview scrub-preview-overlay" data-testid="scrub-preview">
@@ -400,6 +406,9 @@ export default function PlaybackTransport({
                 aria-label="播放速度（设置面板）"
               />
             </label>
+            <p className="kbd-help muted" data-testid="kbd-help">
+              快捷键：空格 播放/暂停 · ← 上一步 · → 下一步（输入框/按钮/滑块/编辑器内不抢键）
+            </p>
             {segments.length > 0 && n > 0 && (
               <div className="phase-track" data-testid="phase-track-dock" aria-hidden="true">
                 {segments.map((seg) => {

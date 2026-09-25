@@ -1,7 +1,11 @@
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Visualizer from '../../components/Visualizer'
 import WorkbenchLayout from '../../components/workbench/WorkbenchLayout'
+import PlaybackTransport from '../../components/workbench/PlaybackTransport'
+import CurrentStepData from '../../components/data/CurrentStepData'
+import { usePlaybackController } from '../../components/workbench/usePlaybackController'
+import { useWorkbenchPrefs } from '../../components/workbench/useWorkbenchPrefs'
 import CodeBrowser from '../../components/codeBrowser/CodeBrowser'
 import { getCatalog } from '../../codeCatalog'
 import {
@@ -66,7 +70,6 @@ export default function KnapsackUnit() {
   const [runSnap, setRunSnap] = useState<RunSnapshotLocal | null>(null)
   const [cursorIndex, setCursorIndex] = useState(0)
   const [theoryOpen, setTheoryOpen] = useState(false)
-  const [chromeHost, setChromeHost] = useState<HTMLDivElement | null>(null)
   const runKeyRef = useRef(0)
 
   const draftInst: KnapsackInstance = useMemo(() => {
@@ -94,6 +97,15 @@ export default function KnapsackUnit() {
 
   // Display: when dirty, keep old trace but mark stale; summary from snapshot
   const displaySteps = hasRun && runSnap.steps.length ? runSnap.steps : [previewStep]
+  const visRunId = hasRun ? runSnap!.runKey : 'preview'
+  const onCursor = useCallback((i: number) => setCursorIndex(i), [])
+  /** V23: the ONE playback controller for this page. */
+  const player = usePlaybackController({
+    steps: displaySteps,
+    runId: visRunId,
+    onStepIndexChange: hasRun ? onCursor : undefined,
+  })
+  const [layoutPrefs, patchLayoutPrefs] = useWorkbenchPrefs()
   const summary = runSnap?.summary ?? ''
   const snapInst = runSnap?.inst
 
@@ -252,24 +264,35 @@ export default function KnapsackUnit() {
       <section className="teach-section">
         <h2>可视化</h2>
         <WorkbenchLayout
-          hideTitle
-          title={`背包 · ${STRATEGY_LABEL[strategy]}`}
-          inputSummary={
-            hasRun && snapInst
-              ? dirty
-                ? `上一轮 W=${snapInst.capacity} · n=${snapInst.items.length}（草稿 W=${draftInst.capacity} 待运行）`
-                : `W=${snapInst.capacity} · n=${snapInst.items.length}`
-              : `预览 · W=${draftInst.capacity} · n=${draftInst.items.length}`
-          }
-          viz={
+          fill="section"
+          prefs={layoutPrefs}
+          onPrefsChange={patchLayoutPrefs}
+          runKey={visRunId}
+          scene={
             <Visualizer
-              key={hasRun ? runSnap!.runKey : 'preview'}
-              steps={displaySteps}
-              runId={hasRun ? runSnap!.runKey : 'preview'}
+              key={visRunId}
+              player={player}
               staleResult={dirty}
-              chromePlacement="workbench"
-              externalChromeHost={chromeHost}
-              onStepIndexChange={hasRun ? (i) => setCursorIndex(i) : undefined}
+              context={
+                /* V23: the needed input context lives in the demo column, next to the step text */
+                <p className="viz-context muted" data-testid="knapsack-input-summary">
+                  背包 · {STRATEGY_LABEL[strategy]} ·{' '}
+                  {hasRun && snapInst
+                    ? dirty
+                      ? `上一轮 W=${snapInst.capacity} · n=${snapInst.items.length}（草稿 W=${draftInst.capacity} 待运行）`
+                      : `W=${snapInst.capacity} · n=${snapInst.items.length}`
+                    : `预览 · W=${draftInst.capacity} · n=${draftInst.items.length}`}
+                </p>
+              }
+            />
+          }
+          data={
+            <CurrentStepData
+              step={player.step}
+              prevStep={player.prevStep}
+              isPreview={player.isPreview}
+              atEnd={player.atEnd}
+              runKey={visRunId}
             />
           }
           code={
@@ -287,7 +310,7 @@ export default function KnapsackUnit() {
               </div>
             )
           }
-          transport={<div ref={setChromeHost} className="workbench-chrome-host" data-testid="knapsack-chrome-host" />}
+          transport={<PlaybackTransport {...player.transportProps} />}
         />
       </section>
 
