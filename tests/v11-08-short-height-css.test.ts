@@ -35,7 +35,9 @@ describe('V11-08 / V23 short-height transport', () => {
 
   it('short landscape tabs: one transport row and tabs share the transport row', () => {
     expect(css).toMatch(/@media \(min-width: 600px\)\s*\{\s*\.workbench-layout\[data-layout-mode="tabbed"\] \.playback-transport\s*\{[^}]*grid-template-areas:\s*"ctrl scrub meta"/s)
-    // tabs share the transport row so the scene keeps the height (no first-view page scroll)
+    // tabs share the transport row so the scene keeps the height
     expect(wb).toMatch(/gridTemplateAreas: t\(\['view view', 'tabs transport'\]\)/)
+    // natural scroll: low-height tabs claim the whole scroll viewport (toolbar scrolls away)
+    expect(wb).toMatch(/Math\.max\(240, viewportHeight - 8\)/)
   })
 })

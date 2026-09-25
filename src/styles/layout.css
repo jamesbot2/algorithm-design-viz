@@ -255,6 +255,17 @@
 .wb-data[data-expanded="0"] .wb-data-head {
   border-bottom: 0;
 }
+/* Wide + collapsed: the data column shrinks to a vertical header strip. */
+.workbench-layout[data-layout-mode="wide"] .wb-data[data-expanded="0"] .wb-data-head {
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 0.4rem 0.2rem;
+  border-bottom: 0;
+}
+.workbench-layout[data-layout-mode="wide"] .wb-data[data-expanded="0"] .wb-data-title {
+  writing-mode: vertical-rl;
+}
 .wb-data-title {
   font-size: 0.8rem;
   font-weight: 600;

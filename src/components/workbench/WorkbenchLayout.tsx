@@ -158,9 +158,11 @@ export default function WorkbenchLayout({
         gridTemplateAreas: t(['tabs', 'view', 'transport']),
       }
     }
-    if (mode === 'wide' && hasData && prefs.dataVisible) {
+    if (mode === 'wide' && hasData) {
+      // Collapsed data keeps its own narrow column (header strip) so the scene only
+      // gains width — collapsing never costs the graph height.
       return {
-        gridTemplateColumns: `minmax(0, 1fr) ${GUTTER}px ${wideDataW}px ${GUTTER}px ${codeW}px`,
+        gridTemplateColumns: `minmax(0, 1fr) ${GUTTER}px ${prefs.dataVisible ? `${wideDataW}px` : 'auto'} ${GUTTER}px ${codeW}px`,
         gridTemplateRows: 'minmax(0, 1fr) auto',
         gridTemplateAreas: t([
           'demo split-a data split-b code',
@@ -183,12 +185,13 @@ export default function WorkbenchLayout({
     }
   }, [mode, lowTabs, hasCode, hasData, prefs.dataVisible, codeW, wideDataW, dockedDataH])
 
-  // Low-height tabs fill the remaining page height (no page scroll at first view);
-  // the floor only protects against a collapsed scene.
+  // Low-height landscape = natural scroll: the workbench claims the whole scroll
+  // viewport (the one-line toolbar scrolls away above it) instead of locking one
+  // screen and crushing the scene under toolbar + tabs + transport.
   const minH =
     mode === 'tabbed'
       ? viewportHeight > 0 && viewportHeight < 560
-        ? 240
+        ? Math.max(240, viewportHeight - 8)
         : 420
       : mode === 'wide'
         ? 480
