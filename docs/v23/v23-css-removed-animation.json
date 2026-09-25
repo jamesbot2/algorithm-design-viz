@@ -1,0 +1,51 @@
+[
+ {
+  "line": 433,
+  "media": "@media (max-width: 960px)",
+  "removed": [
+   ".viz-body"
+  ],
+  "kept": [],
+  "decls": [
+   "grid-template-columns:1fr"
+  ]
+ },
+ {
+  "line": 440,
+  "media": "",
+  "removed": [
+   ".viz-banner-slot.viz-banner-enter",
+   ".viz-banner-slot"
+  ],
+  "kept": [],
+  "decls": [
+   "animation:none!important"
+  ]
+ },
+ {
+  "line": 446,
+  "media": "",
+  "removed": [
+   ".workbench-layout",
+   ".workbench-header"
+  ],
+  "kept": [
+   ".viz-toolbar",
+   ".control-row"
+  ],
+  "decls": [
+   "transform:none!important"
+  ]
+ },
+ {
+  "line": 452,
+  "media": "",
+  "removed": [
+   ".input-panel"
+  ],
+  "kept": [],
+  "decls": [
+   "transform:none"
+  ]
+ }
+]

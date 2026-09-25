@@ -1,0 +1,192 @@
+/*
+ * V23 scene composition — how the ONE stage (.stage-viewport, the demo region's
+ * scene box) distributes its height between the primary scene and companions.
+ *
+ * Every rule is scoped to .stage-viewport[data-primary-scene=…] (set by
+ * Visualizer), never to a page-level flag. The stage itself is sized by the
+ * workbench grid (layout.css); nothing here sets a viewport-relative height.
+ */
+
+/* ---- Graph primary: the plot takes all remaining stage height. ---- */
+.stage-viewport[data-primary-scene="graph"] {
+  overflow: hidden;
+}
+.stage-viewport[data-primary-scene="graph"] > .graph-view {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+}
+.stage-viewport[data-primary-scene="graph"] .graph-plot {
+  flex: 1 1 0;
+  min-height: 0;
+}
+.stage-viewport[data-primary-scene="graph"] .graph-view > .graph-neg-warning {
+  flex: 0 0 auto;
+}
+/* Companion arrays under a graph stay a compact strip that scrolls itself. */
+.stage-viewport[data-primary-scene="graph"] > .arrays-panel {
+  flex: 0 0 auto;
+  max-height: min(88px, 30%);
+  overflow: auto;
+}
+
+/* ---- Matrix / board primary: the table scroller owns the remainder. ---- */
+.stage-viewport[data-primary-scene="matrix"],
+.stage-viewport[data-primary-scene="board"] {
+  overflow: hidden;
+}
+.stage-viewport[data-primary-scene="matrix"] .matrices-panel,
+.stage-viewport[data-primary-scene="board"] .matrices-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.stage-viewport[data-primary-scene="matrix"] .matrix-view,
+.stage-viewport[data-primary-scene="board"] .matrix-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* V19/V22: .matrix-scroll is the single matrix scrollport (content-coordinate follow).
+ * V21-03: soft floor min(48px,100%) + max-height 100% — never a hard 120px that overruns the stage. */
+.stage-viewport[data-primary-scene="matrix"] .matrix-scroll,
+.stage-viewport[data-primary-scene="board"] .matrix-scroll {
+  flex: 1 1 auto;
+  min-height: min(48px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+/* V22-01: the X/Y label strip never flex-shrinks below one glyph line. */
+.stage-viewport[data-primary-scene="matrix"] .arrays-panel.array-labels-strip,
+.stage-viewport[data-primary-scene="board"] .arrays-panel.array-labels-strip {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  /* at least one full glyph line, never a half-line slice */
+  min-height: calc(0.78rem * 1.35 + 0.4rem);
+  max-height: min(4.5rem, 40%);
+  overflow: auto;
+  margin: 0 0 0.2rem;
+}
+/* V22-02: compact buttons — the follow bar keeps its intrinsic height (wraps, never clips). */
+.stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar {
+  flex-wrap: wrap;
+  overflow: visible;
+  max-height: none;
+}
+/* V22: short height — no media query shrinks the strip or the bar; the stage owns overflow. */
+.stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar button {
+  padding: 0.1rem 0.35rem;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  flex: 0 0 auto;
+}
+.stage-viewport[data-primary-scene="matrix"] .matrix-note {
+  display: none;
+}
+.stage-viewport[data-primary-scene="matrix"] .array-label {
+  font-size: 0.75rem;
+  margin-bottom: 0.15rem;
+}
+
+/* ---- Array primary ---- */
+.stage-viewport[data-primary-scene="array"] > .arrays-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* V18-02: primary scene — DP/matrix owns stage; companion X/Y labels stay compact */
+.array-labels-strip .compact-seq-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  padding: 0.15rem 0.2rem;
+}
+.array-labels-strip .compact-seq {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.array-labels-strip .compact-seq-name {
+  font-weight: 600;
+  color: var(--muted);
+  margin-right: 0.15rem;
+}
+.array-labels-strip .compact-ch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.05rem;
+  padding: 0.05rem 0.2rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-soft, #1a1a1a);
+  font-variant-numeric: tabular-nums;
+}
+.array-labels-strip .compact-ch.is-focus,
+.array-labels-strip .compact-ch.is-compare {
+  border-color: var(--sem-focus, #3b82f6);
+  background: color-mix(in srgb, var(--sem-focus, #3b82f6) 22%, transparent);
+  font-weight: 700;
+}
+.array-labels-strip .compact-ch.is-ptr {
+  outline: 1px dashed var(--lab-accent, var(--accent));
+}
+.array-labels-strip .compact-context {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.array-labels-strip .array-buffers {
+  max-height: 56px;
+  overflow: auto;
+}
+/* Legacy full ArrayView inside strip (buffers only) stay compact */
+
+.matrix-follow-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0 0 0.15rem;
+  /* V22-02: toolbar keeps intrinsic button height — never mid-slice locate/resume */
+  flex: 0 0 auto;
+  min-height: calc(0.72rem * 1.2 + 0.35rem);
+}
+.matrix-follow-bar .hint {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+/* V18.1: primary owns flex height; aux buffers stay compact + in-stage (top).
+ * DOM order = buffers then primary so mid-step temp/key intersects viz-canvas. */
+.arrays-panel[data-array-order="primary-first"] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+.arrays-panel[data-array-order="primary-first"] > .array-buffers {
+  flex: 0 0 auto;
+  order: 0;
+  max-height: 88px;
+  overflow: hidden;
+}
+.arrays-panel[data-array-order="primary-first"] > .array-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  order: 1;
+}
+

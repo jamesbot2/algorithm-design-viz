@@ -1,0 +1,609 @@
+/*
+ * V23 learning-workbench layout — the ONLY place page/workbench geometry lives.
+ *
+ * Responsibility chain (one owner per box, see docs/V23_DELIVERY.md):
+ *   .main-wrap[data-lab-fill]  → 100dvh column: topbar + .main (the page scroll viewport)
+ *   .algo-page / .algo-page-body → column: toolbar (+ optional input body) + workbench
+ *   .workbench-layout          → CSS grid; track sizes come from WorkbenchLayout.tsx
+ *                                (ResizeObserver budget + page-owned prefs), not from CSS
+ *   .wb-demo  → step text + stage      .wb-data → header + scrolling body
+ *   .wb-code  → CodeBrowser (one CM)   .workbench-transport → one compact row
+ *
+ * Rules: no global `*`, no viewport-relative heights inside the grid, no
+ * `!important`, z-index only for real temporary layers (popover / modal).
+ */
+
+/* ---------- Shell: lab pages fill the viewport; .main is the ONE page scroller ---------- */
+.main-wrap[data-lab-fill="1"] {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.main-wrap[data-lab-fill="1"] > .topbar {
+  flex: 0 0 auto;
+}
+.main-wrap[data-lab-fill="1"] > .main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0.5rem 0.75rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 760px) {
+  .main-wrap[data-lab-fill="1"] > .main {
+    padding: 0.35rem 0.4rem 0.4rem;
+  }
+}
+
+.algo-page {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+.algo-page-body {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+}
+
+/* ---------- Algorithm toolbar: name · input summary · edit · run/cancel · theory ---------- */
+.algo-toolbar {
+  flex: 0 0 auto;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm, 10px);
+  padding: 0.4rem 0.6rem;
+}
+.input-summary-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+}
+.algo-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.input-summary-text {
+  flex: 1 1 14rem;
+  min-width: 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.algo-toolbar .input-actions.control-row {
+  width: auto;
+  min-height: 0;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.algo-toolbar .input-summary-bar button {
+  height: auto;
+  padding: 0.32rem 0.8rem;
+  font-size: 0.84rem;
+  line-height: 1.3;
+}
+.algo-toolbar .input-panel-body {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: flex-end;
+}
+.algo-toolbar .input-panel-body[hidden] {
+  display: none;
+}
+.algo-toolbar .dirty-banner {
+  margin: 0.4rem 0 0;
+}
+
+/* ---------- Workbench grid (tracks are written inline by WorkbenchLayout) ---------- */
+.workbench-layout {
+  /* basis 0: the grid takes the remaining page height (or its min), never its content height */
+  flex: 1 1 0;
+  min-height: var(--wb-min-h, 480px);
+  min-width: 0;
+  display: grid;
+  gap: 0;
+  position: relative;
+}
+.workbench-layout[data-fill="section"] {
+  flex: 0 0 auto;
+  height: clamp(560px, 82vh, 920px);
+}
+.workbench-layout[data-layout-mode="tabbed"] {
+  row-gap: 0.4rem;
+}
+
+.wb-region {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm, 10px);
+}
+.wb-region[hidden] {
+  display: none;
+}
+
+/* Demo region: step text on top, the stage takes the rest. */
+.wb-demo {
+  padding: 0.45rem;
+  overflow: hidden;
+}
+.visualizer {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+}
+/* V20-02: never 32px / 2rem crush — the banner budgets whole glyph lines and wraps. */
+.viz-banner-slot {
+  --banner-line-h: 1.45em;
+  --banner-pad-y: 0.35rem;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: var(--banner-pad-y) 0.55rem;
+  min-height: calc(var(--banner-line-h) + 2 * var(--banner-pad-y));
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  font-size: 0.88rem;
+  line-height: var(--banner-line-h);
+}
+.viz-banner-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.viz-banner-controls {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  position: relative;
+}
+.viz-legend-toggle > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.78rem;
+  color: var(--muted);
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  user-select: none;
+}
+.viz-legend-toggle > summary::-webkit-details-marker {
+  display: none;
+}
+.viz-legend-toggle[open] > summary {
+  color: var(--text);
+}
+/* Legend is a temporary popover the learner opens; it is not data. */
+.viz-legend {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 9rem;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.78rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+.viz-legend .legend-dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  margin-right: 0.35rem;
+}
+
+/* The stage: one box, sized by the demo region; scenes distribute inside (scene.css). */
+.stage-viewport {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  overflow: auto;
+  position: relative;
+}
+.viz-empty {
+  margin: auto;
+  color: var(--muted);
+}
+
+/* Current-data region: header + the ONE data scroller. */
+.wb-data {
+  overflow: hidden;
+}
+.wb-data-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 30px;
+  padding: 0 0.3rem 0 0.6rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.wb-data[data-expanded="0"] .wb-data-head {
+  border-bottom: 0;
+}
+.wb-data-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.wb-data-head .wb-data-toggle {
+  padding: 0.12rem 0.55rem;
+  font-size: 0.78rem;
+}
+.wb-data-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.wb-data-body[hidden] {
+  display: none;
+}
+.wb-data-content {
+  padding: 0.45rem 0.6rem;
+}
+
+/* Code region: CodeBrowser fills it; its scroller (.cm-scroller / .code-pre) is the only one. */
+.wb-code {
+  padding: 0.45rem;
+  overflow: hidden;
+}
+.wb-code > .code-browser,
+.wb-code > .code-stub,
+.wb-code > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Splitters */
+.wb-split {
+  position: relative;
+  touch-action: none;
+  background: transparent;
+  border-radius: 4px;
+}
+.wb-split::after {
+  content: '';
+  position: absolute;
+  background: var(--border-soft);
+  border-radius: 2px;
+}
+.wb-split-vertical {
+  cursor: col-resize;
+}
+.wb-split-vertical::after {
+  top: 30%;
+  bottom: 30%;
+  left: calc(50% - 1px);
+  width: 2px;
+}
+.wb-split-horizontal {
+  cursor: row-resize;
+}
+.wb-split-horizontal::after {
+  left: 35%;
+  right: 35%;
+  top: calc(50% - 1px);
+  height: 2px;
+}
+.wb-split:hover::after,
+.wb-split:focus-visible::after {
+  background: var(--lab-accent, var(--accent));
+}
+.wb-split:focus-visible {
+  outline: 2px solid var(--lab-accent, var(--accent));
+  outline-offset: -2px;
+}
+
+/* Tabs (narrow / low height) */
+.workbench-tabs {
+  display: flex;
+  gap: 0.3rem;
+}
+.workbench-tabs[hidden] {
+  display: none;
+}
+.workbench-tabs [role="tab"] {
+  flex: 1 1 0;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.86rem;
+}
+.workbench-tabs [role="tab"].active {
+  background: var(--lab-accent, var(--accent));
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ---------- Transport: ONE compact row ---------- */
+.workbench-transport {
+  margin-top: 0.5rem;
+  min-width: 0;
+}
+.workbench-layout[data-layout-mode="tabbed"] .workbench-transport {
+  margin-top: 0;
+}
+.workbench-transport .playback-transport {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 1fr) auto;
+  grid-template-areas:
+    "ctrl scrub meta"
+    "phase phase phase";
+  align-items: center;
+  column-gap: 0.75rem;
+  row-gap: 0.3rem;
+  padding: 0.35rem 0.55rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm, 10px);
+}
+.playback-transport .transport-controls {
+  grid-area: ctrl;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  flex-wrap: nowrap;
+}
+.playback-transport .transport-controls button {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.84rem;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.playback-transport .transport-controls .play-btn {
+  min-width: 6.5rem;
+}
+.playback-transport .transport-scrub {
+  grid-area: scrub;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.playback-transport .scrub-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.78rem;
+}
+.playback-transport .scrub-row input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.playback-transport .phase-track {
+  position: relative;
+  height: 4px;
+  margin: 0;
+}
+.playback-transport .transport-meta {
+  grid-area: meta;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.playback-transport .transport-meta .speed-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.playback-transport .transport-meta .speed-label input {
+  width: 5.5rem;
+}
+.playback-transport .transport-meta .playback-settings-dock {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+}
+.workbench-transport .playback-transport > .phase-jump {
+  grid-area: phase;
+  margin: 0;
+  max-height: 2.4rem;
+  overflow: auto;
+  font-size: 0.78rem;
+}
+.workbench-transport .playback-transport > .phase-jump button {
+  padding: 0.12rem 0.5rem;
+  font-size: 0.76rem;
+}
+/* Inline phase chips only when the workbench is roomy; otherwise via 阶段 / 设置. */
+.workbench-layout:not([data-transport="roomy"]) .playback-transport > .phase-jump {
+  display: none;
+}
+.workbench-transport .scrub-preview-overlay {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+/* Medium widths: counter + settings stay, inline speed moves to the settings panel. */
+@media (max-width: 1100px) {
+  .playback-transport .transport-meta .speed-label {
+    display: none;
+  }
+}
+/* Tabbed (narrow portrait): controls row, then progress + meta. */
+.workbench-layout[data-layout-mode="tabbed"] .playback-transport {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "ctrl ctrl"
+    "scrub meta";
+  padding: 0.3rem 0.4rem;
+  column-gap: 0.5rem;
+}
+.workbench-layout[data-layout-mode="tabbed"] .playback-transport .transport-controls {
+  justify-content: space-between;
+}
+.workbench-layout[data-layout-mode="tabbed"] .playback-transport .transport-controls button {
+  flex: 1 1 auto;
+  padding: 0.3rem 0.4rem;
+}
+.workbench-layout[data-layout-mode="tabbed"] .playback-transport .scrub-label {
+  display: none;
+}
+.workbench-layout[data-layout-mode="tabbed"] .playback-transport .speed-label {
+  display: none;
+}
+/* Short landscape tabs: enough width for ONE transport row. */
+@media (min-width: 600px) {
+  .workbench-layout[data-layout-mode="tabbed"] .playback-transport {
+    grid-template-columns: auto minmax(6rem, 1fr) auto;
+    grid-template-areas: "ctrl scrub meta";
+  }
+  .workbench-layout[data-layout-mode="tabbed"] .playback-transport .transport-controls button {
+    flex: 0 0 auto;
+  }
+}
+
+/* ---------- Current-step data content ---------- */
+.current-step-data {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+}
+.data-config-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.data-hint {
+  margin: 0;
+  font-size: 0.78rem;
+}
+.current-step-data .vars-panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.current-step-data .vars-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.4rem;
+}
+.current-step-data .var-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.12rem 0.45rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: var(--bg-soft);
+}
+.current-step-data .field-code {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--muted-2, var(--muted));
+}
+.current-step-data .data-section-title {
+  margin: 0.2rem 0 0.1rem;
+  font-size: 0.74rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.data-frame,
+.data-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.6rem;
+  align-items: center;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+.data-stats .stat-chip {
+  font-family: var(--mono);
+}
+.data-raw-fields > summary,
+.current-step-data .final-answer-panel > summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.data-raw-row {
+  display: flex;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+
+/* ---------- Theory: a real modal dialog ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.45);
+}
+.theory-drawer {
+  position: fixed;
+  z-index: 61;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(720px, calc(100vw - 24px));
+  max-height: min(80dvh, 720px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.theory-drawer .theory-drawer-inner {
+  margin: 0;
+  border: 0;
+}
+.theory-drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+/* Lab pages: slimmer top bar (it only carries title + theme/motion). */
+.main-wrap[data-lab-fill="1"] > .topbar {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+.viz-context {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}

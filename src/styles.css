@@ -330,20 +330,6 @@ button.icon-btn {
 
 .related-algos { margin-bottom: 1.25rem; }
 .related-algos h3 { margin: 0 0 0.5rem; font-size: 0.92rem; color: var(--muted); font-weight: 600; }
-
-.input-panel {
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius);
-  padding: 1rem 1.15rem;
-  margin-bottom: 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.85rem;
-  align-items: end;
-  box-shadow: var(--shadow);
-}
-.input-panel h3 { width: 100%; margin: 0; font-size: 0.95rem; font-weight: 600; }
 .input-panel label {
   display: flex; flex-direction: column; gap: 0.3rem;
   font-size: 0.82rem; color: var(--muted); min-width: 180px; flex: 1;
@@ -365,25 +351,6 @@ button.icon-btn {
 .input-panel .hint { width: 100%; margin: 0; color: var(--muted); font-size: 0.85rem; }
 
 /* —— Visualizer —— */
-.visualizer {
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius);
-  padding: 1rem 1.1rem 1.15rem;
-  box-shadow: var(--shadow);
-}
-.viz-banner {
-  background: #262626;
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
-  /* V20-02: vertical pad lives on .viz-banner-slot budget — avoid double-pad clip */
-  padding: 0;
-  margin-bottom: 0.85rem;
-  font-weight: 500;
-  min-height: 0;
-  color: var(--text);
-  font-size: 0.95rem;
-}
 
 .viz-toolbar {
   display: flex;
@@ -449,13 +416,6 @@ button.icon-btn {
   min-width: 2.5rem;
   text-align: right;
 }
-
-.stats-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.7rem;
-}
 .stat-chip {
   display: inline-flex;
   align-items: center;
@@ -472,29 +432,12 @@ button.icon-btn {
   font-family: var(--mono);
   font-weight: 600;
 }
-
-.viz-legend {
-  display: flex; flex-wrap: wrap; gap: 0.75rem 1rem;
-  color: var(--muted-2); font-size: 0.75rem; margin-bottom: 0.75rem;
-}
-.viz-legend .dot {
-  display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 0.3rem;
-  vertical-align: middle;
-}
 .dot.compare { background: var(--warn); }
 .dot.swap { background: var(--danger); }
 .dot.focus { background: var(--info); }
 .dot.done, .dot.sorted { background: var(--good); }
 .dot.pivot { background: var(--pivot); }
 .dot.read { background: var(--read); }
-
-.viz-body {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 0.85rem;
-}
-.viz-main { min-width: 0; display: flex; flex-direction: column; gap: 0.75rem; }
-.viz-side { display: flex; flex-direction: column; gap: 0.75rem; }
 
 .array-view, .matrix-view, .vars-panel, .code-panel, .graph-view {
   background: var(--bg-input, var(--bg-soft));
@@ -703,7 +646,6 @@ button.icon-btn {
 /* Graph */
 .graph-svg {
   width: 100%;
-  /* V12-01: default fill; scroll-fallback overrides to height:auto */
   height: 100%;
   min-height: 0;
   max-height: 100%;
@@ -734,9 +676,6 @@ button.icon-btn {
 .graph-view > .graph-neg-warning {
   flex: 0 0 auto;
 }
-.main-wrap[data-lab-fill="1"] .graph-view {
-  padding: 0.35rem;
-}
 .edge { stroke: #555; stroke-width: 2; }
 .edge.hot { stroke: var(--warn); stroke-width: 3; }
 .edge-label { fill: var(--muted); font-family: var(--mono); /* size from GraphView camera */ }
@@ -748,21 +687,6 @@ button.icon-btn {
   padding: 2.5rem; text-align: center; color: var(--muted);
   background: var(--bg-elev); border-radius: var(--radius);
   border: 1px solid var(--border-soft);
-}
-
-.kbd-hint {
-  font-size: 0.72rem;
-  color: var(--muted-2);
-  margin-top: 0.55rem;
-}
-.kbd-hint kbd {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  background: #262626;
-  border: 1px solid var(--border-soft);
-  color: var(--muted);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -795,11 +719,9 @@ button.icon-btn {
   .sidebar.collapsed .nav-algo { display: block; }
   .sidebar-backdrop.visible { display: block; }
   .topbar { display: flex; }
-  .viz-body { grid-template-columns: 1fr; }
   .main { padding: 1rem 1rem 2.5rem; }
   .viz-toolbar { border-radius: 16px; }
 }
-
 
 /* —— M0 additions —— */
 .input-errors {
@@ -1114,14 +1036,6 @@ button.icon-btn {
   max-height: 420px;
   overflow: auto;
 }
-/* V17-03: DP matrix uses stage budget — do not early-cap at 420 under lab-fill */
-.main-wrap[data-lab-fill="1"] .stage-viewport .matrix-scroll,
-.main-wrap[data-lab-fill="1"] .viz-main .matrix-scroll {
-  max-height: min(70vh, calc(var(--wb-measured-h, 70vh) - 4rem));
-  flex: 1 1 auto;
-  /* V21-03: do not force 120px taller than flex ancestor — take remaining space */
-  min-height: 0;
-}
 
 .phase-jump {
   display: flex;
@@ -1369,61 +1283,6 @@ button.icon-btn {
   --sem-frontier: #0284c7;
   --sem-settled: #475569;
 }
-[data-lab-theme="lab-dark"] .workbench-layout {
-  --wb-bg: var(--lab-bg);
-}
-.workbench-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  min-height: 420px;
-  background: var(--lab-bg, transparent);
-  border-radius: var(--radius);
-  padding: 0.75rem;
-  border: 1px solid var(--border-soft);
-}
-.workbench-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 0.75rem;
-}
-.workbench-title {
-  margin: 0;
-  font-size: 1.05rem;
-}
-.workbench-input-summary {
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-.workbench-desktop-controls {
-  display: none; /* theme/motion primary entry is Layout topbar */
-}
-.workbench-panels {
-  flex: 1;
-  min-height: 360px;
-  width: 100%;
-}
-.workbench-viz-panel, .workbench-code-panel {
-  overflow: auto;
-  min-width: 0;
-}
-.workbench-resize {
-  width: 6px;
-  margin: 0 4px;
-  border-radius: 4px;
-  background: var(--border-soft);
-  cursor: col-resize;
-}
-.workbench-resize:hover, .workbench-resize[data-resize-handle-active] {
-  background: var(--lab-accent, var(--accent));
-}
-.workbench-code-panel {
-  background: var(--bg-elev);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-soft);
-  padding: 0.35rem;
-}
 .dirty-banner {
   background: rgba(227, 179, 65, 0.15);
   border: 1px solid var(--warn);
@@ -1509,55 +1368,8 @@ button.icon-btn {
 /* Ensure desktop topbar controls stay visible (not mobile-only) */
 @media (min-width: 961px) {
   .topbar { display: flex; }
-  .workbench-desktop-controls { display: flex; }
-}
-
-
-/* —— V6/V8 height chain: viewport-budgeted shell, panels flex within —— */
-.workbench-layout {
-  /* When lab-fill is active, flex grows inside the page; clamp is a fallback. */
-  --wb-chrome: 14rem; /* fallback only; lab-fill uses flex + measured --wb-measured-h */
-  flex: 1 1 auto;
-  height: clamp(420px, calc(100dvh - var(--wb-chrome)), 880px);
-  min-height: 0;
-  max-height: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-.workbench-panels {
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-  height: auto; /* Group fills via flex, not forced 100% cascade */
-}
-.workbench-viz-panel,
-.workbench-code-panel {
-  min-height: 0;
-  min-width: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.workbench-panel-inner {
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  height: 100%;
-}
-.workbench-code-inner {
-  min-height: 0;
-}
-.workbench-code-panel .code-browser {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
 }
 /* V21-01: pseudo <pre> is the real scrollport — fill remainder like CM wrap */
-.workbench-code-panel .code-browser > .code-pre,
 .code-browser > pre.code-pre {
   flex: 1 1 auto;
   min-height: 0;
@@ -1597,103 +1409,6 @@ button.icon-btn {
   overflow: auto !important;
   overscroll-behavior: contain;
 }
-
-.visualizer {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
-  overflow: hidden;
-}
-.viz-banner-slot {
-  /* V20-02: unified content-height budget ≥1 full glyph line always (not only :has(toggle)) */
-  --banner-line-h: 1.35em;
-  --banner-pad-y: 0.35rem;
-  --banner-font: 0.9rem;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 0 0 auto;
-  height: auto;
-  min-height: calc(var(--banner-pad-y) * 2 + var(--banner-line-h));
-  max-height: calc(var(--banner-pad-y) * 2 + var(--banner-line-h) * 3 + 0.25rem);
-  padding: var(--banner-pad-y) 0.75rem;
-  overflow: hidden;
-  font-size: var(--banner-font);
-}
-.viz-banner-text {
-  flex: 1 1 auto;
-  min-width: 0;
-  line-height: var(--banner-line-h);
-  font-size: inherit;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  /* Content box must fit ≥1 full line — never half-glyph clip */
-  min-height: var(--banner-line-h);
-  max-height: calc(var(--banner-line-h) * 3);
-}
-.viz-banner-controls {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  align-self: center;
-  max-height: 100%;
-}
-.viz-body-single {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  grid-template-columns: unset;
-}
-.viz-inspector {
-  /* V10-01: fixed band (drift) + stage keeps min-height so flex cannot collapse to 0 */
-  flex: 0 0 auto;
-  height: 96px;
-  min-height: 96px;
-  max-height: 96px;
-  overflow: auto;
-  border-top: 1px solid var(--border-soft);
-  padding-top: 0.35rem;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport,
-.main-wrap[data-lab-fill="1"] .viz-main {
-  flex: 1 1 auto;
-  min-height: 160px;
-}
-.viz-vars-stable {
-  min-height: 2.5rem;
-}
-.stats-row-fixed {
-  /* V10-01: fixed band — chip count must not shove viz-canvas during play */
-  min-height: 1.75rem;
-  height: 1.75rem;
-  max-height: 1.75rem;
-  overflow: hidden;
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: nowrap;
-  align-items: center;
-  flex: 0 0 auto;
-}
-.viz-legend {
-  min-height: 1.5rem;
-  height: 1.5rem;
-  max-height: 1.5rem;
-  overflow: hidden;
-  flex: 0 0 auto;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.5rem;
-  align-items: center;
-}
 .tabular-nums {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
@@ -1718,10 +1433,6 @@ button.icon-btn {
   pointer-events: none;
   max-width: min(90%, 420px);
   font-size: 0.8rem;
-}
-.visualizer {
-  position: relative;
-overflow-anchor: none;
 }
 body { overflow-anchor: none; }
 
@@ -1777,9 +1488,6 @@ body { overflow-anchor: none; }
   align-items: center;
   justify-content: center;
 }
-.page-header-compact .theory-toggle {
-  margin-top: 0.35rem;
-}
 .theory-expandable {
   margin-top: 0.5rem;
   padding: 0.65rem 0.75rem;
@@ -1803,13 +1511,12 @@ body { overflow-anchor: none; }
 html, body, #root {
   min-height: 100%;
 }
-.algo-page, .teach-page {
+.teach-page {
   min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
-
 
 /* V5 R4 FLIP layers — translate lives here; pulse/scale on .bar/.cell */
 .bar-flip-layer,
@@ -1836,11 +1543,6 @@ html, body, #root {
   opacity: 0.85;
   background: color-mix(in srgb, var(--sem-read, #64748b) 14%, transparent);
 }
-.workbench-inspector {
-  font-size: 0.85rem;
-  padding: 0.5rem 0.75rem;
-  border-top: 1px solid var(--border, #333);
-}
 .final-answer-human {
   white-space: pre-wrap;
   font-family: ui-monospace, monospace;
@@ -1848,18 +1550,7 @@ html, body, #root {
 }
 .run-status-cancelled { color: var(--sem-error, #ef4444); }
 .run-status-truncated { color: var(--sem-focus, #f59e0b); }
-
-.workbench-transport {
-  border-top: 1px solid var(--border-soft);
-  padding-top: 0.5rem;
-  background: var(--lab-surface, var(--bg-elev));
-  border-radius: var(--radius-sm);
-}
-.workbench-transport-inner { display: flex; flex-direction: column; gap: 0.35rem; }
-.workbench-chrome-host { min-height: 0; }
 .playback-transport { position: relative; }
-.inspector-explanation, .inspector-stack { margin-bottom: 0.45rem; }
-.inspector-explain-text { margin: 0.15rem 0 0; font-size: 0.85rem; color: var(--text); }
 .frame-id { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
 .final-answer-result { display: flex; flex-direction: column; gap: 0.4rem; }
 .final-answer-primary { font-weight: 600; color: var(--text); }
@@ -1867,7 +1558,6 @@ html, body, #root {
 .final-answer-field { display: flex; gap: 0.5rem; font-size: 0.8rem; }
 .final-answer-field dt { color: var(--muted); min-width: 5rem; }
 .final-answer-field dd { margin: 0; font-family: var(--mono); }
-
 
 /* —— V6 theme contrast (semantic tokens, not end-of-file !important dump) —— */
 [data-lab-theme="lab-light"] {
@@ -1928,79 +1618,6 @@ html, body, #root {
   flex: 0 0 auto;
   max-height: none;
 }
-.workbench-transport {
-  flex: 0 0 auto;
-}
-
-/* Narrow workbench tabs (UI-03 / V7-R4 / V8): SAME panel tree, visibility only — no remount.
- * react-resizable-panels v4 puts className on an INNER wrapper and spreads data-* on the
- * outer [data-panel] node — selectors must target [data-panel][data-tab-active], not
- * .workbench-*-panel[data-tab-active] (those never match the same element). */
-.workbench-tabs {
-  display: none;
-  gap: 0.35rem;
-  margin-bottom: 0.35rem;
-  flex: 0 0 auto;
-}
-.workbench-layout[data-layout="tabs"] .workbench-tabs {
-  display: flex;
-  flex-wrap: wrap;
-}
-.workbench-layout[data-layout="tabs"] .workbench-panels-stable {
-  flex: 1 1 auto;
-  min-height: 240px;
-}
-.workbench-layout[data-layout="tabs"] .workbench-resize {
-  display: none !important;
-  width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  flex: 0 0 0 !important;
-}
-/* Collapse inactive outer panel (library flex shorthand lives here) */
-.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="0"] {
-  flex: 0 0 0px !important;
-  flex-grow: 0 !important;
-  flex-shrink: 0 !important;
-  flex-basis: 0px !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  width: 0 !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  border: none !important;
-  margin: 0 !important;
-  pointer-events: none !important;
-}
-.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] {
-  flex: 1 1 auto !important;
-  flex-grow: 1 !important;
-  flex-basis: auto !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  width: 100% !important;
-  /* V10-01: horizontal Group still needs a stretch height or code/canvas collapse to 0 */
-  min-height: 220px !important;
-  height: 100% !important;
-  align-self: stretch !important;
-}
-.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] .workbench-panel-inner,
-.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] .code-browser,
-.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] .visualizer {
-  min-height: 200px;
-  height: 100%;
-}
-.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="0"] > .workbench-viz-panel,
-.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="0"] > .workbench-code-panel,
-.workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="0"] > .workbench-inspector-panel {
-  min-width: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  overflow: hidden !important;
-}
-.workbench-tab-panels { display: none; } /* legacy unused */
-.workbench-tab-panel { display: none; }
-
 
 /* UI-07: desktop collapse vs mobile drawer */
 .mobile-drawer-close { display: none; }
@@ -2027,6 +1644,11 @@ html, body, #root {
   /* Off-screen sidebar when not .open — CSS already translates; inert handles focus */
 }
 @media (min-width: 961px) {
+  /* V23: compact rail shows the bullets only (mode toggle + search live in the expanded nav) */
+  .sidebar.collapsed .nav-mode-toggle,
+  .sidebar.collapsed .nav-search {
+    display: none;
+  }
   .sidebar.collapsed .nav-algos-compact .nav-algo {
     /* keep links reachable with title tooltips */
     font-size: 0;
@@ -2037,7 +1659,6 @@ html, body, #root {
     font-size: 0.85rem;
   }
 }
-
 
 /* UI-11 practice feedback */
 .practice-feedback.is-correct .ok-text { color: var(--sem-done, #16a34a); }
@@ -2053,416 +1674,8 @@ html, body, #root {
   min-height: 2rem;
 }
 
-/* —— V8/V9 preview height: measured budget + honest scroll fallback —— */
 .app-shell {
   min-height: 100dvh;
-}
-.main-wrap[data-lab-fill="1"] {
-  min-height: 100dvh;
-  height: 100dvh;
-  max-height: 100dvh;
-  overflow: hidden;
-  /* safe-area: keep chrome clear of notches / home indicator */
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] {
-  /* Forbidden pattern reverse: do not jam larger min-height into locked hidden shell */
-  height: auto;
-  max-height: none;
-  overflow: auto;
-  overflow-x: hidden;
-}
-.main-wrap[data-lab-fill="1"] > .topbar {
-  flex: 0 0 auto;
-}
-.main-wrap[data-lab-fill="1"] > .main {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding-top: 0.5rem;
-  padding-bottom: max(0.4rem, env(safe-area-inset-bottom, 0px));
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] > .main {
-  overflow: visible;
-  height: auto;
-}
-.main-wrap[data-lab-fill="1"] .algo-page {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
-  overflow: hidden;
-  gap: 0.35rem;
-  position: relative;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .algo-page {
-  overflow: visible;
-  height: auto;
-}
-.main-wrap[data-lab-fill="1"] .page-header-compact {
-  flex: 0 0 auto;
-  margin-bottom: 0;
-}
-.main-wrap[data-lab-fill="1"] .page-header-compact h1 {
-  font-size: 1.15rem;
-  margin: 0.05rem 0;
-}
-.main-wrap[data-lab-fill="1"] .page-header-compact .complexity {
-  margin: 0.1rem 0;
-  font-size: 0.78rem;
-}
-.main-wrap[data-lab-fill="1"] .page-header-compact .theory-toggle {
-  margin-top: 0.15rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.78rem;
-}
-
-/* Theory as overlay drawer — does not expand inside header / crush stage */
-.theory-drawer {
-  position: absolute;
-  z-index: 40;
-  top: 0.25rem;
-  left: 0.5rem;
-  right: 0.5rem;
-  max-height: min(55vh, 420px);
-  overflow: auto;
-  background: var(--bg-elev, #fff);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow, 0 8px 24px rgba(0,0,0,.12));
-  padding: 0.65rem 0.85rem;
-}
-.theory-drawer-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.35rem;
-}
-.algo-page[data-theory-open="1"] .workbench-layout {
-  /* stage keeps budget; theory is overlay */
-}
-
-/* Input: summary + sticky actions; body scrolls independently */
-.main-wrap[data-lab-fill="1"] .input-panel-v9 {
-  flex: 0 0 auto;
-  max-height: none;
-  overflow: visible;
-  margin-bottom: 0;
-  padding: 0.45rem 0.65rem;
-  gap: 0.35rem;
-  display: flex;
-  flex-direction: column;
-}
-.input-summary-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  flex: 0 0 auto;
-}
-.input-summary-text {
-  font-size: 0.8rem;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.input-panel-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: min(42vh, 320px);
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-.input-panel-body[hidden] {
-  display: none !important;
-}
-.input-actions-sticky {
-  flex: 0 0 auto;
-  position: sticky;
-  bottom: 0;
-  background: var(--bg-elev, var(--lab-bg, #fff));
-  padding-top: 0.25rem;
-  z-index: 2;
-}
-.main-wrap[data-lab-fill="1"] .input-panel h3 {
-  margin: 0 0 0.2rem;
-  font-size: 0.88rem;
-}
-.main-wrap[data-lab-fill="1"] .input-panel > .hint {
-  display: none;
-}
-.main-wrap[data-lab-fill="1"] .input-panel .debug-details {
-  display: none;
-}
-.main-wrap[data-lab-fill="1"] .workbench-layout {
-  flex: 1 1 0;
-  min-height: 0;
-  height: auto !important;
-  max-height: none;
-  overflow: hidden;
-  padding: 0.45rem;
-  gap: 0.3rem;
-  min-height: 200px;
-}
-.main-wrap[data-lab-fill="1"] .workbench-layout[data-height-mode="scroll"] {
-  overflow: auto;
-}
-.main-wrap[data-lab-fill="1"] .workbench-header {
-  flex: 0 0 auto;
-  font-size: 0.8rem;
-}
-.main-wrap[data-lab-fill="1"] .workbench-panels,
-.main-wrap[data-lab-fill="1"] .workbench-panels-stable {
-  flex: 1 1 0 !important;
-  min-height: 0 !important;
-  height: auto !important;
-  align-self: stretch;
-}
-.main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] .workbench-panels-stable,
-.main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="split"] .workbench-panels-stable {
-  min-height: 0 !important;
-}
-.main-wrap[data-lab-fill="1"] .viz-banner-slot {
-  --banner-pad-y: 0.3rem;
-  --banner-font: 0.88rem;
-  --banner-line-h: 1.3em;
-  height: auto;
-  min-height: calc(var(--banner-pad-y) * 2 + max(var(--banner-line-h), 1.75rem));
-  max-height: calc(var(--banner-pad-y) * 2 + var(--banner-line-h) * 2 + 0.15rem);
-  overflow: hidden;
-  align-items: center;
-}
-.main-wrap[data-lab-fill="1"] .viz-banner-text {
-  -webkit-line-clamp: 2;
-  min-height: var(--banner-line-h);
-  max-height: calc(var(--banner-line-h) * 2);
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"] .viz-banner-controls .inspector-sheet-toggle {
-  flex: 0 0 auto;
-  white-space: nowrap;
-  padding: 0.25rem 0.55rem;
-  font-size: 0.78rem;
-  line-height: 1.2;
-  min-height: 1.75rem;
-  height: auto;
-}
-.main-wrap[data-lab-fill="1"] .kbd-hint {
-  margin-top: 0.2rem;
-  font-size: 0.65rem;
-  line-height: 1.3;
-}
-
-
-/* V13-01: graph + companion arrays share stage — prefer plot; cap arrays so nodes stay hittable. */
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-body-single:has(.graph-view) {
-  overflow: hidden;
-  min-height: 0;
-  flex: 1 1 auto;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-body-single:has(.graph-view) > .viz-inspector:not(.inspector-sheet-body) {
-  display: none; /* free ~96px for stage; sheet toggle covers short viewports */
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport:has(.graph-view),
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main:has(.graph-view) {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .graph-view {
-  flex: 1 1 auto;
-  min-height: 140px;
-  height: auto !important;
-  max-height: none;
-  overflow: hidden;
-  padding: 0.35rem;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .graph-plot {
-  flex: 1 1 auto;
-  min-height: 120px;
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .arrays-panel {
-  flex: 0 0 auto;
-  max-height: 88px;
-  overflow: auto;
-  margin-top: 0.25rem;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .array-view {
-  padding: 0.35rem;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .bars-wrap {
-  min-height: 48px;
-  max-height: 64px;
-}
-
-
-@media (max-width: 360px) {
-  .main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .arrays-panel {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .graph-view,
-  .main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .graph-plot {
-    min-height: 0;
-  }
-  /* Tabs: panels + transport must share column — do not let panel min-height:220 overflow transport */
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] {
-    overflow: hidden !important;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] .workbench-panels-stable {
-    flex: 1 1 0 !important;
-    min-height: 120px !important;
-    overflow: hidden !important;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] {
-    min-height: 120px !important;
-    height: auto !important;
-    max-height: 100% !important;
-    overflow: hidden !important;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] .workbench-panel-inner,
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] [data-panel][data-tab-active="1"] .visualizer {
-    min-height: 0 !important;
-    height: 100% !important;
-    overflow: hidden !important;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="tabs"] .workbench-transport {
-    flex: 0 0 auto !important;
-    position: relative;
-    z-index: 3;
-    background: var(--lab-surface, var(--bg-elev));
-  }
-}
-
-
-.workbench-layout[data-layout="tabs"] .stage-viewport:has(.graph-view) .arrays-panel {
-  display: none;
-}
-
-/* V12-01: ONE strategy for fill — stage is a fixed flex slot that owns overflow.
- * Graph SVG must fit the slot (height 100%, no intrinsic height:auto bleed into inspector).
- * Scroll-fallback uses the OTHER strategy — natural flow (stage grows; inspector below).
- * Never mix: shrink stage + unconstrained SVG + overflow:visible ancestors.
- */
-.stage-viewport {
-  flex: 1 1 auto;
-  min-height: 220px;
-  overflow: auto;
-  position: relative;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport,
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main {
-  flex: 1 1 auto;
-  min-height: 220px;
-  overflow: auto;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-view {
-  height: 100%;
-  min-height: 160px;
-  max-height: 100%;
-  overflow: hidden; /* fit host — not a z-index hide */
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-plot {
-  flex: 1 1 auto;
-  min-height: 160px;
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-svg {
-  width: 100%;
-  height: 100%;
-  min-height: 0; /* allow shrink into stage slot */
-  max-height: 100%;
-}
-
-/* Scroll fallback: content height participates; inspector is a following sibling — no paint-through */
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport,
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-main {
-  flex: 0 0 auto;
-  height: auto;
-  min-height: 220px;
-  overflow: visible;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .graph-view {
-  height: auto;
-  max-height: none;
-  overflow: visible;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .graph-plot {
-  flex: 0 0 auto;
-  min-height: 220px;
-  height: 220px;
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .graph-svg {
-  height: 100%;
-  max-height: none;
-  min-height: 0;
-}
-/* In scroll mode, do NOT leave a flex-shrunk stage with visible overflow (the hybrid bug). */
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-body-single {
-  overflow: visible;
-  flex: 0 0 auto;
-  height: auto;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .visualizer {
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-body-single {
-  overflow: hidden; /* stage owns scroll; body must not let svg bleed */
-  min-height: 0;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport {
-  min-height: 160px;
-}
-@media (max-height: 520px) {
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport,
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-main {
-    min-height: 180px;
-  }
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .visualizer {
-    min-height: 220px;
-  }
-}
-@media (max-height: 520px) and (orientation: landscape) {
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport,
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-main {
-    min-height: 180px;
-  }
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .visualizer {
-    min-height: 230px;
-  }
-}
-@media (max-height: 400px) and (orientation: landscape) {
-  .main-wrap[data-lab-fill="1"] .stage-viewport,
-  .main-wrap[data-lab-fill="1"] .viz-main,
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .stage-viewport,
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-main {
-    min-height: 180px;
-  }
-  .main-wrap[data-lab-fill="1"] .visualizer,
-  .main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .visualizer {
-    min-height: 220px;
-  }
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .workbench-panels-stable {
-  min-height: 200px !important;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .visualizer {
-  overflow: visible;
-  height: auto;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-body-single {
-  overflow: visible;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .workbench-panel-inner {
-  overflow: visible;
 }
 
 .search-tree-aux {
@@ -2477,111 +1690,6 @@ html, body, #root {
   cursor: pointer;
   color: var(--muted);
   font-size: 0.85rem;
-}
-
-/* Clear scroll ownership: one axis owner per region */
-[data-scroll-owner="viz"] {
-  overflow: auto;
-  overscroll-behavior: contain;
-}
-[data-scroll-owner="code"] {
-  overflow: hidden;
-}
-[data-scroll-owner="matrix"] {
-  overflow: auto;
-  overscroll-behavior: contain;
-  max-height: min(52vh, 420px);
-}
-[data-scroll-owner="inspector"] {
-  overflow: auto;
-  overscroll-behavior: contain;
-}
-[data-scroll-owner="viz"] {
-  overflow: auto;
-  overscroll-behavior: contain;
-  position: relative;
-  z-index: 0;
-  min-height: 0;
-}
-.main-wrap[data-lab-fill="1"] .workbench-transport {
-  position: relative;
-  z-index: 2;
-  background: var(--lab-surface, var(--bg-elev));
-}
-
-
-.main-wrap[data-lab-fill="1"] .workbench-transport {
-  flex: 0 0 auto;
-  padding-top: 0.25rem;
-}
-.main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar,
-.main-wrap[data-lab-fill="1"] .workbench-transport-toolbar {
-  gap: 0.25rem;
-  padding: 0.22rem;
-  margin-bottom: 0.25rem;
-  border-radius: 10px;
-}
-.main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar button {
-  padding: 0.28rem 0.55rem;
-  font-size: 0.78rem;
-}
-.main-wrap[data-lab-fill="1"] .playback-transport .play-btn {
-  min-width: 5rem;
-}
-.main-wrap[data-lab-fill="1"] .scrub-row {
-  margin-bottom: 0.25rem;
-  gap: 0.4rem;
-}
-.main-wrap[data-lab-fill="1"] .phase-track {
-  height: 5px;
-  margin: 0 0 0.15rem;
-}
-.main-wrap[data-lab-fill="1"] .phase-jump {
-  max-height: 2rem;
-  min-height: 0;
-  gap: 0.2rem;
-}
-.main-wrap[data-lab-fill="1"] .phase-jump button {
-  padding: 0.2rem 0.45rem;
-  font-size: 0.72rem;
-}
-.main-wrap[data-lab-fill="1"] .step-counter {
-  font-size: 0.72rem;
-}
-
-.workbench-layout[data-layout="tabs"] .kbd-hint {
-  display: none;
-}
-@media (max-width: 720px) {
-  .main-wrap[data-lab-fill="1"] > .main {
-    padding-left: 0.7rem;
-    padding-right: 0.7rem;
-    padding-top: 0.4rem;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact .complexity {
-    display: none;
-  }
-  .input-panel-body {
-    max-height: min(48vh, 280px);
-  }
-  /* Prefer fewer modules over shrinking fonts + touch targets together */
-  .main-wrap[data-lab-fill="1"] .viz-legend {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .stats-row-fixed:empty {
-    display: none;
-  }
-}
-
-@media (min-width: 721px) {
-  .main-wrap[data-lab-fill="1"] .workbench-code-panel .code-browser {
-    min-height: 0;
-  }
-  .main-wrap[data-lab-fill="1"] .kbd-hint {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 }
 
 /* DP composable write+focus */
@@ -2605,173 +1713,6 @@ html, body, #root {
   opacity: 0.85;
   /* never display:block in flow — that grew row height every write */
 }
-
-
-/* V10-02: short-height docks features — never delete results/vars/speed/phase with no entry */
-@media (max-height: 520px), (max-width: 400px) {
-  .main-wrap[data-lab-fill="1"] > .main {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact h1 {
-    font-size: 1rem;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact .complexity,
-  .main-wrap[data-lab-fill="1"] .page-header-compact .back {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .input-panel-v9 {
-    padding: 0.25rem 0.5rem;
-  }
-  .main-wrap[data-lab-fill="1"] .input-panel-body {
-    max-height: min(24vh, 100px);
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-body {
-    display: none !important;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-layout {
-    flex: 1 1 0;
-    min-height: 0;
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport {
-    min-height: 180px;
-  }
-  /* Keep signed bars usable — avoid 200px chart crushed into empty strip */
-  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
-    --bar-chart-h: min(140px, 32vh);
-    min-height: var(--bar-chart-h);
-    height: var(--bar-chart-h);
-  }
-  .main-wrap[data-lab-fill="1"] .bars-wrap:not(.signed) {
-    min-height: min(112px, 26vh);
-  }
-  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-    --banner-pad-y: 0.2rem;
-    --banner-font: 0.78rem;
-    --banner-line-h: 1.25em;
-    height: auto;
-    min-height: calc(var(--banner-pad-y) * 2 + max(1.25em, 1.6rem));
-    max-height: calc(var(--banner-pad-y) * 2 + 1.25em + 0.15rem);
-  }
-  .main-wrap[data-lab-fill="1"] .viz-banner-text {
-    -webkit-line-clamp: 1;
-    min-height: var(--banner-line-h);
-    max-height: var(--banner-line-h);
-    font-size: var(--banner-font);
-  }
-  /* V11 fix: NEVER hide Run on short height (preview + after-run).
-     Collapse idle Cancel / status chrome only; keep [data-testid=run-btn] operable. */
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.35rem;
-    margin-top: 0.15rem;
-    padding-top: 0.1rem;
-    min-height: 0;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky.control-row {
-    min-height: 0;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky button {
-    height: auto;
-    min-height: 28px;
-    padding: 0.18rem 0.55rem;
-    font-size: 0.75rem;
-    line-height: 1.2;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky [data-testid="cancel-btn"]:disabled {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky .muted,
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky [data-testid="run-status"] {
-    font-size: 0.7rem;
-  }
-  .main-wrap[data-lab-fill="1"] .array-view > .matrix-note {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .input-panel-v9 {
-    padding: 0.2rem 0.45rem;
-  }
-  /* Inline chrome hidden ONLY when dock/sheet entry exists */
-  .main-wrap[data-lab-fill="1"] .viz-inspector:not(.inspector-sheet-body),
-  .main-wrap[data-lab-fill="1"] .stats-row-fixed,
-  .main-wrap[data-lab-fill="1"] .viz-legend,
-  .main-wrap[data-lab-fill="1"] .kbd-hint {
-    display: none;
-  }
-  /* V11-08: direct-child only — do NOT hide dock variants inside settings panel */
-  .main-wrap[data-lab-fill="1"] .playback-transport > .phase-jump,
-  .main-wrap[data-lab-fill="1"] .playback-transport > .phase-track,
-  .main-wrap[data-lab-fill="1"] .playback-transport > .viz-toolbar > .speed-label,
-  .main-wrap[data-lab-fill="1"] .workbench-header {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-jump,
-  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-track,
-  .main-wrap[data-lab-fill="1"] .playback-settings-panel .speed-label {
-    display: flex !important;
-  }
-  .main-wrap[data-lab-fill="1"] .playback-settings-panel .phase-jump {
-    flex-wrap: wrap;
-  }
-  /* Dock entries stay visible and usable */
-  .main-wrap[data-lab-fill="1"] .playback-settings-dock,
-  .main-wrap[data-lab-fill="1"] .inspector-sheet-toggle {
-    display: inline-flex !important;
-  }
-  .main-wrap[data-lab-fill="1"] .input-summary-text {
-    font-size: 0.72rem;
-  }
-  .main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar button {
-    padding: 0.2rem 0.4rem;
-    font-size: 0.72rem;
-  }
-}
-
-/* Default: dock toggle hidden when tall enough for inline chrome */
-.playback-settings-dock,
-.inspector-sheet-toggle {
-  display: none;
-}
-/* V14-01: JS sets [hidden] when inline inspector is visible; when drawer mode, force show */
-.inspector-sheet-toggle:not([hidden]) {
-  display: inline-flex !important;
-  align-items: center;
-}
-.visualizer[data-inspector-layout="drawer"] .inspector-sheet-toggle {
-  display: inline-flex !important;
-  align-items: center;
-}
-/* Also when lab-fill + graph hides inline inspector (desktop), keep entry reachable even before JS measures */
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .visualizer:has(.graph-view) .inspector-sheet-toggle {
-  display: inline-flex !important;
-  align-items: center;
-}
-.inspector-sheet {
-  position: fixed;
-  z-index: 60;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  max-height: min(55vh, 360px);
-  overflow: auto;
-  background: var(--bg-elev, #fff);
-  border-top: 1px solid var(--border-soft);
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 -8px 24px rgba(0,0,0,.18);
-  padding: 0.75rem 1rem 1.25rem;
-}
-.inspector-sheet[hidden] {
-  display: none !important;
-}
-.inspector-sheet-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
 .playback-settings-panel {
   margin-top: 0;
   padding: 0.5rem 0.65rem;
@@ -2782,209 +1723,22 @@ html, body, #root {
 .playback-settings-panel[hidden] {
   display: none !important;
 }
-.playback-settings-dock {
-  align-items: center;
-}
 
-/* V10-03: when height fallback is scroll, release ALL related clip ancestors */
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .workbench-layout,
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .visualizer,
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .viz-body-single,
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .workbench-panels-stable {
-  overflow: visible;
-  max-height: none;
-}
-.main-wrap[data-lab-fill="1"][data-height-fallback="scroll"] .workbench-layout[data-height-mode="scroll"] {
-  overflow: visible;
-}
-
-
-/* Ultra-short (e.g. 844×390): raise stage — never lower below ≤520 floor */
-@media (max-height: 400px) {
-  .main-wrap[data-lab-fill="1"] > .main {
-    padding-top: 0.1rem;
-    padding-bottom: 0.1rem;
-  }
-  .main-wrap[data-lab-fill="1"] .input-summary-bar {
-    min-height: 0;
-    padding: 0.05rem 0;
-  }
-  .main-wrap[data-lab-fill="1"] .visualizer {
-    min-height: 220px;
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport,
-  .main-wrap[data-lab-fill="1"] .viz-main {
-    min-height: 180px;
-  }
-  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
-    --bar-chart-h: min(150px, 40vh);
-    min-height: var(--bar-chart-h);
-    height: var(--bar-chart-h);
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.35rem;
-    margin: 0;
-    padding: 0.05rem 0;
-    min-height: 0;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact > :not(.theory-toggle) {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact .theory-toggle {
-    display: inline-flex;
-    margin: 0;
-    padding: 0.12rem 0.4rem;
-    font-size: 0.7rem;
-    line-height: 1.2;
-    height: auto;
-    min-height: 0;
-  }
-    .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-    --banner-pad-y: 0.15rem;
-    --banner-font: 0.75rem;
-    --banner-line-h: 1.2em;
-    height: auto;
-    min-height: calc(var(--banner-pad-y) * 2 + max(1.2em, 1.5rem));
-    max-height: calc(var(--banner-pad-y) * 2 + 1.2em + 0.1rem);
-  }
-}
-
-/* Short landscape (w>h or h≤520 landscape): prefer stage over chrome */
-@media (max-height: 520px) and (orientation: landscape) {
-  .main-wrap[data-lab-fill="1"] .page-header-compact {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.35rem;
-    margin: 0;
-    padding: 0.05rem 0;
-    min-height: 0;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact > :not(.theory-toggle) {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact .theory-toggle {
-    display: inline-flex;
-    margin: 0;
-    padding: 0.12rem 0.4rem;
-    font-size: 0.7rem;
-    line-height: 1.2;
-    height: auto;
-    min-height: 0;
-  }
-  .main-wrap[data-lab-fill="1"] .visualizer {
-    min-height: 230px;
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport,
-  .main-wrap[data-lab-fill="1"] .viz-main {
-    min-height: 180px;
-  }
-  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
-    --bar-chart-h: min(160px, 42vh);
-    min-height: var(--bar-chart-h);
-    height: var(--bar-chart-h);
-  }
-  .main-wrap[data-lab-fill="1"] .bars-wrap:not(.signed) {
-    min-height: min(130px, 34vh);
-  }
-    .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-    --banner-pad-y: 0.15rem;
-    --banner-font: 0.75rem;
-    --banner-line-h: 1.2em;
-    height: auto;
-    min-height: calc(var(--banner-pad-y) * 2 + max(1.2em, 1.5rem));
-    max-height: calc(var(--banner-pad-y) * 2 + 1.2em + 0.1rem);
-  }
-  .main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar button {
-    padding: 0.15rem 0.35rem;
-    font-size: 0.7rem;
-  }
-}
-
-/* Ultra-short landscape: tabs mode (JS) + compact tablist; demo full width */
-@media (max-height: 400px) and (orientation: landscape) {
-  .main-wrap[data-lab-fill="1"] .workbench-tabs {
-    display: flex !important;
-    min-height: 0;
-    padding: 0;
-    gap: 0.25rem;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-tabs button {
-    padding: 0.1rem 0.45rem;
-    font-size: 0.68rem;
-    line-height: 1.2;
-  }
-  .main-wrap[data-lab-fill="1"] .topbar {
-    min-height: 0;
-    padding-top: 0.1rem;
-    padding-bottom: 0.1rem;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-transport {
-    padding-top: 0.05rem;
-    padding-bottom: 0.05rem;
-  }
-  .main-wrap[data-lab-fill="1"] .playback-transport .scrub-row {
-    margin: 0;
-  }
-  .main-wrap[data-lab-fill="1"] .visualizer {
-    min-height: 240px !important;
-    /* V13: keep hidden for graphs so SVG does not paint under transport;
-       array bars still get room via bars-wrap / panels overflow rules */
-    overflow: hidden !important;
-  }
-  .main-wrap[data-lab-fill="1"] .visualizer:has(.bars-wrap) {
-    overflow: visible !important;
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport,
-  .main-wrap[data-lab-fill="1"] .viz-main {
-    min-height: 190px !important;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-panels-stable {
-    min-height: 240px !important;
-    overflow: visible !important;
-    flex: 1 1 auto !important;
-  }
-  .main-wrap[data-lab-fill="1"] .bars-wrap.signed {
-    --bar-chart-h: min(170px, 48vh);
-    min-height: var(--bar-chart-h);
-    height: var(--bar-chart-h);
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-layout {
-    overflow: visible !important;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-height-mode="scroll"] .workbench-panels-stable,
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-height-mode="fill"] .workbench-panels-stable {
-    flex: 1 1 auto !important;
-    min-height: 240px !important;
-    overflow: visible !important;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-transport {
-    flex: 0 0 auto;
-    max-height: 56px;
-    overflow: hidden;
-  }
-  .main-wrap[data-lab-fill="1"] .playback-transport .viz-toolbar {
-    flex-wrap: nowrap;
-    gap: 0.2rem;
-  }
-}
-
-
-/* V14-02: compact array tables inside inspector (cursor-synced) */
+/* V14-02 / V23: compact cursor-synced array tables in the Current-data region */
 .inspector-arrays {
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.35rem 0.9rem;
+}
+.inspector-arrays > .data-section-title {
+  flex: 0 0 100%;
 }
 .inspector-array-table {
   overflow-x: auto;
   max-width: 100%;
+  min-width: 0;
 }
 .inspector-array-name {
   font-size: 0.72rem;
@@ -3043,23 +1797,8 @@ html, body, #root {
   cursor: grabbing;
 }
 
-
 /* V14: keep graph readable on short / warn layouts — do not let chrome steal plot */
-.main-wrap[data-lab-fill="1"] .graph-view:has(.graph-neg-warning) .graph-plot {
-  min-height: 100px;
-}
-.main-wrap[data-lab-fill="1"] .graph-view:has(.graph-neg-warning) {
-  min-height: 0;
-}
 @media (max-height: 600px), (max-width: 360px) {
-  .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-view,
-  .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-plot {
-    min-height: 100px;
-  }
-  .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport,
-  .main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main {
-    min-height: 140px;
-  }
   /* Compact reset chip on tiny stages */
   .graph-reset-view {
     font-size: 0.65rem;
@@ -3067,654 +1806,8 @@ html, body, #root {
     opacity: 0.85;
   }
 }
-/* Sheet must not permanently trap transport: leave bottom gap + Esc/close */
-.inspector-sheet {
-  max-height: min(50vh, 340px);
-  /* keep a strip of page above for awareness; transport is outside dialog */
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+.build-info {
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  font-family: var(--mono);
 }
-
-
-/* V15-03: continuous inspect — drawer-internal transport + non-modal side on desktop */
-.inspector-sheet-transport {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.35rem 0 0.55rem;
-  border-bottom: 1px solid var(--border-soft);
-  margin-bottom: 0.5rem;
-}
-.inspector-sheet-transport button:disabled {
-  opacity: 0.4;
-}
-.inspector-sheet[aria-modal="false"] {
-  /* Honest non-modal: does not trap page; transport outside still usable when side */
-  pointer-events: auto;
-}
-@media (min-width: 900px) and (min-height: 560px) {
-  .inspector-sheet[data-inspect-mode="side"] {
-    left: auto;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: min(360px, 38vw);
-    max-height: none;
-    height: 100vh;
-    border-radius: 0;
-    border-top: none;
-    border-left: 1px solid var(--border-soft);
-    box-shadow: -8px 0 24px rgba(0,0,0,.14);
-    overflow: auto;
-  }
-}
-
-/* ============================================================================
- * V16-05 / V16-06 — Desktop workbench uses available space; enlarge real content
- * ============================================================================ */
-
-/* Lab-fill algo pages: NOT limited by article --viz-max / --content-max card */
-.main-wrap[data-lab-fill="1"] > .main,
-.main-wrap[data-lab-fill="1"] > .main.wide {
-  max-width: none !important;
-  width: 100%;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  padding-left: 0.65rem;
-  padding-right: 0.65rem;
-  box-sizing: border-box;
-}
-
-/* Compact page header on lab-fill */
-.main-wrap[data-lab-fill="1"] .page-header-compact {
-  padding: 0.1rem 0;
-  margin-bottom: 0.15rem;
-}
-.main-wrap[data-lab-fill="1"] .page-header-compact h1 {
-  font-size: 1.05rem;
-  margin: 0;
-}
-.main-wrap[data-lab-fill="1"] .page-header-compact .meta-extras,
-.main-wrap[data-lab-fill="1"] .page-header-compact .complexity {
-  font-size: 0.72rem;
-  margin: 0.05rem 0;
-}
-
-/* Input: keep summary compact; editing body smaller so stage keeps budget */
-.main-wrap[data-lab-fill="1"] .input-panel-v9 {
-  padding: 0.3rem 0.5rem;
-}
-.main-wrap[data-lab-fill="1"] .input-panel-body {
-  max-height: min(26vh, 200px);
-}
-.main-wrap[data-lab-fill="1"][data-input-collapsed="1"] .input-panel-body,
-.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-body {
-  /* collapsed via [hidden] already; belt-and-suspenders */
-}
-
-/* Workbench fills main width */
-.main-wrap[data-lab-fill="1"] .workbench-layout {
-  width: 100%;
-  max-width: none;
-}
-
-/* V16-06: enlarge via flex growth after width/chrome reclaim — do NOT force
- * min-heights larger than the flex budget (that painted nodes under transport). */
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport:has(.graph-view),
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main:has(.graph-view) {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport:has(.graph-view) .graph-view,
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport:has(.graph-view) .graph-plot {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-
-/* Arrays / DP companion: grow with viewport a bit more under taller stages */
-@media (min-height: 800px) {
-  .main-wrap[data-lab-fill="1"] .stage-viewport:has(.graph-view) .arrays-panel {
-    max-height: min(120px, 14vh);
-  }
-}
-
-/* Code panel: own scroll, fill height */
-.main-wrap[data-lab-fill="1"] .workbench-code-panel .code-browser,
-.main-wrap[data-lab-fill="1"] .workbench-code-inner {
-  min-height: 0;
-  height: 100%;
-}
-
-/* V17-02: Workbench owns data-open layout — NO fixed body gutter that shrinks
- * content <720 → tabs → code.w=0 on 1366. Sheet docks; workbench reserves via
- * its own margin when [data-data-open=1] and stays in split on laptop+. */
-@media (min-width: 900px) and (min-height: 560px) {
-  .inspector-sheet[data-inspect-mode="side"] {
-    width: min(360px, 38vw);
-    max-width: 38vw;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-data-open="1"] {
-    /* Reserve sheet without forcing body padding / tab collapse */
-    margin-right: min(360px, 38vw);
-    width: auto;
-    max-width: calc(100% - min(360px, 38vw));
-  }
-  /* Laptop: scene|code stay split; data is side sheet (stacked visually with scene column) */
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-data-open="1"][data-layout-profile="laptop"] .workbench-code-panel,
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-data-open="1"][data-layout-profile="laptop"] [data-testid="workbench-code-slot"] {
-    min-width: 160px;
-  }
-  /* Wide: keep readable code + scene beside docked data */
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-data-open="1"][data-layout-profile="wide"] .workbench-code-panel {
-    min-width: 200px;
-  }
-}
-
-/* Wide desktop (≥1440 content): prefer split panels; tabs stay for narrow WorkbenchLayout */
-@media (min-width: 1440px) {
-  .main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="split"] .workbench-panels-stable {
-    min-height: 0;
-  }
-}
-
-/* Laptop mid-width: ensure workbench uses nearly full main (already width 100%) */
-@media (min-width: 1100px) and (max-width: 1599px) {
-  .main-wrap[data-lab-fill="1"] .workbench-layout {
-    /* scene | code; data docks via side sheet + gutter when open */
-  }
-}
-
-/* Warn strip stays outside plot flex budget (V13 contract) */
-.main-wrap[data-lab-fill="1"] .graph-view > .graph-neg-warning {
-  flex: 0 0 auto;
-}
-
-/* Slightly larger readable labels in CSS fallback contexts */
-.main-wrap[data-lab-fill="1"] .node-label {
-  /* SVG font-size set in user units by camera; CSS min as soft hint for HTML labels */
-}
-.main-wrap[data-lab-fill="1"] .arrays-panel .array-view {
-  font-size: 0.8rem;
-}
-
-/* V16-06b: force flex 0-basis so stage absorbs free space (auto basis left ~90px unused) */
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .visualizer {
-  flex: 1 1 0;
-  min-height: 0;
-  height: 100%;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-body-single {
-  flex: 1 1 0 !important;
-  min-height: 0 !important;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport,
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main {
-  flex: 1 1 0 !important;
-  min-height: 0 !important;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-view,
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .graph-plot {
-  flex: 1 1 0 !important;
-  min-height: 0 !important;
-  height: auto;
-}
-
-/* Compact chrome → stage.
- * V17-01: collapsed/idle may compact; editing/error must NOT get 4.5rem overflow:hidden
- * (that zeroed input body @1366/1440×900). Editing gets a real body budget. */
-@media (max-height: 900px) {
-  .main-wrap[data-lab-fill="1"] .page-header-compact {
-    max-height: 3.2rem;
-    overflow: hidden;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact .meta-extras {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .stats-row-fixed {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .viz-legend {
-    display: none;
-  }
-  /* Idle/collapsed only — never blanket-clamp while editing */
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
-    max-height: 2.8rem;
-    overflow: hidden;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .input-panel-v9,
-  .main-wrap[data-lab-fill="1"] .input-panel-v9.has-errors {
-    max-height: none;
-    overflow: visible;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .input-panel-body,
-  .main-wrap[data-lab-fill="1"] .input-panel-v9.has-errors .input-panel-body {
-    max-height: min(40vh, 300px);
-    min-height: 4.5rem;
-    overflow: auto;
-  }
-}
-
-/* V16-06c: laptop 768-class — reclaim ~20–40px more for plot */
-@media (max-height: 800px) {
-  .main-wrap[data-lab-fill="1"] .page-header-compact {
-    max-height: 2.4rem;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact .back,
-  .main-wrap[data-lab-fill="1"] .page-header-compact .complexity {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .viz-banner-slot {
-    /* V20-02: never 32px+12+12 → 6px text; budget ≥1 glyph line + controls */
-    --banner-pad-y: 0.25rem;
-    --banner-font: 0.82rem;
-    --banner-line-h: 1.25em;
-    height: auto;
-    min-height: calc(var(--banner-pad-y) * 2 + max(1.25em, 1.75rem));
-    max-height: calc(var(--banner-pad-y) * 2 + 1.25em * 2 + 0.2rem);
-    overflow: hidden;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
-    max-height: 2.4rem;
-    padding: 0.2rem 0.45rem;
-  }
-  .main-wrap[data-lab-fill="1"] .workbench-transport {
-    /* slightly tighter transport padding */
-    padding-top: 0.15rem;
-  }
-}
-
-
-/* ============================================================================
- * V17 — input edit / data+code / array stage budget
- * ============================================================================ */
-
-/* V17-01: ensure sticky actions + summary stay reachable while editing on short heights */
-.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .input-summary-bar,
-.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .input-actions-sticky {
-  flex: 0 0 auto;
-  position: relative;
-  z-index: 3;
-}
-.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] .theory-toggle,
-.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] [data-testid="run-btn"],
-.main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="1"] [data-testid="input-edit-toggle"] {
-  pointer-events: auto;
-}
-
-/* V17-02: zero-width code must not be treated as "ok" by layout profile alone —
- * keep code slot visible in split whenever data is open on laptop+ */
-.main-wrap[data-lab-fill="1"] .workbench-layout[data-layout="split"][data-data-open="1"] [data-testid="workbench-code-slot"] {
-  display: block;
-  min-width: 160px;
-  overflow: auto;
-}
-
-/* ============================================================================
- * V18 — data body / primary scene / controls not covered
- * ============================================================================ */
-
-/* V18-01: side/bottom sheet body must NOT inherit inline .viz-inspector 96px band.
- * Sheet is flex column: head + transport + body (minmax 0,1fr scroll). */
-.inspector-sheet {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-.inspector-sheet-head,
-.inspector-sheet-transport {
-  flex: 0 0 auto;
-}
-.inspector-sheet .inspector-sheet-body,
-.inspector-sheet .viz-inspector.inspector-sheet-body,
-.viz-inspector.inspector-sheet-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: auto !important;
-  max-height: none !important;
-  /* override inline strip 96px from .viz-inspector */
-  min-height: 0 !important;
-  overflow: auto;
-  border-top: none;
-  padding-top: 0.35rem;
-}
-@media (min-width: 900px) and (min-height: 560px) {
-  .inspector-sheet[data-inspect-mode="side"] {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* body scrolls; chrome stays put */
-  }
-}
-
-/* V18-03: one layout decision — reserve sheet for whole algo page (header+input+scene),
- * not only workbench. Avoids edit/run/theory sitting under the fixed side sheet. */
-@media (min-width: 900px) and (min-height: 560px) {
-  .main-wrap[data-lab-fill="1"] .algo-page[data-data-open="1"] {
-    margin-right: min(360px, 38vw);
-    max-width: calc(100% - min(360px, 38vw));
-    width: auto;
-    box-sizing: border-box;
-  }
-  /* Prevent double reservation once parent algo-page already inset */
-  .main-wrap[data-lab-fill="1"] .algo-page[data-data-open="1"] .workbench-layout[data-data-open="1"] {
-    margin-right: 0;
-    max-width: 100%;
-    width: 100%;
-  }
-}
-
-/* V18-03: compact idle controls — one row (summary|edit|run) so buttons are fully
- * in clip AND stage keeps V17 array budget. No 2.4rem overflow:hidden clamp. */
-@media (max-height: 900px) {
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
-    max-height: none;
-    overflow: visible;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.35rem;
-    min-height: 2.25rem;
-    padding-top: 0.15rem;
-    padding-bottom: 0.15rem;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-summary-bar {
-    display: contents;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-summary-text {
-    flex: 1 1 auto;
-    min-width: 0;
-    order: 1;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] [data-testid="input-edit-toggle"] {
-    order: 2;
-    flex: 0 0 auto;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky {
-    position: static;
-    bottom: auto;
-    margin-top: 0;
-    padding-top: 0;
-    flex: 0 0 auto;
-    order: 3;
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.3rem;
-    z-index: auto;
-    background: transparent;
-  }
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-actions-sticky button {
-    height: auto;
-    min-height: 28px;
-    padding: 0.18rem 0.5rem;
-    font-size: 0.75rem;
-    line-height: 1.2;
-  }
-  /* Header: keep theory chrome hittable — no overflow clip of toggles */
-  .main-wrap[data-lab-fill="1"] .page-header-compact {
-    max-height: none;
-    overflow: visible;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25rem 0.5rem;
-  }
-}
-@media (max-height: 800px) {
-  .main-wrap[data-lab-fill="1"] .algo-page[data-input-editing="0"] .input-panel-v9 {
-    max-height: none;
-    overflow: visible;
-    padding: 0.15rem 0.45rem;
-  }
-  .main-wrap[data-lab-fill="1"] .page-header-compact {
-    max-height: none;
-    overflow: visible;
-  }
-}
-
-/* V18-02: primary scene — DP/matrix owns stage; companion X/Y labels stay compact */
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport[data-primary-scene="matrix"],
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main[data-primary-scene="matrix"],
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport[data-primary-scene="board"],
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main[data-primary-scene="board"] {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* matrix scrolls internally; do not push DP below stage */
-  min-height: 0;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrices-panel,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrices-panel,
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="board"] .matrices-panel,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="board"] .matrices-panel {
-  flex: 1 1 auto;
-  min-height: 0;
-  /* Prefer matrix over companion strip when stage is short */
-  flex-grow: 2;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-view,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-view {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-scroll,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-scroll {
-  flex: 1 1 auto;
-  /* V21-03: remaining space; soft floor when parent has room; max-height blocks overhang */
-  min-height: min(48px, 100%);
-  max-height: 100%;
-  overflow: auto;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .arrays-panel.array-labels-strip,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .arrays-panel.array-labels-strip,
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="board"] .arrays-panel.array-labels-strip,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="board"] .arrays-panel.array-labels-strip {
-  /* V22-01: intrinsic compact strip — do not flex-shrink below one glyph line.
-   * Long inputs scroll inside the strip; matrix still owns remaining space (flex sibling). */
-  flex: 0 0 auto;
-  min-height: calc(0.78rem * 1.35 + 0.4rem); /* ≥ one .compact-ch line + padding */
-  max-height: min(4.5rem, 40%);
-  overflow: auto;
-  margin: 0 0 0.2rem;
-  gap: 0.2rem;
-  display: flex;
-  flex-direction: column;
-}
-.array-labels-strip .compact-seq-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.35rem 0.75rem;
-  font-size: 0.78rem;
-  line-height: 1.35;
-  padding: 0.15rem 0.2rem;
-}
-.array-labels-strip .compact-seq {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.15rem;
-  min-width: 0;
-}
-.array-labels-strip .compact-seq-name {
-  font-weight: 600;
-  color: var(--muted);
-  margin-right: 0.15rem;
-}
-.array-labels-strip .compact-ch {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.05rem;
-  padding: 0.05rem 0.2rem;
-  border-radius: 4px;
-  border: 1px solid var(--border-soft);
-  background: var(--bg-soft, #1a1a1a);
-  font-variant-numeric: tabular-nums;
-}
-.array-labels-strip .compact-ch.is-focus,
-.array-labels-strip .compact-ch.is-compare {
-  border-color: var(--sem-focus, #3b82f6);
-  background: color-mix(in srgb, var(--sem-focus, #3b82f6) 22%, transparent);
-  font-weight: 700;
-}
-.array-labels-strip .compact-ch.is-ptr {
-  outline: 1px dashed var(--lab-accent, var(--accent));
-}
-.array-labels-strip .compact-context {
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-.array-labels-strip .array-buffers {
-  max-height: 56px;
-  overflow: auto;
-}
-/* Legacy full ArrayView inside strip (buffers only) stay compact */
-.main-wrap[data-lab-fill="1"] .array-labels-strip .array-view {
-  padding: 0.1rem 0.25rem;
-}
-.main-wrap[data-lab-fill="1"] .array-labels-strip .array-view .bars-wrap {
-  display: none;
-}
-.main-wrap[data-lab-fill="1"] .array-labels-strip .array-view .array-label {
-  font-size: 0.7rem;
-  margin: 0;
-}
-.main-wrap[data-lab-fill="1"] .array-labels-strip .array-view .cell {
-  font-size: 0.7rem;
-  min-width: 1.1rem;
-  padding: 0.05rem 0.2rem;
-}
-
-.matrix-follow-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 0 0 0.15rem;
-  /* V22-02: toolbar keeps intrinsic button height — never mid-slice locate/resume */
-  flex: 0 0 auto;
-  min-height: calc(0.72rem * 1.2 + 0.35rem);
-}
-.matrix-follow-bar .hint {
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-/* V22-02: compact buttons OK; never clip with max-height/overflow:hidden */
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-follow-bar {
-  flex-wrap: wrap;
-  overflow: visible;
-  max-height: none;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar button,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-follow-bar button {
-  padding: 0.1rem 0.35rem;
-  font-size: 0.72rem;
-  line-height: 1.2;
-  flex: 0 0 auto;
-}
-@media (max-height: 700px) {
-  .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-follow-bar .hint,
-  .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-follow-bar .hint {
-    display: none;
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-view > .array-label,
-  .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-view > .array-label {
-    font-size: 0.7rem;
-    margin: 0;
-    line-height: 1.1;
-    max-height: 1.1rem;
-    overflow: hidden;
-  }
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-note,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-note {
-  display: none; /* reclaim stage for DP grid */
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .array-label,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-view > .array-label {
-  font-size: 0.75rem;
-  margin-bottom: 0.15rem;
-}
-.main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="array"] .arrays-panel,
-.main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="array"] .arrays-panel {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-/* V18.1: primary owns flex height; aux buffers stay compact + in-stage (top).
- * DOM order = buffers then primary so mid-step temp/key intersects viz-canvas. */
-.arrays-panel[data-array-order="primary-first"] {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  min-height: 0;
-  flex: 1 1 auto;
-  overflow: hidden;
-}
-.arrays-panel[data-array-order="primary-first"] > .array-buffers {
-  flex: 0 0 auto;
-  order: 0;
-  max-height: 88px;
-  overflow: hidden;
-}
-.arrays-panel[data-array-order="primary-first"] > .array-view {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  order: 1;
-}
-
-/* V18.1: graph primary must keep plot hittable — do not let min-height:0 zero the stage */
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport[data-primary-scene="graph"],
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main[data-primary-scene="graph"] {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 0;
-  flex: 1 1 auto;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport[data-primary-scene="graph"] .graph-view,
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main[data-primary-scene="graph"] .graph-view {
-  flex: 1 1 auto;
-  min-height: 140px;
-  overflow: hidden;
-}
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .stage-viewport[data-primary-scene="graph"] .graph-plot,
-.main-wrap[data-lab-fill="1"]:not([data-height-fallback="scroll"]) .viz-main[data-primary-scene="graph"] .graph-plot {
-  flex: 1 1 auto;
-  min-height: 120px;
-  overflow: hidden;
-}
-
-
-/* V22: short height — compress chrome, but keep strip glyphs + follow buttons fully visible.
- * Matrix still owns remainder via flex; soft floor stays (no hard 120px). */
-@media (max-height: 640px) {
-  .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .arrays-panel.array-labels-strip,
-  .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .arrays-panel.array-labels-strip {
-    max-height: min(3.2rem, 28%);
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-view > .array-label,
-  .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-view > .array-label {
-    display: none; /* reclaim for scrollport at ≤640px */
-  }
-  .main-wrap[data-lab-fill="1"] .stage-viewport[data-primary-scene="matrix"] .matrix-scroll,
-  .main-wrap[data-lab-fill="1"] .viz-main[data-primary-scene="matrix"] .matrix-scroll {
-    min-height: min(64px, 100%);
-  }
-}
-
-@media (max-height: 640px) {
-  /* V21-03: hide inline inspector under short height so matrix owns stage;
-   * variables/data remain via inspector-sheet-toggle (V18 sheet). */
-  .main-wrap[data-lab-fill="1"] .visualizer .viz-body-single > .viz-inspector {
-    display: none !important;
-  }
-}
-

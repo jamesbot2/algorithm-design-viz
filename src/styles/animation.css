@@ -430,28 +430,14 @@
 }
 
 @media (max-width: 960px) {
-  .viz-body { grid-template-columns: 1fr; }
   .viz-toolbar { border-radius: 16px; }
   .arrays-panel { gap: 0.5rem; }
 }
-
-
-/* V4: banner is in-place text — do not re-enter-animate every step */
-.viz-banner-slot.viz-banner-enter,
-.viz-banner-slot {
-  animation: none !important;
-}
 /* Stable layout shell — do not transform chrome.
    Shake applies to .input-panel-shake-inner only (UI-08). */
-.workbench-layout,
-.workbench-header,
 .viz-toolbar,
 .control-row {
   transform: none !important;
-}
-.input-panel {
-  /* shell stays put; inner may shake */
-  transform: none;
 }
 .input-panel.shake .input-panel-shake-inner,
 .input-panel-shake-inner.shake {
