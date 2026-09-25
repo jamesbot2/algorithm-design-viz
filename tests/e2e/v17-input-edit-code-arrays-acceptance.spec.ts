@@ -67,7 +67,8 @@ async function measureCodeData(page: Page) {
     const codeBrowser = rr('[data-testid="code-browser"]')
     const execLine = document.querySelector('.cm-exec-line') as HTMLElement | null
     const execR = execLine?.getBoundingClientRect()
-    const sheet = rr('[data-testid="inspector-sheet"]')
+    // V23: data region (was the body-portal inspector sheet)
+    const sheet = rr('[data-testid="workbench-data-slot"]')
     let sheetOverlapsCode = false
     const code = codeSlot
     if (sheet && code && code.w > 0) {
@@ -86,7 +87,7 @@ async function measureCodeData(page: Page) {
       sheet,
       sheetOverlapsCode,
       layout: wb?.getAttribute('data-layout'),
-      dataOpen: wb?.getAttribute('data-data-open'),
+      dataOpen: wb?.getAttribute('data-data-visible'), // V23 rename of data-data-open
       profile: wb?.getAttribute('data-layout-profile'),
       stepIndex: document.querySelector('[data-testid="visualizer"]')?.getAttribute('data-step-index'),
       preview: document.querySelector('[data-testid="visualizer"]')?.getAttribute('data-preview'),
@@ -194,7 +195,7 @@ test.describe('V17 input-edit / code+data / arrays / acceptance', () => {
     await page.waitForTimeout(300)
 
     await openDataSheet(page)
-    await expect(page.getByTestId('workbench-layout')).toHaveAttribute('data-data-open', '1', {
+    await expect(page.getByTestId('workbench-layout')).toHaveAttribute('data-data-visible', '1', {
       timeout: 5_000,
     })
     await page.waitForTimeout(400)
@@ -203,8 +204,9 @@ test.describe('V17 input-edit / code+data / arrays / acceptance', () => {
     // Assert readable code BEFORE / independent of sheetOverlapsCode
     expect(withData.layout, JSON.stringify(withData)).toBe('split')
     expect(withData.dataOpen).toBe('1')
-    expect(withData.codeSlot?.w ?? 0, JSON.stringify(withData)).toBeGreaterThanOrEqual(160)
-    expect(withData.codeBrowser?.w ?? 0, JSON.stringify(withData)).toBeGreaterThanOrEqual(140)
+    // V23: stronger — brief's readable-code target ~360px (was 160/140)
+    expect(withData.codeSlot?.w ?? 0, JSON.stringify(withData)).toBeGreaterThanOrEqual(360)
+    expect(withData.codeBrowser?.w ?? 0, JSON.stringify(withData)).toBeGreaterThanOrEqual(340)
     // Zero-width code fault must fail — inject and assert
     const fault = await page.evaluate(() => {
       const slot = document.querySelector('[data-testid="workbench-code-slot"]') as HTMLElement | null
@@ -233,8 +235,10 @@ test.describe('V17 input-edit / code+data / arrays / acceptance', () => {
 
     // ≥10 continuous steps with data open
     const before = Number(restored.stepIndex ?? 0)
+    // V23: the single shared transport steps while data stays open
     for (let s = 0; s < 10; s++) {
-      await page.getByTestId('inspector-next-btn').click()
+      await page.getByTestId('next-step-btn').click()
+      await expect(page.getByTestId('workbench-data-body')).toBeVisible()
     }
     const after = await measureCodeData(page)
     expect(Number(after.stepIndex)).toBe(before + 10)
@@ -355,7 +359,7 @@ test.describe('V17 input-edit / code+data / arrays / acceptance', () => {
       expect(roles['2->1'], JSON.stringify(roles)).toMatch(/tree|accepted/)
 
       await openDataSheet(page)
-      const dist = page.getByTestId('viz-inspector-sheet').getByTestId('inspector-array-dist')
+      const dist = page.getByTestId('workbench-data-body').getByTestId('inspector-array-dist')
       await expect(dist).toBeVisible({ timeout: 8_000 })
       const distText = ((await dist.textContent()) || '').replace(/\s+/g, ' ')
       // Final dist: 0,1,1 or similar for n=3 case (0→0=0, 0→2=1, 0→1 via 2 = 2)

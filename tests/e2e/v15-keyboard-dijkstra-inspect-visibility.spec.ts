@@ -6,6 +6,7 @@ import {
   injectOpaqueOverlayFault,
 } from './helpers/assertStrictGraphVisible'
 import { prepareDijkstraN3Ready } from './helpers/runReadiness'
+import { openCurrentData, openFinalResult } from './helpers/currentData'
 
 const OUT_SHOTS = path.join(process.cwd(), 'docs/screenshots/v15')
 const OUT_TRACES = path.join(process.cwd(), 'docs/traces/v15')
@@ -30,22 +31,10 @@ async function prepareDijkstraCase(page: Page) {
   await expect(page.getByTestId('play-btn')).toBeVisible({ timeout: 20_000 })
 }
 
+/** V23: data is a region / 「数据」 tab — no viewport swap fallback (the old helper resized to 390). */
 async function openDrawer(page: Page) {
-  const toggle = page.getByTestId('inspector-sheet-toggle')
-  if ((await toggle.count()) && (await toggle.isVisible()) && !(await toggle.getAttribute('hidden'))) {
-    await toggle.click()
-    await expect(page.getByTestId('inspector-sheet')).toBeVisible()
-    return true
-  }
-  // Force drawer layout via resize if needed
-  await page.setViewportSize({ width: 390, height: 720 })
-  await page.waitForTimeout(300)
-  if (await toggle.count()) {
-    await toggle.click()
-    await expect(page.getByTestId('inspector-sheet')).toBeVisible({ timeout: 8_000 })
-    return true
-  }
-  return false
+  await openCurrentData(page)
+  return true
 }
 
 test.describe('V15 keyboard / Dijkstra roles / continuous inspect / visibility', () => {
@@ -61,7 +50,8 @@ test.describe('V15 keyboard / Dijkstra roles / continuous inspect / visibility',
     const stepBefore = await viz.getAttribute('data-step-index')
     const counterBefore = await page.getByTestId('step-counter').textContent()
 
-    const target = page.getByTestId('viz-inspector-sheet').getByTestId('graph-result-target')
+    // V23: the query target lives in the separately-labelled final-result details
+    const target = (await openFinalResult(page)).getByTestId('graph-result-target')
     await expect(target).toBeVisible({ timeout: 10_000 })
     await target.focus()
     await target.press('ArrowRight')
@@ -79,20 +69,27 @@ test.describe('V15 keyboard / Dijkstra roles / continuous inspect / visibility',
     )
   })
 
-  test('V15-01 Esc closes sheet, restores focus, does not change step', async ({ page }) => {
+  // V23 replacement: there is no data sheet to close. Contract kept: Escape never
+  // changes the step or strands focus — (1) inside the 「数据」 tab, (2) for the real
+  // theory modal, which closes and returns focus to its toggle.
+  test('V15-01 Esc in data tab / theory modal restores focus, does not change step', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await prepareDijkstraCase(page)
     await openDrawer(page)
     const viz = page.getByTestId('visualizer')
     const stepBefore = await viz.getAttribute('data-step-index')
-    const toggle = page.getByTestId('inspector-sheet-toggle')
-    await page.getByTestId('inspector-sheet').focus()
+    const tab = page.getByTestId('workbench-tab-data')
+    await tab.focus()
     await page.keyboard.press('Escape')
-    await expect(page.getByTestId('inspector-sheet')).toHaveCount(0)
-    const stepAfter = await viz.getAttribute('data-step-index')
-    expect(stepAfter).toBe(stepBefore)
-    // Focus restored to toggle when still in drawer layout
-    await expect(toggle).toBeFocused({ timeout: 3_000 })
+    expect(await viz.getAttribute('data-step-index')).toBe(stepBefore)
+    await expect(tab).toBeFocused()
+    const theory = page.getByRole('button', { name: /说明/ })
+    await theory.click()
+    await expect(page.getByTestId('theory-drawer')).toHaveAttribute('aria-modal', 'true')
+    await page.keyboard.press('Escape')
+    await expect(page.getByTestId('theory-drawer')).toHaveCount(0)
+    expect(await viz.getAttribute('data-step-index')).toBe(stepBefore)
+    await expect(theory).toBeFocused({ timeout: 3_000 })
   })
 
   test('V15-02 final edge roles: current preds only 0→2 and 2→1', async ({ page }) => {
@@ -153,19 +150,23 @@ test.describe('V15 keyboard / Dijkstra roles / continuous inspect / visibility',
     await page.setViewportSize({ width: 390, height: 844 })
     await prepareDijkstraCase(page)
     await openDrawer(page)
-    await expect(page.getByTestId('inspector-sheet-transport')).toBeVisible()
-    const sheet = page.getByTestId('inspector-sheet')
-    await expect(sheet).toHaveAttribute('aria-modal', 'false')
+    // V23: the ONE shared transport stays outside the tab panels, so the data tab stays
+    // open while stepping (replaces the sheet's internal mini transport). Data is a
+    // tabpanel region, not a dialog.
+    const panel = page.getByTestId('workbench-data-slot')
+    await expect(panel).toHaveAttribute('role', 'tabpanel')
+    const transportNext = page.getByTestId('next-step-btn')
+    expect(await transportNext.evaluate((b) => b.closest('[role="tabpanel"]') === null)).toBe(true)
 
     const viz = page.getByTestId('visualizer')
     const startIdx = Number((await viz.getAttribute('data-step-index')) || '0')
     const distSeen: string[] = []
     for (let i = 0; i < 10; i++) {
-      const next = page.getByTestId('inspector-next-btn')
-      if (await next.isDisabled()) break
-      await next.click()
-      await expect(sheet).toBeVisible()
-      const host = page.getByTestId('viz-inspector-sheet')
+      if (await transportNext.isDisabled()) break
+      await transportNext.click()
+      await expect(panel).toBeVisible()
+      await expect(page.getByTestId('workbench-tab-data')).toHaveAttribute('aria-selected', 'true')
+      const host = page.getByTestId('workbench-data-body')
       const d1 = host.locator('[data-testid="inspector-array-dist"] [data-idx="1"]')
       if (await d1.count()) {
         distSeen.push(((await d1.textContent()) || '').trim())

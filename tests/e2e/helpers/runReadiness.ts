@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 import { ensureInputEditing } from './ensureInputEditing'
+import { openCurrentData } from './currentData'
 
 /**
  * V16-02 / V17-04: Wait for a submitted run to be ready — not merely play-btn visible.
@@ -69,14 +70,13 @@ export async function waitForRunReady(page: Page, opts: RunReadyOpts = {}) {
   return snap
 }
 
-/** Open data sheet without force:true or secret viewport swap (V17-04). */
+/**
+ * Open current data without force:true or secret viewport swap (V17-04).
+ * V23: data is a workbench region / 「数据」 tab (the body-portal sheet was removed);
+ * the entry must be reachable at the current viewport.
+ */
 export async function openDataSheet(page: Page) {
-  const toggle = page.getByTestId('inspector-sheet-toggle')
-  await expect(toggle).toBeVisible({ timeout: 10_000 })
-  const hidden = await toggle.getAttribute('hidden')
-  expect(hidden, 'inspector toggle must be visible without viewport swap').toBeNull()
-  await toggle.click()
-  await expect(page.getByTestId('inspector-sheet')).toBeVisible({ timeout: 8_000 })
+  await openCurrentData(page)
   return true
 }
 

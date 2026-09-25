@@ -8,6 +8,7 @@ import {
   clearVisibilityFaults,
 } from './helpers/assertStrictGraphVisible'
 import { prepareDijkstraN3Ready } from './helpers/runReadiness'
+import { openCurrentData } from './helpers/currentData'
 
 const OUT_SHOTS = path.join(process.cwd(), 'docs/screenshots/v16')
 const OUT_TRACES = path.join(process.cwd(), 'docs/traces/v16')
@@ -29,7 +30,8 @@ async function rects(page: Page) {
     const wb = rr('[data-testid="workbench-layout"]')
     const plot = rr('[data-testid="graph-plot"]') || rr('.graph-plot')
     const code = rr('[data-testid="workbench-code-slot"]')
-    const sheet = rr('[data-testid="inspector-sheet"]')
+    // V23: the data region (was the inspector sheet)
+    const sheet = rr('[data-testid="workbench-data-slot"]')
     let sheetOverlapsCode = false
     if (sheet && code) {
       sheetOverlapsCode = !(
@@ -51,20 +53,15 @@ async function rects(page: Page) {
       preview: document.querySelector('[data-testid="visualizer"]')?.getAttribute('data-preview'),
       stepIndex: document.querySelector('[data-testid="visualizer"]')?.getAttribute('data-step-index'),
       mainCounter: document.querySelector('[data-testid="step-counter"]')?.textContent,
-      drawerCounter: document.querySelector('[data-testid="inspector-step-counter"]')?.textContent,
+      counterCount: document.querySelectorAll('[data-testid="step-counter"]').length,
     }
   })
 }
 
+/** V23: open the data region / tab (no force, no viewport swap — V17-04 kept). */
 async function openDrawer(page: Page) {
-  // V17-04: no force:true / no secret viewport→390 swap to pass desktop cases
-  const toggle = page.getByTestId('inspector-sheet-toggle')
-  if ((await toggle.count()) && (await toggle.isVisible()) && !(await toggle.getAttribute('hidden'))) {
-    await toggle.click()
-    await expect(page.getByTestId('inspector-sheet')).toBeVisible({ timeout: 8_000 })
-    return true
-  }
-  return false
+  await openCurrentData(page)
+  return true
 }
 
 test.describe('V16 workbench space / keyboard / visibility', () => {
@@ -125,8 +122,10 @@ test.describe('V16 workbench space / keyboard / visibility', () => {
       const opened = await openDrawer(page)
       expect(opened).toBe(true)
       const before = await page.getByTestId('visualizer').getAttribute('data-step-index')
+      // V23: the single shared transport steps while the data region stays visible
       for (let s = 0; s < 10; s++) {
-        await page.getByTestId('inspector-next-btn').click()
+        await page.getByTestId('next-step-btn').click()
+        await expect(page.getByTestId('workbench-data-body')).toBeVisible()
       }
       const after = await page.getByTestId('visualizer').getAttribute('data-step-index')
       expect(Number(after)).toBe(Number(before) + 10)
@@ -141,7 +140,7 @@ test.describe('V16 workbench space / keyboard / visibility', () => {
       await page.setViewportSize({ width: 1280, height: 800 })
       await prepareDijkstraN3Ready(page)
       await openDrawer(page)
-      const host = page.getByTestId('viz-inspector-sheet')
+      const host = page.getByTestId('workbench-data-body')
       await expect(host.getByTestId('inspector-arrays')).toBeVisible({ timeout: 10_000 })
       await expect(host.getByTestId('inspector-array-dist')).toBeVisible()
       await page.keyboard.press('Escape')
@@ -179,26 +178,25 @@ test.describe('V16 workbench space / keyboard / visibility', () => {
     await page.screenshot({ path: path.join(OUT_SHOTS, 'v16-03-visibility-fault.png') })
   })
 
-  test('V16-04 main and drawer counters share 1-based model', async ({ page }) => {
+  // V23 replacement: the drawer's second counter no longer exists (one transport).
+  // Stronger contract: exactly one step counter, 1-based, equal to cursor+1 while the
+  // data tab is open.
+  test('V16-04 single 1-based step counter while data is open', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await prepareDijkstraN3Ready(page)
     await openDrawer(page)
-    await page.getByTestId('inspector-next-btn').click()
-    await page.getByTestId('inspector-next-btn').click()
+    const idx0 = Number(await page.getByTestId('visualizer').getAttribute('data-step-index'))
+    await page.getByTestId('next-step-btn').click()
+    await page.getByTestId('next-step-btn').click()
+    await expect(page.getByTestId('workbench-data-body')).toBeVisible()
+    expect(await page.getByTestId('step-counter').count()).toBe(1)
+    const idx = Number(await page.getByTestId('visualizer').getAttribute('data-step-index'))
+    expect(idx).toBe(idx0 + 2)
     const main = (await page.getByTestId('step-counter').textContent()) || ''
-    const drawer = (await page.getByTestId('inspector-step-counter').textContent()) || ''
     const mainNum = main.match(/(\d+)\s*\/\s*(\d+)/)
-    const drawerNum = drawer.match(/(\d+)\s*\/\s*(\d+)/)
     expect(mainNum).toBeTruthy()
-    expect(drawerNum).toBeTruthy()
-    expect(mainNum![1]).toBe(drawerNum![1])
-    expect(mainNum![2]).toBe(drawerNum![2])
-    // 1-based: after two next from 0 → display "3 / n"
-    expect(Number(mainNum![1])).toBeGreaterThanOrEqual(1)
-    fs.writeFileSync(
-      path.join(OUT_TRACES, 'v16-04-step-counters.json'),
-      JSON.stringify({ main, drawer }, null, 2),
-    )
+    expect(Number(mainNum![1])).toBe(idx + 1)
+    fs.writeFileSync(path.join(OUT_TRACES, 'v16-04-step-counters.json'), JSON.stringify({ main, idx }, null, 2))
   })
 
   for (const vp of [
@@ -220,10 +218,9 @@ test.describe('V16 workbench space / keyboard / visibility', () => {
       expect(after.wb!.w / after.main!.w).toBeGreaterThanOrEqual(0.92)
       expect(after.plot!.h, JSON.stringify(after.plot)).toBeGreaterThanOrEqual(vp.minPlot)
 
-      // Open data — must not cover code on desktop side mode
-      const toggle = page.getByTestId('inspector-sheet-toggle')
-      if ((await toggle.count()) && (await toggle.isVisible())) {
-        await toggle.click()
+      // Open data — must not cover code on desktop (V23: data is a grid region)
+      {
+        await openCurrentData(page)
         await page.waitForTimeout(400)
         const withData = await rects(page)
         expect(withData.sheetOverlapsCode, JSON.stringify(withData)).toBe(false)
@@ -232,8 +229,6 @@ test.describe('V16 workbench space / keyboard / visibility', () => {
           path.join(OUT_TRACES, `v16-05-${vp.name}.json`),
           JSON.stringify({ after, withData }, null, 2),
         )
-      } else {
-        fs.writeFileSync(path.join(OUT_TRACES, `v16-05-${vp.name}.json`), JSON.stringify({ after }, null, 2))
       }
       await page.screenshot({ path: path.join(OUT_SHOTS, `v16-05-${vp.name}-after-run.png`) })
     })
@@ -257,12 +252,12 @@ test.describe('V16 workbench space / keyboard / visibility', () => {
     }))
     expect(mid.step).toBe(before.step)
     expect(mid.preview).toBe('0')
-    const toggle = page.getByTestId('inspector-sheet-toggle')
-    if ((await toggle.count()) && (await toggle.isVisible())) {
-      await toggle.click()
-      await page.waitForTimeout(200)
-      await page.keyboard.press('Escape')
-    }
+    // V23: collapse + re-expand the data region
+    const toggle = page.getByTestId('data-toggle')
+    await toggle.click()
+    await page.waitForTimeout(200)
+    await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true')
     const after = await page.evaluate(() => ({
       step: document.querySelector('[data-testid="visualizer"]')?.getAttribute('data-step-index'),
       preview: document.querySelector('[data-testid="visualizer"]')?.getAttribute('data-preview'),

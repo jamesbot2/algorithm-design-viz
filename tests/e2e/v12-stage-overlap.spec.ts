@@ -27,7 +27,9 @@ async function measureOverlap(page: Page, clipToStage = true) {
   return page.evaluate((clipToStage) => {
     const svg = document.querySelector('.graph-svg') as SVGElement | null
     const stage = document.querySelector('[data-testid="viz-canvas"]') as HTMLElement | null
-    const inspector = document.querySelector('[data-testid="viz-inspector"]') as HTMLElement | null
+    // V23: the only persistent data surface is the workbench data region (the old
+    // viz-inspector band / sheet no longer exist) — it is the occluder candidate.
+    const inspector = document.querySelector('[data-testid="workbench-data-slot"]') as HTMLElement | null
     if (!svg || !stage || !inspector) {
       return { ok: false as const, reason: 'missing', hasSvg: !!svg, hasStage: !!stage, hasIns: !!inspector }
     }
@@ -69,7 +71,7 @@ async function measureOverlap(page: Page, clipToStage = true) {
         continue
       }
       const topEl = document.elementFromPoint(x, y)
-      const blocked = Boolean(topEl?.closest?.('[data-testid="viz-inspector"]'))
+      const blocked = Boolean(topEl?.closest?.('[data-testid="workbench-data-slot"]'))
       hits.push({
         kind: el.tagName,
         blocked,

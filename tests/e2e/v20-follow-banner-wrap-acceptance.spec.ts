@@ -120,9 +120,8 @@ async function measureBanner(page: Page) {
       fontSize: Math.round(fontSize * 10) / 10,
       title: text.getAttribute('title') ?? '',
       textSample: (text.textContent ?? '').slice(0, 80),
-      hasToggle: !!document.querySelector(
-        '.viz-banner-controls .inspector-sheet-toggle:not([hidden])',
-      ),
+      // V23: data toggle lives in the data region header, not the banner
+      hasToggle: !!document.querySelector('[data-testid="data-toggle"]'),
     }
   })
 }
@@ -368,7 +367,8 @@ test.describe('V20 follow intent / banner / wrap / unassisted acceptance', () =>
       return { scrollTop: sc?.scrollTop ?? 0, execVis: Math.round(vis) }
     })
     // Close + reopen data while paused — must stay paused and must NOT re-follow exec
-    await page.getByTestId('inspector-sheet-toggle').click()
+    // V23: data-toggle collapses the data region; openDataSheet re-expands it
+    await page.getByTestId('data-toggle').click()
     await page.waitForTimeout(100)
     await openDataSheet(page)
     await page.waitForTimeout(200)
@@ -424,7 +424,8 @@ test.describe('V20 follow intent / banner / wrap / unassisted acceptance', () =>
       ).toBeGreaterThanOrEqual(Math.max(12, beforeToggle!.fontSize * 0.9))
       expect(beforeToggle!.title.length, 'accessible title').toBeGreaterThan(0)
 
-      const toggle = page.getByTestId('inspector-sheet-toggle')
+      // V23: toggling the data region (collapse) must not squeeze the banner either
+      const toggle = page.getByTestId('data-toggle')
       const toggleVisible = (await toggle.count()) > 0 && (await toggle.isVisible().catch(() => false))
       if (toggleVisible) {
         await toggle.click()

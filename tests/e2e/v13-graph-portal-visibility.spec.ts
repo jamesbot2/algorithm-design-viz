@@ -32,7 +32,8 @@ async function measureGraphVisibility(page: Page) {
     const plot = document.querySelector('[data-testid="graph-plot"]') as HTMLElement | null
     const svg = document.querySelector('.graph-svg') as SVGElement | null
     const stage = document.querySelector('[data-testid="viz-canvas"]') as HTMLElement | null
-    const inspector = document.querySelector('[data-testid="viz-inspector"]') as HTMLElement | null
+    // V23: the persistent data surface is the workbench data region (viz-inspector removed)
+    const inspector = document.querySelector('[data-testid="workbench-data-slot"]') as HTMLElement | null
     const warn = document.querySelector('[data-testid="graph-neg-warning"]') as HTMLElement | null
     if (!svg || !stage) {
       return { pass: false, reason: 'missing-svg-or-stage', hasSvg: !!svg, hasStage: !!stage }
@@ -106,7 +107,7 @@ async function measureGraphVisibility(page: Page) {
       for (const [sx, sy] of samples) {
         const stack = document.elementsFromPoint(sx, sy)
         if (!topEl && stack[0]) topEl = stack[0]
-        if (stack.some((el) => Boolean(el.closest?.('[data-testid="viz-inspector"]')))) blocked = true
+        if (stack.some((el) => Boolean(el.closest?.('[data-testid="workbench-data-slot"]')))) blocked = true
         if (
           stack.some(
             (el) =>
@@ -287,7 +288,12 @@ test.describe('V13 graph readability + portal + real visibility asserts', () => 
     expect(m.overlapArea).toBeLessThan(8)
   })
 
-  test('settings: 844 open → 1280 closes when toggle hides (no off-screen panel)', async ({ page }) => {
+  // V23 replacement: the settings entry is now ALWAYS rendered in the one-row transport
+  // (it no longer hides at tall viewports), so the old "closes when toggle hides" branch
+  // cannot occur. Stronger contract: across 844x390 → 1280x800 the open panel is either
+  // closed or fully inside the viewport and re-anchored to its visible toggle — never a
+  // 0-rect / off-screen ghost.
+  test('settings: 844 open → 1280 stays anchored in-viewport (no off-screen panel)', async ({ page }) => {
     await page.setViewportSize({ width: 844, height: 390 })
     await runAlgo(page, '#/algo/insertionSort')
     const toggle = page.getByTestId('playback-settings-toggle')
@@ -304,13 +310,21 @@ test.describe('V13 graph readability + portal + real visibility asserts', () => 
 
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.waitForTimeout(350)
-    // Toggle hidden at tall viewport → panel must close (not 0-rect off-screen)
-    await expect(panel).toBeHidden({ timeout: 5_000 })
+    await expect(toggle).toBeVisible()
     const ghost = await page.evaluate(() => {
       const p = document.querySelector('[data-testid="playback-settings-panel"]')
-      return p ? (p as HTMLElement).getBoundingClientRect() : null
+      if (!p) return null
+      const r = (p as HTMLElement).getBoundingClientRect()
+      return { w: r.width, h: r.height, top: r.top, bottom: r.bottom, left: r.left, right: r.right, vw: innerWidth, vh: innerHeight }
     })
-    expect(ghost).toBeNull()
+    if (ghost) {
+      expect(ghost.w).toBeGreaterThan(40)
+      expect(ghost.h).toBeGreaterThan(40)
+      expect(ghost.top).toBeGreaterThanOrEqual(0)
+      expect(ghost.left).toBeGreaterThanOrEqual(0)
+      expect(ghost.bottom).toBeLessThanOrEqual(ghost.vh)
+      expect(ghost.right).toBeLessThanOrEqual(ghost.vw)
+    }
     fs.writeFileSync(
       path.join(OUT_TRACES, 'settings-844-to-1280.json'),
       JSON.stringify({ before, ghost }, null, 2),

@@ -76,7 +76,8 @@ async function assertBarsPainted(page: Page, vpName: string) {
   const metrics = await page.evaluate(() => {
     const canvas = document.querySelector('[data-testid="viz-canvas"]') as HTMLElement | null
     const cr = canvas?.getBoundingClientRect()
-    const inspector = document.querySelector('[data-testid="viz-inspector"]') as HTMLElement | null
+    // V23: the data region replaces the viz-inspector band as the occluder candidate
+    const inspector = document.querySelector('[data-testid="workbench-data-slot"]') as HTMLElement | null
     const ir = inspector?.getBoundingClientRect()
     const bars = [...document.querySelectorAll('.bar-col .bar, .bar-col [data-data-height]')] as HTMLElement[]
 

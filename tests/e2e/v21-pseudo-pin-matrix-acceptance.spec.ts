@@ -348,6 +348,10 @@ test.describe('V21 pseudo scroll / reading pin / matrix viewport', () => {
     expect(at140.scrollTop ?? 0, JSON.stringify(at140)).toBeGreaterThan(100)
     expect(at140.scrollTop ?? 0, JSON.stringify(at140)).toBeLessThan(220)
 
+    // V23: data is visible by default, so a real layout change = collapse + re-open
+    // the data region (two height changes of the code/scene grid), not a no-op open.
+    await page.getByTestId('data-toggle').click()
+    await page.waitForTimeout(200)
     await openDataSheet(page)
     await page.waitForTimeout(500)
     const afterData = await measurePin(page)
@@ -358,7 +362,7 @@ test.describe('V21 pseudo scroll / reading pin / matrix viewport', () => {
     ).toBeLessThan(40)
     expect(afterData.scrollTop ?? 0, 'must not restore stale 0').toBeGreaterThan(80)
 
-    await page.getByTestId('inspector-sheet-toggle').click()
+    await page.getByTestId('data-toggle').click() // V23: collapse data (was sheet close)
     await page.waitForTimeout(300)
     await userWheel(page, '.cm-scroller', -500, 6)
     st = 0
@@ -576,12 +580,14 @@ test.describe('V21 pseudo scroll / reading pin / matrix viewport', () => {
         st = (await measurePin(page)).scrollTop ?? 0
       }
       const before = await measurePin(page)
+      await page.getByTestId('data-toggle').click() // V23: collapse first so opening is a real layout change
+      await page.waitForTimeout(150)
       await openDataSheet(page)
       await page.waitForTimeout(400)
       const after = await measurePin(page)
       expect(Math.abs((after.scrollTop ?? 0) - (before.scrollTop ?? 0)) < 40, `B#${i}`).toBe(true)
       expect((after.scrollTop ?? 0) > 80, `B#${i} stale0`).toBe(true)
-      await page.getByTestId('inspector-sheet-toggle').click().catch(() => {})
+      await page.getByTestId('data-toggle').click() // V23: collapse data (was sheet close)
 
       await page.setViewportSize({ width: 1366, height: 768 })
       await prepareLcsReady(page)

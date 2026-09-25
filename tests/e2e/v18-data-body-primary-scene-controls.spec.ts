@@ -38,29 +38,45 @@ async function realHit(page: Page, sel: string) {
 
 async function measureSheetBody(page: Page) {
   return page.evaluate(() => {
-    const body = document.querySelector('[data-testid="viz-inspector-sheet"]') as HTMLElement | null
+    // V23: the data region body (was the viz-inspector-sheet portal)
+    const body = document.querySelector('[data-testid="workbench-data-body"]') as HTMLElement | null
     const cs = body ? getComputedStyle(body) : null
     let rowsVisible = 0
     if (body) {
       const sb = body.getBoundingClientRect()
-      document.querySelectorAll('[data-testid="viz-inspector-sheet"] tr').forEach((tr) => {
+      document.querySelectorAll('[data-testid="workbench-data-body"] tr').forEach((tr) => {
         const r = (tr as HTMLElement).getBoundingClientRect()
         if (Math.max(0, Math.min(r.bottom, sb.bottom) - Math.max(r.top, sb.top)) > 8) rowsVisible++
       })
     }
     return {
       sheetBodyH: body ? Math.round(body.getBoundingClientRect().height) : 0,
+      sheetScrollH: body?.scrollHeight ?? 0,
+      sheetClientH: body?.clientHeight ?? 0,
       sheetBodyCssH: cs?.height ?? null,
       sheetBodyMaxH: cs?.maxHeight ?? null,
       sheetBodyMinH: cs?.minHeight ?? null,
       rowsVisible,
-      algoDataOpen: document.querySelector('.algo-page')?.getAttribute('data-data-open'),
+      algoDataOpen: document.querySelector('[data-testid="workbench-layout"]')?.getAttribute('data-data-visible'),
       headerRight: Math.round(document.querySelector('.page-header')?.getBoundingClientRect().right ?? 0),
       inputRight: Math.round(
         document.querySelector('[data-testid="input-panel"]')?.getBoundingClientRect().right ?? 0,
       ),
+      // V23: data is an in-grid region; header / input must not intersect it at all
+      headerOverlapData: (() => {
+        const a = document.querySelector('.page-header')?.getBoundingClientRect()
+        const d = document.querySelector('[data-testid="workbench-data-slot"]')?.getBoundingClientRect()
+        if (!a || !d) return -1
+        return Math.max(0, Math.min(a.right, d.right) - Math.max(a.left, d.left)) * Math.max(0, Math.min(a.bottom, d.bottom) - Math.max(a.top, d.top))
+      })(),
+      inputOverlapData: (() => {
+        const a = document.querySelector('[data-testid="input-panel"]')?.getBoundingClientRect()
+        const d = document.querySelector('[data-testid="workbench-data-slot"]')?.getBoundingClientRect()
+        if (!a || !d) return -1
+        return Math.max(0, Math.min(a.right, d.right) - Math.max(a.left, d.left)) * Math.max(0, Math.min(a.bottom, d.bottom) - Math.max(a.top, d.top))
+      })(),
       sheetLeft: Math.round(
-        document.querySelector('[data-testid="inspector-sheet"]')?.getBoundingClientRect().left ?? 0,
+        document.querySelector('[data-testid="workbench-data-slot"]')?.getBoundingClientRect().left ?? 0,
       ),
     }
   })
@@ -129,19 +145,25 @@ test.describe('V18 data-body / primary-scene / controls / acceptance', () => {
     test.setTimeout(120_000)
     const results: Record<string, unknown> = {}
     for (const vp of [
-      { w: 1366, h: 768, minBody: 280 },
-      { w: 1920, h: 1080, minBody: 480 },
+      // V23 replacement: at 1366 the data region is content-calibrated (the brief's
+      // target: default 3-node state visible WITHOUT scrolling while the graph keeps
+      // ≥300px) instead of a fixed 280px body; wide 1920 keeps the ≥480 column.
+      { w: 1366, h: 768, minBody: 96, noScroll: true },
+      { w: 1920, h: 1080, minBody: 480, noScroll: true },
     ]) {
       await page.setViewportSize({ width: vp.w, height: vp.h })
       await prepareDijkstraN3Ready(page)
       await openDataSheet(page)
-      await expect(page.getByTestId('workbench-layout')).toHaveAttribute('data-data-open', '1')
+      await expect(page.getByTestId('workbench-layout')).toHaveAttribute('data-data-visible', '1')
       await page.waitForTimeout(300)
       const m = await measureSheetBody(page)
       expect(m.sheetBodyMaxH === 'none' || m.sheetBodyMaxH === '' || !m.sheetBodyMaxH).toBeTruthy()
       expect(m.sheetBodyH, JSON.stringify(m)).toBeGreaterThanOrEqual(vp.minBody)
       expect(m.rowsVisible, JSON.stringify(m)).toBeGreaterThanOrEqual(2)
       expect(Number.parseFloat(String(m.sheetBodyCssH ?? '0'))).not.toBe(96)
+      if (vp.noScroll) expect(m.sheetScrollH, JSON.stringify(m)).toBeLessThanOrEqual(m.sheetClientH + 1)
+      const plotH = await page.evaluate(() => document.querySelector('[data-testid="graph-plot"]')?.getBoundingClientRect().height ?? 0)
+      expect(plotH, 'graph drawing height with data open').toBeGreaterThanOrEqual(300)
       results[`${vp.w}x${vp.h}`] = m
       await page.screenshot({ path: path.join(OUT_SHOTS, `v18-01-sheet-body-${vp.w}.png`) })
     }
@@ -233,8 +255,10 @@ test.describe('V18 data-body / primary-scene / controls / acceptance', () => {
     await page.waitForTimeout(300)
     const sheet = await measureSheetBody(page)
     expect(sheet.algoDataOpen).toBe('1')
-    expect(sheet.headerRight, JSON.stringify(sheet)).toBeLessThanOrEqual(sheet.sheetLeft + 2)
-    expect(sheet.inputRight, JSON.stringify(sheet)).toBeLessThanOrEqual(sheet.sheetLeft + 2)
+    // V23 replacement of "header/input right edge ≤ fixed sheet left": the data region
+    // is a grid sibling, so the contract is zero intersection area.
+    expect(sheet.headerOverlapData, JSON.stringify(sheet)).toBe(0)
+    expect(sheet.inputOverlapData, JSON.stringify(sheet)).toBe(0)
 
     const editHit = await realHit(page, '[data-testid="input-edit-toggle"]')
     const runHit = await realHit(page, '[data-testid="run-btn"]')
@@ -262,7 +286,7 @@ test.describe('V18 data-body / primary-scene / controls / acceptance', () => {
 
     const mutationSanity = await page.evaluate(() => {
       const faults: Record<string, boolean> = {}
-      const body = document.querySelector('[data-testid="viz-inspector-sheet"]') as HTMLElement | null
+      const body = document.querySelector('[data-testid="workbench-data-body"]') as HTMLElement | null
       const edit = document.querySelector('[data-testid="input-edit-toggle"]') as HTMLElement | null
       const code = document.querySelector('[data-testid="workbench-code-slot"]') as HTMLElement | null
       const stage = document.querySelector('[data-testid="viz-canvas"]') as HTMLElement | null

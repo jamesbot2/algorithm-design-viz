@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test'
 import * as fs from 'fs'
 import * as path from 'path'
+import { openCurrentData, backToScene } from './helpers/currentData'
 
 const OUT_SHOTS = path.join(process.cwd(), 'docs/screenshots/v10')
 const OUT_TRACES = path.join(process.cwd(), 'docs/traces/v10')
@@ -117,12 +118,10 @@ test.describe('V10-07 real workflow acceptance', () => {
         if (await next.count() && (await next.first().isEnabled())) await next.first().click()
       }
       if (vp.height <= 520) {
-        const insp = page.getByTestId('inspector-sheet-toggle')
-        await expect(insp).toBeVisible()
-        await insp.click()
-        await expect(page.getByTestId('inspector-sheet')).toBeVisible()
-        await page.getByTestId('inspector-sheet').getByRole('button', { name: '关闭' }).click()
-        await expect(page.getByTestId('inspector-sheet')).toHaveCount(0)
+        // V23: current data is a workbench region/tab (no sheet); same reachability contract.
+        const body = await openCurrentData(page)
+        await expect(body.getByTestId('current-step-data')).toBeVisible()
+        await backToScene(page)
         const settings = page.getByTestId('playback-settings-toggle')
         await expect(settings).toBeVisible()
         await settings.click()
@@ -150,24 +149,18 @@ test.describe('V10-07 real workflow acceptance', () => {
     for (const vp of chain) {
       await page.setViewportSize(vp)
       await page.waitForTimeout(120)
-      const toggle = page.getByTestId('inspector-sheet-toggle')
+      // V23: data is reachable at every height (region when docked, 「数据」 tab when tabbed);
+      // settings entry always rendered in the transport.
       const settings = page.getByTestId('playback-settings-toggle')
+      await expect(settings).toBeVisible()
+      const body = await openCurrentData(page)
+      await expect(body).toBeVisible()
+      await backToScene(page)
       if (vp.height <= 520) {
-        await expect(toggle).toBeVisible()
-        await expect(settings).toBeVisible()
-        await toggle.click()
-        await expect(page.getByTestId('inspector-sheet')).toBeVisible()
-        await page.keyboard.press('Escape')
-        await expect(page.getByTestId('inspector-sheet')).toHaveCount(0)
         await settings.click()
         await expect(page.getByTestId('playback-settings-panel')).toBeVisible()
         // collapse settings for next iteration
         await settings.click()
-      } else {
-        const inline = page.getByTestId('viz-inspector')
-        const inlineOk = await inline.isVisible().catch(() => false)
-        const dockOk = await toggle.isVisible().catch(() => false)
-        expect(inlineOk || dockOk).toBeTruthy()
       }
       log.push({ vp, ok: true })
     }
@@ -178,7 +171,8 @@ test.describe('V10-07 real workflow acceptance', () => {
   test('theory drawer dialog Escape returns focus', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('#/algo/binarySearch')
-    const toggle = page.getByRole('button', { name: /展开说明/ })
+    // V23: the toolbar button is「说明 / 理论」(opens a real modal dialog)
+    const toggle = page.getByRole('button', { name: /说明/ })
     await toggle.click()
     const drawer = page.getByTestId('theory-drawer')
     await expect(drawer).toBeVisible()

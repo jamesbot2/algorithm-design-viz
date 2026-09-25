@@ -149,10 +149,10 @@ async function measureCompact(page: Page) {
 
 async function measureVarsBtn(page: Page) {
   return page.evaluate(() => {
-    const slot = document.querySelector('.viz-banner-slot') as HTMLElement | null
-    const btn = document.querySelector(
-      '[data-testid="inspector-sheet-toggle"]',
-    ) as HTMLElement | null
+    // V23: the data entry is the data-region header toggle (was the banner's
+    // inspector-sheet-toggle); it must be fully inside its own header row.
+    const slot = document.querySelector('.wb-data-head') as HTMLElement | null
+    const btn = document.querySelector('[data-testid="data-toggle"]') as HTMLElement | null
     if (!slot || !btn) return { missing: true as const }
     const s = slot.getBoundingClientRect()
     const b = btn.getBoundingClientRect()
@@ -396,14 +396,21 @@ test.describe('V19 matrix follow / CM scroll / compact / vars / acceptance', () 
     }
     // Real hit — no force
     const hit = await page.evaluate(() => {
-      const el = document.querySelector('[data-testid="inspector-sheet-toggle"]') as HTMLElement
+      const el = document.querySelector('[data-testid="data-toggle"]') as HTMLElement
       const b = el.getBoundingClientRect()
       const top = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2)
       return !!(top && (top === el || el.contains(top)))
     })
     expect(hit).toBe(true)
-    await page.getByTestId('inspector-sheet-toggle').click()
-    await expect(page.getByTestId('inspector-sheet')).toBeVisible()
+    // V23: data is visible by default — real clicks collapse then re-open it
+    const dataToggle = page.getByTestId('data-toggle')
+    await expect(page.getByTestId('workbench-data-body')).toBeVisible()
+    await dataToggle.click()
+    await expect(dataToggle).toHaveAttribute('aria-expanded', 'false')
+    await expect(page.getByTestId('workbench-data-body')).toBeHidden()
+    await dataToggle.click()
+    await expect(dataToggle).toHaveAttribute('aria-expanded', 'true')
+    await expect(page.getByTestId('workbench-data-body')).toBeVisible()
 
     // Run button not regressing
     const runClip = await page.evaluate(() => {
@@ -476,12 +483,15 @@ test.describe('V19 matrix follow / CM scroll / compact / vars / acceptance', () 
 
       // 5) sheet body (V18 preserve)
       await openDataSheet(page)
-      const bodyH = await page.evaluate(() => {
-        const body = document.querySelector('[data-testid="viz-inspector-sheet"]') as HTMLElement | null
-        return body ? Math.round(body.getBoundingClientRect().height) : 0
+      // V23 replacement (see V18-01): content-calibrated data body — the default
+      // 3-node state fits without scrolling (was a fixed ≥280px sheet body).
+      const body = await page.evaluate(() => {
+        const el = document.querySelector('[data-testid="workbench-data-body"]') as HTMLElement | null
+        return el ? { h: el.clientHeight, sh: el.scrollHeight } : { h: 0, sh: 0 }
       })
-      expect(bodyH).toBeGreaterThanOrEqual(280)
-      paths.sheetBody.push(bodyH)
+      expect(body.h).toBeGreaterThanOrEqual(96)
+      expect(body.sh, JSON.stringify(body)).toBeLessThanOrEqual(body.h + 1)
+      paths.sheetBody.push(body.h)
     }
 
     // Mutation sanity: force regressions must be detectable

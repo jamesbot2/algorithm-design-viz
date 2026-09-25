@@ -5,6 +5,7 @@ import {
   measureStrictGraphVisibility,
   injectOpaqueOverlayFault,
 } from './helpers/assertStrictGraphVisible'
+import { openCurrentData, backToScene } from './helpers/currentData'
 
 const OUT_SHOTS = path.join(process.cwd(), 'docs/screenshots/v14')
 const OUT_TRACES = path.join(process.cwd(), 'docs/traces/v14')
@@ -27,94 +28,48 @@ async function runAlgo(page: Page, route: string) {
   await expect(page.getByTestId('play-btn')).toBeVisible({ timeout: 20_000 })
 }
 
+/**
+ * V23: the inline 96px inspector and the portal sheet are gone. Current data is the
+ * workbench data region (docked/wide: visible next to the scene; tabbed: the 「数据」
+ * tab). "inline" ⇔ region visible without any click; "drawer" ⇔ one tab click away.
+ * The contract (vars/arrays reachable, cursor unchanged) is unchanged.
+ */
 async function inspectorReachable(page: Page) {
   return page.evaluate(() => {
-    const inline = document.querySelector('[data-testid="viz-inspector"]') as HTMLElement | null
-    const toggle = document.querySelector(
-      '[data-testid="inspector-sheet-toggle"]',
-    ) as HTMLElement | null
-    const inlineVisible = (() => {
-      if (!inline) return false
-      const cs = getComputedStyle(inline)
-      const r = inline.getBoundingClientRect()
+    const vis = (el: Element | null) => {
+      if (!el || (el as HTMLElement).closest('[hidden]')) return false
+      const cs = getComputedStyle(el)
+      const r = el.getBoundingClientRect()
       return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1 && r.height > 1
-    })()
-    const toggleReachable = (() => {
-      if (!toggle || toggle.hasAttribute('hidden')) return false
-      const cs = getComputedStyle(toggle)
-      const r = toggle.getBoundingClientRect()
-      return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1 && r.height > 1
-    })()
+    }
+    const inlineVisible = vis(document.querySelector('[data-testid="workbench-data-body"]'))
+    const toggleReachable = vis(document.querySelector('[data-testid="workbench-tab-data"]'))
     return {
       inlineVisible,
       toggleReachable,
-      layout: document
-        .querySelector('[data-testid="visualizer"]')
-        ?.getAttribute('data-inspector-layout'),
+      layout: document.querySelector('[data-testid="workbench-layout"]')?.getAttribute('data-layout-mode'),
       ok: inlineVisible || toggleReachable,
     }
   })
 }
 
 async function openInspectorIfNeeded(page: Page) {
-  // Product may still be measuring drawer vs inline after graph mount — wait briefly.
-  await page.waitForFunction(() => {
-    const inline = document.querySelector('[data-testid="viz-inspector"]') as HTMLElement | null
-    const toggle = document.querySelector(
-      '[data-testid="inspector-sheet-toggle"]',
-    ) as HTMLElement | null
-    const layout = document
-      .querySelector('[data-testid="visualizer"]')
-      ?.getAttribute('data-inspector-layout')
-    const inlineVisible = (() => {
-      if (!inline) return false
-      const cs = getComputedStyle(inline)
-      const r = inline.getBoundingClientRect()
-      return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1 && r.height > 1
-    })()
-    const toggleReachable = (() => {
-      if (!toggle || toggle.hasAttribute('hidden')) return false
-      const cs = getComputedStyle(toggle)
-      const r = toggle.getBoundingClientRect()
-      return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1 && r.height > 1
-    })()
-    return inlineVisible || toggleReachable || layout === 'drawer'
-  }, { timeout: 8_000 }).catch(() => null)
-
   const state = await inspectorReachable(page)
   if (state.inlineVisible) return 'inline' as const
-  if (state.toggleReachable || state.layout === 'drawer') {
-    const toggle = page.getByTestId('inspector-sheet-toggle')
-    // layout:drawer should have cleared [hidden]; if still racing, click when visible
-    if (await toggle.isVisible().catch(() => false)) {
-      await toggle.click()
-    } else if (state.layout === 'drawer') {
-      await toggle.evaluate((el) => (el as HTMLElement).click())
-    }
-    await expect(page.getByTestId('inspector-sheet')).toBeVisible()
+  if (state.toggleReachable) {
+    await openCurrentData(page)
     return 'drawer' as const
   }
-  throw new Error(`inspector unreachable: ${JSON.stringify(state)}`)
+  throw new Error(`current data unreachable: ${JSON.stringify(state)}`)
 }
 
-
 async function closeInspectorSheet(page: Page) {
-  const sheet = page.getByTestId('inspector-sheet')
-  if (await sheet.count() && (await sheet.isVisible())) {
-    // Prefer explicit close — Esc is also wired in product
-    const closeBtn = sheet.getByRole('button', { name: '关闭' })
-    if (await closeBtn.count()) await closeBtn.click()
-    else await page.keyboard.press('Escape')
-    await expect(sheet).toBeHidden({ timeout: 5_000 })
-  }
+  await backToScene(page)
 }
 
 async function readInspectorDistParent(page: Page) {
   const mode = await openInspectorIfNeeded(page)
-  const host =
-    mode === 'drawer'
-      ? page.getByTestId('viz-inspector-sheet')
-      : page.getByTestId('viz-inspector')
+  const host = page.getByTestId('workbench-data-body')
   await expect(host.getByTestId('inspector-arrays')).toBeVisible({ timeout: 8_000 })
   const dist1 = (
     await host.locator('[data-testid="inspector-array-dist"] [data-idx="1"]').textContent()
@@ -125,7 +80,7 @@ async function readInspectorDistParent(page: Page) {
   const done1 = (
     await host.locator('[data-testid="inspector-array-done"] [data-idx="1"]').textContent()
   )?.trim()
-  // Always close drawer so transport remains clickable for the next step
+  // Always return to the scene tab so the transport flow is identical to a learner's
   await closeInspectorSheet(page)
   return { dist1, parent1, done1, mode }
 }
@@ -157,11 +112,8 @@ test.describe('V14 inspector / arrays / pan / visibility', () => {
           path: path.join(OUT_SHOTS, `inspector-${algo}-${vp.name}.png`),
         })
         expect(reach.ok, JSON.stringify(reach)).toBe(true)
-        const mode = await openInspectorIfNeeded(page)
-        const host =
-          mode === 'drawer'
-            ? page.getByTestId('viz-inspector-sheet')
-            : page.getByTestId('viz-inspector')
+        await openInspectorIfNeeded(page)
+        const host = page.getByTestId('workbench-data-body')
         await expect(host.getByTestId('vars-panel')).toBeVisible()
         const afterStep = await page.getByTestId('visualizer').getAttribute('data-step-index')
         expect(afterStep).toBe(beforeStep)
@@ -192,9 +144,7 @@ test.describe('V14 inspector / arrays / pan / visibility', () => {
 
       // Initial open: tables exist
       await openInspectorIfNeeded(page)
-      const firstHost = page
-        .locator('[data-testid="viz-inspector-sheet"], [data-testid="viz-inspector"]')
-        .last()
+      const firstHost = page.getByTestId('workbench-data-body')
       await expect(firstHost.getByTestId('inspector-arrays')).toBeVisible({ timeout: 10_000 })
       await expect(firstHost.getByTestId('inspector-array-dist')).toBeVisible()
       await expect(firstHost.getByTestId('inspector-array-parent')).toBeVisible()
