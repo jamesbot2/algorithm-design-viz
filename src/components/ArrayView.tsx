@@ -6,9 +6,11 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
 } from 'react'
 import type { ArrayOp, HighlightRole, Step, StepRanges } from '../types/step'
 import { deriveArrayPointers } from '../types/step'
+import type { PresentationDescriptor } from '../types/presentation'
 import { useMotion } from '../theme/MotionContext'
 import { resolveDuration } from '../theme/motion'
 
@@ -33,6 +35,8 @@ interface Props {
   snapSwap?: boolean
   /** Compact buffer strip — prefer cells, smaller chart */
   compact?: boolean
+  /** V24-02: label presentation for string cells (interval → id + [start,finish) card). */
+  labelFormat?: 'interval-card'
 }
 
 const ROLE_CLASS: Record<HighlightRole, string> = {
@@ -123,6 +127,16 @@ export function computeBarGeometry(
   return { absMax, zeroRatio, heights, directions }
 }
 
+/** Below this data height the value label sits just above the bar (never clipped / never overlapping the index). */
+const SHORT_BAR_PX = 18
+
+/** "A0[1,4)" → { id: "A0", range: "[1,4)" } — presentation only, endpoints kept verbatim. */
+export function splitIntervalLabel(label: string): { id: string; range: string } {
+  const m = label.match(/^(.*?)(\[[^\]]*[\])])$/)
+  if (!m) return { id: label, range: '' }
+  return { id: m[1]!, range: m[2]! }
+}
+
 function uniqueDisplayIds(ids: string[]): string[] {
   const seen = new Map<string, number>()
   return ids.map((id) => {
@@ -170,6 +184,7 @@ function ArrayView({
   prevElementIds,
   snapSwap = false,
   compact = false,
+  labelFormat,
 }: Props) {
   const numeric = values.every((v) => typeof v === 'number' && Number.isFinite(v as number))
   const suitable = barSuitable(values)
@@ -209,6 +224,9 @@ function ArrayView({
     return map
   }, [pointers, values.length])
 
+  const hasPointers = pointersByIndex.size > 0
+  const interval = labelFormat === 'interval-card'
+
   /** Real swap only when explicit swap op present — never from highlights.length >= 2 */
   const swapPair = useMemo(() => {
     const swapOp = arrayOps?.find((o) => o.type === 'swap' && o.indices.length >= 2)
@@ -229,54 +247,69 @@ function ArrayView({
   const animToken = useRef(0)
   const transitionIdRef = useRef(0)
   const wrapRef = useRef<HTMLDivElement>(null)
-  // Fit signed/unsigned bar chart into remaining stage (after banner/toggles) — landscape short prefers taller bars.
+  // V24-01A: bar geometry comes from the box this ArrayView is actually allotted
+  // (its own border-box, sized by the scene layout), never from the whole stage or
+  // the viewport. Chrome (label, note, index row, pointer rows) is measured from the
+  // real DOM, so the chart always fits the drawing area it gets.
   useLayoutEffect(() => {
     if (compact || mode !== 'bars') return
     const self = wrapRef.current
     if (!self) return
-    const stage = self.closest('[data-testid="viz-canvas"]') as HTMLElement | null
+    const px = (v: string) => (Number.isFinite(parseFloat(v)) ? parseFloat(v) : 0)
+    const outerH = (el: Element | null) => {
+      if (!el) return 0
+      const cs = getComputedStyle(el)
+      return (el as HTMLElement).offsetHeight + px(cs.marginTop) + px(cs.marginBottom)
+    }
     const apply = () => {
-      const stageH = stage?.clientHeight ?? 0
-      if (stageH <= 0) return
-      const top = stage?.getBoundingClientRect().top ?? 0
-      const roomInViewport = Math.max(0, window.innerHeight - top - 4)
-      const usable = Math.min(stageH, roomInViewport)
-      const labelH = self.querySelector('.array-label')?.getBoundingClientRect().height ?? 28
-      const noteH = self.querySelector('.matrix-note')?.getBoundingClientRect().height ?? 0
-      // Reserve sibling aux buffer strip so primary bars do not push temp outside viz-canvas
-      const panel = self.closest('.arrays-panel')
-      const bufEl = panel?.querySelector(':scope > .array-buffers, :scope > [data-testid="array-buffers"]') as HTMLElement | null
-      const reserveBuf =
-        bufEl && !self.closest('.array-buffers')
-          ? Math.max(56, Math.ceil(bufEl.getBoundingClientRect().height) || 64) + 8
-          : 0
-      const short = window.innerHeight <= 520
-      const ultra = window.innerHeight <= 400
-      const landscape = window.innerWidth > window.innerHeight
-      // signed chart box ≈ maxH+40; keep that inside remaining stage after label/note/buffers
-      const chartChrome = 40
-      const overhead = labelH + noteH + chartChrome + 8 + reserveBuf
-      const minBudget = landscape && ultra ? 140 : landscape && short ? 110 : short ? 80 : 56
-      // V17-03: main array maxH from usable stage — not a hard desktop 160 cap
-      const stageBudget = Math.max(0, usable - overhead)
-      const shortMax = landscape && ultra ? 240 : landscape && short ? 220 : short ? 180 : null
-      const maxBudget =
-        shortMax != null
-          ? shortMax
-          : Math.min(stageBudget, Math.floor(window.innerHeight * 0.5))
-      const budget = Math.max(minBudget, Math.min(maxBudget, stageBudget))
-      setMaxH((prev) => (Math.abs(prev - budget) >= 4 ? budget : prev))
+      const box = self.getBoundingClientRect().height
+      if (box <= 0) return
+      const cs = getComputedStyle(self)
+      const chromeY =
+        px(cs.paddingTop) + px(cs.paddingBottom) + px(cs.borderTopWidth) + px(cs.borderBottomWidth)
+      const labelH = outerH(self.querySelector(':scope > .array-label'))
+      const noteH = outerH(self.querySelector(':scope > .matrix-note'))
+      const wrap = self.querySelector(':scope > .bars-wrap') as HTMLElement | null
+      const wcs = wrap ? getComputedStyle(wrap) : null
+      const wrapPad = wcs ? px(wcs.paddingTop) + px(wcs.paddingBottom) : 0
+      let colChrome = 0
+      if (signedMode) {
+        colChrome = hasPositive && hasNegative ? 40 : 24
+      } else if (wrap) {
+        for (const col of Array.from(wrap.querySelectorAll(':scope > .bar-col'))) {
+          const layer = col.querySelector(':scope > .bar-flip-layer') as HTMLElement | null
+          colChrome = Math.max(colChrome, (col as HTMLElement).offsetHeight - (layer?.offsetHeight ?? 0))
+        }
+        colChrome = Math.max(colChrome, 30)
+      }
+      const budget = Math.floor(box - chromeY - labelH - noteH - wrapPad - colChrome - 2)
+      const next = Math.max(32, budget)
+      setMaxH((prev) => {
+        if (Math.abs(prev - next) < 2) return prev
+        // A re-fit is geometry, not data: land it without the 220ms height transition
+        // (otherwise the old, larger bars would overhang the box mid-transition).
+        if (wrap) {
+          wrap.setAttribute('data-refit', '1')
+          requestAnimationFrame(() => requestAnimationFrame(() => wrap.removeAttribute('data-refit')))
+        }
+        return next
+      })
     }
     apply()
-    const ro = new ResizeObserver(apply)
-    if (stage) ro.observe(stage)
-    ro.observe(self)
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(apply) : null
+    ro?.observe(self)
+    // Chrome rows (stacked pointer tags, label wrap) can grow without the allotted box
+    // changing — observe them too so the chart re-fits the same box.
+    const chartEl = self.querySelector(':scope > .bars-wrap')
+    if (chartEl) ro?.observe(chartEl)
+    const labelEl = self.querySelector(':scope > .array-label')
+    if (labelEl) ro?.observe(labelEl)
     window.addEventListener('resize', apply)
     return () => {
-      ro.disconnect()
+      ro?.disconnect()
       window.removeEventListener('resize', apply)
     }
-  }, [compact, mode, values.length, signedMode])
+  }, [compact, mode, values.length, signedMode, hasPositive, hasNegative])
   const geometryGen = useRef(0)
   const [rangeMasks, setRangeMasks] = useState<{
     current: { left: number; width: number; top: number; height: number }[]
@@ -624,6 +657,8 @@ function ArrayView({
                   ) : (
                     <div
                       className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${dir === 'neg' ? ' bar-neg' : ''}${
+                        !signedMode && h < SHORT_BAR_PX ? ' bar-short' : ''
+                      }${
                         isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
                       }`}
                       style={{
@@ -696,25 +731,39 @@ function ArrayView({
                     <div
                       className={`cell${role ? ` ${ROLE_CLASS[role]}` : ''}${
                         isSwap ? ' anim-swap-geo' : ''
-                      }`}
+                      }${interval ? ' cell-interval' : ''}`}
                     >
                       <span className="cell-idx">{i}</span>
-                      <span className="cell-val">{String(v)}</span>
+                      {interval ? (
+                        (() => {
+                          const parts = splitIntervalLabel(String(v))
+                          return (
+                            <span className="cell-val cell-val-interval" title={String(v)}>
+                              <span className="iv-id">{parts.id}</span>
+                              <span className="iv-range">{parts.range}</span>
+                            </span>
+                          )
+                        })()
+                      ) : (
+                        <span className="cell-val">{String(v)}</span>
+                      )}
                     </div>
                   </div>
+                  {(hasPointers || compact) && (
+                    // V24: pointer tags sit under THEIR slot (aligned with value / index);
+                    // compact companions always reserve the row so their height is stable.
+                    <div className="pointer-row cell-ptrs">
+                      {(pointersByIndex.get(i) ?? []).map((p) => (
+                        <span key={p} className="ptr-tag" title={`${p}=${i}`}>
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )
             })}
           </div>
-          {Object.keys(pointers).length > 0 && (
-            <div className="pointer-row" style={{ justifyContent: 'flex-start', marginTop: '0.5rem' }}>
-              {Object.entries(pointers).map(([label, idx]) => (
-                <span key={label} className="ptr-tag">
-                  {label}={idx}
-                </span>
-              ))}
-            </div>
-          )}
         </>
       )}
       {(ranges?.current || ranges?.best) && (
@@ -807,6 +856,7 @@ const BUFFER_LABELS: Record<string, string> = {
   left: 'left',
   right: 'right',
   key: 'key',
+  selected: '已选',
 }
 
 export const ArraysFromStep = memo(function ArraysFromStep({
@@ -817,6 +867,8 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   snapSwap,
   /** V18-02: when matrix/board is primary, render arrays as compact companion labels */
   companionMode = false,
+  presentation,
+  auxBar,
 }: {
   step: Step
   prevStep?: Step
@@ -824,7 +876,24 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   signedDomainByArray?: Record<string, { hasPos: boolean; hasNeg: boolean }>
   snapSwap?: boolean
   companionMode?: boolean
+  /** V24: declared array primary + companions (presentation contract). */
+  presentation?: PresentationDescriptor
+  /** V24: switchable-auxiliary controls rendered in the companion strip. */
+  auxBar?: ReactNode
 }) {
+  if (!companionMode && presentation?.primaryKind === 'array' && presentation.primaryKey) {
+    return (
+      <DeclaredArrayScene
+        step={step}
+        prevStep={prevStep}
+        scaleMaxByArray={scaleMaxByArray}
+        signedDomainByArray={signedDomainByArray}
+        snapSwap={snapSwap}
+        presentation={presentation}
+        auxBar={auxBar}
+      />
+    )
+  }
   if (!step.arrays) return null
   const entries = Object.entries(step.arrays)
   const buffers = entries.filter(([name]) => BUFFER_ARRAY_NAMES.has(name))
@@ -894,3 +963,119 @@ export const ArraysFromStep = memo(function ArraysFromStep({
     </div>
   )
 })
+
+
+/**
+ * V24-01: an array primary declared by the module's presentation contract.
+ * Layout (top → bottom inside the stage):
+ *   companion strip  — required companions (left/right, temp/key, selected) as compact
+ *                      cells + the aux bar (recursion-tree toggle, call-stack summary).
+ *                      Reserved on every frame when `reserveCompanions`, so the primary's
+ *                      drawing area does not jump between frames.
+ *   primary array    — takes the rest of the stage (flex basis 0); its bars/cells geometry
+ *                      is computed from that allotted box (see ArrayView).
+ * Auxiliaries (recursion tree) are never rendered here — Visualizer owns their pane.
+ */
+function DeclaredArrayScene({
+  step,
+  prevStep,
+  scaleMaxByArray,
+  signedDomainByArray,
+  snapSwap,
+  presentation,
+  auxBar,
+}: {
+  step: Step
+  prevStep?: Step
+  scaleMaxByArray?: Record<string, number>
+  signedDomainByArray?: Record<string, { hasPos: boolean; hasNeg: boolean }>
+  snapSwap?: boolean
+  presentation: PresentationDescriptor
+  auxBar?: ReactNode
+}) {
+  const arrays = step.arrays ?? {}
+  const key = presentation.primaryKey!
+  const companionNames = presentation.companions ?? []
+  const primaryValues = arrays[key]
+  const companions = Object.entries(arrays).filter(([n]) => n !== key && companionNames.includes(n))
+  // Any other array the module did not classify stays visible as a compact companion.
+  const others = Object.entries(arrays).filter(([n]) => n !== key && !companionNames.includes(n))
+  const compactEntries = [...companions, ...others]
+  const renderOne = (name: string, values: (number | string)[], compact: boolean) => (
+    <ArrayView
+      key={name}
+      name={name}
+      label={compact ? BUFFER_LABELS[name] ?? name : undefined}
+      values={values}
+      highlights={step.highlights?.[name] ?? []}
+      roles={step.roles?.[name]}
+      pointers={deriveArrayPointers(step, name)}
+      scaleMax={scaleMaxByArray?.[name]}
+      signedDomain={signedDomainByArray?.[name]}
+      ranges={!compact ? step.ranges : undefined}
+      arrayOps={step.arrayOps?.[name]}
+      elementIds={step.elementIds?.[name]}
+      prevValues={prevStep?.arrays?.[name]}
+      prevElementIds={prevStep?.elementIds?.[name]}
+      snapSwap={snapSwap}
+      compact={compact}
+      defaultMode={compact ? 'cells' : undefined}
+      labelFormat={presentation.labelFormat?.[name]}
+    />
+  )
+  const showStrip = compactEntries.length > 0 || presentation.reserveCompanions || auxBar
+  return (
+    <div
+      className="arrays-panel"
+      data-array-order="primary-first"
+      data-declared-primary={key}
+      data-testid="arrays-panel"
+    >
+      {showStrip && (
+        <div
+          className="scene-companions"
+          data-testid="scene-companions"
+          data-reserved={presentation.reserveCompanions ? '1' : '0'}
+        >
+          {compactEntries.length > 0 ? (
+            <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
+              {compactEntries.map(([name, values]) => renderOne(name, values, true))}
+            </div>
+          ) : presentation.reserveCompanions ? (
+            // Same card geometry as real companions (label + one cell + pointer row), so the
+            // primary's allotted box does not change when buffers appear / disappear.
+            <div
+              className="array-buffers scene-companions-empty"
+              data-testid="scene-companions-empty"
+              aria-label={`${companionNames.join(' / ')}：本步无缓冲`}
+            >
+              {companionNames.slice(0, 2).map((name) => (
+                <div key={name} className="array-view array-view-compact" data-placeholder="1">
+                  <div className="array-label">
+                    <span>{BUFFER_LABELS[name] ?? name}</span>
+                  </div>
+                  <div className="array-cells">
+                    <div className="cell-slot">
+                      <div className="cell cell-ghost">
+                        <span className="cell-idx">&nbsp;</span>
+                        <span className="cell-ghost-val muted">—</span>
+                      </div>
+                      <div className="pointer-row cell-ptrs" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <span className="scene-companions-note muted">本步无缓冲</span>
+            </div>
+          ) : null}
+          {auxBar && <div className="scene-aux-bar">{auxBar}</div>}
+        </div>
+      )}
+      {primaryValues ? (
+        renderOne(key, primaryValues, false)
+      ) : (
+        <div className="viz-empty soft">本步无主数组 {key}</div>
+      )}
+    </div>
+  )
+}

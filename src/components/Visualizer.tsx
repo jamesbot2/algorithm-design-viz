@@ -4,6 +4,8 @@ import { ArraysFromStep } from './ArrayView'
 import MatrixView from './MatrixView'
 import GraphView from './GraphView'
 import SearchTreeView from './search/SearchTreeView'
+import ForestView, { forestMaxDepth } from './forest/ForestView'
+import { resolvePresentation } from './presentation/presentation'
 import { SEMANTIC_ROLE_LABELS } from '../theme/semanticColors'
 import type { PlaybackController } from './workbench/usePlaybackController'
 
@@ -16,6 +18,8 @@ interface Props {
   staleResult?: boolean
   /** Optional context shown under the step text (e.g. compact input summary). */
   context?: ReactNode
+  /** V24: algorithm id — selects the module's declared presentation contract. */
+  algoId?: string
 }
 
 type LegendRole = HighlightRole | EdgeRole | 'frontier' | 'settled' | 'pruned' | 'optimal' | 'error'
@@ -136,7 +140,7 @@ function computeSignedDomain(steps: Step[]): Record<string, { hasPos: boolean; h
  * timer, no transport, no inspector band and no body Portal. Current data and
  * the transport are Workbench siblings fed by the same PlaybackController.
  */
-export default function Visualizer({ player, staleResult = false, context }: Props) {
+export default function Visualizer({ player, staleResult = false, context, algoId }: Props) {
   const { steps, idx, step, prevStep, playing, isPreview, runId, snapSwap, speedVars } = player
   const usedRoles = useMemo(() => collectUsedRoles(steps), [steps])
   const scaleMaxByArray = useMemo(() => computeScaleMax(steps), [steps])
@@ -170,16 +174,23 @@ export default function Visualizer({ player, staleResult = false, context }: Pro
       matrices: { ...(step.matrices ?? {}), board: displayBoard },
     }
   }, [step, displayBoard])
-  /** V18-02: explicit primary scene — LCS→DP matrix, sort→main array, NQ→board, graph→graph */
-  const primaryScene = useMemo(() => {
-    if (step?.graph) return 'graph' as const
-    if (hasBoard) return 'board' as const
+  /**
+   * V18-02 → V24: the stage primary comes from the module's declared presentation
+   * contract (stable for the whole run); modules without one keep the legacy
+   * inference (graph → board → matrix → array → tree).
+   */
+  const presentation = useMemo(() => {
     const mats = stepForMatrix?.matrices
-    if (mats && Object.keys(mats).some((k) => k !== 'board')) return 'matrix' as const
-    if (step?.arrays && Object.keys(step.arrays).length > 0) return 'array' as const
-    if (step?.searchTree) return 'tree' as const
-    return 'empty' as const
-  }, [step, hasBoard, stepForMatrix])
+    const hasOtherMatrix = Boolean(mats && Object.keys(mats).some((k) => k !== 'board'))
+    return resolvePresentation(algoId, step, hasBoard, hasOtherMatrix)
+  }, [algoId, step, hasBoard, stepForMatrix])
+  const primaryScene = presentation.scene
+  const descriptor = presentation.descriptor
+  const declaredArray = descriptor?.primaryKind === 'array' && Boolean(descriptor.primaryKey)
+  const treeAux = descriptor?.auxiliaries?.find((a) => a.id === 'recursion-tree')
+  /** Per-run view state: auxiliaries closed by default; toggling never touches the player. */
+  const [auxOpen, setAuxOpen] = useState(Boolean(treeAux?.defaultOpen))
+  const runForestDepth = useMemo(() => (primaryScene === 'forest' ? forestMaxDepth(steps) : 0), [primaryScene, steps])
   const arraysCompanion = primaryScene === 'matrix' || primaryScene === 'board'
   const displayMessage = step?.message ?? '就绪：调整输入后点击「运行」。'
 
@@ -222,47 +233,138 @@ export default function Visualizer({ player, staleResult = false, context }: Pro
         data-testid="viz-canvas"
         data-stage-viewport="1"
         data-primary-scene={primaryScene}
+        data-primary-kind={presentation.kind}
+        data-primary-key={descriptor?.primaryKey}
+        data-presentation={descriptor ? 'declared' : 'legacy'}
+        data-has-aux={treeAux ? '1' : undefined}
         id="stage-viewport"
       >
-        {/* V18-02 Priority: graph | companion labels (compact) | board/matrix primary | main array | tree aux */}
-        {step?.graph && <GraphView graph={step.graph} />}
-        {step && !step.graph && arraysCompanion && (
-          <ArraysFromStep
+        {step && declaredArray ? (
+          <div className="stage-split" data-aux-open={treeAux && auxOpen ? '1' : '0'}>
+            <div className="stage-primary-pane" data-testid="stage-primary-pane">
+              <ArraysFromStep
+                step={step}
+                prevStep={prevStep}
+                scaleMaxByArray={scaleMaxByArray}
+                signedDomainByArray={signedDomainByArray}
+                snapSwap={snapSwap}
+                presentation={descriptor}
+                auxBar={
+                  treeAux || descriptor?.callStackVar ? (
+                    <AuxBar
+                      callStack={descriptor?.callStackVar ? step.vars?.[descriptor.callStackVar] : undefined}
+                      treeLabel={treeAux?.label}
+                      hasTree={Boolean(step.searchTree)}
+                      open={auxOpen}
+                      onToggle={() => setAuxOpen((o) => !o)}
+                    />
+                  ) : undefined
+                }
+              />
+            </div>
+            {treeAux && auxOpen && step.searchTree && (
+              <aside
+                className="stage-aux-pane"
+                id="scene-aux-pane"
+                data-testid="scene-aux-pane"
+                aria-label={treeAux.label}
+              >
+                <SearchTreeView tree={step.searchTree} title={treeAux.label} linkedBoard={false} activePathIds={step.activePathIds} />
+              </aside>
+            )}
+          </div>
+        ) : step && primaryScene === 'forest' ? (
+          <ForestView
             step={step}
             prevStep={prevStep}
-            scaleMaxByArray={scaleMaxByArray}
-            signedDomainByArray={signedDomainByArray}
-            snapSwap={snapSwap}
-            companionMode
+            nextStep={idx + 1 < steps.length ? steps[idx + 1] : undefined}
+            inputTable={descriptor?.inputTable}
+            runMaxDepth={runForestDepth}
           />
-        )}
-        {(primaryScene === 'matrix' || primaryScene === 'board') && stepForMatrix && (
-          <MatrixView step={stepForMatrix} prevStep={prevStep} />
-        )}
-        {step && !step.graph && !arraysCompanion && (
-          <ArraysFromStep
-            step={step}
-            prevStep={prevStep}
-            scaleMaxByArray={scaleMaxByArray}
-            signedDomainByArray={signedDomainByArray}
-            snapSwap={snapSwap}
-            companionMode={false}
-          />
-        )}
-        {primaryScene !== 'matrix' && primaryScene !== 'board' && stepForMatrix?.matrices && (
-          <MatrixView step={stepForMatrix} prevStep={prevStep} />
-        )}
-        {step?.searchTree && hasBoard && (
-          <details className="search-tree-aux" data-testid="search-tree-aux">
-            <summary>搜索树（辅助视图）</summary>
-            <SearchTreeView tree={step.searchTree} linkedBoard activePathIds={step.activePathIds} />
-          </details>
-        )}
-        {step?.searchTree && !hasBoard && (
-          <SearchTreeView tree={step.searchTree} linkedBoard={false} activePathIds={step.activePathIds} />
+        ) : (
+          <>
+            {/* V18-02 Priority: graph | companion labels (compact) | board/matrix primary | main array | tree aux */}
+            {step?.graph && <GraphView graph={step.graph} />}
+            {step && !step.graph && arraysCompanion && (
+              <ArraysFromStep
+                step={step}
+                prevStep={prevStep}
+                scaleMaxByArray={scaleMaxByArray}
+                signedDomainByArray={signedDomainByArray}
+                snapSwap={snapSwap}
+                companionMode
+              />
+            )}
+            {(primaryScene === 'matrix' || primaryScene === 'board') && stepForMatrix && (
+              <MatrixView step={stepForMatrix} prevStep={prevStep} />
+            )}
+            {step && !step.graph && !arraysCompanion && (
+              <ArraysFromStep
+                step={step}
+                prevStep={prevStep}
+                scaleMaxByArray={scaleMaxByArray}
+                signedDomainByArray={signedDomainByArray}
+                snapSwap={snapSwap}
+                companionMode={false}
+              />
+            )}
+            {primaryScene !== 'matrix' && primaryScene !== 'board' && stepForMatrix?.matrices && (
+              <MatrixView step={stepForMatrix} prevStep={prevStep} />
+            )}
+            {step?.searchTree && hasBoard && (
+              <details className="search-tree-aux" data-testid="search-tree-aux">
+                <summary>搜索树（辅助视图）</summary>
+                <SearchTreeView tree={step.searchTree} linkedBoard activePathIds={step.activePathIds} />
+              </details>
+            )}
+            {step?.searchTree && !hasBoard && (
+              <SearchTreeView tree={step.searchTree} linkedBoard={false} activePathIds={step.activePathIds} />
+            )}
+          </>
         )}
         {!step && <div className="viz-empty soft">暂无画布内容</div>}
       </div>
+    </div>
+  )
+}
+
+
+/** V24: switchable-auxiliary controls for an array primary (recursion tree + call-stack summary). */
+function AuxBar({
+  callStack,
+  treeLabel,
+  hasTree,
+  open,
+  onToggle,
+}: {
+  callStack?: string | number | boolean | null
+  treeLabel?: string
+  hasTree: boolean
+  open: boolean
+  onToggle: () => void
+}) {
+  const frames = typeof callStack === 'string' && callStack !== '(empty)' ? callStack.split(' › ') : []
+  return (
+    <div className="aux-bar" data-testid="scene-aux-bar">
+      {typeof callStack === 'string' && (
+        <span className="aux-callstack" data-testid="aux-callstack" title={`调用栈：${callStack}`}>
+          调用栈 <code>{frames.length ? frames[frames.length - 1] : '（空）'}</code>
+          {frames.length > 1 && <span className="muted"> · 深度 {frames.length}</span>}
+        </span>
+      )}
+      {treeLabel && (
+        <button
+          type="button"
+          className="aux-toggle"
+          data-testid="aux-toggle-recursion-tree"
+          aria-pressed={open}
+          aria-controls="scene-aux-pane"
+          disabled={!hasTree}
+          onClick={onToggle}
+        >
+          {open ? `收起${treeLabel}` : `展开${treeLabel}`}
+        </button>
+      )}
     </div>
   )
 }

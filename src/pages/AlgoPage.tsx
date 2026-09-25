@@ -1442,7 +1442,7 @@ export default function AlgoPage() {
         prefs={layoutPrefs}
         onPrefsChange={patchLayoutPrefs}
         runKey={visRunId}
-        scene={<Visualizer key={visRunId} player={player} staleResult={hasRun && (staleResult || draftDirty)} />}
+        scene={<Visualizer key={visRunId} algoId={id} player={player} staleResult={hasRun && (staleResult || draftDirty)} />}
         data={
           <CurrentStepData
             step={player.step}

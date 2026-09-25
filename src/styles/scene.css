@@ -95,10 +95,356 @@
   margin-bottom: 0.15rem;
 }
 
-/* ---- Array primary ---- */
+/* ---- Array primary (legacy inference) ---- */
 .stage-viewport[data-primary-scene="array"] > .arrays-panel {
   flex: 1 1 auto;
   min-height: 0;
+}
+
+/*
+ * ---- V24 declared array primary (presentation contract) ----
+ * The stage is the ONE scroll owner. The primary pane fills the stage; inside it the
+ * companion strip keeps its natural height and the primary array gets the rest with
+ * flex-basis 0 (its allotted box drives ArrayView's bar geometry) and a readable
+ * floor. If the stage is shorter than strip + floor, the STAGE scrolls (explicit) —
+ * the primary is never clipped to a sliver by an overflow:hidden ancestor.
+ */
+.stage-viewport[data-presentation="declared"][data-primary-scene="array"] {
+  overflow: auto;
+}
+.stage-viewport[data-has-aux="1"] {
+  container-type: inline-size;
+  container-name: stage;
+}
+.stage-split {
+  flex: 1 0 auto;
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0.4rem;
+}
+/* Narrow stage + aux open: aux pane stacks BELOW the primary with its own scroller;
+ * the primary keeps its readable floor (never squeezed by the tree). */
+.stage-split[data-aux-open="1"] {
+  grid-template-rows: minmax(var(--primary-floor, 10rem), 1fr) minmax(7rem, 38%);
+}
+@container stage (min-width: 700px) {
+  .stage-split[data-aux-open="1"] {
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 36%);
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+.stage-primary-pane {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.stage-aux-pane {
+  /* size containment: the (tall) tree never sizes the split — the primary does */
+  contain: size;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+}
+.stage-aux-pane > .search-tree-view {
+  margin: 0;
+  max-height: none;
+  overflow: visible;
+  border: 0;
+}
+.stage-primary-pane > .arrays-panel[data-declared-primary] {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 0;
+  overflow: visible;
+}
+.stage-primary-pane > .arrays-panel[data-declared-primary] > .array-view {
+  flex: 1 1 0;
+  min-height: var(--primary-floor, 10rem);
+  overflow: visible;
+  padding: 0.45rem 0.6rem;
+}
+.stage-primary-pane > .arrays-panel[data-declared-primary] > .array-view > .array-label {
+  margin-bottom: 0.3rem;
+}
+.stage-primary-pane > .arrays-panel[data-declared-primary] > .array-view .bars-wrap:not(.signed) {
+  min-height: 0;
+}
+/* Reserve two pointer rows so frames with stacked L/mid/k tags don't rescale bars. */
+.stage-primary-pane > .arrays-panel[data-declared-primary] > .array-view .bars-wrap .pointer-row {
+  min-height: 2.5rem;
+  align-content: flex-start;
+}
+
+/* Companion strip: required companions (compact) + aux bar, one wrapping row. */
+.scene-companions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.35rem 0.5rem;
+}
+.scene-companions > .array-buffers {
+  flex: 1 1 auto;
+  max-height: none;
+  overflow: visible;
+  padding: 0.2rem 0.4rem;
+}
+.bars-wrap[data-refit="1"] .bar {
+  transition: none;
+}
+.scene-companions-empty {
+  flex: 1 1 auto;
+  opacity: 0.6;
+}
+.scene-companions-note {
+  align-self: center;
+  font-size: 0.75rem;
+}
+.cell.cell-ghost {
+  border-style: dashed;
+  background: transparent;
+}
+.cell-ghost-val {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+.scene-aux-bar {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+.aux-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+  font-size: 0.78rem;
+}
+.aux-callstack code {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+}
+.aux-toggle {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  border-radius: 6px;
+}
+.aux-toggle[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Compact companions: label inline with the cells; pointer tags under their own slot. */
+.scene-companions .array-view-compact {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.2rem 0.4rem;
+}
+.scene-companions .array-view-compact > .array-label {
+  margin: 0.55rem 0 0;
+}
+.scene-companions .array-view-compact .cell {
+  min-height: 2.1rem;
+}
+
+/* Cells: each slot stacks cell + its own pointer tags (aligned by construction). */
+.cell-slot {
+  flex-direction: column;
+  align-items: center;
+}
+.cell-ptrs {
+  min-height: 1.15rem;
+  margin-top: 0.15rem;
+  gap: 2px;
+}
+.cell-ptrs .ptr-tag {
+  font-size: 0.62rem;
+  padding: 0 0.25rem;
+}
+
+/* Short bars: the value sits just above the bar (never inside a 5px sliver, never on the index). */
+.bars-wrap:not(.signed) .bar.bar-short {
+  position: relative;
+  overflow: visible;
+  padding-top: 0;
+}
+.bars-wrap:not(.signed) .bar.bar-short > .bar-val {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: visible;
+  max-width: none;
+  width: max-content;
+}
+.bars-wrap:not(.signed) {
+  padding-top: 1rem;
+}
+
+/* ---- V24-02 interval cards: id line + [start,finish) line; width from the real text ---- */
+.cell.cell-interval {
+  width: auto;
+  min-width: 52px;
+  padding: 0.25rem 0.45rem;
+}
+.cell-val-interval {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.cell-val-interval .iv-id {
+  font-size: 0.82rem;
+}
+.cell-val-interval .iv-range {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ---- V24-01B forest primary ---- */
+.stage-viewport[data-primary-scene="forest"] {
+  overflow: hidden;
+}
+.forest-view {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.forest-head {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+.huffman-input-table {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+.fh-title,
+.fh-count {
+  color: var(--muted);
+  font-weight: 600;
+}
+.fh-sym {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  font-family: var(--mono);
+  line-height: 1.35;
+}
+.fh-freq {
+  color: var(--muted);
+}
+.fh-code {
+  color: var(--accent);
+  font-weight: 700;
+}
+.fh-locate {
+  margin-left: auto;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+.forest-viewport {
+  flex: 1 1 0;
+  min-height: 7rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--bg-input, var(--bg-soft));
+}
+.forest-canvas {
+  position: relative;
+  margin: 0 auto;
+}
+.forest-edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.forest-edges line {
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+.forest-edges text {
+  fill: var(--muted);
+  font-size: 10px;
+  font-family: var(--mono);
+}
+.forest-edges .fe-new line,
+.forest-edges .fe-merged line {
+  stroke: var(--sem-update, var(--accent));
+  stroke-width: 2.2;
+}
+.forest-edges .fe-selected line {
+  stroke: var(--sem-compare, #e3b341);
+  stroke-width: 2;
+}
+.forest-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg-elev);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 650;
+  white-space: nowrap;
+  transition: background var(--transition, 180ms), border-color var(--transition, 180ms);
+}
+.forest-node.is-leaf {
+  border-radius: 12px;
+}
+.forest-node.role-selected {
+  border-color: var(--sem-compare, #e3b341);
+  background: color-mix(in srgb, var(--sem-compare, #e3b341) 24%, var(--bg-elev));
+}
+.forest-node.role-merged {
+  border-color: var(--sem-update, var(--accent));
+}
+.forest-node.role-new {
+  border-color: var(--sem-update, var(--accent));
+  background: color-mix(in srgb, var(--sem-update, #10a37f) 26%, var(--bg-elev));
+}
+.forest-node.role-final {
+  border-color: var(--sem-done, var(--good));
+  background: color-mix(in srgb, var(--sem-done, #10a37f) 24%, var(--bg-elev));
+}
+.fn-code {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: var(--accent);
+  line-height: 1.1;
 }
 
 /* V18-02: primary scene — DP/matrix owns stage; companion X/Y labels stay compact */
@@ -190,3 +536,9 @@
   order: 1;
 }
 
+
+/* V24: unsigned bars take their slot's width (the flip layer stretches to the slot),
+ * so the value label fits inside and slots/indices/pointers share one column. */
+.bars-wrap:not(.signed) .bar-col > .bar-flip-layer {
+  align-self: stretch;
+}

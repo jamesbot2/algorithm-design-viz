@@ -271,6 +271,7 @@ export default function KnapsackUnit() {
           scene={
             <Visualizer
               key={visRunId}
+              algoId={`knapsack:${runSnap?.strategy ?? strategy}`}
               player={player}
               staleResult={dirty}
               context={

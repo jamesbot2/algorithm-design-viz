@@ -18,7 +18,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/algorithm-design-viz/',
   define: {
-    __APP_VERSION__: JSON.stringify('V23'),
+    __APP_VERSION__: JSON.stringify('V24'),
     __BUILD_SHA__: JSON.stringify(gitShortSha()),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   },
