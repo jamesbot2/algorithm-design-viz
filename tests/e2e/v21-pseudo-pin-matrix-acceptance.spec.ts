@@ -17,6 +17,10 @@ function ensureDirs() {
 async function prepareDijkstraDefaultReady(page: Page) {
   await page.goto('#/algo/dijkstra')
   await expect(page.getByTestId('workbench-layout')).toBeVisible({ timeout: 15_000 })
+  // V23: tabbed sessions keep the active view across a same-route goto; readiness is
+  // judged on the demo view (the old panels kept a 0-width but 'visible' visualizer).
+  const demoTab = page.getByTestId('workbench-tab-demo')
+  if (await demoTab.isVisible()) await demoTab.click()
   await ensureInputEditing(page)
   const before = await page.getByTestId('visualizer').getAttribute('data-run-id')
   await page.getByTestId('run-btn').click()
@@ -38,6 +42,10 @@ async function prepareDijkstraDefaultReady(page: Page) {
 async function prepareLcsReady(page: Page) {
   await page.goto('#/algo/lcs')
   await expect(page.getByTestId('workbench-layout')).toBeVisible({ timeout: 15_000 })
+  // V23: tabbed sessions keep the active view across a same-route goto; readiness is
+  // judged on the demo view (the old panels kept a 0-width but 'visible' visualizer).
+  const demoTab = page.getByTestId('workbench-tab-demo')
+  if (await demoTab.isVisible()) await demoTab.click()
   await ensureInputEditing(page)
   const before = await page.getByTestId('visualizer').getAttribute('data-run-id')
   await page.getByTestId('run-btn').click()
@@ -499,6 +507,12 @@ test.describe('V21 pseudo scroll / reading pin / matrix viewport', () => {
       const pre = document.querySelector('[data-testid="pseudo-pre"]') as HTMLElement | null
       const el = pre?.querySelector('[data-line="2"]') as HTMLElement | null
       if (!pre || !el) return { ok: false as const }
+      // V23: the pseudo scrollport is tall enough at 1366x600 that the short Dijkstra
+      // pseudo-code barely overflows, so ANY scrollTop keeps line 2 visible. Constrain
+      // the scrollport to 64px first so the wrong-coordinate fault can manifest.
+      pre.style.height = '64px'
+      pre.style.flex = '0 0 64px'
+      void pre.offsetHeight
       const pageEl = document.querySelector('.page.algo-page') as HTMLElement | null
       const wrongTop = pageEl
         ? el.getBoundingClientRect().top - pageEl.getBoundingClientRect().top + (pageEl.scrollTop || 0)
@@ -507,6 +521,8 @@ test.describe('V21 pseudo scroll / reading pin / matrix viewport', () => {
       const preR = pre.getBoundingClientRect()
       const elR = el.getBoundingClientRect()
       const visH = Math.max(0, Math.min(elR.bottom, preR.bottom) - Math.max(elR.top, preR.top))
+      pre.style.height = ''
+      pre.style.flex = ''
       return { ok: true as const, visH: Math.round(visH), elH: Math.round(elR.height), wrongTop }
     })
     expect(mutPseudo2.ok && mutPseudo2.visH < mutPseudo2.elH * 0.5, JSON.stringify(mutPseudo2)).toBe(true)

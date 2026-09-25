@@ -514,16 +514,24 @@ test.describe('V19 matrix follow / CM scroll / compact / vars / acceptance', () 
     for (let i = 0; i < 13; i++) await page.getByTestId('next-step-btn').click()
     const mutMatrix = await page.evaluate(() => {
       const s = document.querySelector('.matrix-scroll') as HTMLElement | null
-      if (s) s.scrollTop = 9999
+      // V23: the taller stage lets the LCS matrix nearly fit, so scrollTop=9999 alone
+      // cannot hide the cell. Constrain the scrollport (64px) so the "scrolled away"
+      // regression can manifest; the detector itself is unchanged.
+      if (s) {
+        s.style.maxHeight = '64px'
+        void s.offsetHeight
+        s.scrollTop = 9999
+      }
       const current = document.querySelector('.matrix-table td.hl-focus, .matrix-table td.hl-write')
       const scroller = document.querySelector('.matrix-scroll')
       if (!current || !scroller) return { detectable: false }
       const a = current.getBoundingClientRect()
       const r = scroller.getBoundingClientRect()
       const vis = Math.max(0, Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top))
+      if (s) s.style.maxHeight = ''
       return { detectable: vis < 8, vis: Math.round(vis) }
     })
-    expect(mutMatrix.detectable).toBe(true)
+    expect(mutMatrix.detectable, JSON.stringify(mutMatrix)).toBe(true)
 
     await page.goto('#/algo/dijkstra')
     await ensureInputEditing(page)

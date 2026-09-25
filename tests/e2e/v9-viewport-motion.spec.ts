@@ -139,9 +139,15 @@ test.describe('V9 viewport visibility + motion', () => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('#/algo/kadane')
     await expect(page.getByTestId('workbench-layout')).toHaveAttribute('data-layout', 'tabs')
-    const inactive = await page.locator('[data-panel][data-tab-active="0"]').first().boundingBox()
-    const active = await page.locator('[data-panel][data-tab-active="1"]').first().boundingBox()
-    expect((inactive?.width ?? 99)).toBeLessThan(12)
+    // V23 replacement of react-resizable-panels [data-panel] widths: inactive tab
+    // panels are hidden (no box at all), the active one gets the full width.
+    const inactive = await page.locator('.workbench-layout [role="tabpanel"][hidden]').first().boundingBox()
+    const active = await page.locator('.workbench-layout [role="tabpanel"]:not([hidden])').first().boundingBox()
+    expect(inactive).toBeNull()
     expect((active?.width ?? 0)).toBeGreaterThan(280)
+    // switching really swaps the visible panel
+    await page.getByTestId('workbench-tab-code').click()
+    await expect(page.getByTestId('workbench-code-slot')).toBeVisible()
+    await expect(page.getByTestId('workbench-viz-slot')).toBeHidden()
   })
 })
