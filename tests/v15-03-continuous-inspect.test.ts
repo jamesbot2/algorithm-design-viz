@@ -1,35 +1,45 @@
+/**
+ * V15-03 → V23 continuous inspect.
+ * V23 replacement note: V15-03 required the side sheet to carry its own mini
+ * transport (inspector-prev/next) wired to the same goPrev/goNext, and to be
+ * non-modal. V23 removes the sheet: the current-data region and the ONE shared
+ * transport are visible at the same time (docked/wide) or one tab away with the
+ * transport always outside the tab panels (tabbed). The "one controller" rule is
+ * now asserted structurally: one timer owner, Visualizer has none, and pages mount
+ * exactly one controller + one transport.
+ */
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-describe('V15-03 continuous inspect contract', () => {
-  it('drawer has internal transport wired to same goPrev/goNext (source)', () => {
-    const viz = readFileSync(resolve('src/components/Visualizer.tsx'), 'utf8')
-    expect(viz).toMatch(/inspector-sheet-transport/)
-    expect(viz).toMatch(/data-testid="inspector-prev-btn"/)
-    expect(viz).toMatch(/data-testid="inspector-next-btn"/)
-    expect(viz).toMatch(/data-testid="inspector-step-counter"/)
-    // Same controller — buttons call goPrev/goNext, not a second setIdx/player
-    expect(viz).toMatch(/onClick=\{goPrev\}/)
-    expect(viz).toMatch(/onClick=\{goNext\}/)
-    // Only one playing timer ownership path
-    expect(viz.match(/useRef<number \| null>\(null\)/g)?.length ?? 0).toBeLessThanOrEqual(2)
+const read = (p: string) => readFileSync(resolve(p), 'utf8')
+
+describe('V15-03 / V23 continuous inspect contract', () => {
+  it('ONE controller: the timer lives only in usePlaybackController', () => {
+    const ctl = read('src/components/workbench/usePlaybackController.ts')
+    const viz = read('src/components/Visualizer.tsx')
+    expect(ctl.match(/useRef<number \| null>\(null\)/g)?.length ?? 0).toBe(1)
+    expect(ctl).toMatch(/window\.setTimeout\(/)
+    expect(viz).not.toMatch(/useRef<number \| null>|setTimeout\(|setInterval\(/)
+    expect(viz).not.toMatch(/inspector-prev-btn|inspector-next-btn|inspector-sheet-transport/)
   })
 
-  it('sheet is honestly non-modal (aria-modal=false) with side inspect mode', () => {
-    const viz = readFileSync(resolve('src/components/Visualizer.tsx'), 'utf8')
-    expect(viz).toMatch(/aria-modal="false"/)
-    expect(viz).toMatch(/data-inspect-mode="side"/)
-    expect(viz).not.toMatch(/aria-modal="true"/)
-    const css = readFileSync(resolve('src/styles.css'), 'utf8')
-    expect(css).toMatch(/inspector-sheet-transport/)
-    expect(css).toMatch(/data-inspect-mode="side"/)
+  it('each page mounts one controller and one transport', () => {
+    for (const p of ['src/pages/AlgoPage.tsx', 'src/pages/teaching/KnapsackUnit.tsx']) {
+      const src = read(p)
+      expect(src.match(/usePlaybackController\(/g)?.length ?? 0).toBe(1)
+      expect(src.match(/<PlaybackTransport /g)?.length ?? 0).toBe(1)
+      expect(src.match(/<Visualizer\b/g)?.length ?? 0).toBe(1)
+      expect(src.match(/<CurrentStepData\b/g)?.length ?? 0).toBe(1)
+    }
   })
 
-  it('content||entry contract preserved (toggle + sheet)', () => {
-    const viz = readFileSync(resolve('src/components/Visualizer.tsx'), 'utf8')
-    expect(viz).toMatch(/inspector-sheet-toggle/)
-    expect(viz).toMatch(/data-inspector-entry/)
-    expect(viz).toMatch(/inspectorLayout/)
+  it('transport is outside every tab panel; data is a region, not a dialog', () => {
+    const wb = read('src/components/workbench/WorkbenchLayout.tsx')
+    const transportAt = wb.indexOf('data-testid="workbench-transport-slot"')
+    const lastPanel = wb.lastIndexOf("role={tabbed ? 'tabpanel' : 'region'}")
+    expect(transportAt).toBeGreaterThan(lastPanel)
+    expect(wb).toMatch(/aria-label="当前数据"/)
+    expect(wb).not.toMatch(/role="dialog"|aria-modal/)
   })
 })

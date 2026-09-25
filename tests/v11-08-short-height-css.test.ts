@@ -1,49 +1,40 @@
+/**
+ * V11-08 → V23 short-height transport + controls.
+ * V23 replacement note: V11-08 checked a `@media (max-height:520px)` ladder and a
+ * short-landscape page-header collapse. V23 decides from the measured workbench
+ * budget instead of viewport media: inline phase chips show only when the
+ * workbench is roomy (data-transport="roomy"), the full phase list is always in the
+ * settings popover, Run/Cancel/theory stay in the one-row toolbar, and low-height
+ * tabs give the scene the whole scroll viewport.
+ */
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { readAllCss } from './helpers/readCss'
 
-describe('V11-08 short-height dock selectors', () => {
-  const css = readFileSync(resolve(__dirname, '../src/styles.css'), 'utf8')
+const css = readAllCss()
+const wb = readFileSync(resolve(__dirname, '../src/components/workbench/WorkbenchLayout.tsx'), 'utf8')
+const tr = readFileSync(resolve(__dirname, '../src/components/workbench/PlaybackTransport.tsx'), 'utf8')
 
-  it('hides inline phase via direct-child, not descendant that kills dock', () => {
-    expect(css).toMatch(/\.playback-transport\s*>\s*\.phase-jump/)
-    expect(css).toMatch(/\.playback-transport\s*>\s*\.phase-track/)
-    // Must not use broad descendant that hides settings-panel copies without exception
-    // After fix, the media-query hide rule should be direct-child
-    const media = css.slice(css.indexOf('@media (max-height: 520px)'))
-    expect(media).toMatch(/\.playback-transport\s*>\s*\.phase-jump/)
-    expect(media).toMatch(/playback-settings-panel\s+\.phase-jump/)
+describe('V11-08 / V23 short-height transport', () => {
+  it('hides only the inline phase chips (direct child) when not roomy; dock copy never hidden', () => {
+    expect(css).toMatch(/\.workbench-layout:not\(\[data-transport="roomy"\]\) \.playback-transport > \.phase-jump\s*\{[^}]*display:\s*none/s)
+    expect(css).not.toMatch(/playback-settings-panel[^{]*\.phase-jump[^{]*\{[^}]*display:\s*none/s)
+    expect(wb).toMatch(/data-transport=\{!tabbed && box\.h >= 700 \? 'roomy' : 'compact'\}/)
+    expect(tr).toMatch(/data-testid="phase-jump-dock"/)
   })
 
-  it('short-height keeps usable signed bar chart height', () => {
-    const media = css.slice(css.indexOf('@media (max-height: 520px)'))
-    expect(media).toMatch(/bars-wrap\.signed/)
-    expect(media).toMatch(/min-height:\s*180px/)
-    expect(media).toMatch(/input-actions-sticky/)
+  it('settings entry is always rendered in the transport meta group', () => {
+    expect(tr).toMatch(/transport-meta[\s\S]*data-testid="playback-settings-toggle"/)
+    expect(css).not.toMatch(/playback-settings-dock[^{]*\{[^}]*display:\s*none/s)
   })
 
-  it('short-height keeps Run visible (no display:none on collapsed sticky actions)', () => {
-    const dock = css.slice(css.indexOf('V10-02: short-height'))
-    expect(dock).toMatch(/input-actions-sticky/)
-    // Must not reclaim the Run row with display:none — preview + after-run need 运行
-    expect(dock).not.toMatch(
-      /data-input-editing="0"[^{]*input-actions-sticky\s*\{[^}]*display:\s*none/s,
-    )
-    expect(dock).toMatch(/\[data-testid="cancel-btn"\]:disabled/)
-    expect(dock).toMatch(/\[data-testid=run-btn\]|keep Run reachable|NEVER hide Run/)
+  it('Run / Cancel / theory are never display:none', () => {
+    expect(css).not.toMatch(/(run-btn|cancel-btn|input-actions|theory-toggle)[^{]*\{[^}]*display:\s*none/s)
   })
 
-  it('short landscape raises stage min and collapses page header chrome', () => {
-    expect(css).toMatch(/orientation:\s*landscape/)
-    const land = css.slice(css.indexOf('/* Short landscape'))
-    expect(land).toMatch(/page-header-compact/)
-    expect(land).toMatch(/theory-toggle/)
-    // Title/back may hide; whole header must not display:none (theory drawer entry)
-    expect(land).not.toMatch(
-      /page-header-compact\s*\{\s*display:\s*none/s,
-    )
-    expect(land).toMatch(/min-height:\s*180px/)
-    expect(land).toMatch(/bars-wrap\.signed/)
-    expect(css).toMatch(/input-actions-sticky/)
+  it('short landscape tabs: one transport row and scene claims the scroll viewport', () => {
+    expect(css).toMatch(/@media \(min-width: 600px\)\s*\{\s*\.workbench-layout\[data-layout-mode="tabbed"\] \.playback-transport\s*\{[^}]*grid-template-areas:\s*"ctrl scrub meta"/s)
+    expect(wb).toMatch(/Math\.max\(300, viewportHeight - 8\)/)
   })
 })

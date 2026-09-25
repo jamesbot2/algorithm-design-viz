@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
+import { readAllCss } from './helpers/readCss'
 
 const root = process.cwd()
 
@@ -25,7 +26,8 @@ describe('V21 static guards', () => {
   })
 
   it('V21-03: matrix-scroll no longer forces 120px under lab-fill primary matrix', () => {
-    const css = fs.readFileSync(path.join(root, 'src/styles.css'), 'utf8')
+    // V23: the matrix-primary rules live in src/styles/scene.css — read all production CSS.
+    const css = readAllCss(root)
     expect(css).toMatch(/V21-03/)
     // Soft floor via min() / 0 — never hard 120px that overruns clip ancestors
     expect(css).toMatch(

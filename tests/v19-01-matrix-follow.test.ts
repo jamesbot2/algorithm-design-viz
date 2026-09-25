@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { readAllCss } from './helpers/readCss'
 
 const mv = readFileSync(resolve(__dirname, '../src/components/MatrixView.tsx'), 'utf8')
-const css = readFileSync(resolve(__dirname, '../src/styles.css'), 'utf8')
+// V23: rules moved into src/styles/scene.css — read all production CSS.
+const css = readAllCss()
 const intent = readFileSync(resolve(__dirname, '../src/utils/scrollFollowIntent.ts'), 'utf8')
 
 describe('V19-01 matrix follow content coords', () => {

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { readAllCss } from './helpers/readCss'
 
 const av = readFileSync(resolve(__dirname, '../src/components/ArrayView.tsx'), 'utf8')
-const css = readFileSync(resolve(__dirname, '../src/styles.css'), 'utf8')
+// V23: rules moved into src/styles/scene.css — read all production CSS.
+const css = readAllCss()
 
 describe('V19-03 compact semantic labels', () => {
   it('renders CompactSequenceStrip instead of clipped full ArrayView in companion mode', () => {

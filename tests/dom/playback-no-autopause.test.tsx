@@ -6,7 +6,8 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { act, cleanup, render, screen, fireEvent } from '@testing-library/react'
 import { useCallback, useState } from 'react'
-import Visualizer, { type SeekCommand } from '../../src/components/Visualizer'
+// V23: Visualizer no longer owns the player — mount the production composition.
+import Visualizer, { type SeekCommand } from './helpers/PlayerHarness'
 import type { Step } from '../../src/types/step'
 import { MotionProvider } from '../../src/theme/MotionContext'
 

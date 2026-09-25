@@ -1,109 +1,89 @@
 /**
- * V8 — tabs mode must collapse inactive [data-panel]; preview pane grows.
+ * V8 → V23 — tabs mode shows exactly ONE region; inactive regions are `hidden`
+ * (no height, no focus) but stay mounted.
+ *
+ * V23 replacement note: the V8 version asserted react-resizable-panels internals
+ * (`[data-panel][data-tab-active]` on the library's outer wrapper). V23 removed the
+ * library from the workbench (one CSS grid), so the contract is now stated on the
+ * real a11y structure: role=tab/aria-selected + role=tabpanel/hidden, for all three
+ * regions (demo / data / code) instead of two.
  * @vitest-environment happy-dom
  */
 import { describe, expect, it, afterEach } from 'vitest'
-import { cleanup, render, screen, act } from '@testing-library/react'
-import WorkbenchLayout from '../../src/components/workbench/WorkbenchLayout'
+import { cleanup, render, screen, act, fireEvent } from '@testing-library/react'
+import WorkbenchLayout from './helpers/LayoutHarness'
 
-function roEntry(target: Element, width: number): ResizeObserverEntry {
-  const rect = {
-    x: 0,
-    y: 0,
-    width,
-    height: 400,
-    top: 0,
-    left: 0,
-    bottom: 400,
-    right: width,
-    toJSON() {
-      return this
-    },
-  } as DOMRectReadOnly
+function installRO(width: number) {
+  const cbs: { cb: ResizeObserverCallback; el?: Element }[] = []
+  globalThis.ResizeObserver = class {
+    cb: ResizeObserverCallback
+    constructor(cb: ResizeObserverCallback) {
+      this.cb = cb
+      cbs.push({ cb })
+    }
+    observe(el: Element) {
+      const row = cbs.find((c) => c.cb === this.cb)
+      if (row) row.el = el
+    }
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver
   return {
-    target,
-    contentRect: rect,
-    borderBoxSize: [{ inlineSize: width, blockSize: 400 }],
-    contentBoxSize: [{ inlineSize: width, blockSize: 400 }],
-    devicePixelContentBoxSize: [{ inlineSize: width, blockSize: 400 }],
-  } as unknown as ResizeObserverEntry
+    fire() {
+      act(() => {
+        for (const { cb, el } of cbs) if (el) cb([{ target: el } as ResizeObserverEntry], {} as ResizeObserver)
+      })
+    },
+    width,
+  }
 }
 
-describe('V8 preview layout selectors', () => {
+describe('V8/V23 tabs layout selectors', () => {
   const OriginalRO = globalThis.ResizeObserver
-  const callbacks: { cb: ResizeObserverCallback; el?: Element }[] = []
-
   afterEach(() => {
     cleanup()
-    callbacks.length = 0
     globalThis.ResizeObserver = OriginalRO
   })
 
-  it('puts data-tab-active on [data-panel] (not on className inner) and toggles active attrs', () => {
-    globalThis.ResizeObserver = class {
-      cb: ResizeObserverCallback
-      constructor(cb: ResizeObserverCallback) {
-        this.cb = cb
-        callbacks.push({ cb })
-      }
-      observe(el: Element) {
-        const row = callbacks.find((c) => c.cb === this.cb)
-        if (row) row.el = el
-        this.cb([roEntry(el, 500)], this as unknown as ResizeObserver)
-      }
-      unobserve() {}
-      disconnect() {}
-    } as unknown as typeof ResizeObserver
-
+  it('tabs: exactly one visible tabpanel, others hidden but mounted; tab switch moves it', () => {
+    const ro = installRO(500)
     render(
       <WorkbenchLayout
-        viz={<div data-testid="viz-child">viz</div>}
+        scene={<div data-testid="viz-child">viz</div>}
+        data={<div data-testid="data-child">data</div>}
         code={<div data-testid="code-child">code</div>}
         transport={<div data-testid="transport-child">transport</div>}
       />,
     )
-
     const layout = screen.getByTestId('workbench-layout')
     Object.defineProperty(layout, 'clientWidth', { configurable: true, get: () => 500 })
-    act(() => {
-      for (const { cb, el } of callbacks) {
-        if (!el) continue
-        cb([roEntry(el, 500)], {} as ResizeObserver)
-      }
-    })
-
+    ro.fire()
     expect(layout.getAttribute('data-layout')).toBe('tabs')
+    expect(layout.getAttribute('data-layout-mode')).toBe('tabbed')
 
-    const panels = [...document.querySelectorAll('[data-panel]')]
-    expect(panels.length).toBe(2)
-
-    // v4 library: className is on the inner child; data-tab-active on outer [data-panel]
-    for (const p of panels) {
-      expect(p.classList.contains('workbench-viz-panel')).toBe(false)
-      expect(p.classList.contains('workbench-code-panel')).toBe(false)
-      expect(p.hasAttribute('data-tab-active')).toBe(true)
-      const inner = p.firstElementChild
-      expect(inner?.classList.contains('workbench-viz-panel') || inner?.classList.contains('workbench-code-panel')).toBe(
-        true,
-      )
-    }
-
-    const active = panels.filter((p) => p.getAttribute('data-tab-active') === '1')
-    const inactive = panels.filter((p) => p.getAttribute('data-tab-active') === '0')
-    expect(active.length).toBe(1)
-    expect(inactive.length).toBe(1)
-
-    // Legacy combined selector must NOT match (root cause of dual-column crush)
-    expect(
-      document.querySelectorAll(
-        '.workbench-viz-panel[data-tab-active], .workbench-code-panel[data-tab-active]',
-      ).length,
-    ).toBe(0)
-    // Correct selector matches outer panels
-    expect(document.querySelectorAll('[data-panel][data-tab-active="1"]').length).toBe(1)
-    expect(document.querySelectorAll('[data-panel][data-tab-active="0"]').length).toBe(1)
-
+    const panels = [...document.querySelectorAll('[role="tabpanel"]')]
+    expect(panels.length).toBe(3)
+    expect(panels.filter((p) => !p.hasAttribute('hidden')).length).toBe(1)
     expect(screen.getByTestId('workbench-viz-slot').hasAttribute('hidden')).toBe(false)
+    expect(screen.getByTestId('workbench-data-slot').hasAttribute('hidden')).toBe(true)
     expect(screen.getByTestId('workbench-code-slot').hasAttribute('hidden')).toBe(true)
+    for (const p of panels) {
+      const tab = document.getElementById(p.getAttribute('aria-labelledby') || '')
+      expect(tab?.getAttribute('role')).toBe('tab')
+      expect(tab?.getAttribute('aria-selected')).toBe(p.hasAttribute('hidden') ? 'false' : 'true')
+    }
+    // transport is never inside a hidden panel
+    expect(screen.getByTestId('transport-child').closest('[hidden]')).toBeNull()
+
+    fireEvent.click(screen.getByTestId('workbench-tab-data'))
+    expect(screen.getByTestId('workbench-data-slot').hasAttribute('hidden')).toBe(false)
+    expect(screen.getByTestId('workbench-viz-slot').hasAttribute('hidden')).toBe(true)
+    // all children still mounted (no remount on tab switch)
+    expect(screen.getByTestId('viz-child')).toBeTruthy()
+    expect(screen.getByTestId('code-child')).toBeTruthy()
+
+    // keyboard: ArrowRight moves to code
+    fireEvent.keyDown(screen.getByTestId('workbench-tab-data'), { key: 'ArrowRight' })
+    expect(screen.getByTestId('workbench-code-slot').hasAttribute('hidden')).toBe(false)
   })
 })

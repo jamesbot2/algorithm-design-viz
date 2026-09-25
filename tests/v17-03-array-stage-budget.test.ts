@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { readAllCss } from './helpers/readCss'
 
 describe('V17-03 array/DP stage budget', () => {
   const av = readFileSync(resolve(__dirname, '../src/components/ArrayView.tsx'), 'utf8')
@@ -21,10 +22,17 @@ describe('V17-03 array/DP stage budget', () => {
     expect(av).toMatch(/array-buffers/)
   })
 
-  it('lab-fill matrix-scroll is not stuck at early 420 cap', () => {
-    expect(css).toMatch(
-      /data-lab-fill="1"[^{]*\.matrix-scroll[\s\S]*?max-height:\s*min\(70vh/s,
+  // V23 replacement: the lab-fill min(70vh) rule is gone with the lab-fill layer; the
+  // primary matrix scroller is bounded by the stage (max-height:100%, flex:1) and the
+  // scene rule out-specifies the base 420px cap (which only applies outside a stage).
+  it('primary matrix-scroll is not stuck at early 420 cap (stage-bounded instead)', () => {
+    const all = readAllCss()
+    expect(all).toMatch(
+      /\.stage-viewport\[data-primary-scene="matrix"\] \.matrix-scroll,[\s\S]*?\{[^}]*flex:\s*1 1 auto;[^}]*max-height:\s*100%/s,
     )
+    // data-lab-fill only sizes the shell (main-wrap / topbar / main), never scene internals
+    expect(all).not.toMatch(/data-lab-fill="1"\][^{,]*(stage-viewport|matrix|graph|viz-|workbench)/)
+    expect(all).not.toMatch(/--wb-measured-h/)
   })
 
   it('resize remasures FLIP (geometryGen clear on ResizeObserver)', () => {

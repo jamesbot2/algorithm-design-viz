@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
+import { readAllCss } from './helpers/readCss'
 
 const root = process.cwd()
 
 describe('V22 static guards', () => {
-  const css = fs.readFileSync(path.join(root, 'src/styles.css'), 'utf8')
+  // V23: the strip / follow-bar rules live in src/styles/scene.css — read all production CSS.
+  const css = readAllCss(root)
 
   it('V22-01: array-labels-strip does not flex-shrink below glyph line', () => {
     expect(css).toMatch(/V22-01/)

@@ -1,29 +1,27 @@
+/**
+ * V17-01 → V23 input edit body budget.
+ * V23 replacement note: V17-01 checked a max-height:900px media ladder that clamped
+ * the idle panel to 2.8rem and gave the editing body a 4.5rem floor. V23 removes the
+ * clamp ladder: the input body is in normal flow under the toolbar, and when it
+ * does not fit the page scroll viewport (.main) scrolls while the workbench keeps
+ * its min height — so nothing is clipped and nothing is crushed.
+ */
 import { describe, expect, it } from 'vitest'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { readAllCss } from './helpers/readCss'
 
-describe('V17-01 input edit body budget CSS', () => {
-  const css = readFileSync(resolve(__dirname, '../src/styles.css'), 'utf8')
-  const media900 = css.slice(css.indexOf('@media (max-height: 900px)'))
+describe('V17-01 / V23 input edit body budget CSS', () => {
+  const css = readAllCss()
 
-  it('does not apply 4.5rem overflow:hidden to input-panel while editing', () => {
-    // Blanket rule that clamps ALL input-panel-v9 must be gone
-    expect(media900).not.toMatch(
-      /\.input-panel-v9\s*\{\s*max-height:\s*4\.5rem;\s*overflow:\s*hidden/s,
-    )
-    // Collapsed/idle may compact
-    expect(media900).toMatch(
-      /data-input-editing="0"[^{]*\.input-panel-v9\s*\{[^}]*max-height:\s*2\.8rem/s,
-    )
-    // Editing gets real budget
-    expect(media900).toMatch(
-      /data-input-editing="1"[^{]*\.input-panel-v9[\s\S]*?max-height:\s*none/s,
-    )
+  it('no max-height/overflow clamp on the input panel or its body', () => {
+    expect(css).not.toMatch(/input-panel-v9/)
+    expect(css).not.toMatch(/\.input-panel-body[^{]*\{[^}]*max-height/s)
+    expect(css).not.toMatch(/\.algo-toolbar[^{]*\{[^}]*overflow:\s*hidden/s)
+    expect(css).not.toMatch(/data-input-editing/)
   })
 
-  it('editing body has min-height / scroll budget under max-height 900', () => {
-    expect(media900).toMatch(
-      /data-input-editing="1"[^{]*\.input-panel-body[\s\S]*?min-height:\s*4\.5rem/s,
-    )
+  it('page viewport scrolls and the workbench keeps a min height (no crush)', () => {
+    expect(css).toMatch(/\.main-wrap\[data-lab-fill="1"\] > \.main\s*\{[^}]*overflow-y:\s*auto/s)
+    expect(css).toMatch(/\.workbench-layout\s*\{[^}]*min-height:\s*var\(--wb-min-h/s)
+    expect(css).toMatch(/\.algo-toolbar \.input-panel-body\s*\{/)
   })
 })

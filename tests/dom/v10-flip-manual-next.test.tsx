@@ -4,7 +4,8 @@ import { join } from 'path'
 import { render, cleanup, act } from '@testing-library/react'
 import ArrayView from '../../src/components/ArrayView'
 import { MotionProvider } from '../../src/theme/MotionContext'
-import Visualizer from '../../src/components/Visualizer'
+// V23: mount the production player composition (controller + Visualizer + transport).
+import Visualizer from './helpers/PlayerHarness'
 import type { Step } from '../../src/types/step'
 
 afterEach(() => cleanup())
@@ -22,7 +23,11 @@ describe('V10-04 manual next must not kill new FLIP', () => {
   })
 
   it('Visualizer goNext/goPrev do not bump transitionEpoch (cancel reserved for pause/seek/run)', () => {
-    const src = readFileSync(join(process.cwd(), 'src/components/Visualizer.tsx'), 'utf8')
+    // V23: the single controller moved out of Visualizer into usePlaybackController.
+    const src = readFileSync(join(process.cwd(), 'src/components/workbench/usePlaybackController.ts'), 'utf8')
+    // …and Visualizer must not keep a second cursor/timer.
+    const viz = readFileSync(join(process.cwd(), 'src/components/Visualizer.tsx'), 'utf8')
+    expect(viz).not.toMatch(/setInterval|setTimeout\(|useState\(\s*0\s*\)|setPlaying/)
     const goNextBlock = src.slice(src.indexOf('const goNext'), src.indexOf('const togglePlay'))
     const goPrevBlock = src.slice(src.indexOf('const goPrev'), src.indexOf('const goNext'))
     expect(goNextBlock).not.toMatch(/bumpTransitionEpoch/)
@@ -74,7 +79,7 @@ describe('V10-04 manual next must not kill new FLIP', () => {
     ]
     const { getByRole } = render(
       <MotionProvider>
-        <Visualizer steps={steps} runId="t1" chromePlacement="embedded" />
+        <Visualizer steps={steps} runId="t1" />
       </MotionProvider>,
     )
     await act(async () => {

@@ -5,7 +5,8 @@
 import { describe, expect, it, afterEach } from 'vitest'
 import { cleanup, render, screen, fireEvent, act } from '@testing-library/react'
 import { useState } from 'react'
-import WorkbenchLayout from '../../src/components/workbench/WorkbenchLayout'
+// V23: WorkbenchLayout takes page-owned prefs; the harness wires them like AlgoPage.
+import WorkbenchLayout from './helpers/LayoutHarness'
 
 let mountCount = 0
 
@@ -86,7 +87,7 @@ describe('V7 R4 workbench layout persist', () => {
       disconnect() {}
     } as unknown as typeof ResizeObserver
 
-    render(<WorkbenchLayout viz={<SessionProbe label="viz" />} code={<SessionProbe label="code" />} />)
+    render(<WorkbenchLayout scene={<SessionProbe label="viz" />} data={<SessionProbe label="data" />} code={<SessionProbe label="code" />} />)
     const layout = screen.getByTestId('workbench-layout')
     Object.defineProperty(layout, 'clientWidth', { configurable: true, get: () => 900 })
     act(() => {
@@ -105,6 +106,7 @@ describe('V7 R4 workbench layout persist', () => {
     expect(screen.getByTestId('probe-code-n').textContent).toBe('10')
     const idViz = screen.getByTestId('probe-viz').getAttribute('data-mount-id')
     const idCode = screen.getByTestId('probe-code').getAttribute('data-mount-id')
+    const idData = screen.getByTestId('probe-data').getAttribute('data-mount-id')
 
     // No legacy dual tree
     expect(document.querySelector('.workbench-tab-panels')).toBeNull()
@@ -137,5 +139,8 @@ describe('V7 R4 workbench layout persist', () => {
     expect(screen.getByTestId('probe-code').getAttribute('data-mount-id')).toBe(idCode)
     expect(screen.getByTestId('probe-viz-n').textContent).toBe('10')
     expect(screen.getByTestId('probe-code-n').textContent).toBe('10')
+    // V23: the current-data region is a real sibling that also survives both switches.
+    expect(screen.getByTestId('probe-data').getAttribute('data-mount-id')).toBe(idData)
+    expect(document.querySelectorAll('[data-testid="probe-data"]').length).toBe(1)
   })
 })

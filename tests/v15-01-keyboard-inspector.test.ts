@@ -1,16 +1,22 @@
+/**
+ * V15-01 keyboard — source contracts (V23 update).
+ * V23 replacement note: the Space/←/→ handler moved with the controller from
+ * Visualizer into usePlaybackController (Visualizer has NO key handler now). The
+ * sheet Escape contract is replaced by the real theory modal: Escape closes it and
+ * restores focus to the toggle without touching seek/run.
+ */
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 describe('V15-01 keyboard — source contracts', () => {
-  it('Visualizer uses shared keyboardGuard (no early sheet bypass before inputs)', () => {
+  it('controller uses shared keyboardGuard; Visualizer has no second key handler', () => {
+    const ctl = readFileSync(resolve('src/components/workbench/usePlaybackController.ts'), 'utf8')
+    expect(ctl).toMatch(/shouldIgnoreKeyboard/)
+    expect(ctl).toMatch(/keyboardGuard/)
+    expect(ctl.match(/addEventListener\('keydown'/g)?.length ?? 0).toBe(1)
     const viz = readFileSync(resolve('src/components/Visualizer.tsx'), 'utf8')
-    expect(viz).toMatch(/shouldIgnoreKeyboard/)
-    expect(viz).toMatch(/keyboardGuard/)
-    // Must NOT contain the V14 early-return that preferred sheet scrubbing before INPUT checks
-    expect(viz).not.toMatch(
-      /\(e\.key === 'ArrowLeft' \|\| e\.key === 'ArrowRight'\) &&\s*\n\s*t\.closest\('\.inspector-sheet/,
-    )
+    expect(viz).not.toMatch(/keydown|onKeyDown/)
   })
 
   it('keyboardGuard checks editing controls, composedPath, defaultPrevented, isComposing, modifiers', () => {
@@ -24,17 +30,15 @@ describe('V15-01 keyboard — source contracts', () => {
     expect(src).toMatch(/isContentEditable/)
   })
 
-  it('Esc closes sheet and restores focus without seek/run mutation hooks', () => {
-    const viz = readFileSync(resolve('src/components/Visualizer.tsx'), 'utf8')
-    expect(viz).toMatch(/closeInspectorSheet/)
-    expect(viz).toMatch(/inspectorToggleRef/)
-    expect(viz).toMatch(/Escape/)
-    // close path must not call goPrev/goNext/setIdx
-    const closeBlock = viz.slice(
-      viz.indexOf('const closeInspectorSheet'),
-      viz.indexOf('useEffect(() => {\n    const onKey'),
-    )
-    expect(closeBlock).not.toMatch(/goPrev|goNext|setIdx/)
+  it('Esc closes the theory modal and restores focus without seek/run mutation hooks', () => {
+    const page = readFileSync(resolve('src/pages/AlgoPage.tsx'), 'utf8')
+    expect(page).toMatch(/closeTheory/)
+    expect(page).toMatch(/theoryToggleRef/)
+    expect(page).toMatch(/Escape/)
+    const block = page.slice(page.indexOf('const closeTheory'), page.indexOf('}, [theoryOpen, closeTheory])'))
+    expect(block).toMatch(/theoryToggleRef\.current\?\.focus\(\)/)
+    expect(block).toMatch(/e\.key === 'Escape'/)
+    expect(block).not.toMatch(/goPrev|goNext|setIdx|seekTo|onRun|setSeekCommand/)
   })
 
   it('GraphResultPanel target input is identifiable for focus tests', () => {
