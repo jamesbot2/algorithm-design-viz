@@ -7,6 +7,7 @@ import {
 } from './helpers/assertStrictGraphVisible'
 import { prepareDijkstraN3Ready } from './helpers/runReadiness'
 import { openCurrentData, openFinalResult } from './helpers/currentData'
+import { clickPhase } from './helpers/phaseJump'
 
 const OUT_SHOTS = path.join(process.cwd(), 'docs/screenshots/v15')
 const OUT_TRACES = path.join(process.cwd(), 'docs/traces/v15')
@@ -102,14 +103,8 @@ test.describe('V15 keyboard / Dijkstra roles / continuous inspect / visibility',
       return !!(plot && plot.isConnected && plot.getBoundingClientRect().height > 40)
     })
     // Seek to terminal via product UI (phase jump / End) — not controlled range value=
-    const inlineDone = page.locator('[data-testid="phase-jump"] button', { hasText: '完成' })
-    if (await inlineDone.count()) {
-      await inlineDone.first().click()
-    } else {
-      const slider = page.locator('.scrub-row input[type=range]')
-      await slider.focus()
-      await page.keyboard.press('End')
-    }
+    // V23: inline chips when roomy, else the 阶段/设置 popover
+    await clickPhase(page, '完成')
     await expect.poll(async () => {
       const txt = (await page.getByTestId('step-counter').textContent()) ?? ''
       const m = txt.match(/(\d+)\s*\/\s*(\d+)/)

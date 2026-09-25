@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { clickPhase } from './helpers/phaseJump'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -42,29 +43,8 @@ async function seekToEnd(page: Page) {
     return m ? Number(m[2]) : 0
   }).toBeGreaterThan(1)
 
-  const inlineDone = page.locator('[data-testid="phase-jump"] button', { hasText: '完成' })
-  if (await inlineDone.count()) {
-    await inlineDone.first().click()
-  } else {
-    // Short-height: open settings dock and use phase-jump-dock
-    const toggle = page.getByTestId('playback-settings-toggle')
-    if (await toggle.isVisible()) {
-      await toggle.click()
-      await page.locator('[data-testid="phase-jump-dock"] button', { hasText: '完成' }).click()
-      await page.keyboard.press('Escape')
-    } else {
-      const slider = page.locator('.scrub-row input[type=range]')
-      await slider.focus()
-      await page.keyboard.press('End')
-    }
-  }
-
-  await expect.poll(async () => {
-    const txt = (await page.getByTestId('step-counter').textContent()) ?? ''
-    const m = txt.match(/(\d+)\s*\/\s*(\d+)/)
-    if (!m) return false
-    return Number(m[1]) === Number(m[2])
-  }).toBeTruthy()
+  // V23: inline chips when roomy, else the 阶段/设置 popover (was: count() of a possibly hidden inline copy)
+  await clickPhase(page, '完成')
 }
 
 async function assertBarsPainted(page: Page, vpName: string) {

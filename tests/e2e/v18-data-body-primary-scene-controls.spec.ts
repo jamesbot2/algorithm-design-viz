@@ -64,7 +64,7 @@ async function measureSheetBody(page: Page) {
       ),
       // V23: data is an in-grid region; header / input must not intersect it at all
       headerOverlapData: (() => {
-        const a = document.querySelector('.page-header')?.getBoundingClientRect()
+        const a = document.querySelector('.algo-page h1')?.getBoundingClientRect() // V23 toolbar title (.page-header does not exist)
         const d = document.querySelector('[data-testid="workbench-data-slot"]')?.getBoundingClientRect()
         if (!a || !d) return -1
         return Math.max(0, Math.min(a.right, d.right) - Math.max(a.left, d.left)) * Math.max(0, Math.min(a.bottom, d.bottom) - Math.max(a.top, d.top))

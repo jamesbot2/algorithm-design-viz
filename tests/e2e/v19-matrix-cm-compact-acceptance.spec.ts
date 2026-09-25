@@ -238,7 +238,21 @@ test.describe('V19 matrix follow / CM scroll / compact / vars / acceptance', () 
     await userWheelAway(page, '.matrix-scroll')
     await expect(page.getByTestId('matrix-follow-paused')).toBeVisible({ timeout: 3_000 })
     const paused = await measureMatrixInner(page)
-    expect(paused.visibleH, 'after manual scroll away').toBeLessThan(8)
+    // V23: the stage is taller at 1366 so the LCS matrix may barely overflow. The
+    // contract is unchanged where it is physically possible: if the scroll range can
+    // hide the current cell it must be hidden (no snap-back); otherwise the user's
+    // scroll must be honored at the end of the range (no auto re-follow).
+    const range = await page.evaluate(() => {
+      const sc = document.querySelector('.matrix-scroll') as HTMLElement
+      const cur = document.querySelector('.matrix-table td.hl-focus, .matrix-table td.hl-write') as HTMLElement
+      const sticky = (document.querySelector('.matrix-table .sticky-top') as HTMLElement | null)?.getBoundingClientRect().height ?? 0
+      const cellBottomInContent = cur.getBoundingClientRect().bottom - sc.getBoundingClientRect().top + sc.scrollTop
+      return { max: sc.scrollHeight - sc.clientHeight, top: sc.scrollTop, canHide: sc.scrollHeight - sc.clientHeight > cellBottomInContent - sticky }
+    })
+    if (range.canHide) expect(paused.visibleH, `after manual scroll away ${JSON.stringify(range)}`).toBeLessThan(8)
+    else expect(range.top, `user scroll honored ${JSON.stringify(range)}`).toBeGreaterThanOrEqual(range.max - 2)
+    // Sanity: real overflow exists so the pause path was exercised
+    expect(range.max, JSON.stringify(range)).toBeGreaterThan(0)
     await page.getByTestId('matrix-locate-btn').click()
     await page.waitForTimeout(150)
     const restored = await measureMatrixInner(page)

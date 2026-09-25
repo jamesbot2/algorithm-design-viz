@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import path from 'path'
 import fs from 'fs'
+import { visiblePhaseJump } from './helpers/phaseJump'
 
 const shotDir = path.join('docs', 'screenshots', 'v6')
 
@@ -13,8 +14,9 @@ test.describe('V6 UI/UX consistency', () => {
     await page.goto('#/algo/bubbleSort')
     await page.getByTestId('run-btn').click()
     await expect(page.getByTestId('playback-transport')).toBeVisible({ timeout: 20_000 })
-    await expect(page.getByTestId('phase-jump')).toBeVisible()
-    const jumpBtns = page.getByTestId('phase-jump').getByRole('button')
+    // V23: chips are inline when roomy, else in the 阶段/设置 popover (same capped list)
+    const jump = await visiblePhaseJump(page)
+    const jumpBtns = jump.getByRole('button')
     const count = await jumpBtns.count()
     expect(count).toBeLessThanOrEqual(8)
     expect(count).toBeGreaterThan(0)
