@@ -1449,7 +1449,8 @@ export default function AlgoPage() {
           />
         }
         code={codeNode}
-        transport={<PlaybackTransport {...player.transportProps} />}
+        // key: switching algorithm resets temporary transport popovers (settings / more phases)
+        transport={<PlaybackTransport key={id} {...player.transportProps} />}
       />
       </div>
     </div>

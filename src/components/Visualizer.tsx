@@ -195,7 +195,7 @@ export default function Visualizer({ player, staleResult = false, context }: Pro
     >
       {/* ONE main step description (action + reason + result). Wraps; never half-line clipped. */}
       <div className="viz-banner viz-banner-slot" data-testid="viz-banner" role="status">
-        <div className="viz-banner-text" data-testid="viz-banner-text">
+        <div className="viz-banner-text" data-testid="viz-banner-text" title={displayMessage}>
           {displayMessage}
         </div>
         <div className="viz-banner-controls" data-testid="viz-banner-controls">

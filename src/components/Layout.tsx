@@ -94,7 +94,7 @@ export default function Layout() {
       // Lab pages: <main> is the scroll viewport (fixed height). Document pages: the window scrolls.
       const own = el.clientHeight
       const scrolls = getComputedStyle(el).overflowY !== 'visible'
-      const h = scrolls ? own : (window.visualViewport?.height ?? window.innerHeight) - el.offsetTop
+      const h = scrolls ? own : document.documentElement.clientHeight - el.offsetTop
       setBudget((b) => (b.viewportHeight === h && b.viewportWidth === el.clientWidth ? b : { viewportHeight: h, viewportWidth: el.clientWidth }))
     }
     read()
