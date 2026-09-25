@@ -190,6 +190,13 @@ export default function CodeBrowser({
   const followExecRef = useRef(true)
   const userScrolledAwayRef = useRef(false)
   const execLine1Ref = useRef<number | null>(null)
+  // V23 (brief E): per-document reading memory. Leaving a doc while in reading mode
+  // (follow paused by real browsing) remembers its scrollTop; returning restores it
+  // and stays in reading mode. Follow mode keeps locating the current statement.
+  const readingMemo = useRef<{ ts: number | null; pseudo: number | null }>({ ts: null, pseudo: null })
+  const pendingRestore = useRef<number | null>(null)
+  /** Paused-reading pin for the TS scroller (layout reflow restores to it). */
+  const pinTopRef = useRef(0)
   const { theme } = useLabTheme()
   const { mode: motionMode } = useMotion()
   const reduceMotion = motionMode === 'reduced'
@@ -384,6 +391,27 @@ export default function CodeBrowser({
     intentRef.current.cancelAll()
     pseudoScrollCleanup.current?.()
     pseudoScrollCleanup.current = null
+    // V23: returning to a doc that was in reading mode restores its reading position.
+    const restoreTop = pendingRestore.current
+    if (restoreTop != null) {
+      pendingRestore.current = null
+      const gen = scrollGen.current
+      let tries = 0
+      const apply = () => {
+        if (scrollGen.current !== gen) return
+        const el = tab === 'ts' ? viewRef.current?.scrollDOM : pseudoPreRef.current
+        if ((!el || el.scrollHeight - el.clientHeight < restoreTop) && tries++ < 20) {
+          requestAnimationFrame(apply)
+          return
+        }
+        if (!el) return
+        if (tab === 'ts') pinTopRef.current = restoreTop
+        const txn = intentRef.current.beginTransaction('layout')
+        el.scrollTop = restoreTop
+        requestAnimationFrame(() => requestAnimationFrame(() => txn.end()))
+      }
+      requestAnimationFrame(apply)
+    }
     // V21-01: remasure pseudo scrollport after tab restore (pre may layout async)
     if (tab === 'pseudo' && followExecRef.current && !userScrolledAwayRef.current) {
       const line = execLine1Ref.current
@@ -415,10 +443,10 @@ export default function CodeBrowser({
       // V20-01 / V21-02: pin scrollTop across layout/data reflow while paused.
       // Keep updating pin on real user browse (not only pre-pause); absorb layout/follow
       // txn scrolls so restore does not overwrite the user's latest reading position.
-      let pinTop = scrollDOM.scrollTop
+      pinTopRef.current = scrollDOM.scrollTop
       const onScrollPin = () => {
         if (intentRef.current.isAbsorbing()) return
-        pinTop = scrollDOM.scrollTop
+        pinTopRef.current = scrollDOM.scrollTop
       }
       scrollDOM.addEventListener('scroll', onScrollPin, { passive: true })
       let ro: ResizeObserver | null = null
@@ -427,7 +455,7 @@ export default function CodeBrowser({
           if (!userScrolledAwayRef.current) return
           const txn = intentRef.current.beginTransaction('layout')
           const max = Math.max(0, scrollDOM.scrollHeight - scrollDOM.clientHeight)
-          scrollDOM.scrollTop = Math.min(pinTop, max)
+          scrollDOM.scrollTop = Math.min(pinTopRef.current, max)
           requestAnimationFrame(() => requestAnimationFrame(() => txn.end()))
         })
         ro.observe(scrollDOM)
@@ -436,7 +464,6 @@ export default function CodeBrowser({
         unbind()
         scrollDOM.removeEventListener('scroll', onScrollPin)
         ro?.disconnect()
-        pinTop = 0
       }
     },
     [execLine1, contextLines],
@@ -476,9 +503,17 @@ export default function CodeBrowser({
   }, [])
 
   const changeTab = (t: 'ts' | 'pseudo') => {
+    if (t === tab) {
+      setUserScrolledAway(false)
+      return
+    }
+    const cur = tab === 'ts' ? viewRef.current?.scrollDOM : pseudoPreRef.current
+    readingMemo.current[tab] = userScrolledAway && cur ? cur.scrollTop : null
+    const memo = readingMemo.current[t]
+    pendingRestore.current = memo
     setTab(t)
     onTabChange?.(t)
-    setUserScrolledAway(false)
+    setUserScrolledAway(memo != null)
   }
 
   const copy = async () => {
