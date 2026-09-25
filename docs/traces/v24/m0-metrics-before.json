@@ -1,0 +1,2401 @@
+{
+  "merge7-1366x768-bars": {
+    "frame": {
+      "runId": "run_muh28365_qjnnyhh",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1366,
+        "h": 768
+      }
+    },
+    "stage": {
+      "x": 80.1875,
+      "y": 172.4375,
+      "w": 770.625,
+      "h": 330.546875
+    },
+    "bars": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        17.84,
+        89.23,
+        17.84,
+        142.77,
+        160.63,
+        53.53,
+        124.92
+      ]
+    },
+    "values": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        64.58,
+        135.97,
+        64.58,
+        189.5,
+        207.36,
+        100.27,
+        171.66
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge7-1366x768-cells": {
+    "frame": {
+      "runId": "run_muh28365_qjnnyhh",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1366,
+        "h": 768
+      }
+    },
+    "stage": {
+      "x": 80.1875,
+      "y": 172.4375,
+      "w": 770.625,
+      "h": 330.546875
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge4-1366x768-bars": {
+    "frame": {
+      "runId": "run_muh286vb_78arkbe",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1366,
+        "h": 768
+      }
+    },
+    "dims": {
+      "frameH": 61.375,
+      "innerH": 215.359375,
+      "innerMin": "180px"
+    },
+    "bars": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        5.2,
+        0,
+        0
+      ],
+      "elH": [
+        40.16,
+        160.63,
+        120.47,
+        80.31
+      ]
+    },
+    "values": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0.2,
+        0,
+        0
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        5.2,
+        0,
+        0
+      ],
+      "elH": [
+        86.89,
+        207.36,
+        182.95,
+        127.05
+      ]
+    }
+  },
+  "merge4-1366x768-cells": {
+    "frame": {
+      "runId": "run_muh286vb_78arkbe",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1366,
+        "h": 768
+      }
+    },
+    "dims": {
+      "frameH": 31.265625,
+      "innerH": 54,
+      "innerMin": "0px"
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54
+      ]
+    }
+  },
+  "huffman-1366x768": {
+    "frame": {
+      "runId": "run_muh289k6_9zkwzme",
+      "stepIndex": 3,
+      "counter": "4 / 10 · sort",
+      "banner": "选取最小两棵（排序后队头）",
+      "execLine": 7,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1366,
+        "h": 768
+      }
+    },
+    "forestNodes": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLeaves": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLabels": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "inputSymbols": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "legacySymbols": {
+      "n": 5,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "legacyFreqs": {
+      "n": 5,
+      "full": 2,
+      "visH": [
+        0,
+        0,
+        0,
+        10.88,
+        10.88
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    }
+  },
+  "activity-1366x768": {
+    "frame": {
+      "runId": "run_muh28b9i_5gmj10d",
+      "stepIndex": 3,
+      "counter": "4 / 14",
+      "banner": "考察 A1：[3,5)，上次结束=4",
+      "execLine": 9,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1366,
+        "h": 768
+      }
+    },
+    "count": 6,
+    "overlaps": [
+      {
+        "a": "A0[1,4)",
+        "b": "A1[3,5)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A1[3,5)",
+        "b": "A2[0,6)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A2[0,6)",
+        "b": "A3[5,7)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A3[5,7)",
+        "b": "A4[8,9)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A4[8,9)",
+        "b": "A5[5,9)",
+        "dx": 2.06,
+        "dy": 19
+      }
+    ],
+    "clipped": [],
+    "widths": [
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45
+    ],
+    "sel": ".array-view[data-array=\"activities\"] .cell-val, [data-testid=\"activity-card\"] .act-id, [data-testid=\"activity-card\"] .act-range"
+  },
+  "merge7-1920x1080-bars": {
+    "frame": {
+      "runId": "run_muh28d5u_l511ykp",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "stage": {
+      "x": 280.1875,
+      "y": 172.4375,
+      "w": 752.625,
+      "h": 789.546875
+    },
+    "bars": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        127.61,
+        0,
+        307.61,
+        367.61,
+        7.61,
+        247.61
+      ],
+      "elH": [
+        60,
+        300,
+        60,
+        480,
+        540,
+        180,
+        420
+      ]
+    },
+    "values": {
+      "n": 7,
+      "full": 4,
+      "visH": [
+        0,
+        10.88,
+        0,
+        10.88,
+        10.88,
+        2.61,
+        10.88
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        127.61,
+        0,
+        307.61,
+        367.61,
+        7.61,
+        247.61
+      ],
+      "elH": [
+        106.73,
+        346.73,
+        106.73,
+        526.73,
+        586.73,
+        226.73,
+        466.73
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge7-1920x1080-cells": {
+    "frame": {
+      "runId": "run_muh28d5u_l511ykp",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "stage": {
+      "x": 280.1875,
+      "y": 172.4375,
+      "w": 752.625,
+      "h": 789.546875
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 7,
+      "full": 7,
+      "visH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 7,
+      "visH": [
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 4,
+      "visH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge4-1920x1080-bars": {
+    "frame": {
+      "runId": "run_muh28gm9_7fh5nz7",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "dims": {
+      "frameH": 437.359375,
+      "innerH": 594.734375,
+      "innerMin": "180px"
+    },
+    "bars": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        381.19,
+        261.94,
+        111.19
+      ],
+      "elH": [
+        135,
+        540,
+        405,
+        270
+      ]
+    },
+    "values": {
+      "n": 4,
+      "full": 3,
+      "visH": [
+        0,
+        10.88,
+        10.88,
+        10.88
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        381.19,
+        261.94,
+        111.19
+      ],
+      "elH": [
+        181.73,
+        586.73,
+        467.48,
+        316.73
+      ]
+    }
+  },
+  "merge4-1920x1080-cells": {
+    "frame": {
+      "runId": "run_muh28gm9_7fh5nz7",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "dims": {
+      "frameH": 353.8125,
+      "innerH": 54,
+      "innerMin": "0px"
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 4,
+      "full": 4,
+      "visH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 4,
+      "visH": [
+        54,
+        54,
+        54,
+        54
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54
+      ]
+    }
+  },
+  "huffman-1920x1080": {
+    "frame": {
+      "runId": "run_muh28jc2_kd76luu",
+      "stepIndex": 3,
+      "counter": "4 / 10 · sort",
+      "banner": "选取最小两棵（排序后队头）",
+      "execLine": 7,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "forestNodes": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLeaves": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLabels": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "inputSymbols": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "legacySymbols": {
+      "n": 5,
+      "full": 0,
+      "visH": [
+        17.69,
+        17.69,
+        17.69,
+        17.69,
+        17.69
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "legacyFreqs": {
+      "n": 5,
+      "full": 5,
+      "visH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    }
+  },
+  "activity-1920x1080": {
+    "frame": {
+      "runId": "run_muh28l44_bg3ghly",
+      "stepIndex": 3,
+      "counter": "4 / 14",
+      "banner": "考察 A1：[3,5)，上次结束=4",
+      "execLine": 9,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1920,
+        "h": 1080
+      }
+    },
+    "count": 6,
+    "overlaps": [
+      {
+        "a": "A0[1,4)",
+        "b": "A1[3,5)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A1[3,5)",
+        "b": "A2[0,6)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A2[0,6)",
+        "b": "A3[5,7)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A3[5,7)",
+        "b": "A4[8,9)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A4[8,9)",
+        "b": "A5[5,9)",
+        "dx": 2.06,
+        "dy": 19
+      }
+    ],
+    "clipped": [],
+    "widths": [
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45
+    ],
+    "sel": ".array-view[data-array=\"activities\"] .cell-val, [data-testid=\"activity-card\"] .act-id, [data-testid=\"activity-card\"] .act-range"
+  },
+  "merge7-390x844-bars": {
+    "frame": {
+      "runId": "run_muh28mwu_d6czqsf",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 390,
+        "h": 844
+      }
+    },
+    "stage": {
+      "x": 14.578125,
+      "y": 238.40625,
+      "w": 360.84375,
+      "h": 496.984375
+    },
+    "bars": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        92.38,
+        128.67,
+        0,
+        56.08
+      ],
+      "elH": [
+        36.28,
+        181.45,
+        36.28,
+        290.33,
+        326.63,
+        108.88,
+        254.03
+      ]
+    },
+    "values": {
+      "n": 7,
+      "full": 3,
+      "visH": [
+        0,
+        0,
+        0,
+        10.88,
+        10.88,
+        0,
+        10.88
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        92.38,
+        128.67,
+        0,
+        56.08
+      ],
+      "elH": [
+        83.02,
+        243.94,
+        83.02,
+        337.06,
+        373.36,
+        155.61,
+        300.77
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        17.67,
+        17.67,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge7-390x844-cells": {
+    "frame": {
+      "runId": "run_muh28mwu_d6czqsf",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 390,
+        "h": 844
+      }
+    },
+    "stage": {
+      "x": 14.578125,
+      "y": 238.40625,
+      "w": 360.84375,
+      "h": 496.984375
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 7,
+      "full": 5,
+      "visH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 5,
+      "visH": [
+        54,
+        54,
+        54,
+        54,
+        54,
+        13.14,
+        13.14
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge4-390x844-bars": {
+    "frame": {
+      "runId": "run_muh28pwh_5vl71lk",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 390,
+        "h": 844
+      }
+    },
+    "dims": {
+      "frameH": 194.0625,
+      "innerH": 381.359375,
+      "innerMin": "180px"
+    },
+    "bars": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        137.89,
+        71.98,
+        0
+      ],
+      "elH": [
+        81.66,
+        326.63,
+        244.97,
+        163.31
+      ]
+    },
+    "values": {
+      "n": 4,
+      "full": 2,
+      "visH": [
+        0,
+        10.88,
+        10.88,
+        0
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        137.89,
+        71.98,
+        0
+      ],
+      "elH": [
+        128.39,
+        373.36,
+        307.45,
+        210.05
+      ]
+    }
+  },
+  "merge4-390x844-cells": {
+    "frame": {
+      "runId": "run_muh28pwh_5vl71lk",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 390,
+        "h": 844
+      }
+    },
+    "dims": {
+      "frameH": 106.84375,
+      "innerH": 54,
+      "innerMin": "0px"
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 4,
+      "full": 4,
+      "visH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 4,
+      "visH": [
+        54,
+        54,
+        54,
+        54
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54
+      ]
+    }
+  },
+  "huffman-390x844": {
+    "frame": {
+      "runId": "run_muh28sf6_75hn615",
+      "stepIndex": 3,
+      "counter": "4 / 10 · sort",
+      "banner": "选取最小两棵（排序后队头）",
+      "execLine": 7,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 390,
+        "h": 844
+      }
+    },
+    "forestNodes": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLeaves": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLabels": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "inputSymbols": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "legacySymbols": {
+      "n": 5,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "legacyFreqs": {
+      "n": 5,
+      "full": 3,
+      "visH": [
+        0,
+        2.53,
+        10.88,
+        10.88,
+        10.88
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    }
+  },
+  "activity-390x844": {
+    "frame": {
+      "runId": "run_muh28u3r_t1pygb6",
+      "stepIndex": 3,
+      "counter": "4 / 14",
+      "banner": "考察 A1：[3,5)，上次结束=4",
+      "execLine": 9,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 390,
+        "h": 844
+      }
+    },
+    "count": 6,
+    "overlaps": [
+      {
+        "a": "A0[1,4)",
+        "b": "A1[3,5)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A1[3,5)",
+        "b": "A2[0,6)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A2[0,6)",
+        "b": "A3[5,7)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A3[5,7)",
+        "b": "A4[8,9)",
+        "dx": 2.06,
+        "dy": 19
+      }
+    ],
+    "clipped": [],
+    "widths": [
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45
+    ],
+    "sel": ".array-view[data-array=\"activities\"] .cell-val, [data-testid=\"activity-card\"] .act-id, [data-testid=\"activity-card\"] .act-range"
+  },
+  "merge7-1024x600-bars": {
+    "frame": {
+      "runId": "run_muh28vsm_22y73ad",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1024,
+        "h": 600
+      }
+    },
+    "stage": {
+      "x": 76.1875,
+      "y": 127.546875,
+      "w": 558.625,
+      "h": 291.40625
+    },
+    "bars": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        13.39,
+        67,
+        13.39,
+        107.22,
+        120.63,
+        40.2,
+        93.81
+      ]
+    },
+    "values": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        60.13,
+        113.73,
+        60.13,
+        153.95,
+        167.36,
+        86.94,
+        140.55
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge7-1024x600-cells": {
+    "frame": {
+      "runId": "run_muh28vsm_22y73ad",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1024,
+        "h": 600
+      }
+    },
+    "stage": {
+      "x": 76.1875,
+      "y": 127.546875,
+      "w": 558.625,
+      "h": 291.40625
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge4-1024x600-bars": {
+    "frame": {
+      "runId": "run_muh28yvn_drlecg6",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1024,
+        "h": 600
+      }
+    },
+    "dims": {
+      "frameH": 33.46875,
+      "innerH": 180,
+      "innerMin": "180px"
+    },
+    "bars": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        30.16,
+        120.63,
+        90.47,
+        60.31
+      ]
+    },
+    "values": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        76.89,
+        167.36,
+        152.95,
+        107.05
+      ]
+    }
+  },
+  "merge4-1024x600-cells": {
+    "frame": {
+      "runId": "run_muh28yvn_drlecg6",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1024,
+        "h": 600
+      }
+    },
+    "dims": {
+      "frameH": 26,
+      "innerH": 54,
+      "innerMin": "0px"
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54
+      ]
+    }
+  },
+  "huffman-1024x600": {
+    "frame": {
+      "runId": "run_muh291fv_qaj3v5y",
+      "stepIndex": 3,
+      "counter": "4 / 10 · sort",
+      "banner": "选取最小两棵（排序后队头）",
+      "execLine": 7,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1024,
+        "h": 600
+      }
+    },
+    "forestNodes": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLeaves": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLabels": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "inputSymbols": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "legacySymbols": {
+      "n": 5,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "legacyFreqs": {
+      "n": 5,
+      "full": 1,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        10.88
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    }
+  },
+  "activity-1024x600": {
+    "frame": {
+      "runId": "run_muh2934f_oxx3uwa",
+      "stepIndex": 3,
+      "counter": "4 / 14",
+      "banner": "考察 A1：[3,5)，上次结束=4",
+      "execLine": 9,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 1024,
+        "h": 600
+      }
+    },
+    "count": 6,
+    "overlaps": [
+      {
+        "a": "A0[1,4)",
+        "b": "A1[3,5)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A1[3,5)",
+        "b": "A2[0,6)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A2[0,6)",
+        "b": "A3[5,7)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A3[5,7)",
+        "b": "A4[8,9)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A4[8,9)",
+        "b": "A5[5,9)",
+        "dx": 2.06,
+        "dy": 19
+      }
+    ],
+    "clipped": [],
+    "widths": [
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45
+    ],
+    "sel": ".array-view[data-array=\"activities\"] .cell-val, [data-testid=\"activity-card\"] .act-id, [data-testid=\"activity-card\"] .act-range"
+  },
+  "merge7-844x390-bars": {
+    "frame": {
+      "runId": "run_muh294vw_3tlkafd",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 844,
+        "h": 390
+      }
+    },
+    "stage": {
+      "x": 16.1875,
+      "y": 127.546875,
+      "w": 811.625,
+      "h": 194.03125
+    },
+    "bars": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        15.55,
+        77.77,
+        15.55,
+        124.44,
+        140,
+        46.66,
+        108.88
+      ]
+    },
+    "values": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        62.28,
+        124.5,
+        62.28,
+        171.17,
+        186.73,
+        93.39,
+        155.61
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        7.42,
+        7.42,
+        7.42,
+        7.42
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge7-844x390-cells": {
+    "frame": {
+      "runId": "run_muh294vw_3tlkafd",
+      "stepIndex": 20,
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 844,
+        "h": 390
+      }
+    },
+    "stage": {
+      "x": 16.1875,
+      "y": 127.546875,
+      "w": 811.625,
+      "h": 194.03125
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 7,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54,
+        54,
+        54,
+        54
+      ]
+    },
+    "pointers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        21.59,
+        21.59,
+        21.59,
+        21.59
+      ]
+    },
+    "buffers": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        22.47,
+        22.47,
+        22.47,
+        22.47
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    }
+  },
+  "merge4-844x390-bars": {
+    "frame": {
+      "runId": "run_muh297ua_xdhwybq",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 844,
+        "h": 390
+      }
+    },
+    "dims": {
+      "frameH": 26,
+      "innerH": 194.734375,
+      "innerMin": "180px"
+    },
+    "bars": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        35,
+        140,
+        105,
+        70
+      ]
+    },
+    "values": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        81.73,
+        186.73,
+        167.48,
+        116.73
+      ]
+    }
+  },
+  "merge4-844x390-cells": {
+    "frame": {
+      "runId": "run_muh297ua_xdhwybq",
+      "stepIndex": 12,
+      "counter": "13 / 25 · merge",
+      "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+      "execLine": 21,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 844,
+        "h": 390
+      }
+    },
+    "dims": {
+      "frameH": 26,
+      "innerH": 54,
+      "innerMin": "0px"
+    },
+    "bars": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "values": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "slots": {
+      "n": 4,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        54,
+        54,
+        54,
+        54
+      ]
+    }
+  },
+  "huffman-844x390": {
+    "frame": {
+      "runId": "run_muh29aap_ya7xsw9",
+      "stepIndex": 3,
+      "counter": "4 / 10 · sort",
+      "banner": "选取最小两棵（排序后队头）",
+      "execLine": 7,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 844,
+        "h": 390
+      }
+    },
+    "forestNodes": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLeaves": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "forestLabels": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "inputSymbols": {
+      "n": 0,
+      "full": 0,
+      "visH": [],
+      "elH": []
+    },
+    "legacySymbols": {
+      "n": 5,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        23.77,
+        23.77,
+        23.77,
+        23.77,
+        23.77
+      ]
+    },
+    "legacyFreqs": {
+      "n": 5,
+      "full": 0,
+      "visH": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "elH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ]
+    }
+  },
+  "activity-844x390": {
+    "frame": {
+      "runId": "run_muh29byd_p36w033",
+      "stepIndex": 3,
+      "counter": "4 / 14",
+      "banner": "考察 A1：[3,5)，上次结束=4",
+      "execLine": 9,
+      "primary": "array",
+      "primaryKind": null,
+      "vp": {
+        "w": 844,
+        "h": 390
+      }
+    },
+    "count": 6,
+    "overlaps": [
+      {
+        "a": "A0[1,4)",
+        "b": "A1[3,5)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A1[3,5)",
+        "b": "A2[0,6)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A2[0,6)",
+        "b": "A3[5,7)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A3[5,7)",
+        "b": "A4[8,9)",
+        "dx": 2.06,
+        "dy": 19
+      },
+      {
+        "a": "A4[8,9)",
+        "b": "A5[5,9)",
+        "dx": 2.06,
+        "dy": 19
+      }
+    ],
+    "clipped": [],
+    "widths": [
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45,
+      60.45
+    ],
+    "sel": ".array-view[data-array=\"activities\"] .cell-val, [data-testid=\"activity-card\"] .act-id, [data-testid=\"activity-card\"] .act-range"
+  }
+}

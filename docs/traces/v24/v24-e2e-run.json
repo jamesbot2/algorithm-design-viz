@@ -1,0 +1,665 @@
+{
+  "anim-mergeSort": {
+    "worstVisibleRatio": [
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "anim-insertionSort": {
+    "worstVisibleRatio": [
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "huffman-2 / 10 · sort": {
+    "visH": [
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59
+    ],
+    "sel": [
+      "a:5",
+      "b:9"
+    ]
+  },
+  "huffman-4 / 10 · sort": {
+    "visH": [
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59
+    ],
+    "sel": [
+      "c:12",
+      "d:13"
+    ]
+  },
+  "huffman-6 / 10 · sort": {
+    "visH": [
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59
+    ],
+    "sel": [
+      "⊕14",
+      "e:16"
+    ]
+  },
+  "huffman-8 / 10 · sort": {
+    "visH": [
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59
+    ],
+    "sel": [
+      "⊕25",
+      "⊕30"
+    ]
+  },
+  "huffman-codes": {
+    "a": [
+      "100",
+      "100"
+    ],
+    "b": [
+      "101",
+      "101"
+    ],
+    "c": [
+      "00",
+      "00"
+    ],
+    "d": [
+      "01",
+      "01"
+    ],
+    "e": [
+      "11",
+      "11"
+    ]
+  },
+  "activity-start-1366": {
+    "widths": [
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42
+    ],
+    "overlaps": 0
+  },
+  "activity-4of14-1366": {
+    "widths": [
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42
+    ],
+    "overlaps": 0
+  },
+  "activity-end-1366": {
+    "widths": [
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42
+    ],
+    "overlaps": 0
+  },
+  "activity-large-font": {
+    "widths": [
+      46.8,
+      46.8,
+      46.8,
+      46.8,
+      46.8,
+      46.8
+    ]
+  },
+  "merge7-21of55-1920x1080-bars": {
+    "counter": "21 / 55 · merge",
+    "banner": "比较 left[0]=2 与 right[1]=8",
+    "valuesVisH": [
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88
+    ],
+    "barsVisH": [
+      62.77,
+      313.88,
+      62.77,
+      502.22,
+      565,
+      188.33,
+      439.44
+    ],
+    "barsElH": [
+      62.77,
+      313.88,
+      62.77,
+      502.22,
+      565,
+      188.33,
+      439.44
+    ]
+  },
+  "merge7-21of55-1920x1080-cells": {
+    "counter": "21 / 55 · merge",
+    "banner": "比较 left[0]=2 与 right[1]=8",
+    "valuesVisH": [
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77
+    ],
+    "barsVisH": [],
+    "barsElH": []
+  },
+  "merge4-13of25-1920x1080-bars": {
+    "counter": "13 / 25 · merge",
+    "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+    "valuesVisH": [
+      10.88,
+      10.88,
+      10.88,
+      10.88
+    ],
+    "barsVisH": [
+      141.5,
+      566,
+      424.5,
+      283
+    ],
+    "barsElH": [
+      141.5,
+      566,
+      424.5,
+      283
+    ]
+  },
+  "huffman-4of10-1920x1080": {
+    "visH": [
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59
+    ]
+  },
+  "activity-4of14-1920x1080": {
+    "widths": [
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42
+    ]
+  },
+  "merge7-21of55-390x844-bars": {
+    "counter": "21 / 55 · merge",
+    "banner": "比较 left[0]=2 与 right[1]=8",
+    "valuesVisH": [
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88
+    ],
+    "barsVisH": [
+      25.11,
+      125.55,
+      25.11,
+      200.88,
+      226,
+      75.33,
+      175.77
+    ],
+    "barsElH": [
+      25.11,
+      125.55,
+      25.11,
+      200.88,
+      226,
+      75.33,
+      175.77
+    ]
+  },
+  "merge7-21of55-390x844-cells": {
+    "counter": "21 / 55 · merge",
+    "banner": "比较 left[0]=2 与 right[1]=8",
+    "valuesVisH": [
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77
+    ],
+    "barsVisH": [],
+    "barsElH": []
+  },
+  "merge4-13of25-390x844-bars": {
+    "counter": "13 / 25 · merge",
+    "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+    "valuesVisH": [
+      10.88,
+      10.88,
+      10.88,
+      10.88
+    ],
+    "barsVisH": [
+      61,
+      244,
+      183,
+      122
+    ],
+    "barsElH": [
+      61,
+      244,
+      183,
+      122
+    ]
+  },
+  "huffman-4of10-390x844": {
+    "visH": [
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59,
+      20.59
+    ]
+  },
+  "activity-4of14-390x844": {
+    "widths": [
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42,
+      37.42
+    ]
+  },
+  "fallback-merge7-1024x600": {
+    "before": {
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "valuesVisH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ],
+      "barsVisH": [
+        4.22,
+        21.11,
+        4.22,
+        33.77,
+        38,
+        12.66,
+        29.55
+      ],
+      "barsElH": [
+        4.22,
+        21.11,
+        4.22,
+        33.77,
+        38,
+        12.66,
+        29.55
+      ]
+    },
+    "after": {
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "valuesVisH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ],
+      "barsVisH": [
+        4.22,
+        21.11,
+        4.22,
+        33.77,
+        38,
+        12.66,
+        29.55
+      ],
+      "barsElH": [
+        4.22,
+        21.11,
+        4.22,
+        33.77,
+        38,
+        12.66,
+        29.55
+      ]
+    },
+    "scroll": {
+      "sh": 291,
+      "ch": 291
+    }
+  },
+  "neg-merge-squeeze": {
+    "failWhileInjected": [
+      "a:slots clipped 7/7 (minVisH 0)",
+      "a:bars clipped 7/7 (minVisH 0)",
+      "a:values clipped 7/7 (minVisH 0)",
+      "a:indices clipped 7/7 (minVisH 0)",
+      "a:pointers clipped 4/4 (minVisH 0)"
+    ]
+  },
+  "neg-huffman-squeeze": {
+    "failWhileInjected": [
+      "forest:c:12",
+      "forest:d:13",
+      "forest:a:5",
+      "forest:b:9",
+      "forest:⊕14",
+      "forest:e:16",
+      "glyph:a",
+      "glyph:5",
+      "glyph:b",
+      "glyph:9",
+      "glyph:c",
+      "glyph:12",
+      "glyph:d",
+      "glyph:13",
+      "glyph:e",
+      "glyph:16"
+    ]
+  },
+  "merge7-21of55-1366-tree-open": {
+    "counter": "21 / 55 · merge",
+    "banner": "比较 left[0]=2 与 right[1]=8",
+    "valuesVisH": [
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88
+    ],
+    "barsVisH": [
+      8.44,
+      42.22,
+      8.44,
+      67.55,
+      76,
+      25.33,
+      59.11
+    ],
+    "barsElH": [
+      8.44,
+      42.22,
+      8.44,
+      67.55,
+      76,
+      25.33,
+      59.11
+    ],
+    "nodes0": 4,
+    "nodes1": 9
+  },
+  "fallback-merge7-844x390": {
+    "before": {
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "valuesVisH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ],
+      "barsVisH": [
+        3.55,
+        17.77,
+        3.55,
+        28.44,
+        32,
+        10.66,
+        24.88
+      ],
+      "barsElH": [
+        3.55,
+        17.77,
+        3.55,
+        28.44,
+        32,
+        10.66,
+        24.88
+      ]
+    },
+    "after": {
+      "counter": "21 / 55 · merge",
+      "banner": "比较 left[0]=2 与 right[1]=8",
+      "valuesVisH": [
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88,
+        10.88
+      ],
+      "barsVisH": [
+        3.55,
+        17.77,
+        3.55,
+        28.44,
+        32,
+        10.66,
+        24.88
+      ],
+      "barsElH": [
+        3.55,
+        17.77,
+        3.55,
+        28.44,
+        32,
+        10.66,
+        24.88
+      ]
+    },
+    "scroll": {
+      "sh": 252,
+      "ch": 194
+    }
+  },
+  "neg-merge-hidden": {
+    "failWhileInjected": [
+      "a:slots clipped 7/7 (minVisH 0)",
+      "a:bars clipped 7/7 (minVisH 0)",
+      "a:values clipped 7/7 (minVisH 0)",
+      "a:indices clipped 7/7 (minVisH 0)",
+      "a:pointers clipped 4/4 (minVisH 0)"
+    ]
+  },
+  "neg-activity-52px": {
+    "overlapsWhileInjected": [
+      {
+        "a": "A0[1,4)",
+        "b": "A1[3,5)",
+        "dx": 2.08,
+        "dy": 19
+      },
+      {
+        "a": "A1[3,5)",
+        "b": "A2[0,6)",
+        "dx": 2.08,
+        "dy": 19
+      },
+      {
+        "a": "A2[0,6)",
+        "b": "A3[5,7)",
+        "dx": 2.08,
+        "dy": 19
+      },
+      {
+        "a": "A3[5,7)",
+        "b": "A4[8,9)",
+        "dx": 2.08,
+        "dy": 19
+      },
+      {
+        "a": "A4[8,9)",
+        "b": "A5[5,9)",
+        "dx": 2.08,
+        "dy": 19
+      }
+    ]
+  },
+  "merge7-21of55-1366-bars": {
+    "counter": "21 / 55 · merge",
+    "banner": "比较 left[0]=2 与 right[1]=8",
+    "valuesVisH": [
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88,
+      10.88
+    ],
+    "barsVisH": [
+      12,
+      59.44,
+      11.88,
+      95.11,
+      107,
+      35.66,
+      83.22
+    ],
+    "barsElH": [
+      12,
+      59.44,
+      11.88,
+      95.11,
+      107,
+      35.66,
+      83.22
+    ]
+  },
+  "merge7-21of55-1366-cells": {
+    "counter": "21 / 55 · merge",
+    "banner": "比较 left[0]=2 与 right[1]=8",
+    "valuesVisH": [
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77,
+      23.77
+    ],
+    "barsVisH": [],
+    "barsElH": []
+  },
+  "merge7-keyframes": {
+    "keyFrames": [
+      0,
+      6,
+      7,
+      8,
+      9,
+      54
+    ],
+    "phases": [
+      "other",
+      "buffers",
+      "compare",
+      "write",
+      "remaining",
+      "done"
+    ]
+  },
+  "merge4-13of25-1366-bars": {
+    "counter": "13 / 25 · merge",
+    "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+    "valuesVisH": [
+      10.88,
+      10.88,
+      10.88,
+      10.88
+    ],
+    "barsVisH": [
+      26.75,
+      107,
+      80.25,
+      53.5
+    ],
+    "barsElH": [
+      26.75,
+      107,
+      80.25,
+      53.5
+    ]
+  },
+  "merge4-13of25-1366-cells": {
+    "counter": "13 / 25 · merge",
+    "banner": "归并区间 [2,2] 与 [3,3]（抽出 left/right 缓冲）",
+    "valuesVisH": [
+      23.77,
+      23.77,
+      23.77,
+      23.77
+    ],
+    "barsVisH": [],
+    "barsElH": []
+  },
+  "large-huffman-locate": {
+    "dims": {
+      "sw": 1000,
+      "cw": 769,
+      "sh": 496,
+      "ch": 301
+    },
+    "awayFull": 2
+  }
+}
