@@ -1,4 +1,5 @@
 import type { ArrayOp, HighlightRole, Step } from '../types/step'
+import type { PresentationDescriptor } from '../types/presentation'
 
 export const meta = {
   id: 'mergeSort',
@@ -19,6 +20,16 @@ export const meta = {
   spaceNotes: '合并需要 O(n) 临时空间。',
   inputAssumptions: '任意数值数组。',
   statDefinitions: 'comparisons=归并比较；writes=写入结果次数（若统计）。',
+}
+
+/** V24 presentation: `a` is the primary; left/right are required companions; the recursion tree is a switchable auxiliary. */
+export const presentation: PresentationDescriptor = {
+  primaryKind: 'array',
+  primaryKey: 'a',
+  companions: ['left', 'right'],
+  reserveCompanions: true,
+  auxiliaries: [{ id: 'recursion-tree', label: '递归树' }],
+  callStackVar: 'callStack',
 }
 
 function pendingId(seq: number, slot: number): string {

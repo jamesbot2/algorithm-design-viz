@@ -1,4 +1,5 @@
 import type { Step } from '../types/step'
+import type { PresentationDescriptor } from '../types/presentation'
 import * as bubbleSort from './bubbleSort'
 import * as insertionSort from './insertionSort'
 import * as mergeSort from './mergeSort'
@@ -44,6 +45,8 @@ export interface AlgoModule {
   meta: AlgoMeta
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   generateSteps: (input: number[], ...args: any[]) => Step[]
+  /** V24: optional per-module presentation contract (presentation only). */
+  presentation?: PresentationDescriptor
 }
 
 export const algorithms: Record<string, AlgoModule> = {

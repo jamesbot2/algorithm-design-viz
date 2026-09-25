@@ -1,5 +1,6 @@
 import type { SearchTreeNode, Step } from '../types/step'
 import { snapshotTree } from '../utils/cloneTree'
+import type { PresentationDescriptor } from '../types/presentation'
 
 export const meta = {
   id: 'nQueens',
@@ -17,6 +18,13 @@ export const meta = {
   timeComplexity: 'O(n!) 量级（剪枝后更少）',
   spaceComplexity: 'O(n)',
   inputAssumptions: 'n≥1；demo 默认求全部解；大 n 需提高 budget',
+}
+
+/** V24 presentation: the board is the primary; the search tree is a collapsed auxiliary. */
+export const presentation: PresentationDescriptor = {
+  primaryKind: 'board',
+  primaryKey: 'board',
+  auxiliaries: [{ id: 'search-tree', label: '搜索树（辅助视图）' }],
 }
 
 export type NQueensMode = 'one' | 'all'

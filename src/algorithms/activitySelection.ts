@@ -1,4 +1,5 @@
 import type { Step } from '../types/step'
+import type { PresentationDescriptor } from '../types/presentation'
 
 export const meta = {
   id: 'activitySelection',
@@ -9,6 +10,14 @@ export const meta = {
 选第一个；之后选开始 ≥ 上次结束的活动`,
   defaultStarts: [1, 3, 0, 5, 8, 5],
   defaultEnds: [4, 5, 6, 7, 9, 9],
+}
+
+/** V24 presentation: interval cards (id + [start,finish)) are the primary; the selected set is a companion. */
+export const presentation: PresentationDescriptor = {
+  primaryKind: 'array',
+  primaryKey: 'activities',
+  companions: ['selected'],
+  labelFormat: { activities: 'interval-card' },
 }
 
 export function generateSteps(

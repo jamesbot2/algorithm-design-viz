@@ -1,5 +1,6 @@
 import type { SearchTreeNode, Step } from '../types/step'
 import { snapshotTree } from '../utils/cloneTree'
+import type { PresentationDescriptor } from '../types/presentation'
 
 export const meta = {
   id: 'huffman',
@@ -17,6 +18,12 @@ export const meta = {
   timeComplexity: 'O(n log n) with heap; this demo uses sort+shift each round (O(n² log n))',
   spaceComplexity: 'O(n)',
   inputAssumptions: '正频率；空→WPL=0；单符号→码长 0、WPL=0；重复符号须聚合',
+}
+
+/** V24 presentation: the forest is the primary on every frame; symbols/freqs are a compact input table. */
+export const presentation: PresentationDescriptor = {
+  primaryKind: 'forest',
+  inputTable: ['symbols', 'freqs'],
 }
 
 interface HNode {

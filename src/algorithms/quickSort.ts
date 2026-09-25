@@ -1,4 +1,5 @@
 import type { ArrayOp, HighlightRole, Step } from '../types/step'
+import type { PresentationDescriptor } from '../types/presentation'
 
 export const meta = {
   id: 'quickSort',
@@ -19,6 +20,9 @@ export const meta = {
   inputAssumptions: '任意可比较数值；枢轴取区间右端（Lomuto）；i 语义为「已放置 ≤pivot 的最后下标」，初值 L-1。',
   statDefinitions: 'comparisons = 与 pivot 的元素比较；swaps = 元素交换次数（含枢轴就位）。',
 }
+
+/** V24 presentation: the partitioned array `a` is the primary. */
+export const presentation: PresentationDescriptor = { primaryKind: 'array', primaryKey: 'a' }
 
 export function generateSteps(input: number[]): Step[] {
   const a = [...input]

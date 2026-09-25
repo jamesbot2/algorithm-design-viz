@@ -1,4 +1,5 @@
 import type { ArrayOp, HighlightRole, Step } from '../types/step'
+import type { PresentationDescriptor } from '../types/presentation'
 
 export const meta = {
   id: 'insertionSort',
@@ -20,6 +21,14 @@ export const meta = {
   spaceNotes: '原地。',
   inputAssumptions: '任意数值数组。',
   statDefinitions: 'comparisons=插入探测比较；writes=右移与插入写入。',
+}
+
+/** V24 presentation: `a` is the primary; temp/key is a required companion while a key is lifted. */
+export const presentation: PresentationDescriptor = {
+  primaryKind: 'array',
+  primaryKey: 'a',
+  companions: ['temp', 'key'],
+  reserveCompanions: true,
 }
 
 function vacantId(seq: number, slot: number): string {
