@@ -30,7 +30,26 @@ describe('V15-03 / V23 continuous inspect contract', () => {
       expect(src.match(/usePlaybackController\(/g)?.length ?? 0).toBe(1)
       expect(src.match(/<PlaybackTransport /g)?.length ?? 0).toBe(1)
       expect(src.match(/<Visualizer\b/g)?.length ?? 0).toBe(1)
-      expect(src.match(/<CurrentStepData\b/g)?.length ?? 0).toBe(1)
+      // Exactly ONE live CurrentStepData. The only other allowed copies are the
+      // inert measuring probes passed via `dataProbes=` (rendered by the workbench
+      // under DataProbeContext, aria-hidden + inert, no player wiring, never at end).
+      const probeAt = src.indexOf('dataProbes={')
+      const live = probeAt < 0 ? src : src.slice(0, probeAt) + src.slice(src.indexOf('code={', probeAt))
+      expect(live.match(/<CurrentStepData\b/g)?.length ?? 0).toBe(1)
+      if (probeAt >= 0) {
+        const probe = src.slice(probeAt, src.indexOf('code={', probeAt))
+        expect(probe.match(/<CurrentStepData\b/g)?.length ?? 0).toBe(1)
+        expect(probe).not.toMatch(/player\.|onStep|seek|atEnd=\{(?!false)/)
+      }
+    }
+  })
+
+  it('data probes are inert, invisible, and never carry test ids', () => {
+    const wb = read('src/components/workbench/WorkbenchLayout.tsx')
+    expect(wb).toMatch(/className="wb-data-probes"[^>]*aria-hidden="true"[^>]*inert/)
+    expect(wb).toMatch(/<DataProbeContext\.Provider value=\{true\}>/)
+    for (const p of ['src/components/VarsPanel.tsx', 'src/components/data/CurrentStepData.tsx']) {
+      expect(read(p)).not.toMatch(/data-testid=/)
     }
   })
 

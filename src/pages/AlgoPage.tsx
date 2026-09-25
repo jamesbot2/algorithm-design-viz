@@ -982,6 +982,12 @@ export default function AlgoPage() {
     seekCommand: hasRun ? seekCommand : null,
     onStepIndexChange: hasRun ? onStepChange : undefined,
   })
+  /**
+   * V23: frames whose data presentation is largest (plus the last frame), used as
+   * invisible measuring copies so the data region is sized once per run and
+   * playback never resizes the scene. Pure selection over the existing trace; no solve.
+   */
+  const probeSteps = useMemo(() => pickDataProbeSteps(displaySteps), [displaySteps])
   /** V23: page-owned layout intent (single source; WorkbenchLayout only reads/patches it). */
   const [layoutPrefs, patchLayoutPrefs] = useWorkbenchPrefs()
 
@@ -1448,6 +1454,16 @@ export default function AlgoPage() {
             runKey={visRunId}
           />
         }
+        dataProbes={probeSteps.map((i) => (
+          <CurrentStepData
+            step={displaySteps[i]}
+            prevStep={i > 0 ? displaySteps[i - 1] : undefined}
+            isPreview={isPreviewMode}
+            atEnd={false}
+            finalAnswer={finalAnswer ? <span /> : undefined}
+            graph={isGraphAlgo(id)}
+          />
+        ))}
         code={codeNode}
         // key: switching algorithm resets temporary transport popovers (settings / more phases)
         transport={<PlaybackTransport key={id} {...player.transportProps} />}
@@ -1456,4 +1472,23 @@ export default function AlgoPage() {
     </div>
   )
 
+}
+
+/**
+ * Indices of the run's largest data presentations (by vars / long values / array
+ * cells; top 3) + the last frame. Rendered with their previous frame so the
+ * before→after markers are measured too.
+ */
+function pickDataProbeSteps(steps: Step[]): number[] {
+  if (steps.length <= 1) return steps.map((_, i) => i)
+  const score = (st: Step) => {
+    let n = Object.keys(st.vars ?? {}).length * 3
+    for (const v of Object.values(st.vars ?? {})) n += String(v ?? '').length > 18 ? 3 : 0
+    for (const a of Object.values(st.arrays ?? {})) n += Array.isArray(a) ? a.length : 0
+    return n
+  }
+  const ranked = steps.map((st, i) => [score(st), i] as const).sort((a, b) => b[0] - a[0] || a[1] - b[1])
+  const out = new Set<number>(ranked.slice(0, 3).map(([, i]) => i))
+  out.add(steps.length - 1)
+  return [...out]
 }

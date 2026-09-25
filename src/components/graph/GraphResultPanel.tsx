@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { Step } from '../../types/step'
+import { useTestId } from '../data/dataProbe'
 import { reconstructPath as reconstructNaive } from '../../algorithms/dijkstra'
 import { reconstructPath as reconstructHeap } from '../../algorithms/dijkstraHeap'
 
@@ -17,6 +18,7 @@ function lastResult(steps: Step[]): Record<string, unknown> | null {
 }
 
 export default function GraphResultPanel({ algoId, steps }: Props) {
+  const tid = useTestId()
   const result = useMemo(() => lastResult(steps), [steps])
   const [target, setTarget] = useState(0)
 
@@ -63,7 +65,7 @@ export default function GraphResultPanel({ algoId, steps }: Props) {
             min={0}
             max={Math.max(0, n - 1)}
             value={target}
-            data-testid="graph-result-target"
+            {...tid('graph-result-target')}
             aria-label="目标顶点"
             onChange={(e) => {
               const raw = e.target.value

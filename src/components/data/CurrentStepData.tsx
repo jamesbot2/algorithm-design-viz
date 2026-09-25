@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import type { Step } from '../../types/step'
 import VarsPanel from '../VarsPanel'
 import { CONFIG_KEYS, friendlyLabel, summarizeConfig } from './friendlyFields'
+import { useTestId } from './dataProbe'
 
 interface Props {
   step: Step | undefined
@@ -27,6 +28,7 @@ function serialize(v: unknown): string {
  * own tab). No portal, no fixed band, no transport of its own.
  */
 export default function CurrentStepData({ step, prevStep, isPreview, atEnd, finalAnswer, graph, runKey }: Props) {
+  const tid = useTestId()
   const [finalOpen, setFinalOpen] = useState(false)
   // New run: collapse the final result again; reaching the end opens it once.
   useEffect(() => setFinalOpen(false), [runKey])
@@ -43,17 +45,17 @@ export default function CurrentStepData({ step, prevStep, isPreview, atEnd, fina
   const hasFinal = finalAnswer !== undefined && finalAnswer !== null && finalAnswer !== false
 
   return (
-    <div className="current-step-data" data-testid="current-step-data" data-step-id={step.id}>
+    <div className="current-step-data" {...tid('current-step-data')} data-step-id={step.id}>
       {isPreview && <p className="data-hint muted">尚未运行：点击「运行」后这里显示每一步的关键数据。</p>}
       <VarsPanel step={step} prevStep={prevStep} graph={graph} />
       {frameId !== undefined && frameId !== null && (
-        <div className="data-frame" data-testid="call-stack">
+        <div className="data-frame" {...tid('call-stack')}>
           <span className="field-label">当前帧标识</span> <code className="frame-id">{String(frameId)}</code>
           <span className="muted"> （不是完整调用栈）</span>
         </div>
       )}
       {stats.length > 0 && (
-        <div className="data-stats" data-testid="stats-row">
+        <div className="data-stats" {...tid('stats-row')}>
           {stats.map(([k, v]) => (
             <span className="stat-chip" key={k}>
               {k === 'comparisons' ? '比较' : k === 'swaps' ? '交换' : k === 'writes' ? '写入' : k}{' '}
@@ -64,16 +66,16 @@ export default function CurrentStepData({ step, prevStep, isPreview, atEnd, fina
       )}
       {(summary || hasFinal || rawEntries.length > 0) && (
         // Low-frequency config summary + collapsed secondary details share one row.
-        <div className="data-secondary" data-testid="data-secondary">
+        <div className="data-secondary" {...tid('data-secondary')}>
           {summary && (
-            <p className="data-config-summary" data-testid="data-config-summary">
+            <p className="data-config-summary" {...tid('data-config-summary')}>
               {summary}
             </p>
           )}
           {hasFinal && (
             <details
               className="final-answer-panel"
-              data-testid="final-answer-panel"
+              {...tid('final-answer-panel')}
               open={finalOpen}
               onToggle={(e) => setFinalOpen((e.target as HTMLDetailsElement).open)}
             >
@@ -82,7 +84,7 @@ export default function CurrentStepData({ step, prevStep, isPreview, atEnd, fina
             </details>
           )}
           {rawEntries.length > 0 && (
-            <details className="data-raw-fields" data-testid="data-raw-fields">
+            <details className="data-raw-fields" {...tid('data-raw-fields')}>
               <summary>全部字段（{rawEntries.length}）</summary>
               <dl>
                 {rawEntries.map(([k, v]) => (

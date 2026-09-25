@@ -43,6 +43,10 @@ describe('V15-01 keyboard — source contracts', () => {
 
   it('GraphResultPanel target input is identifiable for focus tests', () => {
     const grp = readFileSync(resolve('src/components/graph/GraphResultPanel.tsx'), 'utf8')
-    expect(grp).toMatch(/data-testid="graph-result-target"/)
+    // V23 replacement note: the id is emitted through useTestId() so the inert
+    // data-measuring probe copy carries no duplicate id; the live panel still has it
+    // (asserted in the browser by the v15 e2e focus tests).
+    expect(grp).toMatch(/\{\.\.\.tid\('graph-result-target'\)\}/)
+    expect(grp).toMatch(/const tid = useTestId\(\)/)
   })
 })

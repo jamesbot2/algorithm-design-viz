@@ -42,8 +42,13 @@ export const MIN_CODE_W = 340
 export const MIN_DATA_W = 280
 /** Below this, docked two-column would crush either demo or code. */
 export const TABBED_MAX_W = 760
-/** Below this viewport height, docked cannot hold scene + data + transport; use tabs. */
-export const TABBED_MAX_VH = 460
+/**
+ * Below this scroll-viewport height, docked cannot hold scene + data + transport
+ * (docked floor 490px + the one-line toolbar) without page scrolling; use tabs.
+ * (Was 460: with compact low-height chrome a 900x500 window reported 466 and
+ * fell into a docked layout whose transport sat below the fold.)
+ */
+export const TABBED_MAX_VH = 540
 /** Three real columns only when each gets readable width. */
 export const WIDE_MIN_W = MIN_SCENE_W + MIN_DATA_W + MIN_CODE_W + 460
 

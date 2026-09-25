@@ -2,6 +2,7 @@ import { memo, useMemo } from 'react'
 import type { Step } from '../types/step'
 import { formatFinalAnswer } from '../utils/formatAnswer'
 import { CONFIG_KEYS, friendlyLabel } from './data/friendlyFields'
+import { useTestId } from './data/dataProbe'
 
 function serialize(v: string | number | boolean | null | undefined): string {
   if (v === null || v === undefined) return 'null'
@@ -22,6 +23,7 @@ function ArraysInInspector({
   step: Step
   prevStep?: Step
 }) {
+  const tid = useTestId()
   const arrays = step.arrays
   const changedIdx = useMemo(() => {
     const map: Record<string, Set<number>> = {}
@@ -43,13 +45,13 @@ function ArraysInInspector({
   if (!arrays || Object.keys(arrays).length === 0) return null
 
   return (
-    <div className="inspector-arrays" data-testid="inspector-arrays">
+    <div className="inspector-arrays" {...tid('inspector-arrays')}>
       <div className="data-section-title">数组（当前步）</div>
       {Object.entries(arrays).map(([name, values]) => (
         <div
           key={name}
           className="inspector-array-table"
-          data-testid={`inspector-array-${name}`}
+          {...tid(`inspector-array-${name}`)}
           data-array-name={name}
         >
           <div className="inspector-array-name">
@@ -91,6 +93,7 @@ function ArraysInInspector({
  * (ready/n/start/directed…) is summarized by CurrentStepData, not rendered as pills.
  */
 function VarsPanel({ step, prevStep, graph = false }: { step: Step; prevStep?: Step; graph?: boolean }) {
+  const tid = useTestId()
   const vars = step.vars ?? {}
   const entries = Object.entries(vars).filter(([k]) => !CONFIG_KEYS.has(k) && k !== 'frameId')
 
@@ -111,7 +114,7 @@ function VarsPanel({ step, prevStep, graph = false }: { step: Step; prevStep?: S
     !step.message?.includes('完成')
 
   return (
-    <div className="vars-panel" data-testid="vars-panel">
+    <div className="vars-panel" {...tid('vars-panel')}>
       {entries.length === 0 ? null : (
         <div className="vars-grid">
           {entries.map(([k, v]) => (
@@ -120,7 +123,7 @@ function VarsPanel({ step, prevStep, graph = false }: { step: Step; prevStep?: S
               className={`var-chip${changed.has(k) ? ' flash' : ''}`}
               data-changed={changed.has(k) ? '1' : undefined}
               data-var={k}
-              data-testid="var-chip"
+              {...tid('var-chip')}
             >
               <span className="var-key">
                 {friendlyLabel(k, graph) !== k && <span className="field-label">{friendlyLabel(k, graph)}</span>}
@@ -133,7 +136,7 @@ function VarsPanel({ step, prevStep, graph = false }: { step: Step; prevStep?: S
       )}
       <ArraysInInspector step={step} prevStep={prevStep} />
       {hasInlineResult && (
-        <div className="result-panel-enter data-mid-result" data-testid="inspector-mid-result">
+        <div className="result-panel-enter data-mid-result" {...tid('inspector-mid-result')}>
           <div className="data-section-title">中间结果（当前步）</div>
           <div className="result-snap muted">
             {formatFinalAnswer(step.result, step.vars)}

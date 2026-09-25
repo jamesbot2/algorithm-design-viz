@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { formatFinalAnswer } from '../../utils/formatAnswer'
+import { useTestId } from '../data/dataProbe'
 
 interface Props {
   result?: unknown
@@ -9,12 +10,13 @@ interface Props {
 
 /** Structured final-answer panel — never raw JSON.slice as primary UI. */
 export default function FinalAnswerResult({ result, vars, statusNote }: Props) {
+  const tid = useTestId()
   const primary = formatFinalAnswer(result, vars)
   const fields = extractFields(result)
 
   return (
-    <div className="final-answer-result" data-testid="final-answer">
-      <div className="final-answer-primary" data-testid="final-answer-primary">
+    <div className="final-answer-result" {...tid('final-answer')}>
+      <div className="final-answer-primary" {...tid('final-answer-primary')}>
         {primary}
       </div>
       {fields.length > 0 && (

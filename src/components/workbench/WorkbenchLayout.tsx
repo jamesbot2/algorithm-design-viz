@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { useWorkspaceBudget } from './WorkspaceBudget'
+import { DataProbeContext } from '../data/dataProbe'
 import {
   MIN_CODE_W,
   clamp,
@@ -24,6 +25,12 @@ interface Props {
   /** Page-owned layout intent (single source). */
   prefs: WorkbenchLayoutPrefs
   onPrefsChange: (patch: Partial<WorkbenchLayoutPrefs>) => void
+  /**
+   * Invisible measuring copies of the data presentation for the run's largest
+   * frames (rendered under DataProbeContext). The data region is calibrated from
+   * them once per run, so playback never resizes the scene.
+   */
+  dataProbes?: ReactNode[]
   /** Resets content-calibrated data height (new run). */
   runKey?: string | number
   /** 'viewport' = lab page fills the scroll viewport; 'section' = inside a document page. */
@@ -58,12 +65,14 @@ export default function WorkbenchLayout({
   transport,
   prefs,
   onPrefsChange,
+  dataProbes,
   runKey,
   fill = 'viewport',
   onModeChange,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null)
   const dataContentRef = useRef<HTMLDivElement>(null)
+  const probeRef = useRef<HTMLDivElement>(null)
   const { viewportHeight } = useWorkspaceBudget()
   const [box, setBox] = useState({ w: 0, h: 0 })
   const [dataContentH, setDataContentH] = useState(0)
@@ -106,16 +115,30 @@ export default function WorkbenchLayout({
   useLayoutEffect(() => {
     const el = dataContentRef.current
     if (!el || typeof ResizeObserver === 'undefined') return
+    const probeHost = probeRef.current
     const read = () => {
-      const h = el.scrollHeight
+      // The final-result block (auto-opened at the last frame, or opened by the
+      // user) never drives the region height: it opens in place and the data body
+      // (the single data scroller) scrolls, so playback never resizes the scene.
+      const fin = el.querySelector<HTMLElement>('.final-answer-panel[open]')
+      let h = el.scrollHeight
+      const row = fin?.parentElement
+      if (fin && row) {
+        // Height the secondary row would have with the final block closed.
+        let closed = fin.querySelector<HTMLElement>('summary')?.offsetHeight ?? 0
+        for (const c of Array.from(row.children)) if (c !== fin) closed = Math.max(closed, (c as HTMLElement).offsetHeight)
+        h -= Math.max(0, row.offsetHeight - closed)
+      }
+      if (probeHost) for (const p of Array.from(probeHost.children)) h = Math.max(h, (p as HTMLElement).scrollHeight)
       setDataContentH((prev) => (h > prev ? h : prev))
     }
     read()
     const ro = new ResizeObserver(read)
     ro.observe(el)
     for (const c of Array.from(el.children)) ro.observe(c)
+    if (probeHost) for (const p of Array.from(probeHost.querySelectorAll('.wb-data-probe-item > *'))) ro.observe(p)
     return () => ro.disconnect()
-  }, [runKey])
+  }, [runKey, dataProbes?.length])
 
   const hasCode = code !== undefined && code !== null
   const hasData = data !== undefined && data !== null
@@ -185,13 +208,13 @@ export default function WorkbenchLayout({
     }
   }, [mode, lowTabs, hasCode, hasData, prefs.dataVisible, codeW, wideDataW, dockedDataH])
 
-  // Low-height landscape = natural scroll: the workbench claims the whole scroll
-  // viewport (the one-line toolbar scrolls away above it) instead of locking one
-  // screen and crushing the scene under toolbar + tabs + transport.
+  // Low-height landscape stays ONE locked screen (transport always reachable);
+  // the scene gets its room from compact chrome (layout.css, max-height: 560px)
+  // and from tabs sharing the transport row, not from page scrolling.
   const minH =
     mode === 'tabbed'
       ? viewportHeight > 0 && viewportHeight < 560
-        ? Math.max(240, viewportHeight - 8)
+        ? 240
         : 420
       : mode === 'wide'
         ? 480
@@ -366,6 +389,17 @@ export default function WorkbenchLayout({
             <div className="wb-data-content" ref={dataContentRef}>
               {data}
             </div>
+            {dataProbes && dataProbes.length > 0 && (
+              <div className="wb-data-probes" ref={probeRef} aria-hidden="true" inert>
+                <DataProbeContext.Provider value={true}>
+                  {dataProbes.map((p, i) => (
+                    <div className="wb-data-probe-item wb-data-content" key={i}>
+                      {p}
+                    </div>
+                  ))}
+                </DataProbeContext.Provider>
+              </div>
+            )}
           </div>
         </section>
       )}

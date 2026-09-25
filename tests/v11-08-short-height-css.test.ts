@@ -5,7 +5,8 @@
  * budget instead of viewport media: inline phase chips show only when the
  * workbench is roomy (data-transport="roomy"), the full phase list is always in the
  * settings popover, Run/Cancel/theory stay in the one-row toolbar, and low-height
- * tabs give the scene the whole scroll viewport.
+ * tabs stay one locked screen whose scene room comes from compact chrome
+ * (@media max-height: 640px), so the transport is never below the fold.
  */
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
@@ -37,7 +38,10 @@ describe('V11-08 / V23 short-height transport', () => {
     expect(css).toMatch(/@media \(min-width: 600px\)\s*\{\s*\.workbench-layout\[data-layout-mode="tabbed"\] \.playback-transport\s*\{[^}]*grid-template-areas:\s*"ctrl scrub meta"/s)
     // tabs share the transport row so the scene keeps the height
     expect(wb).toMatch(/gridTemplateAreas: t\(\['view view', 'tabs transport'\]\)/)
-    // natural scroll: low-height tabs claim the whole scroll viewport (toolbar scrolls away)
-    expect(wb).toMatch(/Math\.max\(240, viewportHeight - 8\)/)
+    // one locked screen at low height (transport never below the fold) ...
+    expect(wb).toMatch(/viewportHeight < 560\s*\?\s*240/)
+    // ... with the scene's room coming from compact chrome, not page scrolling
+    const layoutCss = readFileSync(resolve(__dirname, '../src/styles/layout.css'), 'utf8')
+    expect(layoutCss).toMatch(/@media \(max-height: 640px\)\s*\{[^@]*\.main-wrap\[data-lab-fill="1"\] > \.topbar/s)
   })
 })

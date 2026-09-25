@@ -287,6 +287,22 @@
 .wb-data-content {
   padding: 0.45rem 0.6rem;
 }
+/* Measuring copies: zero-height, invisible, inert; each item keeps the real width. */
+.wb-data-body {
+  position: relative;
+}
+.wb-data-probes {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+.wb-data-probe-item {
+  height: 0;
+  overflow: hidden;
+}
 
 /* Code region: CodeBrowser fills it; its scroller (.cm-scroller / .code-pre) is the only one. */
 .wb-code {
@@ -654,4 +670,58 @@
   margin: 0;
   font-size: 0.8rem;
   line-height: 1.4;
+}
+
+/* ------------------------------------------------------------------
+ * V23 low-height compact chrome (landscape phones, short windows).
+ * The workbench stays one locked screen; the scene's room comes from
+ * slimmer chrome, never from hiding the transport below the fold.
+ * ------------------------------------------------------------------ */
+@media (max-height: 640px) {
+  .main-wrap[data-lab-fill="1"] > .topbar {
+    padding: 0.1rem 0.75rem;
+    min-height: 0;
+  }
+  .main-wrap[data-lab-fill="1"] > .topbar button.icon-btn {
+    width: 30px;
+    height: 30px;
+  }
+  .main-wrap[data-lab-fill="1"] > .topbar .topbar-title {
+    font-size: 0.95rem;
+  }
+  .main-wrap[data-lab-fill="1"] > .main {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+  .algo-page-body {
+    gap: 0.25rem;
+  }
+  .algo-toolbar {
+    padding: 0.15rem 0.5rem;
+  }
+  .algo-toolbar .input-summary-bar button {
+    padding: 0.18rem 0.65rem;
+  }
+  .workbench-layout {
+    gap: 0.25rem;
+  }
+  .wb-region.wb-demo {
+    padding: 0.2rem;
+  }
+  .visualizer {
+    gap: 0.2rem;
+  }
+  .viz-banner {
+    padding: 0.2rem 0.55rem;
+  }
+  .graph-view {
+    padding: 0.25rem;
+  }
+  .workbench-transport .playback-transport {
+    padding: 0.15rem 0.45rem;
+    row-gap: 0.15rem;
+  }
+  .playback-transport .transport-controls button {
+    padding: 0.22rem 0.6rem;
+  }
 }
