@@ -1,0 +1,8448 @@
+{
+  "kadane-default-22": [
+    {
+      "frame": 1,
+      "banner": "初始化 best = cur = a[0] = -2",
+      "anchor": "init",
+      "line": 4,
+      "statement": "let best = a[0]!",
+      "vars": {
+        "best": -2,
+        "cur": -2,
+        "bestStart": 0,
+        "bestEnd": 0,
+        "curStart": 0
+      }
+    },
+    {
+      "frame": 2,
+      "banner": "考察 a[1] = 1",
+      "anchor": "loopVisit",
+      "line": 9,
+      "statement": "for (let i = 1; i < a.length; i++) {",
+      "vars": {
+        "i": 1,
+        "cur": -2,
+        "curStart": 0,
+        "best": -2,
+        "bestStart": 0,
+        "bestEnd": 0
+      }
+    },
+    {
+      "frame": 3,
+      "banner": "重新开始：cur ← a[1] = 1，curStart ← 1",
+      "anchor": "resetWrite",
+      "line": 11,
+      "statement": "cur = a[i]!",
+      "vars": {
+        "i": 1,
+        "cur": 1,
+        "curStart": 1,
+        "best": -2,
+        "bestStart": 0,
+        "bestEnd": 0
+      }
+    },
+    {
+      "frame": 4,
+      "banner": "更新最优区间 [1,1]，best=1",
+      "anchor": "updateBest",
+      "line": 17,
+      "statement": "best = cur",
+      "vars": {
+        "i": 1,
+        "cur": 1,
+        "curStart": 1,
+        "best": 1,
+        "bestStart": 1,
+        "bestEnd": 1
+      }
+    },
+    {
+      "frame": 5,
+      "banner": "考察 a[2] = -3",
+      "anchor": "loopVisit",
+      "line": 9,
+      "statement": "for (let i = 1; i < a.length; i++) {",
+      "vars": {
+        "i": 2,
+        "cur": 1,
+        "curStart": 1,
+        "best": 1,
+        "bestStart": 1,
+        "bestEnd": 1
+      }
+    },
+    {
+      "frame": 6,
+      "banner": "延伸：cur ← cur + a[2] = -2",
+      "anchor": "extendWrite",
+      "line": 14,
+      "statement": "cur = cur + a[i]!",
+      "vars": {
+        "i": 2,
+        "cur": -2,
+        "curStart": 1,
+        "best": 1,
+        "bestStart": 1,
+        "bestEnd": 1
+      }
+    },
+    {
+      "frame": 7,
+      "banner": "考察 a[3] = 4",
+      "anchor": "loopVisit",
+      "line": 9,
+      "statement": "for (let i = 1; i < a.length; i++) {",
+      "vars": {
+        "i": 3,
+        "cur": -2,
+        "curStart": 1,
+        "best": 1,
+        "bestStart": 1,
+        "bestEnd": 1
+      }
+    },
+    {
+      "frame": 8,
+      "banner": "重新开始：cur ← a[3] = 4，curStart ← 3",
+      "anchor": "resetWrite",
+      "line": 11,
+      "statement": "cur = a[i]!",
+      "vars": {
+        "i": 3,
+        "cur": 4,
+        "curStart": 3,
+        "best": 1,
+        "bestStart": 1,
+        "bestEnd": 1
+      }
+    },
+    {
+      "frame": 9,
+      "banner": "更新最优区间 [3,3]，best=4",
+      "anchor": "updateBest",
+      "line": 17,
+      "statement": "best = cur",
+      "vars": {
+        "i": 3,
+        "cur": 4,
+        "curStart": 3,
+        "best": 4,
+        "bestStart": 3,
+        "bestEnd": 3
+      }
+    },
+    {
+      "frame": 10,
+      "banner": "考察 a[4] = -1",
+      "anchor": "loopVisit",
+      "line": 9,
+      "statement": "for (let i = 1; i < a.length; i++) {",
+      "vars": {
+        "i": 4,
+        "cur": 4,
+        "curStart": 3,
+        "best": 4,
+        "bestStart": 3,
+        "bestEnd": 3
+      }
+    },
+    {
+      "frame": 11,
+      "banner": "延伸：cur ← cur + a[4] = 3",
+      "anchor": "extendWrite",
+      "line": 14,
+      "statement": "cur = cur + a[i]!",
+      "vars": {
+        "i": 4,
+        "cur": 3,
+        "curStart": 3,
+        "best": 4,
+        "bestStart": 3,
+        "bestEnd": 3
+      }
+    },
+    {
+      "frame": 12,
+      "banner": "考察 a[5] = 2",
+      "anchor": "loopVisit",
+      "line": 9,
+      "statement": "for (let i = 1; i < a.length; i++) {",
+      "vars": {
+        "i": 5,
+        "cur": 3,
+        "curStart": 3,
+        "best": 4,
+        "bestStart": 3,
+        "bestEnd": 3
+      }
+    },
+    {
+      "frame": 13,
+      "banner": "延伸：cur ← cur + a[5] = 5",
+      "anchor": "extendWrite",
+      "line": 14,
+      "statement": "cur = cur + a[i]!",
+      "vars": {
+        "i": 5,
+        "cur": 5,
+        "curStart": 3,
+        "best": 4,
+        "bestStart": 3,
+        "bestEnd": 3
+      }
+    },
+    {
+      "frame": 14,
+      "banner": "更新最优区间 [3,5]，best=5",
+      "anchor": "updateBest",
+      "line": 17,
+      "statement": "best = cur",
+      "vars": {
+        "i": 5,
+        "cur": 5,
+        "curStart": 3,
+        "best": 5,
+        "bestStart": 3,
+        "bestEnd": 5
+      }
+    },
+    {
+      "frame": 15,
+      "banner": "考察 a[6] = 1",
+      "anchor": "loopVisit",
+      "line": 9,
+      "statement": "for (let i = 1; i < a.length; i++) {",
+      "vars": {
+        "i": 6,
+        "cur": 5,
+        "curStart": 3,
+        "best": 5,
+        "bestStart": 3,
+        "bestEnd": 5
+      }
+    },
+    {
+      "frame": 16,
+      "banner": "延伸：cur ← cur + a[6] = 6",
+      "anchor": "extendWrite",
+      "line": 14,
+      "statement": "cur = cur + a[i]!",
+      "vars": {
+        "i": 6,
+        "cur": 6,
+        "curStart": 3,
+        "best": 5,
+        "bestStart": 3,
+        "bestEnd": 5
+      }
+    },
+    {
+      "frame": 17,
+      "banner": "更新最优区间 [3,6]，best=6",
+      "anchor": "updateBest",
+      "line": 17,
+      "statement": "best = cur",
+      "vars": {
+        "i": 6,
+        "cur": 6,
+        "curStart": 3,
+        "best": 6,
+        "bestStart": 3,
+        "bestEnd": 6
+      }
+    },
+    {
+      "frame": 18,
+      "banner": "考察 a[7] = -5",
+      "anchor": "loopVisit",
+      "line": 9,
+      "statement": "for (let i = 1; i < a.length; i++) {",
+      "vars": {
+        "i": 7,
+        "cur": 6,
+        "curStart": 3,
+        "best": 6,
+        "bestStart": 3,
+        "bestEnd": 6
+      }
+    },
+    {
+      "frame": 19,
+      "banner": "延伸：cur ← cur + a[7] = 1",
+      "anchor": "extendWrite",
+      "line": 14,
+      "statement": "cur = cur + a[i]!",
+      "vars": {
+        "i": 7,
+        "cur": 1,
+        "curStart": 3,
+        "best": 6,
+        "bestStart": 3,
+        "bestEnd": 6
+      }
+    },
+    {
+      "frame": 20,
+      "banner": "考察 a[8] = 4",
+      "anchor": "loopVisit",
+      "line": 9,
+      "statement": "for (let i = 1; i < a.length; i++) {",
+      "vars": {
+        "i": 8,
+        "cur": 1,
+        "curStart": 3,
+        "best": 6,
+        "bestStart": 3,
+        "bestEnd": 6
+      }
+    },
+    {
+      "frame": 21,
+      "banner": "延伸：cur ← cur + a[8] = 5",
+      "anchor": "extendWrite",
+      "line": 14,
+      "statement": "cur = cur + a[i]!",
+      "vars": {
+        "i": 8,
+        "cur": 5,
+        "curStart": 3,
+        "best": 6,
+        "bestStart": 3,
+        "bestEnd": 6
+      }
+    },
+    {
+      "frame": 22,
+      "banner": "完成：最大和=6，区间[3,6]（非空子数组）",
+      "anchor": "done",
+      "line": 22,
+      "statement": "return { best, start: bestStart, end: bestEnd }",
+      "vars": {
+        "best": 6,
+        "bestStart": 3,
+        "bestEnd": 6
+      }
+    }
+  ],
+  "kadane-f7-robust": {
+    "line": 9,
+    "decorated": [
+      "for (let i = 1; i < a.length; i++) {"
+    ],
+    "banner": "考察 a[3] = 4",
+    "counter": "7 / 22",
+    "unmapped": false,
+    "runId": "run_mui7x92s_82loacl",
+    "cursor": 6,
+    "speed": "1000"
+  },
+  "kadane-default-7of22-standard": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-7of22-standard-next": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "insertion-1_-1-3of6-standard": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57.05,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-1_-1-3of6-standard-next": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "quick-5_-5_0-3of10-standard": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-3of10-standard-next": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L",
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "kadane-default-7of22-reduced": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-7of22-reduced-next": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "insertion-1_-1-3of6-reduced": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "quick-5_-5_0-3of10-reduced": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-3of10-reduced-next": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L",
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "kadane-default-7of22-1920x1080": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 128.6,
+        "barH": 128.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 64.3,
+        "barH": 64.3,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 192.9,
+        "barH": 192.9,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 257.2,
+        "barH": 257.2,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 64.3,
+        "barH": 64.3,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 128.6,
+        "barH": 128.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 64.3,
+        "barH": 64.3,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 321.5,
+        "barH": 321.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 257.2,
+        "barH": 257.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 551.7166748046875,
+    "failures": []
+  },
+  "insertion-1_-1-3of6-1920x1080": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 286.5,
+        "barH": 286.5,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 286.5,
+        "barH": 286.73,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 600.4500122070312,
+    "failures": []
+  },
+  "quick-5_-5_0-3of10-1920x1080": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 333,
+        "barH": 333,
+        "ptrs": [
+          "L"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 333,
+        "barH": 333,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 554.4166870117188,
+    "failures": []
+  },
+  "kadane-default-7of22-390x844": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 63,
+        "barH": 63,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 31.5,
+        "barH": 31.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 94.5,
+        "barH": 94.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 126,
+        "barH": 126,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 31.5,
+        "barH": 31.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 63,
+        "barH": 63,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 31.5,
+        "barH": 31.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 157.5,
+        "barH": 157.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 126,
+        "barH": 126,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 489.01666259765625,
+    "failures": []
+  },
+  "insertion-1_-1-3of6-390x844": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 140.5,
+        "barH": 140.5,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 140.5,
+        "barH": 140.52,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 520.4500122070312,
+    "failures": []
+  },
+  "quick-5_-5_0-3of10-390x844": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 186.5,
+        "barH": 186.5,
+        "ptrs": [
+          "L"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 186.5,
+        "barH": 186.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 473.91668701171875,
+    "failures": []
+  },
+  "kadane-default-7of22-844x390": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 9.4,
+        "barH": 9.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 4.7,
+        "barH": 4.7,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 14.1,
+        "barH": 14.1,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 18.8,
+        "barH": 18.8,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 4.7,
+        "barH": 4.7,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 9.4,
+        "barH": 9.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 4.7,
+        "barH": 4.7,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 23.5,
+        "barH": 23.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 18.8,
+        "barH": 18.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 208.85000610351562,
+    "failures": []
+  },
+  "insertion-1_-1-3of6-844x390": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18,
+        "barH": 18,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18,
+        "barH": 18,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 287.08331298828125,
+    "failures": []
+  },
+  "quick-5_-5_0-3of10-844x390": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 35,
+        "barH": 35,
+        "ptrs": [
+          "L"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 35,
+        "barH": 35,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 211.5500030517578,
+    "failures": []
+  },
+  "quick-5_-5_0-f1": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-f2": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-f3": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-f4": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L",
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-f5": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-f6": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L",
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f1": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 59,
+        "barH": 59,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.59,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 59,
+        "barH": 59,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 368.6333312988281,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f2": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f3": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f4": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "bubble-all-negative-f1": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f2": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f3": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i",
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f4": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i",
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f5": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f6": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "insertion-all-zero-f1": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 415.6333312988281,
+    "failures": []
+  },
+  "insertion-all-zero-f2": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 415.95001220703125,
+    "failures": []
+  },
+  "insertion-all-zero-f3": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 415.95001220703125,
+    "failures": []
+  },
+  "insertion-all-zero-f4": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 415.95001220703125,
+    "failures": []
+  },
+  "insertion-all-zero-f5": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 415.95001220703125,
+    "failures": []
+  },
+  "insertion-all-zero-f6": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 415.6333312988281,
+    "failures": []
+  },
+  "insertion-all-zero-maxPtrsPerSlot": 1,
+  "binary-negative-sorted-f1": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-7",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [
+          "lo"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 45.214285714285715,
+        "barH": 45.22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 30.142857142857142,
+        "barH": 30.15,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 75.35714285714286,
+        "barH": 75.35,
+        "ptrs": [
+          "hi"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 335.7166748046875,
+    "failures": []
+  },
+  "binary-negative-sorted-f2": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-7",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [
+          "lo"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 45.214285714285715,
+        "barH": 45.22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "mid"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 30.142857142857142,
+        "barH": 30.15,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 75.35714285714286,
+        "barH": 75.35,
+        "ptrs": [
+          "hi"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 335.7166748046875,
+    "failures": []
+  },
+  "binary-negative-sorted-f3": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-7",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [
+          "lo"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 45.214285714285715,
+        "barH": 45.22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "mid"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 30.142857142857142,
+        "barH": 30.15,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 75.35714285714286,
+        "barH": 75.35,
+        "ptrs": [
+          "hi"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 335.7166748046875,
+    "failures": []
+  },
+  "binary-negative-sorted-f4": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-7",
+        "dir": "neg",
+        "dataH": 97.5,
+        "barH": 97.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 41.785714285714285,
+        "barH": 41.78,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 27.857142857142854,
+        "barH": 27.85,
+        "ptrs": [
+          "lo",
+          "mid"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 69.64285714285714,
+        "barH": 69.65,
+        "ptrs": [
+          "hi"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 327.7166748046875,
+    "failures": []
+  },
+  "binary-negative-sorted-f5": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-7",
+        "dir": "neg",
+        "dataH": 97.5,
+        "barH": 97.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 41.785714285714285,
+        "barH": 41.78,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 27.857142857142854,
+        "barH": 27.85,
+        "ptrs": [
+          "lo",
+          "mid"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 69.64285714285714,
+        "barH": 69.65,
+        "ptrs": [
+          "hi"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 327.7166748046875,
+    "failures": []
+  },
+  "binary-negative-sorted-f6": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-7",
+        "dir": "neg",
+        "dataH": 88,
+        "barH": 88,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 37.714285714285715,
+        "barH": 37.72,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 25.142857142857142,
+        "barH": 25.15,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 62.85714285714286,
+        "barH": 62.85,
+        "ptrs": [
+          "lo",
+          "mid",
+          "hi"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 318.2166748046875,
+    "failures": []
+  },
+  "binary-negative-sorted-f7": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-7",
+        "dir": "neg",
+        "dataH": 88,
+        "barH": 88,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 37.714285714285715,
+        "barH": 37.72,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 25.142857142857142,
+        "barH": 25.15,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 62.85714285714286,
+        "barH": 62.85,
+        "ptrs": [
+          "lo",
+          "mid",
+          "hi"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 318.2166748046875,
+    "failures": []
+  },
+  "binary-negative-sorted-f8": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-7",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 45.214285714285715,
+        "barH": 45.22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 30.142857142857142,
+        "barH": 30.15,
+        "ptrs": [
+          "hi"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 75.35714285714286,
+        "barH": 75.35,
+        "ptrs": [
+          "lo"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 335.7166748046875,
+    "failures": []
+  },
+  "binary-negative-sorted-maxPtrsPerSlot": 3,
+  "kadane-default-f1": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f2": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f3": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f4": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f5": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f6": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f7": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f8": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f9": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f10": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f11": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f12": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f13": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f14": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f15": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f16": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f17": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f18": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f19": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f20": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f21": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-f22": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "kadane-default-maxPtrsPerSlot": 1,
+  "toggle-bars-cells": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "data-collapsed": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 66.2,
+        "barH": 66.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 33.1,
+        "barH": 33.1,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 99.3,
+        "barH": 99.3,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 132.4,
+        "barH": 132.4,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 33.1,
+        "barH": 33.1,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 66.2,
+        "barH": 66.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 33.1,
+        "barH": 33.1,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 165.5,
+        "barH": 165.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 132.4,
+        "barH": 132.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 395.7166748046875,
+    "failures": []
+  },
+  "data-expanded": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "narrow-1180": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "narrow-1024": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "code-font-17": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "merge-signed-f6": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "3",
+        "dir": "pos",
+        "dataH": 44.25,
+        "barH": 44.25,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 14.75,
+        "barH": 14.75,
+        "ptrs": [
+          "L",
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 29.5,
+        "barH": 29.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 59,
+        "barH": 59,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 368.6333312988281,
+    "failures": []
+  },
+  "merge-signed-tree-toggled": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "3",
+        "dir": "pos",
+        "dataH": 33,
+        "barH": 33,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 11,
+        "barH": 11,
+        "ptrs": [
+          "L",
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 22,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 44,
+        "barH": 44,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 383.8666687011719,
+    "failures": []
+  },
+  "merge-signed-tree-restored": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "3",
+        "dir": "pos",
+        "dataH": 44.25,
+        "barH": 44.25,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 14.75,
+        "barH": 14.75,
+        "ptrs": [
+          "L",
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 29.5,
+        "barH": 29.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 59,
+        "barH": 59,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 368.6333312988281,
+    "failures": []
+  },
+  "nc-baseline": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "nc-restored-pointer-row-over-plot": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "nc-restored-plot-squeezed": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "nc-restored-zero-line-shifted": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 55.199999999999996,
+        "barH": 55.2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 4,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 5,
+        "value": "2",
+        "dir": "pos",
+        "dataH": 36.800000000000004,
+        "barH": 36.8,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 6,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 18.400000000000002,
+        "barH": 18.4,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 7,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 92,
+        "barH": 92,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 8,
+        "value": "4",
+        "dir": "pos",
+        "dataH": 73.60000000000001,
+        "barH": 73.6,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 322.2166748046875,
+    "failures": []
+  },
+  "negative-controls": {
+    "pointer-row-over-plot": [
+      "conflicts: [{\"a\":\"ptr i@3\",\"b\":\"value 4@3\",\"dx\":6.53,\"dy\":1.25},{\"a\":\"ptr i@3\",\"b\":\"bar 4@3\",\"dx\":19.45,\"dy\":4.7}]"
+    ],
+    "plot-squeezed": [
+      "value outside plot @0",
+      "value outside plot @1",
+      "value outside plot @2",
+      "value outside plot @3",
+      "value outside plot @4",
+      "value outside plot @5",
+      "value outside plot @6",
+      "value outside plot @7",
+      "value outside plot @8",
+      "pos bar bottom 161.71665954589844 ≠ zero line 322.2166748046875",
+      "pos bar bottom 161.71665954589844 ≠ zero line 322.2166748046875",
+      "pos bar bottom 161.71665954589844 ≠ zero line 322.2166748046875",
+      "pos bar bottom 161.71665954589844 ≠ zero line 322.2166748046875",
+      "pos bar bottom 161.71665954589844 ≠ zero line 322.2166748046875"
+    ],
+    "zero-line-shifted": [
+      "pos bar bottom 321.7166442871094 ≠ zero line 336.2166748046875",
+      "pos bar bottom 321.71665954589844 ≠ zero line 336.2166748046875",
+      "pos bar bottom 321.7166748046875 ≠ zero line 336.2166748046875",
+      "pos bar bottom 321.7166442871094 ≠ zero line 336.2166748046875",
+      "pos bar bottom 321.71665954589844 ≠ zero line 336.2166748046875",
+      "neg bar top 321.7166748046875 ≠ zero line 336.2166748046875",
+      "neg bar top 321.7166748046875 ≠ zero line 336.2166748046875",
+      "neg bar top 321.7166748046875 ≠ zero line 336.2166748046875",
+      "neg bar top 321.7166748046875 ≠ zero line 336.2166748046875"
+    ]
+  },
+  "insertion-1_-1-3of6-reduced-next": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "quick-5_-5_0-f7": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L",
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "p"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-f8": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L",
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-f9": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [
+          "L",
+          "R"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-f10": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-5",
+        "dir": "neg",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "5",
+        "dir": "pos",
+        "dataH": 103.5,
+        "barH": 103.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 324.91668701171875,
+    "failures": []
+  },
+  "quick-5_-5_0-maxPtrsPerSlot": 2,
+  "insertion-100_1_-100_0-f5": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f6": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f7": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57.05,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f8": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f9": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f10": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f11": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f12": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f13": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "bubble-all-negative-f7": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f8": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f9": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f10": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f11": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f12": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i",
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f13": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [
+          "i",
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f14": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f15": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f16": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-f17": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-4",
+        "dir": "neg",
+        "dataH": 211,
+        "barH": 211,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "-3",
+        "dir": "neg",
+        "dataH": 158.25,
+        "barH": 158.25,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "-2",
+        "dir": "neg",
+        "dataH": 105.5,
+        "barH": 105.5,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "-1",
+        "dir": "neg",
+        "dataH": 52.75,
+        "barH": 52.75,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 230.21665954589844,
+    "failures": []
+  },
+  "bubble-all-negative-maxPtrsPerSlot": 2,
+  "insertion-100_1_-100_0-f14": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f15": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f16": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f17": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "j"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.5700000000000001,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 57,
+        "barH": 57,
+        "ptrs": [
+          "i"
+        ],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 370.95001220703125,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-f18": {
+    "slots": [
+      {
+        "i": 0,
+        "value": "-100",
+        "dir": "neg",
+        "dataH": 59,
+        "barH": 59,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 1,
+        "value": "0",
+        "dir": "zero",
+        "dataH": 0,
+        "barH": 22,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 2,
+        "value": "1",
+        "dir": "pos",
+        "dataH": 0.59,
+        "barH": 2,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      },
+      {
+        "i": 3,
+        "value": "100",
+        "dir": "pos",
+        "dataH": 59,
+        "barH": 59,
+        "ptrs": [],
+        "valueInPlot": true,
+        "ptrAligned": true,
+        "idxAligned": true
+      }
+    ],
+    "conflicts": [],
+    "zeroLineY": 368.6333312988281,
+    "failures": []
+  },
+  "insertion-100_1_-100_0-maxPtrsPerSlot": 1
+}

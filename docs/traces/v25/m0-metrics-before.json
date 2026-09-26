@@ -1,0 +1,769 @@
+{
+  "base": "http://127.0.0.1:5291/algorithm-design-viz/",
+  "reduced": false,
+  "at": "2026-09-26T08:57:52.540Z",
+  "results": {
+    "kadane-default-7of22-1366x768": {
+      "counter": "7 / 22",
+      "banner": "考察 a[3] = 4",
+      "runId": "run_mui5pu37_x69l621",
+      "execLine": "2",
+      "execLineText": "export function kadane(a: number[]): { best: number; start: number; end: number } {",
+      "codeMeta": "Kadane 最大子数组 (TypeScript) · ▶ —",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "-2",
+          "ptrs": []
+        },
+        {
+          "i": 1,
+          "v": "1",
+          "ptrs": []
+        },
+        {
+          "i": 2,
+          "v": "-3",
+          "ptrs": []
+        },
+        {
+          "i": 3,
+          "v": "4",
+          "ptrs": [
+            "i"
+          ]
+        },
+        {
+          "i": 4,
+          "v": "-1",
+          "ptrs": []
+        },
+        {
+          "i": 5,
+          "v": "2",
+          "ptrs": []
+        },
+        {
+          "i": 6,
+          "v": "1",
+          "ptrs": []
+        },
+        {
+          "i": 7,
+          "v": "-5",
+          "ptrs": []
+        },
+        {
+          "i": 8,
+          "v": "4",
+          "ptrs": []
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "i@3",
+          "with": "valueText(4)@3",
+          "dx": 6.53,
+          "dy": 8.53
+        },
+        {
+          "ptr": "i@3",
+          "with": "valueBox(4)@3",
+          "dx": 6.53,
+          "dy": 6.53
+        },
+        {
+          "ptr": "i@3",
+          "with": "bar(4)@3",
+          "dx": 19.42,
+          "dy": 11.53
+        }
+      ],
+      "errors": []
+    },
+    "insertion-1_-1-3of6-1366x768": {
+      "counter": "3 / 6 · shift",
+      "banner": "a[0]=1 > key=-1，准备右移",
+      "runId": "run_mui5pvq8_3147b5w",
+      "execLine": "8",
+      "execLineText": "      arr[j + 1] = arr[j]!",
+      "codeMeta": "插入排序 (TypeScript) · ▶ shift @insertionSort.ts:8",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "1",
+          "ptrs": [
+            "j"
+          ]
+        },
+        {
+          "i": 1,
+          "v": "-1",
+          "ptrs": [
+            "i"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "j@0",
+          "with": "valueText(1)@0",
+          "dx": 6.53,
+          "dy": 7.86
+        },
+        {
+          "ptr": "j@0",
+          "with": "valueBox(1)@0",
+          "dx": 6.53,
+          "dy": 6.73
+        },
+        {
+          "ptr": "j@0",
+          "with": "bar(1)@0",
+          "dx": 19.42,
+          "dy": 17.67
+        },
+        {
+          "ptr": "idx@0",
+          "with": "valueText@0",
+          "dx": 6.23,
+          "dy": 0.8
+        },
+        {
+          "ptr": "idx@0",
+          "with": "bar@0",
+          "dx": 6.23,
+          "dy": 3.8
+        }
+      ],
+      "errors": []
+    },
+    "quick-5_-5_0-3of10-1366x768": {
+      "counter": "3 / 10 · partition",
+      "banner": "选取枢轴 pivot = a[2] = 0",
+      "runId": "run_mui5px4e_2il4jf5",
+      "execLine": "14",
+      "execLineText": "  const pivot = arr[R]!",
+      "codeMeta": "快速排序 (TypeScript) · ▶ partition @quickSort.ts:14",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "5",
+          "ptrs": [
+            "L"
+          ]
+        },
+        {
+          "i": 1,
+          "v": "-5",
+          "ptrs": []
+        },
+        {
+          "i": 2,
+          "v": "0",
+          "ptrs": [
+            "R"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "L@0",
+          "with": "valueText(5)@0",
+          "dx": 6.53,
+          "dy": 7.86
+        },
+        {
+          "ptr": "L@0",
+          "with": "valueBox(5)@0",
+          "dx": 6.53,
+          "dy": 6.73
+        },
+        {
+          "ptr": "L@0",
+          "with": "bar(5)@0",
+          "dx": 19.42,
+          "dy": 17.67
+        },
+        {
+          "ptr": "idx@0",
+          "with": "valueText@0",
+          "dx": 6.23,
+          "dy": 0.8
+        },
+        {
+          "ptr": "idx@0",
+          "with": "bar@0",
+          "dx": 6.23,
+          "dy": 3.8
+        }
+      ],
+      "errors": []
+    },
+    "kadane-default-7of22-1920x1080": {
+      "counter": "7 / 22",
+      "banner": "考察 a[3] = 4",
+      "runId": "run_mui5pyfk_76jcsmk",
+      "execLine": "2",
+      "execLineText": "export function kadane(a: number[]): { best: number; start: number; end: number } {",
+      "codeMeta": "Kadane 最大子数组 (TypeScript) · ▶ —",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "-2",
+          "ptrs": []
+        },
+        {
+          "i": 1,
+          "v": "1",
+          "ptrs": []
+        },
+        {
+          "i": 2,
+          "v": "-3",
+          "ptrs": []
+        },
+        {
+          "i": 3,
+          "v": "4",
+          "ptrs": [
+            "i"
+          ]
+        },
+        {
+          "i": 4,
+          "v": "-1",
+          "ptrs": []
+        },
+        {
+          "i": 5,
+          "v": "2",
+          "ptrs": []
+        },
+        {
+          "i": 6,
+          "v": "1",
+          "ptrs": []
+        },
+        {
+          "i": 7,
+          "v": "-5",
+          "ptrs": []
+        },
+        {
+          "i": 8,
+          "v": "4",
+          "ptrs": []
+        }
+      ],
+      "conflicts": [],
+      "errors": []
+    },
+    "insertion-1_-1-3of6-1920x1080": {
+      "counter": "3 / 6 · shift",
+      "banner": "a[0]=1 > key=-1，准备右移",
+      "runId": "run_mui5q045_gl8ql3x",
+      "execLine": "8",
+      "execLineText": "      arr[j + 1] = arr[j]!",
+      "codeMeta": "插入排序 (TypeScript) · ▶ shift @insertionSort.ts:8",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "1",
+          "ptrs": [
+            "j"
+          ]
+        },
+        {
+          "i": 1,
+          "v": "-1",
+          "ptrs": [
+            "i"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "j@0",
+          "with": "valueText(1)@0",
+          "dx": 6.53,
+          "dy": 7.86
+        },
+        {
+          "ptr": "j@0",
+          "with": "valueBox(1)@0",
+          "dx": 6.53,
+          "dy": 6.73
+        },
+        {
+          "ptr": "j@0",
+          "with": "bar(1)@0",
+          "dx": 19.42,
+          "dy": 17.67
+        },
+        {
+          "ptr": "idx@0",
+          "with": "valueText@0",
+          "dx": 6.23,
+          "dy": 0.8
+        },
+        {
+          "ptr": "idx@0",
+          "with": "bar@0",
+          "dx": 6.23,
+          "dy": 3.8
+        }
+      ],
+      "errors": []
+    },
+    "quick-5_-5_0-3of10-1920x1080": {
+      "counter": "3 / 10 · partition",
+      "banner": "选取枢轴 pivot = a[2] = 0",
+      "runId": "run_mui5q1lb_9h3orhl",
+      "execLine": "14",
+      "execLineText": "  const pivot = arr[R]!",
+      "codeMeta": "快速排序 (TypeScript) · ▶ partition @quickSort.ts:14",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "5",
+          "ptrs": [
+            "L"
+          ]
+        },
+        {
+          "i": 1,
+          "v": "-5",
+          "ptrs": []
+        },
+        {
+          "i": 2,
+          "v": "0",
+          "ptrs": [
+            "R"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "L@0",
+          "with": "valueText(5)@0",
+          "dx": 6.53,
+          "dy": 7.86
+        },
+        {
+          "ptr": "L@0",
+          "with": "valueBox(5)@0",
+          "dx": 6.53,
+          "dy": 6.73
+        },
+        {
+          "ptr": "L@0",
+          "with": "bar(5)@0",
+          "dx": 19.42,
+          "dy": 17.67
+        },
+        {
+          "ptr": "idx@0",
+          "with": "valueText@0",
+          "dx": 6.23,
+          "dy": 0.8
+        },
+        {
+          "ptr": "idx@0",
+          "with": "bar@0",
+          "dx": 6.23,
+          "dy": 3.8
+        }
+      ],
+      "errors": []
+    },
+    "kadane-default-7of22-390x844": {
+      "counter": "7 / 22",
+      "banner": "考察 a[3] = 4",
+      "runId": "run_mui5q2vr_vzu7j1l",
+      "execLine": "2",
+      "execLineText": "export function kadane(a: number[]): { best: number; start: number; end: number } {",
+      "codeMeta": "Kadane 最大子数组 (TypeScript) · ▶ —",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "-2",
+          "ptrs": []
+        },
+        {
+          "i": 1,
+          "v": "1",
+          "ptrs": []
+        },
+        {
+          "i": 2,
+          "v": "-3",
+          "ptrs": []
+        },
+        {
+          "i": 3,
+          "v": "4",
+          "ptrs": [
+            "i"
+          ]
+        },
+        {
+          "i": 4,
+          "v": "-1",
+          "ptrs": []
+        },
+        {
+          "i": 5,
+          "v": "2",
+          "ptrs": []
+        },
+        {
+          "i": 6,
+          "v": "1",
+          "ptrs": []
+        },
+        {
+          "i": 7,
+          "v": "-5",
+          "ptrs": []
+        },
+        {
+          "i": 8,
+          "v": "4",
+          "ptrs": []
+        }
+      ],
+      "conflicts": [],
+      "errors": []
+    },
+    "insertion-1_-1-3of6-390x844": {
+      "counter": "3 / 6 · shift",
+      "banner": "a[0]=1 > key=-1，准备右移",
+      "runId": "run_mui5q4h3_c2lhxqm",
+      "execLine": "8",
+      "execLineText": "      arr[j + 1] = arr[j]!",
+      "codeMeta": "插入排序 (TypeScript) · ▶ shift @insertionSort.ts:8",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "1",
+          "ptrs": [
+            "j"
+          ]
+        },
+        {
+          "i": 1,
+          "v": "-1",
+          "ptrs": [
+            "i"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "j@0",
+          "with": "valueText(1)@0",
+          "dx": 6.53,
+          "dy": 7.86
+        },
+        {
+          "ptr": "j@0",
+          "with": "valueBox(1)@0",
+          "dx": 6.53,
+          "dy": 6.73
+        },
+        {
+          "ptr": "j@0",
+          "with": "bar(1)@0",
+          "dx": 19.42,
+          "dy": 17.67
+        },
+        {
+          "ptr": "idx@0",
+          "with": "valueText@0",
+          "dx": 6.23,
+          "dy": 0.8
+        },
+        {
+          "ptr": "idx@0",
+          "with": "bar@0",
+          "dx": 6.23,
+          "dy": 3.8
+        }
+      ],
+      "errors": []
+    },
+    "quick-5_-5_0-3of10-390x844": {
+      "counter": "3 / 10 · partition",
+      "banner": "选取枢轴 pivot = a[2] = 0",
+      "runId": "run_mui5q5ru_le3dmai",
+      "execLine": "14",
+      "execLineText": "  const pivot = arr[R]!",
+      "codeMeta": "快速排序 (TypeScript) · ▶ partition @quickSort.ts:14",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "5",
+          "ptrs": [
+            "L"
+          ]
+        },
+        {
+          "i": 1,
+          "v": "-5",
+          "ptrs": []
+        },
+        {
+          "i": 2,
+          "v": "0",
+          "ptrs": [
+            "R"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "L@0",
+          "with": "valueText(5)@0",
+          "dx": 6.53,
+          "dy": 7.86
+        },
+        {
+          "ptr": "L@0",
+          "with": "valueBox(5)@0",
+          "dx": 6.53,
+          "dy": 6.73
+        },
+        {
+          "ptr": "L@0",
+          "with": "bar(5)@0",
+          "dx": 19.42,
+          "dy": 17.67
+        },
+        {
+          "ptr": "idx@0",
+          "with": "valueText@0",
+          "dx": 6.23,
+          "dy": 0.8
+        },
+        {
+          "ptr": "idx@0",
+          "with": "bar@0",
+          "dx": 6.23,
+          "dy": 3.8
+        }
+      ],
+      "errors": []
+    },
+    "kadane-default-7of22-844x390": {
+      "counter": "7 / 22",
+      "banner": "考察 a[3] = 4",
+      "runId": "run_mui5q6zd_n3qtjvz",
+      "execLine": "2",
+      "execLineText": "export function kadane(a: number[]): { best: number; start: number; end: number } {",
+      "codeMeta": "Kadane 最大子数组 (TypeScript) · ▶ —",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "-2",
+          "ptrs": []
+        },
+        {
+          "i": 1,
+          "v": "1",
+          "ptrs": []
+        },
+        {
+          "i": 2,
+          "v": "-3",
+          "ptrs": []
+        },
+        {
+          "i": 3,
+          "v": "4",
+          "ptrs": [
+            "i"
+          ]
+        },
+        {
+          "i": 4,
+          "v": "-1",
+          "ptrs": []
+        },
+        {
+          "i": 5,
+          "v": "2",
+          "ptrs": []
+        },
+        {
+          "i": 6,
+          "v": "1",
+          "ptrs": []
+        },
+        {
+          "i": 7,
+          "v": "-5",
+          "ptrs": []
+        },
+        {
+          "i": 8,
+          "v": "4",
+          "ptrs": []
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "i@3",
+          "with": "valueText(4)@3",
+          "dx": 6.53,
+          "dy": 13.36
+        },
+        {
+          "ptr": "i@3",
+          "with": "valueBox(4)@3",
+          "dx": 6.53,
+          "dy": 10.88
+        },
+        {
+          "ptr": "i@3",
+          "with": "bar(4)@3",
+          "dx": 19.42,
+          "dy": 18.36
+        }
+      ],
+      "errors": []
+    },
+    "insertion-1_-1-3of6-844x390": {
+      "counter": "3 / 6 · shift",
+      "banner": "a[0]=1 > key=-1，准备右移",
+      "runId": "run_mui5q8id_s641mym",
+      "execLine": "8",
+      "execLineText": "      arr[j + 1] = arr[j]!",
+      "codeMeta": "插入排序 (TypeScript) · ▶ shift @insertionSort.ts:8",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "1",
+          "ptrs": [
+            "j"
+          ]
+        },
+        {
+          "i": 1,
+          "v": "-1",
+          "ptrs": [
+            "i"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "j@0",
+          "with": "valueText(1)@0",
+          "dx": 6.53,
+          "dy": 7.86
+        },
+        {
+          "ptr": "j@0",
+          "with": "valueBox(1)@0",
+          "dx": 6.53,
+          "dy": 6.73
+        },
+        {
+          "ptr": "j@0",
+          "with": "bar(1)@0",
+          "dx": 19.42,
+          "dy": 17.67
+        },
+        {
+          "ptr": "idx@0",
+          "with": "valueText@0",
+          "dx": 6.23,
+          "dy": 0.8
+        },
+        {
+          "ptr": "idx@0",
+          "with": "bar@0",
+          "dx": 6.23,
+          "dy": 3.8
+        }
+      ],
+      "errors": []
+    },
+    "quick-5_-5_0-3of10-844x390": {
+      "counter": "3 / 10 · partition",
+      "banner": "选取枢轴 pivot = a[2] = 0",
+      "runId": "run_mui5q9s8_9b5yj9v",
+      "execLine": "14",
+      "execLineText": "  const pivot = arr[R]!",
+      "codeMeta": "快速排序 (TypeScript) · ▶ partition @quickSort.ts:14",
+      "signed": "1",
+      "slots": [
+        {
+          "i": 0,
+          "v": "5",
+          "ptrs": [
+            "L"
+          ]
+        },
+        {
+          "i": 1,
+          "v": "-5",
+          "ptrs": []
+        },
+        {
+          "i": 2,
+          "v": "0",
+          "ptrs": [
+            "R"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "ptr": "L@0",
+          "with": "valueText(5)@0",
+          "dx": 6.53,
+          "dy": 7.86
+        },
+        {
+          "ptr": "L@0",
+          "with": "valueBox(5)@0",
+          "dx": 6.53,
+          "dy": 6.73
+        },
+        {
+          "ptr": "L@0",
+          "with": "bar(5)@0",
+          "dx": 19.42,
+          "dy": 17.67
+        },
+        {
+          "ptr": "idx@0",
+          "with": "valueText@0",
+          "dx": 6.23,
+          "dy": 0.8
+        },
+        {
+          "ptr": "idx@0",
+          "with": "bar@0",
+          "dx": 6.23,
+          "dy": 3.8
+        }
+      ],
+      "errors": []
+    }
+  }
+}

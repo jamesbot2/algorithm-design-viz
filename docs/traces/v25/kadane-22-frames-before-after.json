@@ -1,0 +1,156 @@
+[
+ {
+  "frame": 1,
+  "banner_before": "初始化 best = cur = a[0] = -2",
+  "before": "4: let best = a[0]!  [anchor init]",
+  "banner_after": "初始化 best = cur = a[0] = -2",
+  "after": "4: let best = a[0]!  [anchor init]"
+ },
+ {
+  "frame": 2,
+  "banner_before": "考察 a[1] = 1",
+  "before": "2: export function kadane(a: number[]): { best: number; start: number; end: number } {  [numeric codeLine 1→+1]",
+  "banner_after": "考察 a[1] = 1",
+  "after": "9: for (let i = 1; i < a.length; i++) {  [anchor loopVisit]"
+ },
+ {
+  "frame": 3,
+  "banner_before": "重新开始：cur ← a[1] = 1",
+  "before": "10: if (cur + a[i]! < a[i]!) {  [anchor extendOrReset]",
+  "banner_after": "重新开始：cur ← a[1] = 1，curStart ← 1",
+  "after": "11: cur = a[i]!  [anchor resetWrite]"
+ },
+ {
+  "frame": 4,
+  "banner_before": "更新最优区间 [1,1]，best=1",
+  "before": "16: if (cur > best) {  [anchor updateBest]",
+  "banner_after": "更新最优区间 [1,1]，best=1",
+  "after": "17: best = cur  [anchor updateBest]"
+ },
+ {
+  "frame": 5,
+  "banner_before": "考察 a[2] = -3",
+  "before": "2: export function kadane(a: number[]): { best: number; start: number; end: number } {  [numeric codeLine 1→+1]",
+  "banner_after": "考察 a[2] = -3",
+  "after": "9: for (let i = 1; i < a.length; i++) {  [anchor loopVisit]"
+ },
+ {
+  "frame": 6,
+  "banner_before": "延伸：cur ← cur + a[2] = -2",
+  "before": "10: if (cur + a[i]! < a[i]!) {  [anchor extendOrReset]",
+  "banner_after": "延伸：cur ← cur + a[2] = -2",
+  "after": "14: cur = cur + a[i]!  [anchor extendWrite]"
+ },
+ {
+  "frame": 7,
+  "banner_before": "考察 a[3] = 4",
+  "before": "2: export function kadane(a: number[]): { best: number; start: number; end: number } {  [numeric codeLine 1→+1]",
+  "banner_after": "考察 a[3] = 4",
+  "after": "9: for (let i = 1; i < a.length; i++) {  [anchor loopVisit]"
+ },
+ {
+  "frame": 8,
+  "banner_before": "重新开始：cur ← a[3] = 4",
+  "before": "10: if (cur + a[i]! < a[i]!) {  [anchor extendOrReset]",
+  "banner_after": "重新开始：cur ← a[3] = 4，curStart ← 3",
+  "after": "11: cur = a[i]!  [anchor resetWrite]"
+ },
+ {
+  "frame": 9,
+  "banner_before": "更新最优区间 [3,3]，best=4",
+  "before": "16: if (cur > best) {  [anchor updateBest]",
+  "banner_after": "更新最优区间 [3,3]，best=4",
+  "after": "17: best = cur  [anchor updateBest]"
+ },
+ {
+  "frame": 10,
+  "banner_before": "考察 a[4] = -1",
+  "before": "2: export function kadane(a: number[]): { best: number; start: number; end: number } {  [numeric codeLine 1→+1]",
+  "banner_after": "考察 a[4] = -1",
+  "after": "9: for (let i = 1; i < a.length; i++) {  [anchor loopVisit]"
+ },
+ {
+  "frame": 11,
+  "banner_before": "延伸：cur ← cur + a[4] = 3",
+  "before": "10: if (cur + a[i]! < a[i]!) {  [anchor extendOrReset]",
+  "banner_after": "延伸：cur ← cur + a[4] = 3",
+  "after": "14: cur = cur + a[i]!  [anchor extendWrite]"
+ },
+ {
+  "frame": 12,
+  "banner_before": "考察 a[5] = 2",
+  "before": "2: export function kadane(a: number[]): { best: number; start: number; end: number } {  [numeric codeLine 1→+1]",
+  "banner_after": "考察 a[5] = 2",
+  "after": "9: for (let i = 1; i < a.length; i++) {  [anchor loopVisit]"
+ },
+ {
+  "frame": 13,
+  "banner_before": "延伸：cur ← cur + a[5] = 5",
+  "before": "10: if (cur + a[i]! < a[i]!) {  [anchor extendOrReset]",
+  "banner_after": "延伸：cur ← cur + a[5] = 5",
+  "after": "14: cur = cur + a[i]!  [anchor extendWrite]"
+ },
+ {
+  "frame": 14,
+  "banner_before": "更新最优区间 [3,5]，best=5",
+  "before": "16: if (cur > best) {  [anchor updateBest]",
+  "banner_after": "更新最优区间 [3,5]，best=5",
+  "after": "17: best = cur  [anchor updateBest]"
+ },
+ {
+  "frame": 15,
+  "banner_before": "考察 a[6] = 1",
+  "before": "2: export function kadane(a: number[]): { best: number; start: number; end: number } {  [numeric codeLine 1→+1]",
+  "banner_after": "考察 a[6] = 1",
+  "after": "9: for (let i = 1; i < a.length; i++) {  [anchor loopVisit]"
+ },
+ {
+  "frame": 16,
+  "banner_before": "延伸：cur ← cur + a[6] = 6",
+  "before": "10: if (cur + a[i]! < a[i]!) {  [anchor extendOrReset]",
+  "banner_after": "延伸：cur ← cur + a[6] = 6",
+  "after": "14: cur = cur + a[i]!  [anchor extendWrite]"
+ },
+ {
+  "frame": 17,
+  "banner_before": "更新最优区间 [3,6]，best=6",
+  "before": "16: if (cur > best) {  [anchor updateBest]",
+  "banner_after": "更新最优区间 [3,6]，best=6",
+  "after": "17: best = cur  [anchor updateBest]"
+ },
+ {
+  "frame": 18,
+  "banner_before": "考察 a[7] = -5",
+  "before": "2: export function kadane(a: number[]): { best: number; start: number; end: number } {  [numeric codeLine 1→+1]",
+  "banner_after": "考察 a[7] = -5",
+  "after": "9: for (let i = 1; i < a.length; i++) {  [anchor loopVisit]"
+ },
+ {
+  "frame": 19,
+  "banner_before": "延伸：cur ← cur + a[7] = 1",
+  "before": "10: if (cur + a[i]! < a[i]!) {  [anchor extendOrReset]",
+  "banner_after": "延伸：cur ← cur + a[7] = 1",
+  "after": "14: cur = cur + a[i]!  [anchor extendWrite]"
+ },
+ {
+  "frame": 20,
+  "banner_before": "考察 a[8] = 4",
+  "before": "2: export function kadane(a: number[]): { best: number; start: number; end: number } {  [numeric codeLine 1→+1]",
+  "banner_after": "考察 a[8] = 4",
+  "after": "9: for (let i = 1; i < a.length; i++) {  [anchor loopVisit]"
+ },
+ {
+  "frame": 21,
+  "banner_before": "延伸：cur ← cur + a[8] = 5",
+  "before": "10: if (cur + a[i]! < a[i]!) {  [anchor extendOrReset]",
+  "banner_after": "延伸：cur ← cur + a[8] = 5",
+  "after": "14: cur = cur + a[i]!  [anchor extendWrite]"
+ },
+ {
+  "frame": 22,
+  "banner_before": "完成：最大和=6，区间[3,6]（非空子数组）",
+  "before": "22: return { best, start, end }  [anchor done]",
+  "banner_after": "完成：最大和=6，区间[3,6]（非空子数组）",
+  "after": "22: return { best, start: bestStart, end: bestEnd }  [anchor done]"
+ }
+]
