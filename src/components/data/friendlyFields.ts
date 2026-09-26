@@ -25,6 +25,10 @@ export const FRIENDLY_LABELS: Record<string, string> = {
   mid: '中点',
   target: '目标值',
   best: '当前最优',
+  // V25-01 Kadane: the reference code's names (one execution context with kadane.ts)
+  curStart: '当前段起点',
+  bestStart: '最优起点',
+  bestEnd: '最优终点',
   bestMask: '最优选择',
   mask: '选择掩码',
   item: '当前物品',

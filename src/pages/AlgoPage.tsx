@@ -43,7 +43,7 @@ import { createRunId, freezeRunSnapshot, type RunSnapshot } from '../core/runSna
 import type { SeekCommand } from '../components/Visualizer'
 import WorkbenchLayout from '../components/workbench/WorkbenchLayout'
 import CodeBrowser from '../components/codeBrowser/CodeBrowser'
-import { getCatalog } from '../codeCatalog'
+import { getCatalog, numericLineFallback } from '../codeCatalog'
 import * as nQueensMod from '../algorithms/nQueens'
 import * as matrixChainMod from '../algorithms/matrixChain'
 import * as huffmanMod from '../algorithms/huffman'
@@ -1110,7 +1110,16 @@ export default function AlgoPage() {
       const step = isPreviewMode ? undefined : steps[cursorIndex]
       const primary = pickPrimaryCodeRef(step)
       const contexts = weakContextRefs(step)
-      const unmapped = !isPreviewMode && !!step && !primary && !step.codeLine && step.phase !== 'preview'
+      // V25-01: numeric meta.code lines may only stand in for a document line when the
+      // module's explicit policy allows it (NUMERIC_LINE_FALLBACK); otherwise a frame
+      // without a semantic ref is reported as unmapped instead of pointing somewhere wrong.
+      const fallback = numericLineFallback(id)
+      const unmapped =
+        !isPreviewMode &&
+        !!step &&
+        !primary &&
+        (fallback === 'forbidden' || !step.codeLine) &&
+        step.phase !== 'preview'
       return (
         <CodeBrowser
           documents={catalog}
@@ -1118,6 +1127,7 @@ export default function AlgoPage() {
           contextAnchorIds={contexts.map((c) => c.anchorId)}
           activeLine={isPreviewMode ? undefined : step?.codeLine}
           unmapped={unmapped}
+          numericFallback={fallback}
         />
       )
     }

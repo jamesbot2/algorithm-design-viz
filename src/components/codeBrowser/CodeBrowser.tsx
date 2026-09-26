@@ -32,6 +32,11 @@ interface Props {
   onTabChange?: (tab: 'ts' | 'pseudo') => void
   /** When true, show unmapped teaching banner instead of faking activeLine */
   unmapped?: boolean
+  /**
+   * V25-01: whether `activeLine` (a meta.code summary index) may stand in for a document
+   * line when no anchor is given. 'forbidden' → never (see NUMERIC_LINE_FALLBACK).
+   */
+  numericFallback?: 'forbidden' | 'legacy-unverified'
 }
 
 class ExecMarker extends GutterMarker {
@@ -174,6 +179,7 @@ export default function CodeBrowser({
   pseudocode,
   onTabChange,
   unmapped = false,
+  numericFallback = 'legacy-unverified',
 }: Props) {
   const [tab, setTab] = useState<'ts' | 'pseudo'>('ts')
   const [fontSize, setFontSize] = useState(13)
@@ -236,12 +242,18 @@ export default function CodeBrowser({
 
   const execLine1 = useMemo(() => {
     if (execRange) return execRange.startLine
-    // Only allow activeLine fallback on TS tab when no anchor (legacy generators)
-    if (tab === 'ts' && typeof activeLine === 'number' && activeLine >= 0 && !execAnchorId) {
+    // Legacy numeric fallback: TS tab, no anchor, and the module does not forbid it.
+    if (
+      numericFallback !== 'forbidden' &&
+      tab === 'ts' &&
+      typeof activeLine === 'number' &&
+      activeLine >= 0 &&
+      !execAnchorId
+    ) {
       return activeLine + 1
     }
     return null
-  }, [execRange, activeLine, tab, execAnchorId])
+  }, [execRange, activeLine, tab, execAnchorId, numericFallback])
   execLine1Ref.current = execLine1
 
   const contextLines = useMemo(() => {

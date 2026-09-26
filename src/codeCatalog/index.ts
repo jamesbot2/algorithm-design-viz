@@ -111,6 +111,33 @@ export function getCatalog(algoId: string): CatalogBundle | null {
   }
 }
 
+/**
+ * V25-01 numeric-line fallback policy (explicit, per module).
+ *
+ * `Step.codeLine` is a 0-based index into a module's historic `meta.code` summary —
+ * NOT a line of the complete CodeDocument. Turning it into `codeLine + 1` on the full
+ * TypeScript document is only a coincidence-level guess (Kadane's 考察 frame landed on
+ * the function declaration). The CodeBrowser may use that numeric fallback ONLY when:
+ *   1. the step carries no primary codeRef, AND
+ *   2. the TypeScript tab is active, AND
+ *   3. the module's policy below is NOT 'forbidden'.
+ *
+ * 'forbidden'          — every frame must carry a semantic codeRef; a frame without
+ *                        one shows the honest「未映射」banner, never a numeric line.
+ * 'legacy-unverified'  — the pre-V25 behaviour is kept so this round does not change
+ *                        modules it did not verify. These are listed in
+ *                        docs/V25_COVERAGE_MATRIX.md as "needs verification", NOT fixed.
+ * No global +1/-1 remapping is applied to make any single module line up.
+ */
+export type NumericLineFallback = 'forbidden' | 'legacy-unverified'
+export const NUMERIC_LINE_FALLBACK: Readonly<Record<string, NumericLineFallback>> = {
+  kadane: 'forbidden',
+}
+export function numericLineFallback(algoId: string | undefined | null): NumericLineFallback {
+  if (!algoId) return 'legacy-unverified'
+  return NUMERIC_LINE_FALLBACK[algoId] ?? 'legacy-unverified'
+}
+
 /** All primary algo ids that have a catalog (for coverage matrix / tests). */
 export const CATALOG_ALGO_IDS = [
   'dijkstra',
