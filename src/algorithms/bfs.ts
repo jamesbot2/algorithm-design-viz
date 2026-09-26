@@ -134,6 +134,6 @@ export function generateSteps(
     parent: parent.map((x) => x),
     dist: distArr.map((d) => (d === Infinity ? null : d)),
     start,
-  })
+  }, ref('done'))
   return steps
 }

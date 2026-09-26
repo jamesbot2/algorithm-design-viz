@@ -41,7 +41,7 @@ export function generateSteps(_arr: number[], matrix = meta.defaultMatrix): Step
     codeLine?: number,
     targets?: { current?: [number, number]; reads?: [number, number][]; writes?: [number, number][]; path?: [number, number][] },
     result?: unknown,
-    codeRefs?: { documentId: string; anchorId: string }[],
+    codeRefs?: { documentId: string; anchorId: string; role?: 'primary' | 'condition' }[],
   ) => {
     steps.push({
       id: id++,
@@ -76,6 +76,7 @@ export function generateSteps(_arr: number[], matrix = meta.defaultMatrix): Step
         )
         if (via < d[i][j]) {
           d[i][j] = via
+          // V25 acceptance: the write is line `d[i][j] = …` (anchor 'update'); the comparison is its condition
           snap(`更新 d[${i}][${j}] = ${via}`, { k, i, j, newVal: via }, 3, {
             current: [i, j],
             writes: [[i, j]],
@@ -83,7 +84,10 @@ export function generateSteps(_arr: number[], matrix = meta.defaultMatrix): Step
               [i, k],
               [k, j],
             ],
-          })
+          }, undefined, [
+            { documentId: DOC, anchorId: 'update', role: 'primary' },
+            { documentId: DOC, anchorId: 'relax', role: 'condition' },
+          ])
         }
       }
     }

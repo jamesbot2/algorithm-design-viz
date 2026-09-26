@@ -47,7 +47,9 @@ export function getBFSCatalog(): {
       "startLine": 15,
       "endLine": 15
     }
-  }
+  },
+  // V25 acceptance: the completion frame was unmapped although the document returns here.
+  { "id": "done", "label": "返回 dist / parent", "range": { "startLine": 19, "endLine": 19 } }
 ],
   }
   const pseudocode: CodeDocument | undefined = undefined

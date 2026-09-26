@@ -35,7 +35,11 @@ export function generateSteps(
   const next = Array(m).fill(0)
   const steps: Step[] = []
   const DOC = 'kmp.ts'
-  const ref = (anchorId: string) => [{ documentId: DOC, anchorId }]
+  // primary statement + optional branch condition (weak context), as in Kadane V25
+  const ref = (anchorId: string, condition?: string) => [
+    { documentId: DOC, anchorId, role: 'primary' as const },
+    ...(condition ? [{ documentId: DOC, anchorId: condition, role: 'condition' as const }] : []),
+  ]
   let id = 0
 
   const snap = (
@@ -44,11 +48,19 @@ export function generateSteps(
     hp: number[] = [],
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
-    codeRefs?: { documentId: string; anchorId: string }[],
+    codeRefs?: { documentId: string; anchorId: string; role?: 'primary' | 'condition' }[],
+    pointers?: { text?: Record<string, number>; pattern?: Record<string, number> },
   ) => {
+    // V25 acceptance: pointer labels are the running function's own variables
+    // (buildLps: i / len on the pattern; kmpSearch: i on the text, j on the pattern),
+    // placed only when that variable is a valid index.
     const arrayPointers: Record<string, Record<string, number>> = {}
-    if (ht.length === 1) arrayPointers.text = { i: ht[0]! }
-    if (hp.length >= 1) arrayPointers.pattern = { j: hp[0]! }
+    for (const [arr, len] of [['text', t.length], ['pattern', m]] as const) {
+      const src = pointers?.[arr]
+      if (!src) continue
+      const inRange = Object.fromEntries(Object.entries(src).filter(([, v]) => v >= 0 && v < len))
+      if (Object.keys(inRange).length) arrayPointers[arr] = inRange
+    }
     steps.push({
       id: id++,
       message,
@@ -70,7 +82,7 @@ export function generateSteps(
       ok: true,
       hits: [0],
       convention: 'empty_pattern_matches_at_0',
-    })
+    }, ref('emptyPattern'))
     return steps
   }
 
@@ -78,28 +90,29 @@ export function generateSteps(
   let len = 0
   let i = 1
   while (i < m) {
-    snap(`比较 p[${i}]='${p[i]}' 与 p[${len}]='${p[len]}'`, [], [i, len], { i, len }, undefined, ref('buildLps'))
+    snap(`比较 p[${i}]='${p[i]}' 与 p[${len}]='${p[len]}'`, [], [i, len], { i, len }, undefined, ref('lpsCompare'), { pattern: { i, len } })
     if (p[i] === p[len]) {
       len++
       next[i] = len
-      snap(`匹配，next[${i}]=${len}`, [], [i], { i, len }, undefined, ref('buildLps'))
+      snap(`匹配，next[${i}]=${len}`, [], [i], { i, len }, undefined, ref('lpsExtend', 'lpsCompare'), { pattern: { i, len } })
       i++
     } else if (len > 0) {
       len = next[len - 1]
-      snap(`失配，len ← next[...] 回退到 ${len}`, [], [i], { i, len })
+      snap(`失配，len ← next[...] 回退到 ${len}`, [], [i], { i, len }, undefined, ref('lpsFallback', 'lpsFallbackCond'), { pattern: { i, len } })
     } else {
       next[i] = 0
-      snap(`next[${i}]=0`, [], [i], { i })
+      snap(`next[${i}]=0`, [], [i], { i }, undefined, ref('lpsZero'), { pattern: { i } })
       i++
     }
   }
-  snap(`π/next = [${next.join(',')}]`, [], [], { phase: 'match' })
+  snap(`π/next = [${next.join(',')}]`, [], [], { phase: 'match' }, undefined, ref('lpsReturn'))
 
   let ti = 0
   let pj = 0
   const hits: number[] = []
+  // vars use the reference code's names (kmpSearch: i over text, j over pattern)
   while (ti < t.length) {
-    snap(`比较 t[${ti}]='${t[ti]}' 与 p[${pj}]='${p[pj]}'`, [ti], [pj], { ti, pj }, undefined, ref('match'))
+    snap(`比较 t[${ti}]='${t[ti]}' 与 p[${pj}]='${p[pj]}'`, [ti], [pj], { i: ti, j: pj }, undefined, ref('match'), { text: { i: ti }, pattern: { j: pj } })
     if (t[ti] === p[pj]) {
       ti++
       pj++
@@ -117,10 +130,10 @@ export function generateSteps(
       }
     } else if (pj > 0) {
       pj = next[pj - 1]
-      snap(`失配，模式串跳转 j ← ${pj}`, [ti], [pj], { ti, pj }, undefined, ref('fallback'))
+      snap(`失配，模式串跳转 j ← ${pj}`, [ti], [pj], { i: ti, j: pj }, undefined, ref('fallbackWrite', 'fallback'), { text: { i: ti }, pattern: { j: pj } })
     } else {
       ti++
-      snap('失配且 j=0，文本前进', [ti < t.length ? ti : t.length - 1], [], { ti, pj })
+      snap('失配且 j=0，文本前进', [ti < t.length ? ti : t.length - 1], [], { i: ti, j: pj }, undefined, ref('advance'), { text: { i: ti } })
     }
   }
   snap(
