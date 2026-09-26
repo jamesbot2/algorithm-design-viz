@@ -1,7 +1,7 @@
 /** V25-02: signed chart model — plot lanes & value domain (pure geometry). */
 import { describe, expect, it } from 'vitest'
 import { computeBarGeometry } from '../src/components/ArrayView'
-import { signedPlotLanes, SIGNED_EDGE_LANE_PX, SIGNED_VALUE_LABEL_PX } from '../src/components/signedPlot'
+import { signedLabelPlacement, signedPlotLanes, SIGNED_EDGE_LANE_PX, SIGNED_VALUE_LABEL_PX } from '../src/components/signedPlot'
 
 describe('V25-02 signed plot model', () => {
   it('equal magnitude opposite signs → equal lengths; zero → 0; same zero line', () => {
@@ -32,10 +32,36 @@ describe('V25-02 signed plot model', () => {
     // all zero: zero line at the bottom edge
     expect(signedPlotLanes(computeBarGeometry([0, 0], undefined, 160), 160)).toEqual({ top: 0, bottom: SIGNED_EDGE_LANE_PX })
   })
-  it('lanes grow only for short-bar labels that would leave a squeezed plot', () => {
+  it('squeezed mixed plot: short-bar labels go across y(0) in their own column → no lane needed', () => {
     const g = computeBarGeometry([1, -1], undefined, 32, { hasPos: true, hasNeg: true })
-    const need = Math.ceil(g.heights[0]! + 2 + SIGNED_VALUE_LABEL_PX - 16)
-    expect(signedPlotLanes(g, 32)).toEqual({ top: need, bottom: need })
+    expect(signedLabelPlacement(g.heights[0]!, 'pos', g.zeroRatio, 32)).toBe('across')
+    expect(signedLabelPlacement(g.heights[1]!, 'neg', g.zeroRatio, 32)).toBe('across')
+    expect(signedPlotLanes(g, 32)).toEqual({ top: 0, bottom: 0 })
     expect(signedPlotLanes(null, 32)).toEqual({ top: 0, bottom: 0 })
+  })
+  it('placement rule: inside for tall bars, tip when own half has room, across otherwise (mixed only)', () => {
+    expect(signedLabelPlacement(40, 'pos', 0.5, 160)).toBe('inside')
+    expect(signedLabelPlacement(0, 'zero', 0.5, 160)).toBe('inside')
+    expect(signedLabelPlacement(4, 'pos', 0.5, 160)).toBe('tip')
+    expect(signedLabelPlacement(4, 'neg', 0.5, 160)).toBe('tip')
+    expect(signedLabelPlacement(10, 'pos', 0.3, 40)).toBe('across') // up-room 12 < 10+16
+    expect(signedLabelPlacement(10, 'neg', 0.7, 40)).toBe('across')
+  })
+  it('single-sign squeezed plot never uses across; the tip label gets a lane instead', () => {
+    const g = computeBarGeometry([-1, -8], undefined, 12, { hasPos: false, hasNeg: true })
+    expect(g.zeroRatio).toBe(0)
+    expect(signedLabelPlacement(g.heights[0]!, 'neg', g.zeroRatio, 12)).toBe('tip')
+    const lanes = signedPlotLanes(g, 12)
+    // every bar is short at span 12 → each tip label must fit below its tip; the deepest one sets the lane
+    expect(lanes.bottom).toBe(Math.ceil(Math.max(...g.heights.map((h) => h + 2 + SIGNED_VALUE_LABEL_PX - 12))))
+    expect(lanes.bottom).toBeGreaterThan(0)
+  })
+  it('across in a mixed plot where the opposite half is tiny reserves only the missing room', () => {
+    // [10,-1] with span 20: zero near bottom; -1 is short, down-room small → across (label above y(0))
+    const g = computeBarGeometry([10, -1], undefined, 20, { hasPos: true, hasNeg: true })
+    const place = signedLabelPlacement(g.heights[1]!, 'neg', g.zeroRatio, 20)
+    const lanes = signedPlotLanes(g, 20)
+    if (place === 'across') expect(lanes.top).toBe(Math.ceil(Math.max(0, 2 + SIGNED_VALUE_LABEL_PX - g.zeroRatio * 20)))
+    expect(lanes.top).toBeGreaterThanOrEqual(0)
   })
 })

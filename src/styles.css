@@ -960,8 +960,9 @@ button.icon-btn {
 .bars-wrap.signed .bar-zero-marker.hl-swap {
   transform: none;
 }
-/* Short signed bars: the value sits just OUTSIDE the tip (above a positive tip, below a
- * negative tip), inside the plot; the lanes are sized in ArrayView so it never leaves it. */
+/* Short signed bars (see signedLabelPlacement): "tip" = just outside the tip in its own
+ * half; "across" = just across y(0) in the empty opposite half of the same column (mixed
+ * plots whose half is too small). Lanes are sized so the label never leaves the plot. */
 .bars-wrap.signed .bar.bar-short {
   position: relative;
   overflow: visible;
@@ -975,10 +976,12 @@ button.icon-btn {
   max-width: none;
   width: max-content;
 }
-.bars-wrap.signed .bar-col.pos .bar.bar-short > .bar-val {
+.bars-wrap.signed .bar-col.pos .bar.bar-short[data-label-pos="tip"] > .bar-val,
+.bars-wrap.signed .bar-col.neg .bar.bar-short[data-label-pos="across"] > .bar-val {
   bottom: calc(100% + 2px);
 }
-.bars-wrap.signed .bar-col.neg .bar.bar-short > .bar-val {
+.bars-wrap.signed .bar-col.neg .bar.bar-short[data-label-pos="tip"] > .bar-val,
+.bars-wrap.signed .bar-col.pos .bar.bar-short[data-label-pos="across"] > .bar-val {
   top: calc(100% + 2px);
 }
 .bar.bar-neg {

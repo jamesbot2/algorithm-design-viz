@@ -13,7 +13,7 @@ import { deriveArrayPointers } from '../types/step'
 import type { PresentationDescriptor } from '../types/presentation'
 import { useMotion } from '../theme/MotionContext'
 import { resolveDuration } from '../theme/motion'
-import { SHORT_BAR_PX, signedPlotLanes } from './signedPlot'
+import { SHORT_BAR_PX, signedLabelPlacement, signedPlotLanes } from './signedPlot'
 
 interface Props {
   name: string
@@ -224,8 +224,16 @@ function ArrayView({
 
   const hasPointers = pointersByIndex.size > 0
   const lanes = signedPlotLanes(signedMode ? geo : null, maxH)
-  const lanesRef = useRef(lanes)
-  lanesRef.current = lanes
+  /** Largest span s ≤ avail with s + lanes(s) ≤ avail (V25-02: lanes never starve the plot). */
+  const fitSpanRef = useRef((avail: number) => Math.max(32, avail))
+  fitSpanRef.current = (avail: number) => {
+    for (let span = Math.floor(avail); span > 32; span -= 1) {
+      const g = computeBarGeometry(nums, scaleMax, span, signedDomain)
+      const l = signedPlotLanes(g, span)
+      if (span + l.top + l.bottom <= avail) return span
+    }
+    return 32
+  }
   const interval = labelFormat === 'interval-card'
 
   /** Real swap only when explicit swap op present — never from highlights.length >= 2 */
@@ -282,7 +290,7 @@ function ArrayView({
           const plot = col.querySelector(':scope > .bar-plot') as HTMLElement | null
           colChrome = Math.max(colChrome, (col as HTMLElement).offsetHeight - (plot?.offsetHeight ?? 0))
         }
-        colChrome = Math.max(colChrome, 30) + lanesRef.current.top + lanesRef.current.bottom
+        colChrome = Math.max(colChrome, 30)
       } else if (wrap) {
         for (const col of Array.from(wrap.querySelectorAll(':scope > .bar-col'))) {
           const layer = col.querySelector(':scope > .bar-flip-layer') as HTMLElement | null
@@ -291,7 +299,9 @@ function ArrayView({
         colChrome = Math.max(colChrome, 30)
       }
       const budget = Math.floor(box - chromeY - labelH - noteH - wrapPad - colChrome - 2)
-      const next = Math.max(32, budget)
+      // signed: `budget` is the whole plot (lanes + span); pick the largest span whose
+      // own lanes still fit — lanes are evaluated for the CANDIDATE span, not the current one.
+      const next = signedMode ? fitSpanRef.current(budget) : Math.max(32, budget)
       setMaxH((prev) => {
         if (Math.abs(prev - next) < 2) return prev
         // A re-fit is geometry, not data: land it without the 220ms height transition
@@ -669,6 +679,7 @@ function ArrayView({
                       minHeight: 0,
                     }}
                     data-data-height={h}
+                    data-label-pos={signedMode ? signedLabelPlacement(h, dir, geo.zeroRatio, maxH) : undefined}
                     title={`[${i}] = ${v}`}
                   >
                     <span className="bar-val">{String(v)}</span>
