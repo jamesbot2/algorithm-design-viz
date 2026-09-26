@@ -882,17 +882,24 @@ button.icon-btn {
   opacity: 0.95;
 }
 
-/* —— V11-01 signed bars: shared y(0); pos up / neg down; zero height 0 —— */
+/* —— V11-01 signed bars: shared y(0); pos up / neg down; zero height 0 ——
+ * V25-02: explicit chart model. Each column = plot area (.bar-plot, explicit height:
+ * lane-top + span + lane-bottom; the zero line at lane-top + zero-ratio·span) followed
+ * by the annotation tracks (index row, pointer track) in normal flow BELOW the plot.
+ * The absolute bar positioning lives inside the plot only, so bars / values never share
+ * pixels with index or pointer labels. */
 .bars-wrap.signed {
+  --signed-pad-top: 0.5rem;
   position: relative;
-  align-items: stretch;
-  min-height: var(--bar-chart-h, 200px);
-  height: var(--bar-chart-h, 200px);
+  align-items: flex-start;
+  min-height: 0;
+  height: auto;
+  padding-top: var(--signed-pad-top);
 }
 .bars-wrap.signed .bar-baseline {
   position: absolute;
   left: 0; right: 0;
-  top: calc(var(--zero-ratio, 0.5) * 100%);
+  top: calc(var(--signed-pad-top) + var(--plot-lane-top, 0px) + var(--zero-ratio, 0.5) * var(--plot-span, 160px));
   height: 1px;
   background: var(--border);
   pointer-events: none;
@@ -900,9 +907,15 @@ button.icon-btn {
 }
 .bars-wrap.signed .bar-col {
   justify-content: flex-start;
-  min-height: 100%;
-  height: 100%;
+  min-height: 0;
+  height: auto;
   position: relative;
+}
+.bars-wrap.signed .bar-plot {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  height: calc(var(--plot-lane-top, 0px) + var(--plot-span, 160px) + var(--plot-lane-bottom, 0px));
 }
 .bars-wrap.signed .bar-flip-layer {
   position: absolute;
@@ -913,17 +926,21 @@ button.icon-btn {
   width: 100%;
 }
 .bars-wrap.signed .bar-col.pos .bar-flip-layer {
-  bottom: calc((1 - var(--zero-ratio, 0.5)) * 100%);
+  bottom: calc(var(--plot-lane-bottom, 0px) + (1 - var(--zero-ratio, 0.5)) * var(--plot-span, 160px));
   align-items: flex-end;
 }
 .bars-wrap.signed .bar-col.neg .bar-flip-layer {
-  top: calc(var(--zero-ratio, 0.5) * 100%);
+  top: calc(var(--plot-lane-top, 0px) + var(--zero-ratio, 0.5) * var(--plot-span, 160px));
   align-items: flex-start;
 }
+/* Zero: a 22px marker centred on the zero line via `top` (the FLIP layer's inline
+ * transform is reserved for motion, so centring must not use transform). */
 .bars-wrap.signed .bar-col.zero .bar-flip-layer {
-  top: calc(var(--zero-ratio, 0.5) * 100%);
-  transform: translateY(-50%);
+  top: calc(var(--plot-lane-top, 0px) + var(--zero-ratio, 0.5) * var(--plot-span, 160px) - 11px);
   align-items: center;
+}
+.bars-wrap.signed .bar-zero-marker {
+  height: 22px;
 }
 .bars-wrap.signed .bar-col.pos .bar {
   align-self: auto;
@@ -936,6 +953,33 @@ button.icon-btn {
   margin-top: 0;
   border-radius: 0 0 6px 6px;
   min-height: 0;
+}
+/* Signed bars stay anchored on the shared zero line: the unsigned "swap lift"
+ * (translateY(-2px)) would detach a bar from y(0); the swap colour still applies. */
+.bars-wrap.signed .bar.hl-swap,
+.bars-wrap.signed .bar-zero-marker.hl-swap {
+  transform: none;
+}
+/* Short signed bars: the value sits just OUTSIDE the tip (above a positive tip, below a
+ * negative tip), inside the plot; the lanes are sized in ArrayView so it never leaves it. */
+.bars-wrap.signed .bar.bar-short {
+  position: relative;
+  overflow: visible;
+  padding-top: 0;
+}
+.bars-wrap.signed .bar.bar-short > .bar-val {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: visible;
+  max-width: none;
+  width: max-content;
+}
+.bars-wrap.signed .bar-col.pos .bar.bar-short > .bar-val {
+  bottom: calc(100% + 2px);
+}
+.bars-wrap.signed .bar-col.neg .bar.bar-short > .bar-val {
+  top: calc(100% + 2px);
 }
 .bar.bar-neg {
   background: rgba(239, 68, 68, 0.35);
@@ -1208,9 +1252,8 @@ button.icon-btn {
   height: auto;
 }
 .array-buffers .array-view-compact .bars-wrap.signed {
-  min-height: 64px;
-  height: 64px;
-  --bar-chart-h: 64px;
+  min-height: 0;
+  height: auto;
 }
 
 /* —— V3 Workbench / Lab theme (gradual migration) —— */

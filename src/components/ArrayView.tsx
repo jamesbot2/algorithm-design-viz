@@ -13,6 +13,7 @@ import { deriveArrayPointers } from '../types/step'
 import type { PresentationDescriptor } from '../types/presentation'
 import { useMotion } from '../theme/MotionContext'
 import { resolveDuration } from '../theme/motion'
+import { SHORT_BAR_PX, signedPlotLanes } from './signedPlot'
 
 interface Props {
   name: string
@@ -127,9 +128,6 @@ export function computeBarGeometry(
   return { absMax, zeroRatio, heights, directions }
 }
 
-/** Below this data height the value label sits just above the bar (never clipped / never overlapping the index). */
-const SHORT_BAR_PX = 18
-
 /** "A0[1,4)" → { id: "A0", range: "[1,4)" } — presentation only, endpoints kept verbatim. */
 export function splitIntervalLabel(label: string): { id: string; range: string } {
   const m = label.match(/^(.*?)(\[[^\]]*[\])])$/)
@@ -225,6 +223,9 @@ function ArrayView({
   }, [pointers, values.length])
 
   const hasPointers = pointersByIndex.size > 0
+  const lanes = signedPlotLanes(signedMode ? geo : null, maxH)
+  const lanesRef = useRef(lanes)
+  lanesRef.current = lanes
   const interval = labelFormat === 'interval-card'
 
   /** Real swap only when explicit swap op present — never from highlights.length >= 2 */
@@ -273,8 +274,15 @@ function ArrayView({
       const wcs = wrap ? getComputedStyle(wrap) : null
       const wrapPad = wcs ? px(wcs.paddingTop) + px(wcs.paddingBottom) : 0
       let colChrome = 0
-      if (signedMode) {
-        colChrome = hasPositive && hasNegative ? 40 : 24
+      if (signedMode && wrap) {
+        // V25-02: annotation tracks (index + pointer rows) are MEASURED from the real
+        // column (column height minus its plot area), plus the plot's edge lanes.
+        // No fixed 40/24 guess — the plot never shares pixels with the annotations.
+        for (const col of Array.from(wrap.querySelectorAll(':scope > .bar-col'))) {
+          const plot = col.querySelector(':scope > .bar-plot') as HTMLElement | null
+          colChrome = Math.max(colChrome, (col as HTMLElement).offsetHeight - (plot?.offsetHeight ?? 0))
+        }
+        colChrome = Math.max(colChrome, 30) + lanesRef.current.top + lanesRef.current.bottom
       } else if (wrap) {
         for (const col of Array.from(wrap.querySelectorAll(':scope > .bar-col'))) {
           const layer = col.querySelector(':scope > .bar-flip-layer') as HTMLElement | null
@@ -309,7 +317,7 @@ function ArrayView({
       ro?.disconnect()
       window.removeEventListener('resize', apply)
     }
-  }, [compact, mode, values.length, signedMode, hasPositive, hasNegative])
+  }, [compact, mode, values.length, signedMode, hasPositive, hasNegative, lanes.top, lanes.bottom])
   const geometryGen = useRef(0)
   const [rangeMasks, setRangeMasks] = useState<{
     current: { left: number; width: number; top: number; height: number }[]
@@ -585,7 +593,11 @@ function ArrayView({
           style={
             {
               position: 'relative',
-              '--bar-chart-h': `${signedMode && hasPositive && hasNegative ? maxH + 40 : maxH + 24}px`,
+              // signed: plot span + edge lanes; the annotation tracks are laid out below the plot
+              '--bar-chart-h': `${signedMode ? maxH + lanes.top + lanes.bottom : maxH + 24}px`,
+              '--plot-span': `${maxH}px`,
+              '--plot-lane-top': `${lanes.top}px`,
+              '--plot-lane-bottom': `${lanes.bottom}px`,
               '--zero-ratio': String(geo.zeroRatio),
             } as CSSProperties
           }
@@ -614,7 +626,8 @@ function ArrayView({
           {rangeMasks.best.length === 0 && bestBand && (
             <div className="range-band best" style={bestBand} title="最优窗口" />
           )}
-          {signedMode && <div className="bar-baseline" style={{ top: `${geo.zeroRatio * 100}%` }} aria-hidden />}
+          {/* V25-02: y(0) = pad + lane-top + zero-ratio·span (CSS), the same line the plot uses */}
+          {signedMode && <div className="bar-baseline" data-zero-line aria-hidden />}
           {values.map((v, i) => {
             const role = roleForIndex(i, highlights, roles, arrayOps)
             const h = geo.heights[i]!
@@ -622,6 +635,47 @@ function ArrayView({
             const ptrs = pointersByIndex.get(i) ?? []
             const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
             const eid = ids[i]!
+            const flipLayer = (
+              <div
+                className="bar-flip-layer"
+                data-flip-layer
+                ref={(el) => {
+                  layerRefs.current.set(eid, el)
+                }}
+                style={{ transform: 'none' } as CSSProperties}
+              >
+                {dir === 'zero' ? (
+                  <button
+                    type="button"
+                    className={`bar-zero-marker${role ? ` ${ROLE_CLASS[role]}` : ''}`}
+                    data-bar-zero
+                    data-data-height="0"
+                    title={`[${i}] = ${v}`}
+                    aria-label={`索引 ${i} 值 0`}
+                  >
+                    <span className="bar-val">0</span>
+                  </button>
+                ) : (
+                  <div
+                    className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${dir === 'neg' ? ' bar-neg' : ''}${
+                      h < SHORT_BAR_PX ? ' bar-short' : ''
+                    }${
+                      isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
+                    }`}
+                    style={{
+                      height: `${h}px`,
+                      // Width from slot geometry (100%), not label text
+                      width: '100%',
+                      minHeight: 0,
+                    }}
+                    data-data-height={h}
+                    title={`[${i}] = ${v}`}
+                  >
+                    <span className="bar-val">{String(v)}</span>
+                  </div>
+                )}
+              </div>
+            )
             const slotKey = `slot-${i}`
             return (
               <div
@@ -635,47 +689,15 @@ function ArrayView({
                   slotRefs.current.set(i, el)
                 }}
               >
-                <div
-                  className="bar-flip-layer"
-                  data-flip-layer
-                  ref={(el) => {
-                    layerRefs.current.set(eid, el)
-                  }}
-                  style={{ transform: 'none' } as CSSProperties}
-                >
-                  {dir === 'zero' ? (
-                    <button
-                      type="button"
-                      className={`bar-zero-marker${role ? ` ${ROLE_CLASS[role]}` : ''}`}
-                      data-bar-zero
-                      data-data-height="0"
-                      title={`[${i}] = ${v}`}
-                      aria-label={`索引 ${i} 值 0`}
-                    >
-                      <span className="bar-val">0</span>
-                    </button>
-                  ) : (
-                    <div
-                      className={`bar${role ? ` ${ROLE_CLASS[role]}` : ''}${dir === 'neg' ? ' bar-neg' : ''}${
-                        !signedMode && h < SHORT_BAR_PX ? ' bar-short' : ''
-                      }${
-                        isSwap ? ' anim-swap-geo' : role === 'compare' ? ' anim-compare-pulse' : ''
-                      }`}
-                      style={{
-                        height: `${h}px`,
-                        // Width from slot geometry (100%), not label text
-                        width: '100%',
-                        minHeight: 0,
-                      }}
-                      data-data-height={h}
-                      title={`[${i}] = ${v}`}
-                    >
-                      <span className="bar-val">{String(v)}</span>
-                    </div>
-                  )}
-                </div>
+                {signedMode ? (
+                  <div className="bar-plot" data-bar-plot>
+                    {flipLayer}
+                  </div>
+                ) : (
+                  flipLayer
+                )}
                 <span className="bar-idx">{i}</span>
-                <div className="pointer-row">
+                <div className="pointer-row" data-ptr-count={ptrs.length}>
                   {ptrs.map((p) => (
                     <span key={p} className="ptr-tag">
                       {p}
