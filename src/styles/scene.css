@@ -535,6 +535,20 @@
   overflow: hidden;
   order: 1;
 }
+/*
+ * V25 acceptance: legacy (undeclared) stage with SEVERAL primary arrays (KMP text / pattern /
+ * next). Shrinking each array-view into an overflow:hidden box cut cells, values and the i / j
+ * pointers with no way to reach them. Each array keeps its content height instead; when the
+ * stage is shorter than their sum the stage viewport (overflow:auto) scrolls. Single-array and
+ * declared (V24) stages are untouched.
+ */
+.stage-viewport[data-presentation="legacy"] .arrays-panel[data-array-order="primary-first"][data-multi-primary="1"] {
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.stage-viewport[data-presentation="legacy"] .arrays-panel[data-array-order="primary-first"][data-multi-primary="1"] > .array-view {
+  flex: 0 0 auto;
+}
 
 
 /* V24: unsigned bars take their slot's width (the flip layer stretches to the slot),

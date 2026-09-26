@@ -986,7 +986,12 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   // V18-02 / V18.1: primary owns flex budget; aux buffers stay ON TOP inside stage
   // so mid-step temp/key remains in viz-canvas (primary-first was clipping buffers below fold).
   return (
-    <div className="arrays-panel" data-array-order="primary-first" data-testid="arrays-panel">
+    <div
+      className="arrays-panel"
+      data-array-order="primary-first"
+      data-testid="arrays-panel"
+      data-multi-primary={primary.length > 1 ? '1' : undefined}
+    >
       {buffers.length > 0 && (
         <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
           {buffers.map(([name, values]) => renderOne(name, values, true))}
