@@ -270,3 +270,154 @@ export async function measureLabelText(page: Page, selector: string, tol = 0.5) 
     { selector, tol },
   )
 }
+
+/**
+ * V25-02 signed-chart annotation check — same detection path as the V24 detector
+ * (real stage, one visible canvas, main array only, buffers excluded).
+ *
+ * A "conflict" is a REAL reading collision, not any bounding-box intersection:
+ *   pointer tag (border box)  × value glyphs (Range) / bar bodies / index glyphs / other tags
+ *   index glyphs (Range)      × value glyphs / bar bodies
+ *   value glyphs of slot i    × bar body of slot j ≠ i   (label spilling onto a neighbour)
+ * Range bands, the zero line, state colours and focus outlines may overlap by design and
+ * are NOT counted. Also reports: pointer/index alignment with their own slot, value glyphs
+ * outside their plot area, zero-value data height, and the zero-line geometry.
+ */
+export interface SignedAnnotationReport {
+  signed: boolean
+  slots: {
+    i: number
+    value: string
+    dir: string | null
+    dataH: number
+    barH: number
+    ptrs: string[]
+    valueInPlot: boolean
+    ptrAligned: boolean
+    idxAligned: boolean
+  }[]
+  conflicts: { a: string; b: string; dx: number; dy: number }[]
+  zeroLineY: number | null
+  posBottoms: number[]
+  negTops: number[]
+  zeroMarkerCenters: number[]
+}
+
+export async function measureSignedAnnotations(page: Page, name = 'a', tol = 0.5): Promise<SignedAnnotationReport> {
+  return page.evaluate(
+    ({ name, tol }) => {
+      type R = { l: number; r: number; t: number; b: number }
+      const glyph = (el: Element | null): R | null => {
+        if (!el) return null
+        const range = document.createRange()
+        range.selectNodeContents(el)
+        const rs = [...range.getClientRects()].filter((x) => x.width > 0 && x.height > 0)
+        if (!rs.length) return null
+        return {
+          l: Math.min(...rs.map((x) => x.left)),
+          r: Math.max(...rs.map((x) => x.right)),
+          t: Math.min(...rs.map((x) => x.top)),
+          b: Math.max(...rs.map((x) => x.bottom)),
+        }
+      }
+      const box = (el: Element | null): R | null => {
+        if (!el) return null
+        const x = el.getBoundingClientRect()
+        return x.width > 0 && x.height > 0 ? { l: x.left, r: x.right, t: x.top, b: x.bottom } : null
+      }
+      const ov = (A: R | null, B: R | null) => {
+        if (!A || !B) return null
+        const dx = Math.min(A.r, B.r) - Math.max(A.l, B.l)
+        const dy = Math.min(A.b, B.b) - Math.max(A.t, B.t)
+        return dx > tol && dy > tol ? { dx: Math.round(dx * 100) / 100, dy: Math.round(dy * 100) / 100 } : null
+      }
+      const stage = [...document.querySelectorAll('[data-testid="viz-canvas"]')].find(
+        (s) => !s.closest('[inert],[aria-hidden="true"],[hidden]'),
+      )
+      const view = stage
+        ? [...stage.querySelectorAll(`.array-view[data-array="${name}"]`)].find((v) => !v.closest('.array-buffers'))
+        : undefined
+      const wrap = view?.querySelector('.bars-wrap') ?? null
+      const slotEls = view ? [...view.querySelectorAll('[data-slot-index]')] : []
+      const S = slotEls.map((s) => {
+        const val = s.querySelector('.bar-val, .cell-val')
+        const barEl = s.querySelector('.bar, .bar-zero-marker')
+        const plot = s.querySelector('.bar-plot')
+        return {
+          i: Number(s.getAttribute('data-slot-index')),
+          value: (val?.textContent ?? '').trim(),
+          dir: s.getAttribute('data-bar-dir'),
+          dataH: Number(barEl?.getAttribute('data-data-height') ?? NaN),
+          slot: box(s)!,
+          plot: box(plot),
+          val: glyph(val),
+          bar: box(barEl),
+          barIsZero: !!barEl?.matches('.bar-zero-marker'),
+          idx: glyph(s.querySelector('.bar-idx, .cell-idx')),
+          ptrs: [...s.querySelectorAll('.ptr-tag')].map((t) => ({ label: (t.textContent ?? '').trim(), r: box(t) })),
+        }
+      })
+      const conflicts: { a: string; b: string; dx: number; dy: number }[] = []
+      const push = (a: string, b: string, o: { dx: number; dy: number } | null) => {
+        if (o) conflicts.push({ a, b, ...o })
+      }
+      for (const A of S) {
+        for (const p of A.ptrs) {
+          for (const B of S) {
+            push(`ptr ${p.label}@${A.i}`, `value ${B.value}@${B.i}`, ov(p.r, B.val))
+            push(`ptr ${p.label}@${A.i}`, `bar ${B.value}@${B.i}`, ov(p.r, B.bar))
+            push(`ptr ${p.label}@${A.i}`, `index @${B.i}`, ov(p.r, B.idx))
+            for (const q of B.ptrs) if (q !== p && (B.i > A.i || (B.i === A.i && A.ptrs.indexOf(q) > A.ptrs.indexOf(p)))) push(`ptr ${p.label}@${A.i}`, `ptr ${q.label}@${B.i}`, ov(p.r, q.r))
+          }
+        }
+        for (const B of S) {
+          push(`index @${A.i}`, `value ${B.value}@${B.i}`, ov(A.idx, B.val))
+          // bars/markers mode: an index glyph on any bar body is a collision
+          if (wrap) push(`index @${A.i}`, `bar ${B.value}@${B.i}`, ov(A.idx, B.bar))
+          if (wrap && B.i !== A.i) push(`value ${A.value}@${A.i}`, `bar ${B.value}@${B.i}`, ov(A.val, B.bar))
+        }
+      }
+      const cx = (r: R | null) => (r ? (r.l + r.r) / 2 : NaN)
+      const zl = wrap?.querySelector('.bar-baseline')?.getBoundingClientRect()
+      return {
+        signed: wrap?.getAttribute('data-signed') === '1',
+        slots: S.map((s) => ({
+          i: s.i,
+          value: s.value,
+          dir: s.dir,
+          dataH: s.dataH,
+          barH: s.bar ? Math.round((s.bar.b - s.bar.t) * 100) / 100 : 0,
+          ptrs: s.ptrs.map((p) => p.label),
+          valueInPlot: !s.plot || !s.val ? true : s.val.t >= s.plot.t - tol && s.val.b <= s.plot.b + tol,
+          ptrAligned: s.ptrs.every((p) => cx(p.r) >= s.slot.l - tol && cx(p.r) <= s.slot.r + tol),
+          idxAligned: !s.idx || (cx(s.idx) >= s.slot.l - tol && cx(s.idx) <= s.slot.r + tol),
+        })),
+        conflicts,
+        zeroLineY: zl ? zl.top + zl.height / 2 : null,
+        posBottoms: S.filter((s) => s.dir === 'pos' && s.bar).map((s) => s.bar!.b),
+        negTops: S.filter((s) => s.dir === 'neg' && s.bar).map((s) => s.bar!.t),
+        zeroMarkerCenters: S.filter((s) => s.barIsZero && s.bar).map((s) => (s.bar!.t + s.bar!.b) / 2),
+      }
+    },
+    { name, tol },
+  )
+}
+
+/** Failure list for a signed report (empty = pass). */
+export function signedAnnotationFailures(r: SignedAnnotationReport, opts: { zeroLineTol?: number } = {}): string[] {
+  const f: string[] = []
+  const tol = opts.zeroLineTol ?? 1.5
+  if (r.conflicts.length) f.push(`conflicts: ${JSON.stringify(r.conflicts.slice(0, 6))}`)
+  for (const s of r.slots) {
+    if (!s.ptrAligned) f.push(`ptr not aligned @${s.i}`)
+    if (!s.idxAligned) f.push(`index not aligned @${s.i}`)
+    if (!s.valueInPlot) f.push(`value outside plot @${s.i}`)
+    if (s.value === '0' && s.dir === 'zero' && s.dataH !== 0) f.push(`zero drawn with data height ${s.dataH} @${s.i}`)
+  }
+  if (r.signed && r.zeroLineY != null) {
+    for (const y of r.posBottoms) if (Math.abs(y - r.zeroLineY) > tol) f.push(`pos bar bottom ${y} ≠ zero line ${r.zeroLineY}`)
+    for (const y of r.negTops) if (Math.abs(y - r.zeroLineY) > tol) f.push(`neg bar top ${y} ≠ zero line ${r.zeroLineY}`)
+    for (const y of r.zeroMarkerCenters) if (Math.abs(y - r.zeroLineY) > tol) f.push(`zero marker centre ${y} ≠ zero line ${r.zeroLineY}`)
+  }
+  return f
+}
