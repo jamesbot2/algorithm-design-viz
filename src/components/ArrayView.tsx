@@ -13,7 +13,7 @@ import { deriveArrayPointers } from '../types/step'
 import type { PresentationDescriptor } from '../types/presentation'
 import { useMotion } from '../theme/MotionContext'
 import { resolveDuration } from '../theme/motion'
-import { SHORT_BAR_PX, signedLabelPlacement, signedPlotLanes } from './signedPlot'
+import { SHORT_BAR_PX, SIGNED_MIN_SPAN_PX, signedLabelPlacement, signedPlotLanes } from './signedPlot'
 
 interface Props {
   name: string
@@ -197,6 +197,8 @@ function ArrayView({
     [numeric, values],
   )
   const [maxH, setMaxH] = useState(compact ? 64 : 160)
+  /** V25 acceptance: min box height (px) that still fits a SIGNED_MIN_SPAN_PX plot + its tracks. */
+  const [signedFloor, setSignedFloor] = useState<number | null>(null)
   const geo = useMemo(
     () => (numeric ? computeBarGeometry(nums, scaleMax, maxH, signedDomain) : null),
     [numeric, nums, scaleMax, maxH, signedDomain],
@@ -234,6 +236,10 @@ function ArrayView({
     }
     return 32
   }
+  /** Lanes of a SIGNED_MIN_SPAN_PX plot for the current values (ref: read inside the fit effect). */
+  const floorLanesRef = useRef(() => ({ top: 0, bottom: 0 }))
+  floorLanesRef.current = () =>
+    signedPlotLanes(computeBarGeometry(nums, scaleMax, SIGNED_MIN_SPAN_PX, signedDomain), SIGNED_MIN_SPAN_PX)
   const interval = labelFormat === 'interval-card'
 
   /** Real swap only when explicit swap op present — never from highlights.length >= 2 */
@@ -299,6 +305,14 @@ function ArrayView({
         colChrome = Math.max(colChrome, 30)
       }
       const budget = Math.floor(box - chromeY - labelH - noteH - wrapPad - colChrome - 2)
+      if (signedMode) {
+        // Readable floor: the box never gets smaller than label + a SIGNED_MIN_SPAN_PX plot (with
+        // its own lanes) + the measured annotation tracks; a shorter stage scrolls (scene.css)
+        // instead of squashing the plot and cutting the index / pointer tracks.
+        const l = floorLanesRef.current()
+        const floor = Math.ceil(box - budget + SIGNED_MIN_SPAN_PX + l.top + l.bottom)
+        setSignedFloor((prev) => (prev != null && Math.abs(prev - floor) < 1 ? prev : floor))
+      }
       // signed: `budget` is the whole plot (lanes + span); pick the largest span whose
       // own lanes still fit — lanes are evaluated for the CANDIDATE span, not the current one.
       const next = signedMode ? fitSpanRef.current(budget) : Math.max(32, budget)
@@ -562,6 +576,7 @@ function ArrayView({
     }
   }, [values, ranges, mode, ids])
 
+  const floorOn = signedMode && !compact && mode === 'bars' && signedFloor != null
   const curBand = rangeStyle(ranges?.current, values.length)
   const bestBand = rangeStyle(ranges?.best, values.length)
 
@@ -572,6 +587,8 @@ function ArrayView({
       ref={wrapRef}
       data-flip-xy="1"
       data-compact={compact ? '1' : '0'}
+      data-signed-floor={floorOn ? '1' : undefined}
+      style={floorOn ? ({ '--signed-floor': `${signedFloor}px` } as CSSProperties) : undefined}
     >
       <div className="array-label">
         <span>{label ?? name}</span>

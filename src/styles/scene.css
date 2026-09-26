@@ -549,6 +549,21 @@
 .stage-viewport[data-presentation="legacy"] .arrays-panel[data-array-order="primary-first"][data-multi-primary="1"] > .array-view {
   flex: 0 0 auto;
 }
+/*
+ * V25 acceptance (zoom follow-up): a legacy SINGLE-primary signed chart (Kadane, max-subarray
+ * D&C) keeps a readable floor — ArrayView publishes --signed-floor (label + SIGNED_MIN_SPAN_PX
+ * plot + lanes + measured index / pointer tracks). Above the floor nothing changes (the panel
+ * still fills the stage and the chart fits its box); below it the panel stops shrinking and the
+ * stage viewport (overflow:auto) scrolls instead of squashing the plot and cutting the annotation
+ * tracks. Multi-primary panels already keep content height (rule above) and are not affected.
+ */
+.stage-viewport[data-presentation="legacy"] > .arrays-panel[data-array-order="primary-first"]:not([data-multi-primary="1"]):has(> .array-view[data-signed-floor="1"]) {
+  flex: 1 0 auto;
+}
+.stage-viewport[data-presentation="legacy"] .arrays-panel[data-array-order="primary-first"]:not([data-multi-primary="1"]) > .array-view[data-signed-floor="1"] {
+  flex: 1 1 0;
+  min-height: var(--signed-floor);
+}
 
 
 /* V24: unsigned bars take their slot's width (the flip layer stretches to the slot),
