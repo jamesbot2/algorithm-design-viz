@@ -14,6 +14,12 @@ export const SHORT_BAR_PX = 18
  * (all-negative → top, all-zero → bottom) so the centred zero marker and its "0"
  * stay inside the plot instead of spilling into the annotation track.
  */
+/**
+ * Readable floor for the signed plot span (V25 acceptance, zoom follow-up). When the stage is
+ * shorter than label + plot floor + annotation tracks, the stage scrolls instead of squashing
+ * the plot (and cutting the index / pointer tracks).
+ */
+export const SIGNED_MIN_SPAN_PX = 88
 /** Half the zero marker (22px) + 1px border slack. */
 export const SIGNED_EDGE_LANE_PX = 12
 /** Value label glyph box (0.68rem mono, line-height 1) + text-shadow slack. */
