@@ -154,7 +154,7 @@ export function generateSteps(input: number[]): Step[] {
       { L, mid, R, k: L },
       undefined,
       'merge',
-      ref('mergeCompare'),
+      ref('mergeSlice'),
       { left: [...left], right: [...right] },
       { left: [...leftIds], right: [...rightIds] },
     )

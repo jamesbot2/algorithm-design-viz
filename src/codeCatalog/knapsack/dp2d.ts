@@ -40,6 +40,15 @@ export function getKNAPSACK_DP2DCatalog(): {
       "endLine": 15
     }
   },
+  // V26: the「更优：dp = take」frame is the guarded write on line 16 (compare + assign)
+  {
+    "id": "takeWrite",
+    "label": "更优则写入 take",
+    "range": {
+      "startLine": 16,
+      "endLine": 16
+    }
+  },
   {
     "id": "reconstruct",
     "label": "回溯选中",

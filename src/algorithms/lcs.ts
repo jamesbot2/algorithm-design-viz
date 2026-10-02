@@ -184,7 +184,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
     { current: [i, j], path: [...pathSoFar] },
     undefined,
     'reconstruct',
-    primary('reconstruct'),
+    primary('reconstructStart'),
   )
   while (i > 0 && j > 0) {
     if (X[i - 1] === Y[j - 1]) {
@@ -237,7 +237,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
     { current: [m, n], path },
     { ok: true, length: dp[m]![n], lcs: lcsStr },
     'done',
-    primary('reconstruct'),
+    primary('done'),
   )
   return steps
 }

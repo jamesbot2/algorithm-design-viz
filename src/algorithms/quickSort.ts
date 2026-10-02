@@ -155,7 +155,7 @@ export function generateSteps(input: number[]): Step[] {
         { L, R },
         undefined,
         'recurse',
-        ref('recurse'),
+        ref('baseCase'),
         frameId,
       )
       return

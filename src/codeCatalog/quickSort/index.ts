@@ -48,6 +48,8 @@ export function getQUICK_SORTCatalog(): {
       { id: 'swap', label: '交换（兼容）', range: { startLine: 18, endLine: 19 } },
       { id: 'pivotPlace', label: '枢轴就位', range: { startLine: 22, endLine: 23 } },
       { id: 'recurse', label: '递归分区', range: { startLine: 9, endLine: 11 } },
+      // V26: the empty / single-element interval returns on the base case, before any partition
+      { id: 'baseCase', label: '区间长度 ≤ 1 返回', range: { startLine: 8, endLine: 8 } },
       { id: 'done', label: '返回排序结果', range: { startLine: 5, endLine: 5 } },
       { id: 'return', label: '返回', range: { startLine: 5, endLine: 5 } },
     ],

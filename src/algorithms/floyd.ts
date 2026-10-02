@@ -55,7 +55,7 @@ export function generateSteps(_arr: number[], matrix = meta.defaultMatrix): Step
     })
   }
 
-  snap('初始化距离矩阵（无边为 ∞）', { n }, 0)
+  snap('初始化距离矩阵（无边为 ∞）', { n }, 0, undefined, undefined, ref('init'))
   for (let k = 0; k < n; k++) {
     snap(`中转点 k = ${k}`, { k }, 1, { reads: [[k, k]] })
     for (let i = 0; i < n; i++) {

@@ -65,6 +65,15 @@ export function getLCSCatalog(): {
       "endLine": 13
     }
   },
+  // V26: backtracking starts at (m, n) — `let i = m` / `let j = n`
+  {
+    "id": "reconstructStart",
+    "label": "从 (m,n) 开始回溯",
+    "range": {
+      "startLine": 17,
+      "endLine": 18
+    }
+  },
   {
     "id": "reconstruct",
     "label": "回溯匹配",
@@ -79,6 +88,15 @@ export function getLCSCatalog(): {
     "range": {
       "startLine": 25,
       "endLine": 25
+    }
+  },
+  // V26: the final「LCS 长度 = …」frame is the return
+  {
+    "id": "done",
+    "label": "返回长度与序列",
+    "range": {
+      "startLine": 31,
+      "endLine": 31
     }
   }
 ],
@@ -117,6 +135,15 @@ export function getLCSCatalog(): {
   {
     "id": "reconstruct",
     "label": "回溯",
+    "range": {
+      "startLine": 5,
+      "endLine": 5
+    }
+  },
+  // V26: same pseudo line as before for the「开始回溯」frame ("reconstruct from (m,n)")
+  {
+    "id": "reconstructStart",
+    "label": "从 (m,n) 回溯",
     "range": {
       "startLine": 5,
       "endLine": 5

@@ -44,7 +44,8 @@ export function generateSteps(
         message: '非法输入：0-1 背包离散 DP 要求 weights 为正整数、values 为非负整数、W 为非负整数且等长',
         phase: 'error',
         result: { ok: false, error: 'invalid_input' },
-        codeRefs: [{ documentId: 'knapsack.dp2d.ts', anchorId: 'init' }],
+        // V26: the reference document has no validation statement, so this frame is
+        // 未映射 (not dp allocation). The page's parser rejects these inputs before solving.
       },
     ]
   }
@@ -132,7 +133,7 @@ export function generateSteps(
             4,
             { current: [i, w], writes: [[i, w]] },
             undefined,
-            ref('take'),
+            ref('takeWrite'),
           )
         }
       }

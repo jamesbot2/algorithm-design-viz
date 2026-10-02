@@ -16,6 +16,15 @@ export function getFLOYDCatalog(): {
     source: TS_SOURCE,
     sourceHash: FLOYD_TS_HASH,
     anchors: [
+  // V26: the「初始化距离矩阵」frame is the copy of dist
+  {
+    "id": "init",
+    "label": "复制距离矩阵",
+    "range": {
+      "startLine": 4,
+      "endLine": 4
+    }
+  },
   {
     "id": "kLoop",
     "label": "中间点 k",

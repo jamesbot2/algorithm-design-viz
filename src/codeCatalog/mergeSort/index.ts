@@ -72,6 +72,12 @@ export function getMERGE_SORTCatalog(): {
     "label": "递归左右",
     "range": { "startLine": 10, "endLine": 11 }
   },
+  // V26: the「抽出 left/right 缓冲」frame is the two slices, before any compare
+  {
+    "id": "mergeSlice",
+    "label": "抽出 left/right 缓冲",
+    "range": { "startLine": 15, "endLine": 16 }
+  },
   {
     "id": "mergeCompare",
     "label": "归并比较",
