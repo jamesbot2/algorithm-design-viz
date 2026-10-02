@@ -114,3 +114,43 @@ describe('V26 code-line offsets', () => {
     }
   })
 })
+
+describe('V26 lcs backtrack moves', () => {
+  // lines located by text in the displayed document: the move is the statement inside its branch
+  const L = getCatalog('lcs')!.typescript.source.split('\n').map((l) => l.trim())
+  const cond = L.indexOf('} else if (dp[i - 1]![j]! >= dp[i]![j - 1]!) {') + 1
+  const up = L.indexOf('i--', cond) + 1 // first i-- after the else-if header (1-based search start = cond)
+  const elseLine = L.indexOf('} else {', cond) + 1
+  const left = L.indexOf('j--', elseLine) + 1
+
+  it('document lines: else-if 25, up i-- 26, else 27, left j-- 28', () => {
+    expect([cond, up, elseLine, left]).toEqual([25, 26, 27, 28])
+  })
+
+  it('"上移 → (i,j)" highlights `i--` in the else-if branch, with the else-if test as its condition', () => {
+    let n = 0
+    for (const [x, y] of [[undefined, undefined], ['ABCBDAB', 'BDCABA'], ['AB', 'CD'], ['ABC', 'AC'], ['XMJYAUZ', 'MZJAWXU']] as const) {
+      for (const s of lcs([], x, y).filter((s) => s.message.startsWith('上移'))) {
+        n++
+        const got = shown('lcs', s)
+        expect(got.line, `X=${x} Y=${y} "${s.message}"`).toBe(up)
+        expect(got.text).toBe('i--')
+        expect(got.weak, `X=${x} Y=${y} "${s.message}" condition`).toContain('} else if (dp[i - 1]![j]! >= dp[i]![j - 1]!) {')
+      }
+    }
+    expect(n).toBeGreaterThan(0)
+  })
+
+  it('"左移 → (i,j)" highlights `j--` in the else branch, not the else-if test', () => {
+    let n = 0
+    for (const [x, y] of [[undefined, undefined], ['ABCBDAB', 'BDCABA'], ['AB', 'CD'], ['ABC', 'AC'], ['XMJYAUZ', 'MZJAWXU'], ['A', 'BA']] as const) {
+      for (const s of lcs([], x, y).filter((s) => s.message.startsWith('左移'))) {
+        n++
+        const got = shown('lcs', s)
+        expect(got.line, `X=${x} Y=${y} "${s.message}"`).toBe(left)
+        expect(got.text).toBe('j--')
+      }
+    }
+    expect(n).toBeGreaterThan(0)
+  })
+})

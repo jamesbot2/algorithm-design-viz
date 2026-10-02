@@ -18,10 +18,10 @@ test.describe.configure({ retries: 0 })
 
 const VP = { width: 1366, height: 768 }
 
-/** 1-based line of `stmt` in the TS document the page shows for `algoId`. */
-function lineOf(algoId: string, stmt: string | RegExp) {
+/** 1-based line of `stmt` in the TS document the page shows for `algoId` (first one after line `after`). */
+function lineOf(algoId: string, stmt: string | RegExp, after = 0) {
   const L = getCatalog(algoId)!.typescript.source.split('\n')
-  const i = L.findIndex((l) => (typeof stmt === 'string' ? l.trim() === stmt : stmt.test(l.trim())))
+  const i = L.findIndex((l, k) => k >= after && (typeof stmt === 'string' ? l.trim() === stmt : stmt.test(l.trim())))
   if (i < 0) throw new Error(`${algoId}: statement ${stmt} not in document`)
   return i + 1
 }
@@ -32,7 +32,8 @@ async function frame(page: Page) {
     const wrap = document.querySelector('[data-testid="code-mirror-wrap"]')
     const el = wrap?.querySelector('.cm-exec-line') as HTMLElement | null
     const unmapped = !!document.querySelector('[data-testid="code-unmapped"]')
-    if (!el) return { unmapped, text: null as string | null, full: false }
+    const context = [...(wrap?.querySelectorAll('.cm-context-line') ?? [])].map((e) => (e.textContent ?? '').trim())
+    if (!el) return { unmapped, context, text: null as string | null, full: false }
     const a = el.getBoundingClientRect()
     let t = a.top, b = a.bottom
     for (let n = el.parentElement; n && n !== document.documentElement; n = n.parentElement) {
@@ -45,7 +46,7 @@ async function frame(page: Page) {
     }
     t = Math.max(t, 0)
     b = Math.min(b, window.innerHeight)
-    return { unmapped, text: (el.textContent ?? '').trim(), full: a.height > 0 && b - t >= a.height - 0.75 }
+    return { unmapped, context, text: (el.textContent ?? '').trim(), full: a.height > 0 && b - t >= a.height - 0.75 }
   })
   return { ...m.frame, code }
 }
@@ -62,18 +63,22 @@ async function openAndRun(page: Page, algoId: string) {
   return { runId: f.runId, total }
 }
 
-const CASES: { algoId: string; match: RegExp; stmt: string | RegExp }[] = [
+const LCS_MOVE_IF = '} else if (dp[i - 1]![j]! >= dp[i]![j - 1]!) {'
+const CASES: { algoId: string; match: RegExp; stmt: string | RegExp; after?: string[]; cond?: string }[] = [
   { algoId: 'quickSort', match: /无需划分/, stmt: 'if (L >= R) return' },
   { algoId: 'mergeSort', match: /抽出 left\/right 缓冲/, stmt: 'const left = a.slice(L, mid + 1)' },
   { algoId: 'lcs', match: /开始回溯/, stmt: 'let i = m' },
   { algoId: 'lcs', match: /^LCS 长度 =/, stmt: /^return \{ length: dp\[m\]!\[n\]!/ },
   { algoId: 'knapsack01', match: /更优：dp/, stmt: 'if (take > dp[i]![w]!) dp[i]![w] = take' },
   { algoId: 'floyd', match: /^初始化距离矩阵/, stmt: 'const d = dist.map((r) => r.slice())' },
+  // backtrack moves: the statement inside the taken branch (not the else-if header)
+  { algoId: 'lcs', match: /^上移 →/, stmt: 'i--', after: [LCS_MOVE_IF], cond: LCS_MOVE_IF },
+  { algoId: 'lcs', match: /^左移 →/, stmt: 'j--', after: [LCS_MOVE_IF, '} else {'] },
 ]
 
 for (const c of CASES) {
-  test(`${c.algoId} "${c.match.source}" highlights ${c.stmt} @1366x768 (page default input)`, async ({ page }) => {
-    const want = lineOf(c.algoId, c.stmt)
+  test(`${c.algoId} "${c.match.source}" highlights ${c.stmt}${c.after ? ` (after ${c.after.join(' › ')})` : ''} @1366x768 (page default input)`, async ({ page }) => {
+    const want = lineOf(c.algoId, c.stmt, (c.after ?? []).reduce((from, a) => lineOf(c.algoId, a, from), 0))
     const { runId, total } = await openAndRun(page, c.algoId)
     const results: string[] = []
     let hits = 0
@@ -95,6 +100,7 @@ for (const c of CASES) {
       expect(f.execLine, tag).toBe(want)
       expect(f.code.text, `${tag}: highlighted text`).toBe(getCatalog(c.algoId)!.typescript.source.split('\n')[want - 1]!.trim())
       expect(f.code.full, `${tag}: highlighted line fully visible in the code panel`).toBe(true)
+      if (c.cond) expect(f.code.context, `${tag}: condition line weakly highlighted`).toContain(c.cond)
     }
     test.info().annotations.push({ type: 'frames', description: results.join('\n') })
     expect(hits, `input=page default ${c.algoId}, viewport=1366x768, runId=${runId}: frames matching ${c.match}`).toBeGreaterThan(0)
