@@ -212,7 +212,10 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
         { current: [i, j], path: [...pathSoFar] },
         undefined,
         'reconstruct',
-        primary('reconstructMove'),
+        [
+          { documentId: DOC, anchorId: 'reconstructUp', role: 'primary' },
+          { documentId: DOC, anchorId: 'reconstructCompare', role: 'condition' },
+        ],
       )
     } else {
       j--
@@ -224,7 +227,7 @@ export function generateSteps(_arr: number[], X = meta.defaultX, Y = meta.defaul
         { current: [i, j], path: [...pathSoFar] },
         undefined,
         'reconstruct',
-        primary('reconstructMove'),
+        primary('reconstructLeft'),
       )
     }
   }

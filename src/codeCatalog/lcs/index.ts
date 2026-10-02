@@ -90,6 +90,31 @@ export function getLCSCatalog(): {
       "endLine": 25
     }
   },
+  // V26: a backtrack move is the statement in its branch; line 25 is the up-move test
+  {
+    "id": "reconstructCompare",
+    "label": "比较上/左",
+    "range": {
+      "startLine": 25,
+      "endLine": 25
+    }
+  },
+  {
+    "id": "reconstructUp",
+    "label": "上移 i--",
+    "range": {
+      "startLine": 26,
+      "endLine": 26
+    }
+  },
+  {
+    "id": "reconstructLeft",
+    "label": "左移 j--",
+    "range": {
+      "startLine": 28,
+      "endLine": 28
+    }
+  },
   // V26: the final「LCS 长度 = …」frame is the return
   {
     "id": "done",
