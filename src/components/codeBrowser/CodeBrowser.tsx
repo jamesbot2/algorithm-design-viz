@@ -255,6 +255,18 @@ export default function CodeBrowser({
     return null
   }, [execRange, activeLine, tab, execAnchorId, numericFallback])
   execLine1Ref.current = execLine1
+  /**
+   * V27: what the shown document can say about the current step.
+   * preview = no step yet; unmapped = teaching event without code mapping;
+   * no-location = the step has an anchor but THIS document has no statement for it.
+   */
+  const execState: 'preview' | 'unmapped' | 'no-location' | 'mapped' = unmapped
+    ? 'unmapped'
+    : execLine1 != null
+      ? 'mapped'
+      : execAnchorId
+        ? 'no-location'
+        : 'preview'
 
   const contextLines = useMemo(() => {
     if (!activeDoc || unmapped) return [] as number[]
@@ -472,6 +484,20 @@ export default function CodeBrowser({
         })
         ro.observe(scrollDOM)
       }
+      // V27: the editor is (re)created when the TS tab is shown again; while following,
+      // locate the current step here — the follow effect ran before this view existed.
+      if (followExecRef.current && !userScrolledAwayRef.current && execLine1Ref.current != null) {
+        const gen = scrollGen.current
+        scheduleScrollAfterLayout(view, () => {
+          if (scrollGen.current !== gen || viewRef.current !== view) return
+          if (!followExecRef.current || userScrolledAwayRef.current) return
+          const line = execLine1Ref.current
+          if (line == null) return
+          const txn = intentRef.current.beginTransaction('follow')
+          scrollLineNearest(view, line)
+          requestAnimationFrame(() => requestAnimationFrame(() => txn.end()))
+        })
+      }
       ;(view as unknown as { __advScrollCleanup?: () => void }).__advScrollCleanup = () => {
         unbind()
         scrollDOM.removeEventListener('scroll', onScrollPin)
@@ -566,6 +592,7 @@ export default function CodeBrowser({
       data-testid="code-browser"
       data-active-doc={activeDoc.documentId}
       data-tab={tab}
+      data-exec-state={execState}
       onKeyDown={(e) => {
         e.stopPropagation()
       }}
@@ -660,6 +687,19 @@ export default function CodeBrowser({
       {unmapped && (
         <div className="code-unmapped-banner" data-testid="code-unmapped" role="status">
           此教学事件未映射
+        </div>
+      )}
+      {execState === 'no-location' && (
+        <div className="code-unmapped-banner" data-testid="code-doc-no-location" role="status">
+          当前文档（{activeDoc.title}）没有此步骤的执行位置。
+          {tab === 'pseudo' && (
+            <>
+              {' '}
+              <button type="button" className="ghost" data-testid="code-doc-open-ts" onClick={() => changeTab('ts')}>
+                查看完整实现（TypeScript）
+              </button>
+            </>
+          )}
         </div>
       )}
       {tab === 'ts' ? (
