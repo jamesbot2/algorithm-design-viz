@@ -299,6 +299,7 @@ export default function KnapsackUnit() {
           code={
             catalog ? (
               <CodeBrowser
+                algoId={STRATEGY_CATALOG[strategy]}
                 documents={catalog}
                 execAnchorId={hasRun && !dirty ? primary?.anchorId : undefined}
                 contextAnchorIds={hasRun && !dirty ? contexts.map((c) => c.anchorId) : []}
