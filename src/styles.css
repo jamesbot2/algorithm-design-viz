@@ -489,7 +489,8 @@ button.icon-btn {
   align-items: flex-end;
   justify-content: center;
   gap: 6px;
-  min-height: 180px;
+  /* V29 M1: floor from measured chart var so swap height-lerp cannot shrink the track. */
+  min-height: max(180px, var(--bar-chart-h, 180px));
   padding: 0.5rem 0.25rem 0;
   border-radius: 10px;
 }
@@ -549,14 +550,15 @@ button.icon-btn {
 }
 
 .hl-compare, .bar.hl-compare { background: rgba(227, 179, 65, 0.45); border-color: var(--warn); }
-.hl-swap, .bar.hl-swap { background: rgba(239, 68, 68, 0.4); border-color: var(--danger); transform: translateY(-2px); }
+/* V29 M1: no translateY lift — transform reserved for FLIP layer / WAAPI. */
+.hl-swap, .bar.hl-swap { background: rgba(239, 68, 68, 0.4); border-color: var(--danger); }
 .hl-focus, .bar.hl-focus { background: rgba(96, 165, 250, 0.4); border-color: var(--info); }
 .hl-done, .hl-sorted, .bar.hl-done, .bar.hl-sorted { background: rgba(16, 163, 127, 0.35); border-color: var(--good); }
 .hl-pivot, .bar.hl-pivot { background: rgba(167, 139, 250, 0.4); border-color: var(--pivot); }
 .hl-read, .bar.hl-read { background: rgba(56, 189, 248, 0.35); border-color: var(--read); }
 
 .cell.hl-compare { background: rgba(227, 179, 65, 0.25); border-color: var(--warn); }
-.cell.hl-swap { background: rgba(239, 68, 68, 0.28); border-color: var(--danger); transform: translateY(-2px); }
+.cell.hl-swap { background: rgba(239, 68, 68, 0.28); border-color: var(--danger); }
 .cell.hl-focus { background: rgba(96, 165, 250, 0.28); border-color: var(--info); }
 .cell.hl-done, .cell.hl-sorted { background: rgba(16, 163, 127, 0.22); border-color: var(--good); }
 .cell.hl-pivot { background: rgba(167, 139, 250, 0.28); border-color: var(--pivot); }

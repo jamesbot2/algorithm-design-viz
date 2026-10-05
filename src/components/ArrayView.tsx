@@ -437,6 +437,7 @@ function ArrayView({
     if (snapSwap || (epochChanged && !geometryChanged)) {
       clearTransforms()
       seedCenters()
+      overlayHostRef.current?.removeAttribute('data-flip')
       return
     }
 
@@ -464,8 +465,13 @@ function ArrayView({
     if (!shouldFlip) {
       clearTransforms()
       seedCenters()
+      overlayHostRef.current?.removeAttribute('data-flip')
       return
     }
+
+    // V29 M1: pin chart track — disable in-slot height lerp while identity FLIP runs.
+    const host = overlayHostRef.current
+    host?.setAttribute('data-flip', '1')
 
     const idToIndex = new Map(ids.map((id, i) => [id, i]))
     for (const id of flipIds) {
@@ -508,6 +514,7 @@ function ArrayView({
           const id = ids[k]
           if (c != null && id) prevCenters.current.set(id, c)
         }
+        host?.removeAttribute('data-flip')
       }, swapMs + 20)
     })
   }, [
@@ -630,6 +637,11 @@ function ArrayView({
           }
           data-signed={signedMode ? '1' : '0'}
           data-abs-max={geo.absMax}
+          data-flip={
+            swapPair !== null || arrayOps?.some((o) => o.type === 'move' || o.type === 'swap')
+              ? '1'
+              : undefined
+          }
         >
           {rangeMasks.best.map((s, i) => (
             <div

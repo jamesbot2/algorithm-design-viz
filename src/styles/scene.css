@@ -200,6 +200,12 @@
 .bars-wrap[data-refit="1"] .bar {
   transition: none;
 }
+/* V29 M1: during identity FLIP, snap bar heights — slot-keyed DOM would otherwise
+ * lerp height in place (max dips mid-swap) while translate also runs on the flip layer. */
+.bars-wrap[data-flip="1"] .bar,
+.bars-wrap[data-flip="1"] .bar-zero-marker {
+  transition-property: background, border-color, box-shadow, filter;
+}
 .scene-companions-empty {
   flex: 1 1 auto;
   opacity: 0.6;
