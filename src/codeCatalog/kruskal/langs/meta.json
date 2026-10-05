@@ -1,0 +1,2 @@
+{ "algo": "kruskal", "idPrefix": "kruskal", "titleBase": "Kruskal MST",
+  "files": { "python": "kruskal.py", "cpp": "kruskal.cpp", "java": "Kruskal.java", "rust": "kruskal.rs", "go": "kruskal.go" } }

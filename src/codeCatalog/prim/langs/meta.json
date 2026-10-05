@@ -1,0 +1,2 @@
+{ "algo": "prim", "idPrefix": "prim", "titleBase": "Prim MST",
+  "files": { "python": "prim.py", "cpp": "prim.cpp", "java": "Prim.java", "rust": "prim.rs", "go": "prim.go" } }

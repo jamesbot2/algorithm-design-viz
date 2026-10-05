@@ -1,0 +1,2 @@
+{ "algo": "bellmanFord", "idPrefix": "bellmanFord", "titleBase": "Bellman-Ford",
+  "files": { "python": "bellman_ford.py", "cpp": "bellman_ford.cpp", "java": "BellmanFord.java", "rust": "bellman_ford.rs", "go": "bellman_ford.go" } }

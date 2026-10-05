@@ -1,0 +1,2 @@
+{ "algo": "knapsack/backtracking", "idPrefix": "knapsack.backtracking", "titleBase": "0-1 背包回溯",
+  "files": { "python": "knapsack_backtracking.py", "cpp": "knapsack_backtracking.cpp", "java": "KnapsackBacktracking.java", "rust": "knapsack_backtracking.rs", "go": "knapsack_backtracking.go" } }

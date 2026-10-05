@@ -1,0 +1,2 @@
+{ "algo": "dijkstra", "idPrefix": "dijkstra.naive", "titleBase": "朴素 Dijkstra",
+  "files": { "python": "dijkstra_naive.py", "cpp": "dijkstra_naive.cpp", "java": "NaiveDijkstra.java", "rust": "dijkstra_naive.rs", "go": "dijkstra_naive.go" } }

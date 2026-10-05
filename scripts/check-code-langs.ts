@@ -50,6 +50,8 @@ function build(lang: string, source: string, harnessDir: string, javaClass: stri
       writeFileSync(join(dir, 'algo.go'), source.replace(/^package algorithms$/m, 'package main'))
       copyFileSync(join(harnessDir, 'main.go'), join(dir, 'main.go'))
       writeFileSync(join(dir, 'go.mod'), 'module harness\n\ngo 1.22\n')
+      const unformatted = sh('gofmt', ['-l', 'algo.go'], dir).trim()
+      if (unformatted) throw new Error('displayed Go source is not gofmt-formatted')
       sh('go', ['vet', '.'], dir)
       sh('go', ['build', '-o', 'main', '.'], dir)
       return { run: (i) => sh('./main', [], dir, i) }

@@ -1,0 +1,2 @@
+{ "algo": "knapsack/dp1dCorrect", "idPrefix": "knapsack.dp1dCorrect", "titleBase": "0-1 背包一维正确",
+  "files": { "python": "knapsack_dp1d_correct.py", "cpp": "knapsack_dp1d_correct.cpp", "java": "KnapsackDp1dCorrect.java", "rust": "knapsack_dp1d_correct.rs", "go": "knapsack_dp1d_correct.go" } }

@@ -22,10 +22,22 @@ import * as huffmanAlgo from '../../src/algorithms/huffman'
 import * as activityAlgo from '../../src/algorithms/activitySelection'
 import * as knapsack01Algo from '../../src/algorithms/knapsack01'
 import { getAlgo } from '../../src/algorithms/registry'
+import * as dijkstraAlgo from '../../src/algorithms/dijkstra'
+import * as dijkstraHeapAlgo from '../../src/algorithms/dijkstraHeap'
+import * as bfsAlgo from '../../src/algorithms/bfs'
+import * as kruskalAlgo from '../../src/algorithms/kruskal'
+import * as primAlgo from '../../src/algorithms/prim'
+import * as bellmanAlgo from '../../src/algorithms/bellmanFord'
+import * as K from '../../src/algorithms/knapsack'
 
 /** the page's default trace (registry solve with default input) */
 export const defaultTrace = (id: string) => ({ name: 'default', steps: getAlgo(id as never)!.solve!({} as never).trace.steps as Step[] })
 const PUSH = '(push|append|add|push_back)'
+/** graph arc target / weight / current vertex across the six documents */
+const GV = '(v|e\\.V|a\\.v\\(\\))'
+const GW = '(w|e\\.W|a\\.w\\(\\))'
+const CU = '(cur\\.u|cu|cur_u|cur\\.u\\(\\))'
+const RET_DP = /^(return)?(\{dist,parent\}|\(?dist,parent\)?|newResult\(dist,parent\));?$/
 
 /** `return x` / Rust tail expression `x` */
 export const ret = (x: string) => new RegExp(`^(return)?${x};?$`)
@@ -40,6 +52,10 @@ export interface P3Algo {
   sig: AlgoSig
   /** default trace first, then small/edge inputs */
   traces: () => { name: string; steps: Step[] }[]
+  /** distinct primary anchors the default trace must use (default 3) */
+  minPrimaries?: number
+  /** why minPrimaries is lowered (reported as degraded) */
+  coarseTraceNote?: string
 }
 
 const SORT_DEFAULT = [5, 2, 8, 1, 9, 3, 7]
@@ -166,7 +182,7 @@ export const P3: Record<string, P3Algo> = {
     sig: {
       anchors: {
         conflict: /^if\(?c===?col(\|\||or).*(abs\(c-col\)|\(c-col\)\.abs\(\)).*===?\(?row-r\)?(asi32)?.*return(false|False)/,
-        call: /dfs.*\(.*row/,
+        call: /(functiondfs\(|defdfs\(|fndfs\(|voiddfs\(|dfs=\[&\]\(|dfs=func\()/,
         solution: new RegExp(`${PUSH}\\(cols(\\.slice\\(\\)|\\[:\\]|\\.clone\\(\\))?\\)|append\\(solutions,append\\(\\[\\]int\\(nil\\),cols\\.\\.\\.\\)\\)`),
         place: /^cols\[row\]=col;?$/,
         recurse: /^dfs\(row\+1(,.*)?\);?$/,
@@ -245,5 +261,190 @@ export const P3: Record<string, P3Algo> = {
       },
     },
     traces: () => [defaultTrace('knapsack01'), ...([[[1], [1], 0], [[5], [10], 4], [[2, 2, 2], [3, 3, 3], 5]] as [number[], number[], number][]).map(([w, v, W]) => ({ name: `W=${W}`, steps: knapsack01Algo.generateSteps([], w, v, W) }))],
+  },
+  dijkstra: {
+    algoId: 'dijkstra',
+    sig: {
+      anchors: {
+        init: /^dist\[start\]=0(\.0)?;?$/,
+        selectMin: /^if\(?(!|not)done\[i\](&&|and)dist\[i\]<best\)?/,
+        'relax.condition': new RegExp(`^if\\(?dist\\[u\\]\\+${GW}<dist\\[${GV}\\]\\)?`),
+        'relax.update': new RegExp(`^dist\\[${GV}\\]=dist\\[u\\]\\+${GW};?$`),
+        done: RET_DP,
+        return: RET_DP,
+      },
+    },
+    traces: () => [
+      defaultTrace('dijkstra'),
+      { name: 'unreachable', steps: dijkstraAlgo.generateSteps([], [[0, 1, 5]], 3, 0) },
+      { name: 'single', steps: dijkstraAlgo.generateSteps([], [], 1, 0) },
+      { name: 'ties', steps: dijkstraAlgo.generateSteps([], [[0, 1, 1], [1, 2, 1], [0, 2, 2], [2, 3, 0]], 4, 0) },
+    ],
+  },
+  dijkstraHeap: {
+    algoId: 'dijkstraHeap',
+    sig: {
+      anchors: {
+        init: /^dist\[start\]=0(\.0)?;?$/,
+        extract: /(cur|cu,cd\)|cur_u,cur_d):?=pop\(/,
+        stale: new RegExp(`^if\\(?(cur\\.d|cd|cur_d|cur\\.d\\(\\))!==?dist\\[${CU}\\]\\)?.*continue`),
+        relax: new RegExp(`^if\\(?dist\\[${CU}\\]\\+${GW}<dist\\[${GV}\\]\\)?`),
+        done: RET_DP,
+        return: RET_DP,
+      },
+    },
+    traces: () => [
+      defaultTrace('dijkstraHeap'),
+      { name: 'unreachable', steps: dijkstraHeapAlgo.generateSteps([], [[0, 1, 5]], 3, 0) },
+      { name: 'stale', steps: dijkstraHeapAlgo.generateSteps([], [[0, 1, 10], [0, 2, 1], [2, 1, 1], [1, 3, 1], [2, 3, 10]], 4, 0) },
+    ],
+  },
+  bfs: {
+    algoId: 'bfs',
+    sig: {
+      anchors: {
+        init: /q.*(=|\{).*start/,
+        dequeue: /u:?=q(\[head(\+\+)?\]|\.get\(head\+\+\))/,
+        visit: /^if\(?dist\[v\]<0\)?/,
+        enqueue: /^(q\.push\(v\)|q\.append\(v\)|q\.push_back\(v\)|q\.add\(v\)|q=append\(q,v\));?$/,
+        done: RET_DP,
+      },
+    },
+    traces: () => [
+      defaultTrace('bfs'),
+      { name: 'isolated', steps: bfsAlgo.generateSteps([], { 0: [1], 1: [0], 2: [] }, 0) },
+      { name: 'single', steps: bfsAlgo.generateSteps([], { 0: [] }, 0) },
+    ],
+  },
+  kruskal: {
+    algoId: 'kruskal',
+    sig: {
+      anchors: {
+        sort: /sort.*(\.w|\.W|Edge::w)/,
+        find: /a:?=find\((&mut)?(parent,)?e\.(u|U|u\(\))\)/,
+        skip: /^if\(?a===?b\)?(:|\{)?continue/,
+        union: /^parent\[a\]=b;?$/,
+        done: /^(return)?(\{total,mst\}|\(?total,mst\)?|newResult\(total,mst\));?$/,
+      },
+    },
+    traces: () => [
+      defaultTrace('kruskal'),
+      { name: 'one edge', steps: kruskalAlgo.generateSteps([], [[0, 1, 1]], 2) },
+      { name: 'triangle ties', steps: kruskalAlgo.generateSteps([], [[0, 1, 4], [1, 2, 4], [0, 2, 4]], 3) },
+    ],
+  },
+  prim: {
+    algoId: 'prim',
+    sig: {
+      anchors: {
+        init: /^key\[start\]=0(\.0)?;?$/,
+        selectMin: /^if\(?(!|not)(inMst|in_mst)\[i\](&&|and)key\[i\]<best\)?/,
+        add: /^(inMst|in_mst)\[u\]=(true|True);?$/,
+        relax: new RegExp(`^if\\(?(!|not)(inMst|in_mst)\\[${GV}\\](&&|and)${GW}<key\\[${GV}\\]\\)?`),
+        update: new RegExp(`^key\\[${GV}\\]=${GW};?parent\\[${GV}\\]=u(asi64)?;?$`),
+        done: /^(return)?(\{total,parent\}|\(?total,parent\)?|newResult\(total,parent\));?$/,
+      },
+    },
+    traces: () => [
+      defaultTrace('prim'),
+      { name: 'start=4', steps: primAlgo.generateSteps([], primAlgo.meta.defaultEdges, primAlgo.meta.defaultN, 4) },
+      { name: 'two nodes', steps: primAlgo.generateSteps([], [[0, 1, 1]], 2, 0) },
+    ],
+  },
+  bellmanFord: {
+    algoId: 'bellmanFord',
+    sig: {
+      anchors: {
+        init: /^dist\[start\]=0(\.0)?;?$/,
+        round: /^for.*(i|_).*n-1|^for.*n\.saturating_sub\(1\)/,
+        relax: /^if\(?dist\[e\.(u|U|u\(\))\]\+e\.(w|W|w\(\))<dist\[e\.(v|V|v\(\))\]\)?/,
+        update: /^dist\[e\.(v|V|v\(\))\]=dist\[e\.(u|U|u\(\))\]\+e\.(w|W|w\(\));?$/,
+        negCycle: /^neg_?[cC]ycle=(true|True);?$/,
+        done: /^(return\{|return|\(|returnnewResult\()dist,parent,neg_?[cC]ycle/,
+      },
+    },
+    traces: () => [
+      defaultTrace('bellmanFord'),
+      { name: 'negative cycle', steps: bellmanAlgo.generateSteps([], [[0, 1, 1], [1, 2, -1], [2, 1, -1]], 3, 0) },
+      { name: 'unreachable', steps: bellmanAlgo.generateSteps([], [[0, 1, 1]], 3, 0) },
+    ],
+  },
+  'knapsack/dp1dCorrect': {
+    algoId: 'knapsack.dp1dCorrect',
+    sig: {
+      anchors: {
+        init: /dp.*(W|cap)\+1/,
+        reverse: /^for.*w.*(W|cap).*(w>=wt|w--|\.rev\(\)|,-1\))/,
+        update: /^dp\[w\]=(?=.*max)(?=.*dp\[w-wt\]\+val)/,
+        done: /^(return)?dp\[(W|cap)\];?$/,
+      },
+    },
+    traces: () => [K.DEFAULT_INSTANCE, K.FORWARD_UPDATE_COUNTEREXAMPLE, K.GREEDY_COUNTEREXAMPLE].map((i, k) => ({ name: `inst${k}`, steps: K.solveDp1dCorrect(i).steps })),
+  },
+  'knapsack/dp1dWrong': {
+    algoId: 'knapsack.dp1dWrong',
+    sig: {
+      anchors: {
+        init: /dp.*(W|cap)\+1/,
+        forward: /^for.*w.*wt.*(w<=(W|cap)|w\+\+|(W|cap)\+1\)|\.\.=cap)/,
+        update: /^dp\[w\]=(?=.*max)(?=.*dp\[w-wt\]\+val)/,
+        done: /^(return)?dp\[(W|cap)\];?$/,
+      },
+    },
+    traces: () => [K.FORWARD_UPDATE_COUNTEREXAMPLE, K.DEFAULT_INSTANCE].map((i, k) => ({ name: `inst${k}`, steps: K.solveDp1dWrongForward(i).steps })),
+  },
+  'knapsack/brute': {
+    algoId: 'knapsack.brute',
+    sig: {
+      anchors: {
+        enum: /^for.*mask.*total/,
+        sum: /^wt\+=weights\[i\];?$/,
+        feasible: /^if\(?wt<=(W|cap)(&&|and)val>best\)?.*best=val/,
+        done: ret('best'),
+      },
+    },
+    traces: () => [K.DEFAULT_INSTANCE, K.GREEDY_COUNTEREXAMPLE].map((i, k) => ({ name: `inst${k}`, steps: K.bruteForceKnapsack(i).steps ?? [] })),
+  },
+  'knapsack/backtracking': {
+    algoId: 'knapsack.backtracking',
+    sig: {
+      anchors: {
+        call: /(functiondfs\(|defdfs\(|fndfs\(|voiddfs\(|dfs=\[&\]\(|dfs=func\()/,
+        best: /^if\(?cur>\*?best\)?.*\*?best=cur/,
+        skip: /^dfs\(i\+1,(remW|rem_w),cur(,.*)?\);?$/,
+        take: /^dfs\(i\+1,(remW|rem_w)-weights\[i\],cur\+values\[i\](,.*)?\);?$/,
+      },
+    },
+    traces: () => [K.DEFAULT_INSTANCE, K.GREEDY_COUNTEREXAMPLE].map((i, k) => ({ name: `inst${k}`, steps: K.solveBacktracking(i).steps })),
+    minPrimaries: 2,
+    coarseTraceNote: 'teaching-unit trace is summary-level: 2 frames (call → best); skip/take anchors exist in every language but no frame uses them',
+  },
+  'knapsack/branchAndBound': {
+    algoId: 'knapsack.branchAndBound',
+    sig: {
+      anchors: {
+        bound: /(functionbound\(|defbound\(|fnbound\(|doublebound\(|bound=\[&\]\(|bound:?=func\()/,
+        prune: /^if\(?bound\((c,)?i,(remW|rem_w),cur\)<=.*best.*return/,
+        take: /^if\(?(c\.)?weights\[idx\]<=(remW|rem_w)\)?.*dfs\((c,)?i\+1,(remW|rem_w)-(c\.)?weights\[idx\],cur\+(c\.)?values\[idx\]\)/,
+        skip: /^dfs\((c,)?i\+1,(remW|rem_w),cur\);?$/,
+      },
+    },
+    traces: () => [K.DEFAULT_INSTANCE, K.GREEDY_COUNTEREXAMPLE].map((i, k) => ({ name: `inst${k}`, steps: K.solveBranchAndBound(i).steps })),
+    minPrimaries: 1,
+    coarseTraceNote: 'teaching-unit trace is summary-level: 2 frames, both on the bound function; prune/take/skip anchors exist in every language but no frame uses them',
+  },
+  'knapsack/greedy': {
+    algoId: 'knapsack.greedy',
+    sig: {
+      anchors: {
+        sort: /(sort|sorted).*(density|values\[.\]\/weights\[.\])|values\[b\]\/weights\[b\]-values\[a\]\/weights\[a\]/,
+        check: /^if\(?weights\[i\]<=rem\)?/,
+        pick: new RegExp(`${PUSH}\\((selected,)?i\\)`),
+        done: /^(return)?(\{value,selected\}|\(?value,selected\)?|newResult\(value,selected\));?$/,
+      },
+      // TS splits the sort comparator onto its own continuation line; the others sort in one statement
+      depthExempt: ['sort'],
+    },
+    traces: () => [K.GREEDY_COUNTEREXAMPLE, K.DEFAULT_INSTANCE].map((i, k) => ({ name: `inst${k}`, steps: K.greedyByDensity(i).steps })),
   },
 }

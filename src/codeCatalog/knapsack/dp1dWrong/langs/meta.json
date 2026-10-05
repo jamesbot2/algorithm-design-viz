@@ -1,0 +1,2 @@
+{ "algo": "knapsack/dp1dWrong", "idPrefix": "knapsack.dp1dWrong", "titleBase": "0-1 背包一维正向反例",
+  "files": { "python": "knapsack_dp1d_wrong_forward.py", "cpp": "knapsack_dp1d_wrong_forward.cpp", "java": "KnapsackDp1dWrong.java", "rust": "knapsack_dp1d_wrong_forward.rs", "go": "knapsack_dp1d_wrong_forward.go" } }

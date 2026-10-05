@@ -1,0 +1,2 @@
+{ "algo": "knapsack/branchAndBound", "idPrefix": "knapsack.branchAndBound", "titleBase": "0-1 背包分支限界",
+  "files": { "python": "knapsack_branch_and_bound.py", "cpp": "knapsack_branch_and_bound.cpp", "java": "KnapsackBranchAndBound.java", "rust": "knapsack_branch_and_bound.rs", "go": "knapsack_branch_and_bound.go" } }

@@ -19,6 +19,13 @@ import * as mcAlgo from '../src/algorithms/matrixChain'
 import * as huffmanAlgo from '../src/algorithms/huffman'
 import * as activityAlgo from '../src/algorithms/activitySelection'
 import * as knapsack01Algo from '../src/algorithms/knapsack01'
+import * as dijkstraAlgo from '../src/algorithms/dijkstra'
+import * as dijkstraHeapAlgo from '../src/algorithms/dijkstraHeap'
+import * as bfsAlgo from '../src/algorithms/bfs'
+import * as kruskalAlgo from '../src/algorithms/kruskal'
+import * as primAlgo from '../src/algorithms/prim'
+import * as bellmanAlgo from '../src/algorithms/bellmanFord'
+import * as K from '../src/algorithms/knapsack'
 
 export type Case = { name: string; stdin: string; expected: string }
 const INF = Infinity
@@ -198,6 +205,119 @@ function knapsackDp2dCases(): Case[] {
   })
 }
 
+type WE = [number, number, number][]
+const fmtDist = (d: (number | null)[]) => d.map((x) => (x === null || x === Infinity ? 'INF' : String(x))).join(' ')
+const edgeLines = (es: WE) => es.map((e) => e.join(' ')).join('\n')
+
+/** directed, non-negative graphs for both Dijkstra variants */
+const DIJKSTRA_GRAPHS: [WE, number, number][] = [
+  [dijkstraAlgo.meta.defaultEdges, dijkstraAlgo.meta.defaultN, 0],
+  [dijkstraAlgo.meta.defaultEdges, dijkstraAlgo.meta.defaultN, 2],
+  [[], 1, 0],
+  [[[0, 1, 5]], 3, 0],
+  [[[0, 1, 1], [1, 2, 1], [0, 2, 2], [2, 3, 0], [1, 3, 5]], 4, 0],
+  [[[0, 1, 7], [0, 2, 9], [0, 5, 14], [1, 2, 10], [1, 3, 15], [2, 3, 11], [2, 5, 2], [3, 4, 6], [5, 4, 9]], 6, 0],
+  [[[0, 1, 10], [0, 2, 1], [2, 1, 1], [1, 3, 1], [2, 3, 10]], 4, 0],
+  [[[1, 0, 3], [2, 1, 3]], 3, 2],
+]
+function dijkstraCases(gen: (a: number[], e: WE, n: number, s: number) => { result?: unknown }[]): () => Case[] {
+  return () =>
+    DIJKSTRA_GRAPHS.map(([es, n, st], k) => {
+      const r = gen([], es, n, st).at(-1)!.result as { ok: boolean; dist: (number | null)[]; parent: number[] }
+      if (!r?.ok) throw new Error(`dijkstra graph #${k} rejected by the app`)
+      return { name: `graph#${k} n=${n} s=${st}`, stdin: `${n} ${st}\n${edgeLines(es)}\n`, expected: `${fmtDist(r.dist)}\n${r.parent.join(' ')}` }
+    })
+}
+
+function bfsCases(): Case[] {
+  const gs: [Record<number, number[]>, number][] = [
+    [bfsAlgo.meta.defaultAdj as Record<number, number[]>, 0],
+    [bfsAlgo.meta.defaultAdj as Record<number, number[]>, 4],
+    [{ 0: [] }, 0],
+    [{ 0: [1], 1: [0], 2: [] }, 0],
+    [{ 0: [1, 2, 3], 1: [0, 4], 2: [0, 4], 3: [0], 4: [1, 2] }, 0],
+    [{ 0: [3, 1], 1: [0, 2], 2: [1, 3], 3: [2, 0] }, 1],
+  ]
+  return gs.map(([adj, st], k) => {
+    const r = bfsAlgo.generateSteps([], adj, st).at(-1)!.result as { ok: boolean; dist: number[]; parent: number[] }
+    if (!r?.ok) throw new Error(`bfs graph #${k} rejected`)
+    const n = Object.keys(adj).length
+    const lines = Array.from({ length: n }, (_, i) => (adj[i] ?? []).join(' '))
+    // the app marks unreachable vertices with null; the references (like the TS document) use -1
+    const dist = r.dist.map((x) => (x == null ? -1 : x))
+    return { name: `graph#${k} n=${n} s=${st}`, stdin: `${n} ${st}\n${lines.join('\n')}\n`, expected: `${dist.join(' ')}\n${r.parent.join(' ')}` }
+  })
+}
+
+/** undirected weighted graphs (connected) for Kruskal / Prim */
+const MST_GRAPHS: [WE, number][] = [
+  [kruskalAlgo.meta.defaultEdges, kruskalAlgo.meta.defaultN],
+  [primAlgo.meta.defaultEdges, primAlgo.meta.defaultN],
+  [[[0, 1, 1]], 2],
+  [[[0, 1, 4], [1, 2, 4], [0, 2, 4]], 3],
+  [[[0, 1, 4], [0, 7, 8], [1, 2, 8], [1, 7, 11], [2, 3, 7], [2, 8, 2], [2, 5, 4], [3, 4, 9], [3, 5, 14], [4, 5, 10], [5, 6, 2], [6, 7, 1], [6, 8, 6], [7, 8, 7]], 9],
+  [[[0, 1, 3], [1, 2, 1], [2, 3, 4], [3, 0, 2], [0, 2, 5], [1, 3, 6]], 4],
+]
+function kruskalCases(): Case[] {
+  return MST_GRAPHS.map(([es, n], k) => {
+    const r = kruskalAlgo.generateSteps([], es, n).at(-1)!.result as { ok: boolean; cost: number; mst: WE }
+    if (!r?.ok) throw new Error(`kruskal graph #${k} rejected`)
+    return { name: `graph#${k} n=${n}`, stdin: `${n}\n${edgeLines(es)}\n`, expected: `${r.cost}\n${r.mst.map(([u, v, w]) => `${u}-${v}:${w}`).join(' ')}` }
+  })
+}
+function primCases(): Case[] {
+  return MST_GRAPHS.flatMap(([es, n], k) =>
+    [0, n - 1].filter((s, i, a) => a.indexOf(s) === i).map((st) => {
+      const r = primAlgo.generateSteps([], es, n, st).at(-1)!.result as { ok: boolean; cost: number; edges: WE }
+      if (!r?.ok) throw new Error(`prim graph #${k} rejected`)
+      const set = r.edges.map(([u, v]) => `${Math.min(u, v)}-${Math.max(u, v)}`).sort()
+      return { name: `graph#${k} n=${n} s=${st}`, stdin: `${n} ${st}\n${edgeLines(es)}\n`, expected: `${r.cost}\n${set.join(' ')}` }
+    }),
+  )
+}
+
+const BF_GRAPHS: [WE, number, number][] = [
+  [bellmanAlgo.meta.defaultEdges, bellmanAlgo.meta.defaultN, 0],
+  [[[0, 1, 4], [0, 2, 5], [1, 2, -3], [2, 3, 4], [3, 1, 2]], 4, 0],
+  [[[0, 1, 1]], 3, 0],
+  [[[0, 1, -1], [0, 2, 4], [1, 2, 3], [1, 3, 2], [1, 4, 2], [3, 2, 5], [3, 1, 1], [4, 3, -3]], 5, 0],
+  [[[0, 1, 1], [1, 2, -1], [2, 1, -1]], 3, 0],
+  [[[0, 1, 2], [1, 0, -3]], 2, 0],
+  [[[1, 2, -5]], 3, 0],
+]
+function bellmanCases(): Case[] {
+  return BF_GRAPHS.map(([es, n, st], k) => {
+    const r = bellmanAlgo.generateSteps([], es, n, st).at(-1)!.result as { ok?: boolean; error?: string; dist?: (number | null)[]; parent?: number[]; negativeCycle?: boolean }
+    const neg = r.negativeCycle === true || r.error === 'negative_cycle_reachable'
+    if (!neg && !r.dist) throw new Error(`bellmanFord graph #${k}: unexpected result ${JSON.stringify(r)}`)
+    return {
+      name: `graph#${k} n=${n} s=${st}${neg ? ' (negative cycle: flag only)' : ''}`,
+      stdin: `${n} ${st} ${neg ? 'flag' : 'full'}\n${edgeLines(es)}\n`,
+      expected: neg ? 'true' : `${fmtDist(r.dist!)}\n${r.parent!.join(' ')}\nfalse`,
+    }
+  })
+}
+
+/** knapsack teaching-unit strategies: instances get ids "0".."n-1" so id order = index order */
+const KS_INSTANCES: [number[], number[], number][] = [
+  [K.DEFAULT_INSTANCE.items.map((i) => i.weight), K.DEFAULT_INSTANCE.items.map((i) => i.value), K.DEFAULT_INSTANCE.capacity],
+  [K.GREEDY_COUNTEREXAMPLE.items.map((i) => i.weight), K.GREEDY_COUNTEREXAMPLE.items.map((i) => i.value), K.GREEDY_COUNTEREXAMPLE.capacity],
+  [K.FORWARD_UPDATE_COUNTEREXAMPLE.items.map((i) => i.weight), K.FORWARD_UPDATE_COUNTEREXAMPLE.items.map((i) => i.value), K.FORWARD_UPDATE_COUNTEREXAMPLE.capacity],
+  [[2, 3], [3, 4], 0], [[], [], 5], [[6], [10], 5], [[1, 2, 3], [2, 4, 6], 4], [[1, 3, 4, 5], [1, 4, 5, 7], 7],
+  [[3, 4, 5, 9, 4], [3, 4, 4, 10, 4], 11],
+]
+const ksInst = ([w, v, W]: [number[], number[], number]): K.KnapsackInstance => ({ items: w.map((x, i) => ({ id: String(i), weight: x, value: v[i]! })), capacity: W })
+const ksStdin = ([w, v, W]: [number[], number[], number]) => `${W}\n${w.join(' ')}\n${v.join(' ')}\n`
+function ksCases(solve: (inst: K.KnapsackInstance) => number): () => Case[] {
+  return () => KS_INSTANCES.map((c) => ({ name: `w=[${c[0]}] v=[${c[1]}] W=${c[2]}`, stdin: ksStdin(c), expected: String(solve(ksInst(c))) }))
+}
+function ksGreedyCases(): Case[] {
+  return KS_INSTANCES.map((c) => {
+    const g = K.greedyByDensity(ksInst(c))
+    return { name: `w=[${c[0]}] v=[${c[1]}] W=${c[2]}`, stdin: ksStdin(c), expected: `${g.maxValue}\n${(g.selectedIds ?? []).join(' ')}`.trimEnd() }
+  })
+}
+
 export const CASES: Record<string, () => Case[]> = {
   lcs: lcsCases,
   kmp: kmpCases,
@@ -215,4 +335,20 @@ export const CASES: Record<string, () => Case[]> = {
   huffman: huffmanCases,
   activitySelection: activityCases,
   'knapsack/dp2d': knapsackDp2dCases,
+  dijkstra: dijkstraCases(dijkstraAlgo.generateSteps as never),
+  dijkstraHeap: dijkstraCases(dijkstraHeapAlgo.generateSteps as never),
+  bfs: bfsCases,
+  kruskal: kruskalCases,
+  prim: primCases,
+  bellmanFord: bellmanCases,
+  'knapsack/dp1dCorrect': ksCases((i) => K.solveDp1dCorrect(i).maxValue),
+  'knapsack/dp1dWrong': ksCases((i) => K.solveDp1dWrongForward(i).maxValue),
+  'knapsack/brute': ksCases((i) => {
+    const r = K.bruteForceKnapsack(i)
+    if (r.truncated) throw new Error('brute force truncated')
+    return r.maxValue
+  }),
+  'knapsack/backtracking': ksCases((i) => K.solveBacktracking(i).solution.maxValue),
+  'knapsack/branchAndBound': ksCases((i) => K.solveBranchAndBound(i).solution.maxValue),
+  'knapsack/greedy': ksGreedyCases,
 }

@@ -1,0 +1,2 @@
+{ "algo": "dijkstraHeap", "idPrefix": "dijkstraHeap", "titleBase": "堆优化 Dijkstra",
+  "files": { "python": "dijkstra_heap.py", "cpp": "dijkstra_heap.cpp", "java": "DijkstraHeap.java", "rust": "dijkstra_heap.rs", "go": "dijkstra_heap.go" } }

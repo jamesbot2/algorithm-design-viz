@@ -15,7 +15,7 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { getCatalog } from '../src/codeCatalog'
+import { getCatalog, CATALOG_ALGO_IDS } from '../src/codeCatalog'
 import type { CodeDocument } from '../src/codeCatalog/types'
 import { CODE_LANGUAGES } from '../src/codeCatalog/types'
 import { availableLanguages, languageDirOf, loadAlgoLanguages } from '../src/codeCatalog/languages'
@@ -42,6 +42,14 @@ beforeAll(async () => {
 })
 
 describe('V28 P3 registry', () => {
+  it('every shipped catalog id (algorithm pages + knapsack strategies) offers all six languages', () => {
+    const missing = CATALOG_ALGO_IDS.filter((id) => availableLanguages(id).length !== CODE_LANGUAGES.length)
+    expect(missing).toEqual([])
+    const dirs = new Set(CATALOG_ALGO_IDS.map((id) => languageDirOf(id)))
+    // LCS / KMP / Floyd keep their Phase 2 detector; every other directory is in the Phase 3 table
+    expect([...dirs].filter((d) => d && !['lcs', 'kmp', 'floyd'].includes(d) && !DIRS.includes(d)).sort()).toEqual([])
+  })
+
   for (const d of DIRS) {
     it(`${d}: six languages, distinct ids, titles, labels, harness + case list`, () => {
       const { algoId } = P3[d]!
@@ -88,9 +96,31 @@ describe('V28 P3 traces: every frame located in every document', () => {
       expect(f.slice(0, 20)).toEqual([])
       expect(frames).toBeGreaterThan(traces.length)
       const prim = new Set(traces[0]!.steps.map((s) => pickPrimaryCodeRef(s)?.anchorId))
-      expect(prim.size, `default trace primaries: ${[...prim]}`).toBeGreaterThanOrEqual(3)
+      expect(prim.size, `default trace primaries: ${[...prim]}`).toBeGreaterThanOrEqual(P3[d]!.minPrimaries ?? 3)
     })
   }
+})
+
+describe('V28 P3 mutation scan: the detector catches an anchor moved to ANY other line', () => {
+  it('every anchor of every Phase 3 document, moved onto every other non-blank line → detected', () => {
+    let total = 0
+    const survivors: string[] = []
+    for (const d of DIRS) {
+      const [ts, ...rest] = docsOf[d]!
+      for (const doc of rest.filter((x) => x.language !== 'pseudocode')) {
+        const lines = doc.source.split('\n')
+        for (const an of doc.anchors) {
+          for (let line = 1; line <= lines.length; line++) {
+            if (line === an.range.startLine || !lines[line - 1]!.trim()) continue
+            total++
+            if (!docFailures(ts!, rebind(doc, an.id, line), P3[d]!.sig).length) survivors.push(`${doc.documentId} ${an.id} → ${line}: ${lines[line - 1]!.trim()}`)
+          }
+        }
+      }
+    }
+    expect(total).toBeGreaterThan(10_000)
+    expect(survivors).toEqual([])
+  })
 })
 
 /** clone a document with one anchor moved to another document line (or dropped with line 0) */

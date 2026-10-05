@@ -1,0 +1,2 @@
+{ "algo": "knapsack/greedy", "idPrefix": "knapsack.greedy", "titleBase": "0-1 背包贪心密度",
+  "files": { "python": "knapsack_greedy.py", "cpp": "knapsack_greedy.cpp", "java": "KnapsackGreedy.java", "rust": "knapsack_greedy.rs", "go": "knapsack_greedy.go" } }

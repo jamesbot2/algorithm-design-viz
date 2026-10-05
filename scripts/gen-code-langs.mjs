@@ -58,7 +58,7 @@ export function parseAnnotated(raw, lang, where = '') {
     if (!body.trim()) throw new Error(`${where}:${idx + 1}: anchor marker on an empty line`)
     out.push(body)
     for (const spec of m[1].split(',').map((s) => s.trim()).filter(Boolean)) {
-      const sm = spec.match(/^([A-Za-z_][\w]*)(?:\+(\d+))?$/)
+      const sm = spec.match(/^([A-Za-z_][\w.]*)(?:\+(\d+))?$/)
       if (!sm) throw new Error(`${where}:${idx + 1}: bad anchor spec "${spec}"`)
       if (seen.has(sm[1])) throw new Error(`${where}:${idx + 1}: duplicate anchor "${sm[1]}"`)
       seen.add(sm[1])

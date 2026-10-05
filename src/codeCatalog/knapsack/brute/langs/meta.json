@@ -1,0 +1,2 @@
+{ "algo": "knapsack/brute", "idPrefix": "knapsack.brute", "titleBase": "0-1 背包暴力枚举",
+  "files": { "python": "knapsack_brute.py", "cpp": "knapsack_brute.cpp", "java": "KnapsackBrute.java", "rust": "knapsack_brute.rs", "go": "knapsack_brute.go" } }
