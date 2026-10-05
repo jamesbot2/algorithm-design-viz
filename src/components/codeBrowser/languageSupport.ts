@@ -42,8 +42,13 @@ export function loadLanguageSupport(lang: CodeLanguage): Promise<Extension> {
       return ext
     })
     .catch((e) => {
+      // A grammar is only colouring: if its chunk cannot be fetched, show the code as plain text
+      // rather than blocking the document (browsers would not re-fetch a failed import anyway).
       inflight.delete(lang)
-      throw e
+      console.warn(`[code] ${lang} syntax highlighting unavailable:`, e)
+      const plain: Extension = []
+      cache.set(lang, plain)
+      return plain
     })
   inflight.set(lang, p)
   return p

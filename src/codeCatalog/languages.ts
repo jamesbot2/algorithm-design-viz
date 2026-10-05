@@ -77,6 +77,7 @@ export function availableLanguages(algoId: string | null | undefined): CodeLangu
 
 const cache = new Map<string, Map<LazyLanguage, CodeDocument>>()
 const inflight = new Map<string, Promise<Map<LazyLanguage, CodeDocument>>>()
+const failedChunk = new Map<string, string>()
 
 function withLabels(doc: GeneratedLangDoc, tsAnchors: readonly CodeAnchor[]): CodeDocument {
   const label = (id: string) => tsAnchors.find((a) => a.id === id)?.label ?? id
@@ -101,7 +102,13 @@ export function loadAlgoLanguages(
   if (pending) return pending
   const loader = LOADERS[algoId]
   if (!loader) return Promise.resolve(new Map())
-  const p = loader()
+  // Browsers cache a failed dynamic import per URL (a plain retry would fail again without a
+  // request), so a retry after a fetch failure re-imports the same chunk with a cache-busting query.
+  const failedUrl = failedChunk.get(algoId)
+  const attempt: Promise<{ default: GeneratedLangDoc[] }> = failedUrl
+    ? import(/* @vite-ignore */ `${failedUrl}${failedUrl.includes('?') ? '&' : '?'}retry=${Date.now()}`)
+    : loader()
+  const p = attempt
     .then((mod) => {
       const map = new Map<LazyLanguage, CodeDocument>()
       for (const d of mod.default) map.set(d.language, withLabels(d, tsAnchors))
@@ -111,6 +118,8 @@ export function loadAlgoLanguages(
     })
     .catch((err) => {
       inflight.delete(algoId)
+      const url = String(err instanceof Error ? err.message : err).match(/(https?:\/\/\S+?\.js)(?:\?\S*)?\s*$/)?.[1]
+      if (url) failedChunk.set(algoId, url)
       throw err
     })
   inflight.set(algoId, p)
@@ -125,6 +134,7 @@ export function peekLanguageDoc(algoId: string | null | undefined, lang: CodeLan
 
 /** Test hook: forget loaded chunks (simulates a first visit). */
 export function __resetLanguageCacheForTests() {
+  failedChunk.clear()
   cache.clear()
   inflight.clear()
 }

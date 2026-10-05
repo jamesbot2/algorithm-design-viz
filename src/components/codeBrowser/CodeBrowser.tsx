@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { EditorView, Decoration, gutter, GutterMarker, keymap } from '@codemirror/view'
 import { Compartment, RangeSetBuilder, StateEffect, StateField, type Extension, type Range } from '@codemirror/state'
@@ -223,12 +223,13 @@ export default function CodeBrowser({
   const langs = useMemo(() => availableLanguages(algoId), [algoId])
   const language: CodeLanguage = langs.includes(prefLanguage) ? prefLanguage : 'typescript'
   const [loadTick, setLoadTick] = useState(0)
-  const [loadError, setLoadError] = useState<string | null>(null)
-  const langCompartment = useRef(new Compartment())
+  const [loadFailure, setLoadError] = useState<{ lang: CodeLanguage; msg: string } | null>(null)
+  const [langCompartment] = useState(() => new Compartment())
+  const langRowRef = useRef<HTMLDivElement | null>(null)
   /** language whose grammar the live editor currently has */
   const cmLangRef = useRef<CodeLanguage>('typescript')
   /** last fully loaded CM document (kept on screen, covered, while the next one loads) */
-  const lastCmDocRef = useRef<CodeDocument | null>(null)
+  const [lastCmDoc, setLastCmDoc] = useState<CodeDocument | null>(null)
   const { theme } = useLabTheme()
   const { mode: motionMode } = useMotion()
   const reduceMotion = motionMode === 'reduced'
@@ -268,11 +269,11 @@ export default function CodeBrowser({
   const langReady = !!langDoc && langSupportReady
   const showPseudoTab = tab === 'pseudo' && !!docs?.pseudocode
   const codeLoading = !!docs && !showPseudoTab && !langReady
+  const loadError = loadFailure && loadFailure.lang === language ? loadFailure.msg : null
   const viewKey = showPseudoTab ? 'pseudo' : language
   useEffect(() => {
     if (!docs || langReady) return
     let alive = true
-    setLoadError(null)
     const work: Promise<unknown>[] = [loadLanguageSupport(language)]
     if (algoId && language !== 'typescript') work.push(loadAlgoLanguages(algoId, docs.typescript.anchors))
     Promise.all(work)
@@ -280,18 +281,19 @@ export default function CodeBrowser({
         if (alive) setLoadTick((t) => t + 1)
       })
       .catch((e: unknown) => {
-        if (alive) setLoadError(e instanceof Error ? e.message : String(e))
+        if (alive) setLoadError({ lang: language, msg: e instanceof Error ? e.message : String(e) })
       })
     return () => {
       alive = false
     }
   }, [docs, langReady, language, algoId, loadTick])
-  if (langReady && langDoc) lastCmDocRef.current = langDoc
+  // adjust-state-during-render: remember the last document that was fully ready
+  if (langReady && langDoc && lastCmDoc !== langDoc) setLastCmDoc(langDoc)
   /** what the (single, persistent) CodeMirror instance displays */
-  const cmDoc: CodeDocument | null = langReady ? langDoc : (lastCmDocRef.current ?? docs?.typescript ?? null)
+  const cmDoc: CodeDocument | null = langReady ? langDoc : ((langReady ? langDoc : lastCmDoc) ?? docs?.typescript ?? null)
   const cmDocLanguage: CodeLanguage = langReady
     ? language
-    : ((lastCmDocRef.current?.language as CodeLanguage | undefined) ?? 'typescript')
+    : ((lastCmDoc?.language as CodeLanguage | undefined) ?? 'typescript')
 
   const activeDoc = useMemo(() => {
     if (!docs) return null
@@ -321,8 +323,10 @@ export default function CodeBrowser({
     return null
   }, [execRange, activeLine, tab, execAnchorId, numericFallback, language, langReady])
   execLine1Ref.current = execLine1
-  codeLoadingRef.current = codeLoading
-  cmDocLanguageRef.current = cmDocLanguage
+  useLayoutEffect(() => {
+    codeLoadingRef.current = codeLoading
+    cmDocLanguageRef.current = cmDocLanguage
+  })
   /**
    * V27: what the shown document can say about the current step.
    * preview = no step yet; unmapped = teaching event without code mapping;
@@ -355,7 +359,7 @@ export default function CodeBrowser({
   const extensions = useMemo(() => {
     const exts: Extension[] = [
       // V28: grammar via Compartment — language switches reconfigure, never remount
-      langCompartment.current.of(peekLanguageSupport('typescript') ?? []),
+      langCompartment.of(peekLanguageSupport('typescript') ?? []),
       history(),
       search(),
       highlightSelectionMatches(),
@@ -369,7 +373,7 @@ export default function CodeBrowser({
       }),
     ]
     return exts
-  }, [])
+  }, [langCompartment])
 
   const beginScrollTxn = useCallback((kind: 'follow' | 'layout' | 'locate' = 'follow') => {
     return intentRef.current.beginTransaction(kind)
@@ -480,9 +484,9 @@ export default function CodeBrowser({
     if (!view || tab !== 'ts' || cmLangRef.current === cmDocLanguage) return
     const ext = peekLanguageSupport(cmDocLanguage)
     if (!ext) return
-    view.dispatch({ effects: langCompartment.current.reconfigure(ext) })
+    view.dispatch({ effects: langCompartment.reconfigure(ext) })
     cmLangRef.current = cmDocLanguage
-  }, [cmDocLanguage, tab])
+  }, [cmDocLanguage, tab, langCompartment])
 
   // Clear CM viewRef when leaving TS tab so we never dispatch to destroyed editor
   // V28: runs per shown document (pseudo or a language) once that document is on screen.
@@ -562,7 +566,7 @@ export default function CodeBrowser({
       cmLangRef.current = 'typescript'
       const ext = peekLanguageSupport(cmDocLanguageRef.current)
       if (ext && cmDocLanguageRef.current !== 'typescript') {
-        view.dispatch({ effects: langCompartment.current.reconfigure(ext) })
+        view.dispatch({ effects: langCompartment.reconfigure(ext) })
         cmLangRef.current = cmDocLanguageRef.current
       }
       view.dispatch({
@@ -613,7 +617,7 @@ export default function CodeBrowser({
         ro?.disconnect()
       }
     },
-    [execLine1, contextLines],
+    [execLine1, contextLines, langCompartment],
   )
 
   // V20-03: reconfigure wrap compartment — layout txn so reflow scroll ≠ user pause
@@ -689,6 +693,36 @@ export default function CodeBrowser({
     setUserScrolledAway(memo != null)
   }
 
+  // V28: language row — mark overflowing edges (CSS fades them) and keep the active pill inside
+  // the row's own visible box (scrolls only the row, never the page).
+  useEffect(() => {
+    const row = langRowRef.current
+    if (!row) return
+    const update = () => {
+      const max = row.scrollWidth - row.clientWidth
+      const s = max > 1 && row.scrollLeft > 1
+      const e = max > 1 && row.scrollLeft < max - 1
+      row.dataset.ovf = s && e ? 'both' : s ? 'start' : e ? 'end' : 'none'
+    }
+    update()
+    row.addEventListener('scroll', update, { passive: true })
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null
+    ro?.observe(row)
+    return () => {
+      row.removeEventListener('scroll', update)
+      ro?.disconnect()
+    }
+  }, [])
+  useEffect(() => {
+    const row = langRowRef.current
+    const pill = row?.querySelector<HTMLElement>('.code-lang-pill.active')
+    if (!row || !pill) return
+    const left = pill.getBoundingClientRect().left - row.getBoundingClientRect().left - row.clientLeft + row.scrollLeft
+    const right = left + pill.offsetWidth
+    if (left < row.scrollLeft) row.scrollLeft = Math.max(0, left - 8)
+    else if (right > row.scrollLeft + row.clientWidth) row.scrollLeft = right - row.clientWidth + 8
+  }, [language, showPseudoTab])
+
   const copy = async () => {
     if (!activeDoc) return
     const text = activeDoc.source
@@ -738,7 +772,7 @@ export default function CodeBrowser({
       }}
     >
       <div className="code-browser-head">
-        <div className="code-lang-switch" role="group" aria-label="代码语言" data-testid="code-lang-switch">
+        <div className="code-lang-switch" role="group" aria-label="代码语言" data-testid="code-lang-switch" ref={langRowRef} data-ovf="none">
           {langs.map((l) => {
             const on = !showPseudoTab && language === l
             return (
@@ -887,6 +921,8 @@ export default function CodeBrowser({
           style={{ fontSize }}
           data-testid="code-mirror-wrap"
           data-exec-line={execLine1 ?? ''}
+          data-exec-end={execRange?.endLine ?? execLine1 ?? ''}
+          data-weak-lines={contextLines.join(',')}
           data-scroll-owner="code"
           data-cm-doc={cmDoc.documentId}
           aria-busy={codeLoading || undefined}

@@ -1955,3 +1955,22 @@ html, body, #root {
   .code-lang-pill[data-lang='typescript'] .lang-full { display: none; }
   .code-lang-pill[data-lang='typescript'] .lang-short { display: inline; }
 }
+/* V28: touch-sized language pills on touch screens and short (landscape phone) viewports too */
+@media (pointer: coarse), (max-height: 500px) {
+  .code-lang-pill, .code-copy-btn { min-height: 34px; }
+}
+/* V28: breathing room under the last pseudocode line — at maximum scroll the final statement
+   (e.g. `return`) was flush with the scroller edge and clipped by a sub-pixel amount */
+.code-browser > pre.code-pre { padding-bottom: 0.5rem; }
+/* V28: the code column is often narrow (≈340–470px on desktop splits): compact pills there so
+   all languages + 伪代码 stay visible; when the row still overflows, its edges fade to say so */
+.code-browser-head { container-type: inline-size; }
+@container (max-width: 520px) {
+  .code-lang-pill { padding-inline: 0.5rem; }
+  .code-lang-pill[data-lang='typescript'] .lang-full { display: none; }
+  .code-lang-pill[data-lang='typescript'] .lang-short { display: inline; }
+  .code-copy-btn { padding-inline: 0.6rem; }
+}
+.code-lang-switch[data-ovf='end'] { mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+.code-lang-switch[data-ovf='start'] { mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); }
+.code-lang-switch[data-ovf='both'] { mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent); }
