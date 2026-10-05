@@ -19,6 +19,8 @@ export interface CodeExecState {
   headerDocId: string | null
   headerLine: string | null
   execAttr: string | null
+  /** V28: last line of the primary anchor range (data-exec-end; CodeMirror documents only) */
+  execEnd: number | null
   activeCount: number
   domText: string | null
   weakLines: number[]
@@ -104,6 +106,7 @@ export async function measureCodeExec(page: Page, tol = 0.75): Promise<CodeExecS
       headerDocId: hm?.[2] ?? null,
       headerLine: hm?.[3] ?? null,
       execAttr: host?.getAttribute('data-exec-line') ?? null,
+      execEnd: /^\d+$/.test(host?.getAttribute('data-exec-end') ?? '') ? Number(host!.getAttribute('data-exec-end')) : null,
       activeCount: actives.length,
       domText,
       weakLines: tab === 'pseudo' ? [...(pre?.querySelectorAll('.code-line.context') ?? [])].map((e) => Number(e.getAttribute('data-line'))) : [],
