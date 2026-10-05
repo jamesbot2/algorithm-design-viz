@@ -78,7 +78,7 @@ export function usePlaybackController({
   const timer = useRef<number | null>(null)
   const lastSeekReq = useRef<string | number | null>(null)
   const lastRunId = useRef<string | number | undefined>(undefined)
-  const { mode, setSpeedIntervalMs, bumpTransitionEpoch } = useMotion()
+  const { mode, setSpeedIntervalMs, bumpTransitionEpoch, setPlaybackPlaying } = useMotion()
 
   // A run switch can shorten steps for one render before the reset effect runs.
   const idx = clampIdx(rawIdx, steps.length)
@@ -112,6 +112,11 @@ export function usePlaybackController({
       }),
     [speed, mode, stepHasSwapMotion, stepHasMoveMotion],
   )
+
+  // V29 M2: ArrayView freezes/resumes in-flight WAAPI FLIP from this flag (pause ≠ snap).
+  useEffect(() => {
+    setPlaybackPlaying(playing)
+  }, [playing, setPlaybackPlaying])
 
   // Keep motion tokens / FLIP durations on the same clock as playback
   useEffect(() => {
@@ -158,7 +163,10 @@ export function usePlaybackController({
     lastRunId.current = runId
     setIdx(0)
     setPlaying(false)
+    setSnapSwap(true)
     bumpTransitionEpoch()
+    const t = window.setTimeout(() => setSnapSwap(false), 50)
+    return () => window.clearTimeout(t)
   }, [runId, bumpTransitionEpoch])
 
   // Explicit seek only when requestId changes — snap geometry (no FLIP residue)
@@ -195,8 +203,8 @@ export function usePlaybackController({
     setPlayPulse(true)
     window.setTimeout(() => setPlayPulse(false), 180)
     if (playing) {
+      // V29 M2: freeze mid-motion — do not bumpTransitionEpoch (that cleared transforms to end).
       setPlaying(false)
-      bumpTransitionEpoch()
       return
     }
     if (steps.length === 0) return
@@ -204,19 +212,24 @@ export function usePlaybackController({
     // completed → replay: seek 0 then play (existing trace; must NOT re-solve)
     if (idx >= last) setIdx(0)
     setPlaying(true)
-  }, [playing, steps.length, idx, bumpTransitionEpoch])
+  }, [playing, steps.length, idx])
 
   const reset = useCallback(() => {
     setPlaying(false)
+    // V29 M2: reset is a snapshot jump — snapSwap prevents FLIP across non-adjacent geometry.
+    setSnapSwap(true)
     bumpTransitionEpoch()
     setIdx(0)
+    window.setTimeout(() => setSnapSwap(false), 50)
   }, [bumpTransitionEpoch])
 
   const seekTo = useCallback(
     (i: number) => {
       setPlaying(false)
+      setSnapSwap(true)
       bumpTransitionEpoch()
       setIdx(clampIdx(i, steps.length))
+      window.setTimeout(() => setSnapSwap(false), 50)
     },
     [steps.length, bumpTransitionEpoch],
   )

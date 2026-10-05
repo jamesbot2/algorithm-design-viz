@@ -19,21 +19,24 @@ describe('V11-09 move/copy FLIP', () => {
       </MotionProvider>,
     )
 
-    const slots = [...container.querySelectorAll('[data-slot-index]')] as HTMLElement[]
-    slots.forEach((el, i) => {
-      vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-        x: i * 40,
+    // V29 M2: identity-keyed columns move between slots — mock by data-slot-index, not element identity.
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      const raw = this.getAttribute('data-slot-index')
+      const i = raw != null ? Number(raw) : 0
+      const x = Number.isFinite(i) ? i * 40 : 0
+      return {
+        x,
         y: 10,
         width: 36,
         height: 36,
         top: 10,
-        left: i * 40,
+        left: x,
         bottom: 46,
-        right: i * 40 + 36,
+        right: x + 36,
         toJSON() {
           return {}
         },
-      } as DOMRect)
+      } as DOMRect
     })
 
     await act(async () => {

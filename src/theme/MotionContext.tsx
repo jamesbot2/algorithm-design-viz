@@ -25,9 +25,12 @@ type MotionCtx = {
   /** Live playback interval from Visualizer (ms between steps). */
   speedIntervalMs: number
   setSpeedIntervalMs: (ms: number) => void
-  /** Bumped on pause / seek / resize / replace-run — stale FLIP callbacks must ignore. */
+  /** Bumped on seek / reset / replace-run / resize — snap-cancel stale FLIP (not pause-freeze). */
   transitionEpoch: number
   bumpTransitionEpoch: () => void
+  /** Live transport playing flag — ArrayView freezes/resumes WAAPI FLIP without snapping. */
+  playbackPlaying: boolean
+  setPlaybackPlaying: (playing: boolean) => void
 }
 
 const Ctx = createContext<MotionCtx | null>(null)
@@ -52,6 +55,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   const [density, setDensity] = useState<'normal' | 'projection'>('normal')
   const [speedIntervalMs, setSpeedIntervalMs] = useState(600)
   const [transitionEpoch, setTransitionEpoch] = useState(0)
+  const [playbackPlaying, setPlaybackPlaying] = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -99,6 +103,8 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       setSpeedIntervalMs,
       transitionEpoch,
       bumpTransitionEpoch,
+      playbackPlaying,
+      setPlaybackPlaying,
     }),
     [
       mode,
@@ -110,6 +116,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       speedIntervalMs,
       transitionEpoch,
       bumpTransitionEpoch,
+      playbackPlaying,
     ],
   )
 
@@ -141,6 +148,8 @@ export function useMotion(): MotionCtx {
       setSpeedIntervalMs: () => {},
       transitionEpoch: 0,
       bumpTransitionEpoch: () => {},
+      playbackPlaying: false,
+      setPlaybackPlaying: () => {},
     }
   }
   return ctx

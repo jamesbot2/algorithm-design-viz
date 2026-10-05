@@ -189,7 +189,7 @@ function ArrayView({
   const [mode, setMode] = useState<'bars' | 'cells'>(
     defaultMode ?? (compact ? 'cells' : suitable ? 'bars' : 'cells'),
   )
-  const { mode: motionMode, speedIntervalMs, transitionEpoch } = useMotion()
+  const { mode: motionMode, speedIntervalMs, transitionEpoch, playbackPlaying } = useMotion()
   const swapMs = resolveDuration(280, motionMode, speedIntervalMs)
 
   const nums = useMemo(
@@ -261,6 +261,10 @@ function ArrayView({
   const prevCenters = useRef<Map<string, { x: number; y: number }>>(new Map())
   const animToken = useRef(0)
   const transitionIdRef = useRef(0)
+  /** V29 M2: WAAPI FLIP animations — pause freezes, seek/epoch cancels. */
+  const flipAnims = useRef<Map<string, Animation>>(new Map())
+  const playbackPlayingRef = useRef(playbackPlaying)
+  playbackPlayingRef.current = playbackPlaying
   const wrapRef = useRef<HTMLDivElement>(null)
   // V24-01A: bar geometry comes from the box this ArrayView is actually allotted
   // (its own border-box, sized by the scene layout), never from the whole stage or
@@ -349,12 +353,29 @@ function ArrayView({
   }>({ current: [], best: [] })
   const overlayHostRef = useRef<HTMLDivElement>(null)
 
-  // Clear transforms on cancel / remount / non-swap
+  // Clear transforms on cancel / remount / non-swap / seek snap
+  const cancelFlipAnim = (anim: Animation) => {
+    try {
+      anim.cancel()
+    } catch {
+      /* ignore sync cancel errors */
+    }
+    // happy-dom rejects `finished` on cancel — avoid unhandled rejection
+    try {
+      void anim.finished.catch(() => {})
+    } catch {
+      /* ignore */
+    }
+  }
   const clearTransforms = () => {
+    for (const anim of flipAnims.current.values()) cancelFlipAnim(anim)
+    flipAnims.current.clear()
     for (const el of layerRefs.current.values()) {
       if (!el) continue
       el.style.transition = 'none'
       el.style.transform = 'none'
+      delete el.dataset.runFlip
+      delete el.dataset.transitionId
     }
   }
 
@@ -374,6 +395,18 @@ function ArrayView({
     clearTransforms()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
+
+  // V29 M2: pause freezes WAAPI mid-flight; resume continues from the same progress.
+  useEffect(() => {
+    for (const anim of flipAnims.current.values()) {
+      try {
+        if (!playbackPlaying && anim.playState === 'running') anim.pause()
+        else if (playbackPlaying && anim.playState === 'paused') anim.play()
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [playbackPlaying])
 
   useEffect(() => {
     const el = wrapRef.current
@@ -433,7 +466,7 @@ function ArrayView({
       }
     }
 
-    // Pause/seek/reset: epoch bumped without new geometry → cancel only (do not restart FLIP)
+    // Seek/reset/replace-run: epoch bumped without new geometry → snap-cancel (not pause-freeze).
     if (snapSwap || (epochChanged && !geometryChanged)) {
       clearTransforms()
       seedCenters()
@@ -441,18 +474,21 @@ function ArrayView({
       return
     }
 
-    // FLIP targets: explicit swap pair OR same-array move (id relocates). Copy/write from
-    // aux buffers (temp/left/right) are intentional instant — buffer strip is the mid-viz.
+    // FLIP targets from element-id relocation (never guess from values alone).
+    // i==j swap → no travel. Copy/write from aux buffers stay instant.
     const movingIds = relocatingElementIds(prevElementIds, ids)
     const hasMoveOp = Boolean(arrayOps?.some((o) => o.type === 'move'))
-    const flipIds =
-      swapPair !== null
-        ? [ids[swapPair[0]!]!, ids[swapPair[1]!]!].filter(Boolean)
-        : hasMoveOp
-          ? movingIds
-          : movingIds.length > 0 && !arrayOps?.some((o) => o.type === 'copy' || o.type === 'write')
-            ? movingIds
-            : []
+    const selfSwap = Boolean(swapPair && swapPair[0] === swapPair[1])
+    let flipIds: string[] = []
+    if (selfSwap) {
+      flipIds = []
+    } else if (swapPair !== null) {
+      flipIds = movingIds.length > 0 ? movingIds : [ids[swapPair[0]!]!, ids[swapPair[1]!]!].filter(Boolean)
+    } else if (hasMoveOp) {
+      flipIds = movingIds
+    } else if (movingIds.length > 0 && !arrayOps?.some((o) => o.type === 'copy' || o.type === 'write')) {
+      flipIds = movingIds
+    }
 
     const shouldFlip =
       flipIds.length > 0 &&
@@ -469,11 +505,17 @@ function ArrayView({
       return
     }
 
+    // Cancel any prior in-flight WAAPI before starting a new transition instance.
+        for (const anim of flipAnims.current.values()) cancelFlipAnim(anim)
+    flipAnims.current.clear()
+
     // V29 M1: pin chart track — disable in-slot height lerp while identity FLIP runs.
     const host = overlayHostRef.current
     host?.setAttribute('data-flip', '1')
 
     const idToIndex = new Map(ids.map((id, i) => [id, i]))
+    const ease = 'cubic-bezier(0.2, 0, 0, 1)' // no overshoot / elastic / back
+    let started = 0
     for (const id of flipIds) {
       const idx = idToIndex.get(id)
       if (idx == null) continue
@@ -482,41 +524,52 @@ function ArrayView({
       const oldCenter = prevCenters.current.get(id)
       if (!layer || newCenter == null || oldCenter == null) continue
       const dx = oldCenter.x - newCenter.x
-      const dy = oldCenter.y - newCenter.y
+      // Same-row bars: horizontal move only (shared baseline / zero domain).
+      const dyRaw = oldCenter.y - newCenter.y
+      const dy = Math.abs(dyRaw) < 4 ? 0 : dyRaw
       if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue
       layer.style.transition = 'none'
-      layer.style.transform = `translate(${dx}px, ${dy}px)`
+      layer.style.transform = 'none'
       layer.dataset.transitionId = String(transitionId)
       layer.dataset.runFlip = '1'
-    }
-
-    void document.body.offsetHeight
-
-    requestAnimationFrame(() => {
-      if (animToken.current !== token || geometryGen.current !== gen) return
-      for (const id of flipIds) {
-        const layer = layers.get(id)
-        if (!layer || layer.dataset.transitionId !== String(transitionId)) continue
-        layer.style.transition = `transform ${swapMs}ms ease`
-        layer.style.transform = 'translate(0px, 0px)'
+      layer.dataset.runId = String(transitionId)
+      const anim = layer.animate(
+        [
+          { transform: `translate(${dx}px, ${dy}px)` },
+          { transform: 'translate(0px, 0px)' },
+        ],
+        { duration: swapMs, easing: ease, fill: 'forwards' },
+      )
+      flipAnims.current.set(id, anim)
+      started += 1
+      if (!playbackPlayingRef.current) {
+        try {
+          anim.pause()
+        } catch {
+          /* ignore */
+        }
       }
-      window.setTimeout(() => {
+      anim.addEventListener('finish', () => {
         if (animToken.current !== token || geometryGen.current !== gen) return
-        for (const id of flipIds) {
-          const layer = layers.get(id)
-          if (!layer || layer.dataset.transitionId !== String(transitionId)) continue
-          layer.style.transition = 'none'
-          layer.style.transform = 'none'
-          delete layer.dataset.runFlip
+        if (layer.dataset.transitionId !== String(transitionId)) return
+        layer.style.transition = 'none'
+        layer.style.transform = 'none'
+        delete layer.dataset.runFlip
+        flipAnims.current.delete(id)
+        if (flipAnims.current.size === 0) {
+          for (let k = 0; k < values.length; k++) {
+            const c = slotCenter(k)
+            const cid = ids[k]
+            if (c != null && cid) prevCenters.current.set(cid, c)
+          }
+          host?.removeAttribute('data-flip')
         }
-        for (let k = 0; k < values.length; k++) {
-          const c = slotCenter(k)
-          const id = ids[k]
-          if (c != null && id) prevCenters.current.set(id, c)
-        }
-        host?.removeAttribute('data-flip')
-      }, swapMs + 20)
-    })
+      })
+    }
+    if (started === 0) {
+      host?.removeAttribute('data-flip')
+      seedCenters()
+    }
   }, [
     values,
     ids,
@@ -716,10 +769,10 @@ function ArrayView({
                 )}
               </div>
             )
-            const slotKey = `slot-${i}`
+            // V29 M2: identity key — React reorders the column with the element; height travels with id.
             return (
               <div
-                key={slotKey}
+                key={eid}
                 className={`bar-col ${dir}`}
                 data-el-id={eid}
                 data-slot-index={i}
@@ -771,10 +824,9 @@ function ArrayView({
               const role = roleForIndex(i, highlights, roles, arrayOps)
               const isSwap = swapPair !== null && (i === swapPair[0] || i === swapPair[1])
               const eid = ids[i]!
-              const slotKey = `slot-${i}`
               return (
                 <div
-                  key={slotKey}
+                  key={eid}
                   className="cell-slot"
                   data-el-id={eid}
                   data-slot-index={i}

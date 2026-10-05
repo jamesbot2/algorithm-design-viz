@@ -32,8 +32,11 @@ describe('V10-04 manual next must not kill new FLIP', () => {
     const goPrevBlock = src.slice(src.indexOf('const goPrev'), src.indexOf('const goNext'))
     expect(goNextBlock).not.toMatch(/bumpTransitionEpoch/)
     expect(goPrevBlock).not.toMatch(/bumpTransitionEpoch/)
-    // pause / seek / runId still cancel
-    expect(src).toMatch(/if \(playing\) \{\s*setPlaying\(false\)\s*bumpTransitionEpoch/s)
+    // V29 M2: pause freezes mid-FLIP (no epoch bump); seek / reset / runId still snap-cancel
+    expect(src).toMatch(/freeze mid-motion/)
+    expect(src).not.toMatch(/if \(playing\) \{\s*setPlaying\(false\)\s*bumpTransitionEpoch/s)
+    expect(src).toMatch(/const seekTo[\s\S]*?bumpTransitionEpoch/)
+    expect(src).toMatch(/const reset[\s\S]*?bumpTransitionEpoch/)
   })
 
   it('swap layout still settles without leftover transform residue', async () => {
