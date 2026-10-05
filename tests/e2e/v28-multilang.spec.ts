@@ -226,7 +226,10 @@ test.describe('V28 multi-language code panel', () => {
     }
   })
 
-  test('V28-05 preference persists across reload and algorithms; unsupported algorithm falls back honestly @1366x768', async ({ page }) => {
+  // Phase 3 gave every shipped algorithm six languages, so no real page is TypeScript-only any more:
+  // the honest fallback is covered by the DOM suite (synthetic 'tsOnlyAlgorithm'); here the
+  // preference must carry over to a Phase 3 algorithm (bubbleSort) instead of falling back.
+  test('V28-05 preference persists across reload and algorithms (incl. a Phase 3 algorithm, no fallback) @1366x768', async ({ page }) => {
     await open(page, 'lcs')
     await run(page)
     await pickLang(page, 'go')
@@ -239,9 +242,10 @@ test.describe('V28 multi-language code panel', () => {
     const s = await settle(page, 'floyd')
     expect(gaps('floyd', s, 'floyd.go'), tagOf(s, INPUT.floyd)).toEqual([])
     await page.goto('#/algo/bubbleSort')
-    await expect(page.getByTestId('code-lang-fallback')).toBeVisible({ timeout: 15_000 })
-    await expect(page.getByTestId('code-browser')).toHaveAttribute('data-language', 'typescript')
-    await expect(page.getByTestId('tab-lang-go')).toHaveCount(0)
+    await expect(page.getByTestId('code-browser')).toHaveAttribute('data-active-doc', 'bubbleSort.go', { timeout: 15_000 })
+    await expect(page.getByTestId('code-browser')).toHaveAttribute('data-language', 'go')
+    await expect(page.getByTestId('code-lang-fallback')).toHaveCount(0)
+    await expect(page.getByTestId('tab-lang-go')).toHaveAttribute('aria-pressed', 'true')
     expect(await page.evaluate(() => localStorage.getItem('adv.codeLanguage.v1'))).toBe('go')
   })
 
