@@ -243,7 +243,8 @@ function GraphView({ graph }: { graph: GraphState }) {
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [showNegWarn])
+    // V29 M3: do not rebind on showNegWarn — colour/role changes must not refit camera.
+  }, [])
 
   useEffect(() => {
     if (plotSize.w < 8 || plotSize.h < 8) return
@@ -326,11 +327,17 @@ function GraphView({ graph }: { graph: GraphState }) {
 
   return (
     <div className="graph-view" data-testid="graph-view">
-      {showNegWarn && (
-        <p className="graph-neg-warning" role="status" data-testid="graph-neg-warning">
-          负环警告：当前距离不构成合法最短路（Bellman-Ford / Floyd 检测）。
-        </p>
-      )}
+      <p
+        className={`graph-neg-warning${showNegWarn ? ' is-visible' : ''}`}
+        role="status"
+        data-testid="graph-neg-warning"
+        data-active={showNegWarn ? '1' : '0'}
+        aria-hidden={showNegWarn ? undefined : true}
+      >
+        {showNegWarn
+          ? '负环警告：当前距离不构成合法最短路（Bellman-Ford / Floyd 检测）。'
+          : ' '}
+      </p>
       <div className="graph-view-toolbar" data-testid="graph-view-toolbar">
         <button
           type="button"

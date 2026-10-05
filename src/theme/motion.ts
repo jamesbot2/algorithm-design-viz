@@ -14,7 +14,7 @@ export const motion = {
     emphasized: 'cubic-bezier(0.2, 0, 0, 1)',
     exit: 'cubic-bezier(0.3, 0, 1, 1)',
     enter: 'cubic-bezier(0, 0, 0, 1)',
-    springy: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+    springy: 'cubic-bezier(0.2, 0, 0, 1)', // V29 M3: no overshoot
   },
 } as const
 

@@ -11,7 +11,8 @@
   --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.3, 0, 1, 1);
   --ease-enter: cubic-bezier(0, 0, 0, 1);
-  --ease-springy: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* V29 M3: neutralize springy overshoot token (prefer standard). */
+  --ease-springy: cubic-bezier(0.2, 0, 0, 1);
   --sem-compare: #f59e0b;
   --sem-swap: #ef4444;
   --sem-focus: #3b82f6;
@@ -102,6 +103,13 @@
 .cell.hl-update {
   animation: arr-update-settle var(--motion-settle) var(--ease-emphasized);
 }
+/* V29 M3: update/write-back ≠ swap colour language */
+.bar.hl-update,
+.cell.hl-update {
+  background: color-mix(in srgb, var(--sem-update) 40%, var(--bg-elev, #2a2a2a));
+  border-color: var(--sem-update);
+}
+
 .bar.anim-swap-nudge,
 .cell.anim-swap-nudge {
   animation: arr-swap-nudge var(--motion-normal) var(--ease-standard);
@@ -149,6 +157,12 @@
   animation: mat-write-flash var(--motion-settle) var(--ease-emphasized);
   background: color-mix(in srgb, var(--sem-update) 35%, var(--bg-elev));
   border-color: var(--sem-update);
+  /* V29 M3: keep border width stable — colour/outline only */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sem-update) 55%, transparent);
+}
+.matrix-table td {
+  border-width: 1px;
+  box-sizing: border-box;
 }
 .matrix-table td.hl-read {
   animation: mat-read-glow var(--motion-pulse) var(--ease-standard) 2;
@@ -189,10 +203,10 @@
 @keyframes edge-scan {
   to { stroke-dashoffset: 0; }
 }
-@keyframes edge-reject-shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  75% { transform: translateX(2px); }
+/* V29 M3: reject = paint mark only — do not shake endpoints / geometry. */
+@keyframes edge-reject-mark {
+  0% { stroke-opacity: 1; filter: brightness(1.15); }
+  100% { stroke-opacity: 0.85; filter: brightness(1); }
 }
 @keyframes neg-cycle-warn {
   0%, 100% { opacity: 1; }
@@ -200,7 +214,8 @@
 }
 
 .graph-svg .node {
-  transition: fill var(--motion-fast), stroke var(--motion-fast), transform var(--motion-normal) var(--ease-emphasized);
+  /* V29 M3: paint-only transitions — no transform (avoids radius/position thrash). */
+  transition: fill var(--motion-fast), stroke var(--motion-fast), stroke-width var(--motion-fast), filter var(--motion-fast);
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -208,7 +223,8 @@
 .graph-svg .node.role-current {
   fill: color-mix(in srgb, var(--sem-focus) 45%, #2a2a2a);
   stroke: var(--sem-focus);
-  animation: node-select-pulse var(--motion-pulse) ease infinite;
+  /* V29 M3: finite pulse — ring/colour, not infinite thrash */
+  animation: node-select-pulse var(--motion-pulse) ease 2;
 }
 .graph-svg .node.role-frontier {
   fill: color-mix(in srgb, var(--sem-frontier) 40%, #2a2a2a);
@@ -227,7 +243,7 @@
 .graph-svg .node.role-neg-cycle {
   fill: color-mix(in srgb, var(--sem-error) 45%, #2a2a2a);
   stroke: var(--sem-error);
-  animation: neg-cycle-warn var(--motion-pulse) ease infinite;
+  animation: neg-cycle-warn var(--motion-pulse) ease 2;
 }
 .graph-svg .edge {
   transition: stroke var(--motion-fast), stroke-width var(--motion-fast);
@@ -236,7 +252,7 @@
 .graph-svg .edge.relaxing {
   stroke-dasharray: 8 6;
   stroke-dashoffset: 28;
-  animation: edge-scan var(--motion-slow) linear infinite;
+  animation: edge-scan var(--motion-slow) linear 1;
 }
 .graph-svg .edge.accepted,
 .graph-svg .edge.tree {
@@ -247,21 +263,32 @@
 .graph-svg .edge.rejected {
   stroke: var(--sem-rejected);
   stroke-dasharray: 4 3;
-  animation: edge-reject-shake var(--motion-fast) ease 2;
+  animation: edge-reject-mark var(--motion-normal) var(--ease-emphasized) 1;
 }
 .graph-svg .edge.path {
   stroke: var(--sem-focus);
   stroke-width: 3.5;
 }
 .graph-neg-warning {
+  /* V29 M3: always reserve banner box so appear/clear does not resize the plot/camera. */
   margin: 0.35rem 0 0;
   padding: 0.4rem 0.65rem;
+  min-height: calc(0.8rem * 1.4 + 0.8rem);
+  box-sizing: border-box;
   border-radius: 8px;
-  background: rgba(239, 68, 68, 0.14);
-  border: 1px solid rgba(239, 68, 68, 0.45);
-  color: #fecaca;
+  background: transparent;
+  border: 1px solid transparent;
+  color: transparent;
   font-size: 0.8rem;
-  animation: neg-cycle-warn var(--motion-pulse) ease infinite;
+  pointer-events: none;
+}
+.graph-neg-warning.is-visible,
+.graph-neg-warning[data-active="1"] {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fecaca;
+  pointer-events: auto;
+  animation: neg-cycle-warn var(--motion-pulse) ease 2; /* finite, not infinite thrash */
 }
 
 /* —— Search tree —— */
@@ -269,8 +296,9 @@
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* V29 M3: prune fades — no subtree scale. */
 @keyframes st-prune {
-  to { opacity: 0.35; transform: scale(0.92); }
+  to { opacity: 0.35; }
 }
 .st-node {
   animation: st-enter var(--motion-normal) var(--ease-enter);
@@ -309,12 +337,11 @@
 }
 
 /* —— Interaction polish —— */
+/* V29 M3: local input error only — 1–2px, single pass; never whole workbench. */
 @keyframes input-shake {
   0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
+  30% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
 }
 @keyframes error-fade-in {
   from { opacity: 0; max-height: 0; margin-top: 0; padding-top: 0; padding-bottom: 0; }

@@ -48,9 +48,9 @@ const ROLE_CLASS: Record<HighlightRole, string> = {
   read: 'hl-read',
   focus: 'hl-focus',
   done: 'hl-done',
-  update: 'hl-swap',
+  update: 'hl-update',
   accepted: 'hl-sorted',
-  rejected: 'hl-swap',
+  rejected: 'hl-read', // V29 M3: not swap language
   pruned: 'hl-read',
   optimal: 'hl-sorted',
 }

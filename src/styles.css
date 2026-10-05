@@ -552,6 +552,8 @@ button.icon-btn {
 .hl-compare, .bar.hl-compare { background: rgba(227, 179, 65, 0.45); border-color: var(--warn); }
 /* V29 M1: no translateY lift — transform reserved for FLIP layer / WAAPI. */
 .hl-swap, .bar.hl-swap { background: rgba(239, 68, 68, 0.4); border-color: var(--danger); }
+.hl-update, .bar.hl-update { background: rgba(249, 115, 22, 0.4); border-color: var(--sem-update, #f97316); }
+.cell.hl-update { background: rgba(249, 115, 22, 0.28); border-color: var(--sem-update, #f97316); }
 .hl-focus, .bar.hl-focus { background: rgba(96, 165, 250, 0.4); border-color: var(--info); }
 .hl-done, .hl-sorted, .bar.hl-done, .bar.hl-sorted { background: rgba(16, 163, 127, 0.35); border-color: var(--good); }
 .hl-pivot, .bar.hl-pivot { background: rgba(167, 139, 250, 0.4); border-color: var(--pivot); }
@@ -610,9 +612,9 @@ button.icon-btn {
   animation: chip-flash 0.55s ease;
 }
 @keyframes chip-flash {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  /* V29 M3: paint-only chip flash — no scale */
+  0% { filter: brightness(1.15); }
+  100% { filter: brightness(1); }
 }
 .var-key { color: var(--muted); font-size: 0.78rem; }
 .var-val { font-family: var(--mono); color: #86efac; font-size: 0.82rem; word-break: break-all; }
@@ -1240,6 +1242,17 @@ button.icon-btn {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--accent, #10a37f);
+}
+/* V29 M3: buffer strip keeps a floor so appear/clear is less likely to steal primary chart height */
+.arrays-panel > .array-buffers {
+  flex: 0 0 auto;
+  min-height: 3.2rem;
+}
+.bar:hover,
+.cell:hover,
+.bar-zero-marker:hover {
+  /* design-system hover may recolour — never nudge geometry of auto-moving glyphs */
+  transform: none !important;
 }
 .array-buffers .array-view-compact .view-toggle {
   display: none;
