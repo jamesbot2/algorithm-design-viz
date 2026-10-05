@@ -1870,14 +1870,14 @@ html, body, #root {
 .code-lang-switch {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   flex: 1 1 auto;
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: thin;
   overscroll-behavior-x: contain;
-  padding: 3px;
+  padding: 2px;
   border: 1px solid var(--border-soft);
   border-radius: 999px;
   background: color-mix(in srgb, var(--bg) 70%, transparent);
@@ -1886,7 +1886,7 @@ html, body, #root {
   flex: 0 0 auto;
   position: relative;
   min-height: 30px;
-  padding: 0.2rem 0.72rem;
+  padding: 0.2rem 0.55rem;
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
@@ -1965,11 +1965,13 @@ html, body, #root {
 /* V28: the code column is often narrow (≈340–470px on desktop splits): compact pills there so
    all languages + 伪代码 stay visible; when the row still overflows, its edges fade to say so */
 .code-browser-head { container-type: inline-size; }
-@container (max-width: 520px) {
-  .code-lang-pill { padding-inline: 0.5rem; }
+/* 600px: covers typical desktop code columns (≈340–580px) so "TypeScript" collapses to "TS"
+   before the row overflows by a few CSS pixels on CI's font stack (V28-09 @1440x900). */
+@container (max-width: 600px) {
+  .code-lang-pill { padding-inline: 0.45rem; }
   .code-lang-pill[data-lang='typescript'] .lang-full { display: none; }
   .code-lang-pill[data-lang='typescript'] .lang-short { display: inline; }
-  .code-copy-btn { padding-inline: 0.6rem; }
+  .code-copy-btn { padding-inline: 0.55rem; }
 }
 .code-lang-switch[data-ovf='end'] { mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
 .code-lang-switch[data-ovf='start'] { mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); }

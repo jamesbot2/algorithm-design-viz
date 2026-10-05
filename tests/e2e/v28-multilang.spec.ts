@@ -277,7 +277,7 @@ test.describe('V28 multi-language code panel', () => {
 
   test('V28-07 first load of a language shows a skeleton (goto disabled), a failed load offers retry @1366x768', async ({ page }) => {
     let mode: 'slow' | 'fail' = 'fail'
-    await page.route(/langs\.generated-[^/?]*\.js(\?.*)?$/, async (route) => {
+    await page.route(/langs\.generated(?:-[^/?]*\.js|\.ts)(\?.*)?$/, async (route) => {
       if (mode === 'fail') return route.abort()
       await new Promise((r) => setTimeout(r, 1500))
       return route.continue()

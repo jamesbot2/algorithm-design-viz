@@ -144,7 +144,7 @@ export function loadAlgoLanguages(
     })
     .catch((err) => {
       inflight.delete(algoId)
-      const url = String(err instanceof Error ? err.message : err).match(/(https?:\/\/\S+?\.js)(?:\?\S*)?\s*$/)?.[1]
+      const url = String(err instanceof Error ? err.message : err).match(/(https?:\/\/\S+?\.(?:js|ts))(?:\?\S*)?\s*$/)?.[1]
       if (url) failedChunk.set(algoId, url)
       throw err
     })
