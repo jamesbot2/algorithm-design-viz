@@ -60,6 +60,7 @@ export function solveMaxSubarrayDC(a: number[]): {
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
     ranges?: { current?: [number, number]; best?: [number, number] },
+    codeRefs: Step['codeRefs'] = ref('base'),
   ) => {
     steps.push({
       id: id++,
@@ -73,13 +74,13 @@ export function solveMaxSubarrayDC(a: number[]): {
       vars,
       result,
       ranges,
-      codeRefs: ref('base'),
+      codeRefs,
     })
   }
 
   if (a.length === 0) {
     const result = { ok: true, best: 0, left: -1, right: -1, method: 'divideConquer' }
-    snap('空数组', [], {}, result)
+    snap('空数组', [], {}, result, undefined, ref('empty'))
     return { result, steps }
   }
 
@@ -120,7 +121,7 @@ export function solveMaxSubarrayDC(a: number[]): {
       return { sum: a[lo]!, left: lo, right: hi }
     }
     const mid = Math.floor((lo + hi) / 2)
-    snap(`分解 [${lo},${hi}] mid=${mid}`, [], { lo, hi, mid }, undefined, { current: [lo, hi] })
+    snap(`分解 [${lo},${hi}] mid=${mid}`, [], { lo, hi, mid }, undefined, { current: [lo, hi] }, ref('divide'))
     const L = maxSub(lo, mid)
     const R = maxSub(mid + 1, hi)
     const C = crossing(lo, mid, hi)
@@ -130,6 +131,7 @@ export function solveMaxSubarrayDC(a: number[]): {
       { lo, hi, mid, leftSum: L.sum, rightSum: R.sum, crossSum: C.sum },
       undefined,
       { current: [lo, hi], best: [C.left, C.right] },
+      [...ref('combine'), { documentId: DOC, anchorId: 'cross', role: 'context' }],
     )
     if (L.sum >= R.sum && L.sum >= C.sum) return L
     if (R.sum >= L.sum && R.sum >= C.sum) return R
@@ -150,6 +152,7 @@ export function solveMaxSubarrayDC(a: number[]): {
     { answer: ans.sum },
     result,
     { current: [ans.left, ans.right], best: [ans.left, ans.right] },
+    ref('done'),
   )
   return { result, steps }
 }

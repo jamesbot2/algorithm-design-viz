@@ -54,7 +54,7 @@ export function generateSteps(
     checking?: string,
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
-    codeRefs?: { documentId: string; anchorId: string }[],
+    codeRefs?: Step['codeRefs'],
   ) => {
     const roles = { ...edgeRoles }
     for (const e of accepted) roles[e] = 'accepted'
@@ -95,7 +95,7 @@ export function generateSteps(
     const eid = undirectedEdgeId(u, v)
     const pu = find(u)
     const pv = find(v)
-    snap(`考察边 ${u}-${v} (w=${w})，根 ${pu} vs ${pv}`, eid, { u, v, w, pu, pv })
+    snap(`考察边 ${u}-${v} (w=${w})，根 ${pu} vs ${pv}`, eid, { u, v, w, pu, pv }, undefined, ref('find'))
     if (pu !== pv) {
       parent[pu] = pv
       mst.push([u, v, w])
@@ -104,11 +104,11 @@ export function generateSteps(
       snap(`加入树/森林，union(${pu},${pv})`, eid, {
         mstSize: mst.length,
         cost: mst.reduce((s, e) => s + e[2], 0),
-      })
+      }, undefined, ref('union'))
     } else {
       rejected.add(eid)
       edgeRoles[eid] = 'rejected'
-      snap(`成环，跳过`, eid, { skipped: `${u}-${v}` })
+      snap(`成环，跳过`, eid, { skipped: `${u}-${v}` }, undefined, ref('skip'))
     }
   }
   const cost = mst.reduce((s, e) => s + e[2], 0)
@@ -123,7 +123,7 @@ export function generateSteps(
       totalWeight: cost,
       connected: true,
       isTree: true,
-    })
+    }, ref('done'))
   } else {
     snap(
       `图不连通：得到最小生成森林（${mst.length} 条边，期望 MST 为 ${n - 1} 条）。总权 = ${cost}。并非单棵生成树。`,
@@ -140,6 +140,7 @@ export function generateSteps(
         connected: false,
         isTree: false,
       },
+      ref('done'),
     )
   }
   return steps

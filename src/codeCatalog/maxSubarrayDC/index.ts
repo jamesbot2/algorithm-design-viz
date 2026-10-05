@@ -16,6 +16,8 @@ export function getMAX_SUBARRAY_DCCatalog(): {
     source: TS_SOURCE,
     sourceHash: MAX_SUBARRAY_DC_TS_HASH,
     anchors: [
+  {"id": "empty", "label": "\u7a7a\u8f93\u5165", "range": {"startLine": 26, "endLine": 26}},
+  {"id": "done", "label": "\u8fd4\u56de", "range": {"startLine": 27, "endLine": 27}},
   {
     "id": "base",
     "label": "递归边界",

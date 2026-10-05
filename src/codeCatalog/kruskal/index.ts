@@ -16,6 +16,7 @@ export function getKRUSKALCatalog(): {
     source: TS_SOURCE,
     sourceHash: KRUSKAL_TS_HASH,
     anchors: [
+  {"id": "done", "label": "\u8fd4\u56de", "range": {"startLine": 20, "endLine": 20}},
   {
     "id": "sort",
     "label": "按权排序",

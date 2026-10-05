@@ -16,6 +16,8 @@ export function getBELLMAN_FORDCatalog(): {
     source: TS_SOURCE,
     sourceHash: BELLMAN_FORD_TS_HASH,
     anchors: [
+  {"id": "round", "label": "\u7b2c i \u8f6e", "range": {"startLine": 11, "endLine": 11}},
+  {"id": "done", "label": "\u8fd4\u56de", "range": {"startLine": 26, "endLine": 26}},
   {
     "id": "init",
     "label": "初始化",

@@ -57,6 +57,7 @@ export function generateSteps(
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
     opts?: { warning?: string; nodeRoles?: Record<string, 'current' | 'frontier' | 'settled' | 'source' | 'target' | 'neg-cycle'> },
+    codeRefs: Step['codeRefs'] = ref('init'),
   ) => {
     const roles = { ...edgeRoles }
     const highlightEdgeIds = checking ? [checking] : []
@@ -77,13 +78,13 @@ export function generateSteps(
         nodeRoles: opts?.nodeRoles,
       },
       result,
-      codeRefs: ref('init'),
+      codeRefs,
     })
   }
 
   snap(`初始化 dist[${start}]=0`, undefined, [start], { start })
   for (let i = 1; i <= n - 1; i++) {
-    snap(`第 ${i} 轮松弛`, undefined, [], { round: i })
+    snap(`第 ${i} 轮松弛`, undefined, [], { round: i }, undefined, undefined, ref('round'))
     for (const [u, v, w] of edgeList) {
       const eid = directedEdgeId(u, v)
       snap(`边 ${u}→${v} (w=${w})`, eid, [u, v], {
@@ -92,12 +93,12 @@ export function generateSteps(
         w,
         dist_u: dist[u] === Infinity ? '∞' : dist[u],
         dist_v: dist[v] === Infinity ? '∞' : dist[v],
-      })
+      }, undefined, undefined, ref('relax'))
       if (dist[u] !== Infinity && dist[u] + w < dist[v]) {
         dist[v] = dist[u] + w
         parent[v] = u
         edgeRoles[eid] = 'relaxing'
-        snap(`更新 dist[${v}] = ${dist[v]}`, eid, [v], { v, newDist: dist[v] })
+        snap(`更新 dist[${v}] = ${dist[v]}`, eid, [v], { v, newDist: dist[v] }, undefined, undefined, [...ref('update'), { documentId: DOC, anchorId: 'relax', role: 'condition' }])
       }
     }
   }
@@ -130,6 +131,7 @@ export function generateSteps(
         warning: 'negative_cycle',
         nodeRoles: { [String(u)]: 'neg-cycle', [String(v)]: 'neg-cycle' },
       },
+      ref('negCycle'),
     )
   } else {
     snap(
@@ -144,6 +146,8 @@ export function generateSteps(
         start,
         negativeCycle: false,
       },
+      undefined,
+      ref('done'),
     )
   }
   return steps

@@ -54,7 +54,7 @@ export function solveMatrixChain(dims: number[]): {
       writes?: [number, number][]
     },
     result?: unknown,
-    codeRefs?: { documentId: string; anchorId: string }[],
+    codeRefs?: Step['codeRefs'],
   ) => {
     steps.push({
       id: id++,
@@ -71,7 +71,7 @@ export function solveMatrixChain(dims: number[]): {
   }
 
   for (let i = 1; i <= n; i++) dp[i]![i] = 0
-  snap(`n=${n} 个矩阵，dims=[${dims.join(',')}]`, { n })
+  snap(`n=${n} 个矩阵，dims=[${dims.join(',')}]`, { n }, undefined, undefined, ref('init'))
 
   for (let len = 2; len <= n; len++) {
     for (let i = 1; i <= n - len + 1; i++) {
@@ -91,6 +91,8 @@ export function solveMatrixChain(dims: number[]): {
             ],
             writes: [[i, j]],
           },
+          undefined,
+          [...ref('cost'), { documentId: DOC, anchorId: 'trySplit', role: 'context' }],
         )
         if (cost < dp[i]![j]!) {
           dp[i]![j] = cost
@@ -100,7 +102,7 @@ export function solveMatrixChain(dims: number[]): {
       snap(`dp[${i}][${j}]=${dp[i]![j]}，最优分裂 k=${split[i]![j]}`, { i, j, k: split[i]![j]! }, {
         current: [i, j],
         writes: [[i, j]],
-      })
+      }, undefined, ref('update'))
     }
   }
 
@@ -117,6 +119,7 @@ export function solveMatrixChain(dims: number[]): {
     { answer: minCost, parenthesization },
     { current: [1, n] },
     result,
+    ref('done'),
   )
   return { result, steps, dp }
 }

@@ -64,7 +64,7 @@ export function generateSteps(
     checking?: string,
     vars: Record<string, string | number | boolean | null> = {},
     result?: unknown,
-    codeRefs?: { documentId: string; anchorId: string }[],
+    codeRefs?: Step['codeRefs'],
   ) => {
     const roles = { ...edgeRoles }
     for (const e of treeEdges) roles[e] = 'tree'
@@ -111,18 +111,18 @@ export function generateSteps(
       treeEdges.add(treeEid)
       edgeRoles[treeEid] = 'tree'
     }
-    snap(`加入顶点 ${u}（key=${key[u]}）`, [u], treeEid, { u })
+    snap(`加入顶点 ${u}（key=${key[u]}）`, [u], treeEid, { u }, undefined, [...ref('add'), { documentId: DOC, anchorId: 'selectMin', role: 'context' }])
     for (const { v, w, id: eid } of adj[u]) {
       snap(`检查边 ${u}-${v} (w=${w})`, [u, v], eid, {
         u,
         v,
         w,
         key_v: key[v] === Infinity ? '∞' : key[v],
-      })
+      }, undefined, ref('relax'))
       if (!inMST[v] && w < key[v]) {
         key[v] = w
         parent[v] = u
-        snap(`更新 key[${v}]=${w}, parent[${v}]=${u}`, [v], eid, { v, key: w })
+        snap(`更新 key[${v}]=${w}, parent[${v}]=${u}`, [v], eid, { v, key: w }, undefined, [...ref('update'), { documentId: DOC, anchorId: 'relax', role: 'condition' }])
       }
     }
   }
@@ -142,7 +142,7 @@ export function generateSteps(
       totalWeight,
       connected: true,
       isTree: true,
-    })
+    }, ref('done'))
   } else {
     snap(
       `图从 ${start} 不连通：仅覆盖 ${added}/${n} 个顶点，无生成树（得到部分树/森林分量）。`,
@@ -160,6 +160,7 @@ export function generateSteps(
         connected: false,
         isTree: false,
       },
+      ref('done'),
     )
   }
   return steps

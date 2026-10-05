@@ -16,6 +16,8 @@ export function getPRIMCatalog(): {
     source: TS_SOURCE,
     sourceHash: PRIM_TS_HASH,
     anchors: [
+  {"id": "update", "label": "\u66f4\u65b0 key", "range": {"startLine": 25, "endLine": 26}},
+  {"id": "done", "label": "\u8fd4\u56de", "range": {"startLine": 32, "endLine": 32}},
   {
     "id": "init",
     "label": "初始化 key",

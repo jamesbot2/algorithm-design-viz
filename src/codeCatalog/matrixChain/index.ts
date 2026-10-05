@@ -16,6 +16,8 @@ export function getMATRIX_CHAINCatalog(): {
     source: TS_SOURCE,
     sourceHash: MATRIX_CHAIN_TS_HASH,
     anchors: [
+  {"id": "init", "label": "\u521d\u59cb\u5316", "range": {"startLine": 4, "endLine": 5}},
+  {"id": "done", "label": "\u8fd4\u56de", "range": {"startLine": 19, "endLine": 19}},
   {
     "id": "lenLoop",
     "label": "链长循环",
