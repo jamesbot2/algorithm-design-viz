@@ -542,13 +542,8 @@ function ArrayView({
       )
       flipAnims.current.set(id, anim)
       started += 1
-      if (!playbackPlayingRef.current) {
-        try {
-          anim.pause()
-        } catch {
-          /* ignore */
-        }
-      }
+      // V29 ship fix: manual Next while paused must run FLIP to finish so data-run-flip
+      // clears (E2E landed()). Pause-freeze is only for mid-flight via playbackPlaying effect.
       anim.addEventListener('finish', () => {
         if (animToken.current !== token || geometryGen.current !== gen) return
         if (layer.dataset.transitionId !== String(transitionId)) return

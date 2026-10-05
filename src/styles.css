@@ -489,8 +489,9 @@ button.icon-btn {
   align-items: flex-end;
   justify-content: center;
   gap: 6px;
-  /* V29 M1: floor from measured chart var so swap height-lerp cannot shrink the track. */
-  min-height: max(180px, var(--bar-chart-h, 180px));
+  /* V29 ship fix: keep static 180px floor — measured --bar-chart-h floor prevented shrink
+   * and clipped primary bars when companions/tree reclaim height. data-flip still snaps heights. */
+  min-height: 180px;
   padding: 0.5rem 0.25rem 0;
   border-radius: 10px;
 }
@@ -1243,10 +1244,9 @@ button.icon-btn {
   font-weight: 600;
   color: var(--accent, #10a37f);
 }
-/* V29 M3: buffer strip keeps a floor so appear/clear is less likely to steal primary chart height */
+/* V29 ship fix: no empty-buffer min-height floor — forced 3.2rem stole primary chart space. */
 .arrays-panel > .array-buffers {
   flex: 0 0 auto;
-  min-height: 3.2rem;
 }
 .bar:hover,
 .cell:hover,

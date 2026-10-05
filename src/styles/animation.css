@@ -270,8 +270,14 @@
   stroke-width: 3.5;
 }
 .graph-neg-warning {
-  /* V29 M3: always reserve banner box so appear/clear does not resize the plot/camera. */
-  margin: 0.35rem 0 0;
+  /* V29 ship fix: overlay (like toolbar) — appear/clear must not steal plot flex height
+   * (E2E requires graph-plot ≥300 @1366 with data open). Camera still stable. */
+  position: absolute;
+  top: 0.2rem;
+  left: 0.35rem;
+  right: 4.5rem; /* leave room for graph-view-toolbar */
+  z-index: 2;
+  margin: 0;
   padding: 0.4rem 0.65rem;
   min-height: calc(0.8rem * 1.4 + 0.8rem);
   box-sizing: border-box;

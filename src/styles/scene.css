@@ -21,6 +21,7 @@
   min-height: 0;
 }
 .stage-viewport[data-primary-scene="graph"] .graph-view > .graph-neg-warning {
+  /* overlayed in animation.css — must not participate in plot flex sizing */
   flex: 0 0 auto;
 }
 /* Companion arrays under a graph stay a compact strip that scrolls itself. */
