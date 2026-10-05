@@ -1,0 +1,219 @@
+/*
+ * V28 "Pro Max" design tokens — dark-first, imported after the legacy sheets so it wins.
+ *
+ * Three layers:
+ *   1. primitives  (--pm-ink-*, --pm-indigo-*, …)   raw palette, never used by components directly
+ *   2. semantic    (--pm-surface-*, --pm-text-*, --pm-accent*, --pm-border*, --pm-state-*)
+ *   3. legacy map  (--bg, --bg-elev, --text, --accent, …) so every pre-V28 rule picks up the system
+ * Plus scales: type (--pm-fs-*), spacing (--pm-space-*), radius (--pm-r-*), elevation
+ * (--pm-elev-*), motion (--pm-dur-*, --pm-ease-*), focus ring (--pm-focus-ring).
+ * Geometry-bearing legacy tokens (--sidebar-w, --radius-sm used by the workbench) keep their
+ * values so the three-pane workbench, mobile tabs and every pinned layout test are unaffected.
+ */
+:root {
+  /* —— primitives —— */
+  --pm-ink-950: #07090d;
+  --pm-ink-900: #0b0e14;
+  --pm-ink-850: #0f131a;
+  --pm-ink-800: #131821;
+  --pm-ink-750: #181e29;
+  --pm-ink-700: #1e2532;
+  --pm-ink-600: #283041;
+  --pm-ink-500: #3a4458;
+  --pm-ink-400: #5b6679;
+  --pm-ink-300: #8b95a7;
+  --pm-ink-200: #b9c1cf;
+  --pm-ink-100: #e3e8f0;
+  --pm-ink-50: #f5f7fb;
+  --pm-indigo-300: #a5b8ff;
+  --pm-indigo-400: #8aa2ff;
+  --pm-indigo-500: #6d87fb;
+  --pm-indigo-600: #5468e8;
+  --pm-violet-400: #b49cff;
+  --pm-violet-500: #9b7bff;
+  --pm-cyan-400: #4fd1e8;
+  --pm-emerald-400: #34d399;
+  --pm-amber-400: #fbbf24;
+  --pm-rose-400: #fb7185;
+
+  /* —— type scale (1.125 minor third around 15px body) —— */
+  --pm-font-sans: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --pm-font-mono: "JetBrains Mono", "SF Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+  --pm-fs-2xs: 0.6875rem;
+  --pm-fs-xs: 0.75rem;
+  --pm-fs-sm: 0.8125rem;
+  --pm-fs-md: 0.9375rem;
+  --pm-fs-lg: 1.0625rem;
+  --pm-fs-xl: 1.25rem;
+  --pm-fs-2xl: 1.625rem;
+  --pm-fs-3xl: clamp(1.75rem, 1.2rem + 1.6vw, 2.625rem);
+  --pm-lh-tight: 1.2;
+  --pm-lh-body: 1.6;
+  --pm-fw-medium: 520;
+  --pm-fw-semibold: 620;
+  --pm-fw-bold: 720;
+  --pm-tracking-tight: -0.015em;
+  --pm-tracking-caps: 0.08em;
+
+  /* —— spacing (4px grid) —— */
+  --pm-space-1: 0.25rem;
+  --pm-space-2: 0.5rem;
+  --pm-space-3: 0.75rem;
+  --pm-space-4: 1rem;
+  --pm-space-5: 1.25rem;
+  --pm-space-6: 1.5rem;
+  --pm-space-8: 2rem;
+  --pm-space-10: 2.5rem;
+  --pm-space-12: 3rem;
+
+  /* —— radius —— */
+  --pm-r-xs: 6px;
+  --pm-r-sm: 8px;
+  --pm-r-md: 12px;
+  --pm-r-lg: 16px;
+  --pm-r-xl: 22px;
+  --pm-r-pill: 999px;
+
+  /* —— motion —— */
+  --pm-dur-fast: 120ms;
+  --pm-dur-base: 180ms;
+  --pm-dur-slow: 280ms;
+  --pm-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --pm-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* —— semantic: dark (default) —— */
+:root,
+[data-lab-theme="lab-dark"] {
+  color-scheme: dark;
+  --pm-canvas: var(--pm-ink-900);
+  --pm-canvas-glow: radial-gradient(1200px 520px at 18% -8%, rgba(109, 135, 251, 0.13), transparent 60%),
+    radial-gradient(900px 480px at 92% -12%, rgba(155, 123, 255, 0.09), transparent 62%);
+  --pm-surface-0: var(--pm-ink-950);
+  --pm-surface-1: var(--pm-ink-850);
+  --pm-surface-2: var(--pm-ink-800);
+  --pm-surface-3: var(--pm-ink-750);
+  --pm-surface-4: var(--pm-ink-700);
+  --pm-surface-glass: rgba(15, 19, 26, 0.72);
+  --pm-border-subtle: rgba(148, 163, 194, 0.10);
+  --pm-border: rgba(148, 163, 194, 0.16);
+  --pm-border-strong: rgba(148, 163, 194, 0.28);
+  --pm-text-1: #eef2f8;
+  --pm-text-2: #b6bfce;
+  --pm-text-3: #8892a4;
+  --pm-text-on-accent: #ffffff;
+  --pm-accent: var(--pm-indigo-500);
+  --pm-accent-strong: var(--pm-indigo-600);
+  --pm-accent-text: var(--pm-indigo-300);
+  --pm-accent-soft: rgba(109, 135, 251, 0.16);
+  --pm-accent-softer: rgba(109, 135, 251, 0.09);
+  --pm-accent-gradient: linear-gradient(135deg, #6d87fb 0%, #8b7bff 55%, #a77bff 100%);
+  --pm-state-hover: rgba(148, 163, 194, 0.08);
+  --pm-state-press: rgba(148, 163, 194, 0.14);
+  --pm-state-selected: rgba(109, 135, 251, 0.18);
+  --pm-success: var(--pm-emerald-400);
+  --pm-warning: var(--pm-amber-400);
+  --pm-danger: var(--pm-rose-400);
+  --pm-info: var(--pm-cyan-400);
+  --pm-elev-1: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 1px 2px rgba(0, 0, 0, 0.35);
+  --pm-elev-2: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 6px 18px -6px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --pm-elev-3: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px -12px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.35);
+  --pm-glow-accent: 0 6px 22px -6px rgba(109, 135, 251, 0.55);
+  --pm-focus-ring: 0 0 0 2px var(--pm-canvas), 0 0 0 4px rgba(138, 162, 255, 0.85);
+
+  /* —— legacy map (pre-V28 rules read these) —— */
+  --lab-bg: var(--pm-canvas);
+  --lab-surface: var(--pm-surface-2);
+  --lab-accent: var(--pm-accent);
+  --sidebar: var(--pm-surface-1);
+  --bg: var(--pm-canvas);
+  --bg-elev: var(--pm-surface-2);
+  --bg-soft: var(--pm-surface-4);
+  --bg-hover: var(--pm-ink-600);
+  --bg-input: var(--pm-surface-1);
+  --panel: var(--pm-surface-2);
+  --text: var(--pm-text-1);
+  --muted: var(--pm-text-2);
+  --muted-2: var(--pm-text-3);
+  --accent: var(--pm-accent);
+  --accent-hover: var(--pm-indigo-400);
+  --accent-soft: var(--pm-accent-soft);
+  --border: var(--pm-border-strong);
+  --border-soft: var(--pm-border);
+  --good: var(--pm-success);
+  --warn: var(--pm-warning);
+  --danger: var(--pm-danger);
+  --info: var(--pm-info);
+  --shadow: var(--pm-elev-1);
+  --radius: var(--pm-r-lg);
+  --font: var(--pm-font-sans);
+  --mono: var(--pm-font-mono);
+  --transition: var(--pm-dur-base) var(--pm-ease-out);
+}
+
+/* —— semantic: light —— */
+[data-lab-theme="lab-light"] {
+  color-scheme: light;
+  --pm-canvas: #f4f6fb;
+  --pm-canvas-glow: radial-gradient(1200px 520px at 18% -8%, rgba(84, 104, 232, 0.10), transparent 60%),
+    radial-gradient(900px 480px at 92% -12%, rgba(155, 123, 255, 0.08), transparent 62%);
+  --pm-surface-0: #eef1f7;
+  --pm-surface-1: #f8f9fc;
+  --pm-surface-2: #ffffff;
+  --pm-surface-3: #f7f8fc;
+  --pm-surface-4: #eceff6;
+  --pm-surface-glass: rgba(255, 255, 255, 0.78);
+  --pm-border-subtle: rgba(30, 41, 70, 0.07);
+  --pm-border: rgba(30, 41, 70, 0.12);
+  --pm-border-strong: rgba(30, 41, 70, 0.22);
+  --pm-text-1: #141826;
+  --pm-text-2: #4d566a;
+  --pm-text-3: #6b7489;
+  --pm-accent: var(--pm-indigo-600);
+  --pm-accent-strong: #4253cf;
+  --pm-accent-text: #3f51d6;
+  --pm-accent-soft: rgba(84, 104, 232, 0.12);
+  --pm-accent-softer: rgba(84, 104, 232, 0.06);
+  --pm-accent-gradient: linear-gradient(135deg, #5468e8 0%, #7a64f0 60%, #9161ef 100%);
+  --pm-state-hover: rgba(30, 41, 70, 0.05);
+  --pm-state-press: rgba(30, 41, 70, 0.09);
+  --pm-state-selected: rgba(84, 104, 232, 0.12);
+  --pm-success: #059669;
+  --pm-warning: #b45309;
+  --pm-danger: #dc2626;
+  --pm-info: #0e7490;
+  --pm-elev-1: 0 1px 2px rgba(20, 24, 38, 0.06);
+  --pm-elev-2: 0 6px 18px -8px rgba(20, 24, 38, 0.18), 0 2px 4px rgba(20, 24, 38, 0.05);
+  --pm-elev-3: 0 18px 40px -14px rgba(20, 24, 38, 0.25), 0 4px 10px rgba(20, 24, 38, 0.06);
+  --pm-glow-accent: 0 6px 20px -8px rgba(84, 104, 232, 0.5);
+  --pm-focus-ring: 0 0 0 2px var(--pm-canvas), 0 0 0 4px rgba(84, 104, 232, 0.75);
+
+  --lab-bg: var(--pm-canvas);
+  --lab-surface: var(--pm-surface-2);
+  --lab-accent: var(--pm-accent);
+  --sidebar: var(--pm-surface-1);
+  --bg: var(--pm-canvas);
+  --bg-elev: var(--pm-surface-2);
+  --bg-soft: var(--pm-surface-4);
+  --bg-hover: #e2e7f1;
+  --bg-input: var(--pm-surface-1);
+  --panel: var(--pm-surface-2);
+  --text: var(--pm-text-1);
+  --muted: var(--pm-text-2);
+  --muted-2: var(--pm-text-3);
+  --accent: var(--pm-accent);
+  --accent-hover: var(--pm-accent-strong);
+  --accent-soft: var(--pm-accent-soft);
+  --border: var(--pm-border-strong);
+  --border-soft: var(--pm-border);
+  --danger: var(--pm-danger);
+  --shadow: var(--pm-elev-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pm-dur-fast: 0ms;
+    --pm-dur-base: 0ms;
+    --pm-dur-slow: 0ms;
+  }
+}

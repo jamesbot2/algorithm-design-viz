@@ -6,6 +6,8 @@ import './styles.css'
 import './styles/animation.css'
 import './styles/scene.css'
 import './styles/layout.css'
+import './styles/tokens.css'
+import './styles/promax.css'
 import * as strictGraphVisibility from './utils/strictGraphVisibility'
 
 // V16-03: single detector bridge for E2E + DOM (fault inject mutates page only)
