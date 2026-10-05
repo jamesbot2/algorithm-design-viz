@@ -56,23 +56,49 @@ export interface GeneratedLangDoc {
 type Loader = () => Promise<{ default: GeneratedLangDoc[] }>
 
 /**
- * Algorithms (catalog ids) whose five non-TS documents exist. Keys are catalog ids as used by
- * getCatalog(); several ids may share one loader (e.g. aliases).
+ * Every `<dir>/langs.generated.ts` (one lazy chunk each). `dir` is the catalog directory:
+ * an algorithm id (`lcs`) or a nested strategy (`knapsack/dp2d`).
  */
-const LOADERS: Readonly<Record<string, Loader>> = {
-  lcs: () => import('./lcs/langs.generated'),
-  kmp: () => import('./kmp/langs.generated'),
-  floyd: () => import('./floyd/langs.generated'),
+const CHUNKS = import.meta.glob<{ default: GeneratedLangDoc[] }>('./**/langs.generated.ts')
+
+/** Catalog ids whose directory name differs from the id (aliases share one chunk). */
+const DIR_ALIAS: Readonly<Record<string, string>> = {
+  knapsack01: 'knapsack/dp2d',
+  'knapsack.dp2d': 'knapsack/dp2d',
+  'knapsack.dp1dCorrect': 'knapsack/dp1dCorrect',
+  'knapsack.dp1dWrong': 'knapsack/dp1dWrong',
+  'knapsack.brute': 'knapsack/brute',
+  'knapsack.bruteForce': 'knapsack/brute',
+  'knapsack.backtracking': 'knapsack/backtracking',
+  'knapsack.branchAndBound': 'knapsack/branchAndBound',
+  'knapsack.greedy': 'knapsack/greedy',
 }
 
-export function multiLanguageAlgoIds(): string[] {
-  return Object.keys(LOADERS)
+/** Catalog directory of an algorithm id (or null when it has no multi-language documents). */
+export function languageDirOf(algoId: string | null | undefined): string | null {
+  if (!algoId) return null
+  const dir = DIR_ALIAS[algoId] ?? algoId
+  return CHUNKS[`./${dir}/langs.generated.ts`] ? dir : null
 }
+
+function loaderOf(algoId: string): Loader | null {
+  const dir = languageDirOf(algoId)
+  return dir ? (CHUNKS[`./${dir}/langs.generated.ts`] as Loader) : null
+}
+
+/** Catalog directories that ship the five non-TS documents. */
+export function multiLanguageDirs(): string[] {
+  return Object.keys(CHUNKS)
+    .map((k) => k.replace(/^\.\//, '').replace(/\/langs\.generated\.ts$/, ''))
+    .sort()
+}
+
+/** @deprecated name kept for callers/tests: same as multiLanguageDirs(). */
+export const multiLanguageAlgoIds = multiLanguageDirs
 
 /** Languages the code panel can show for this catalog id (TypeScript always first). */
 export function availableLanguages(algoId: string | null | undefined): CodeLanguage[] {
-  if (algoId && LOADERS[algoId]) return [...CODE_LANGUAGES]
-  return ['typescript']
+  return languageDirOf(algoId) ? [...CODE_LANGUAGES] : ['typescript']
 }
 
 const cache = new Map<string, Map<LazyLanguage, CodeDocument>>()
@@ -100,7 +126,7 @@ export function loadAlgoLanguages(
   if (hit) return Promise.resolve(hit)
   const pending = inflight.get(algoId)
   if (pending) return pending
-  const loader = LOADERS[algoId]
+  const loader = loaderOf(algoId)
   if (!loader) return Promise.resolve(new Map())
   // Browsers cache a failed dynamic import per URL (a plain retry would fail again without a
   // request), so a retry after a fetch failure re-imports the same chunk with a cache-busting query.
