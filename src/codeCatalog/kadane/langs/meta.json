@@ -1,0 +1,2 @@
+{ "algo": "kadane", "idPrefix": "kadane", "titleBase": "Kadane 最大子数组",
+  "files": { "python": "kadane.py", "cpp": "kadane.cpp", "java": "Kadane.java", "rust": "kadane.rs", "go": "kadane.go" } }

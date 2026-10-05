@@ -1,0 +1,2 @@
+{ "algo": "bubbleSort", "idPrefix": "bubbleSort", "titleBase": "冒泡排序",
+  "files": { "python": "bubble_sort.py", "cpp": "bubble_sort.cpp", "java": "BubbleSort.java", "rust": "bubble_sort.rs", "go": "bubble_sort.go" } }

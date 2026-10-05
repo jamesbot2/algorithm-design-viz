@@ -157,9 +157,11 @@ describe('V28 code browser language switching', () => {
   it('an algorithm without that language shows TypeScript with an honest notice, and keeps the preference', async () => {
     localStorage.setItem(CODE_LANGUAGE_STORAGE_KEY, 'go')
     __reloadCodeLanguageForTests()
+    // Since V28 Phase 3 every shipped catalog has six languages; an id without a language chunk
+    // (e.g. a future algorithm that only ships TypeScript) still takes this path.
     const bubble = getCatalog('bubbleSort')!
     const s = getAlgo('bubbleSort')!.solve!({} as never).trace.steps[1] as Step
-    render(wrap({ algoId: 'bubbleSort', documents: bubble, ...stepProps(s) }))
+    render(wrap({ algoId: 'tsOnlyAlgorithm', documents: bubble, ...stepProps(s) }))
     expect(screen.getByTestId('code-lang-fallback').textContent).toMatch(/Go/)
     expect(root().getAttribute('data-language')).toBe('typescript')
     expect(cmWrap().getAttribute('data-cm-doc')).toBe(bubble.typescript.documentId)

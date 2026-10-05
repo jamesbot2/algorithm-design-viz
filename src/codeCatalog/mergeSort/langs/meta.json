@@ -1,0 +1,2 @@
+{ "algo": "mergeSort", "idPrefix": "mergeSort", "titleBase": "归并排序",
+  "files": { "python": "merge_sort.py", "cpp": "merge_sort.cpp", "java": "MergeSort.java", "rust": "merge_sort.rs", "go": "merge_sort.go" } }

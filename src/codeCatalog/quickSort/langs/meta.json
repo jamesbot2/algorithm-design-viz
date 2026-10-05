@@ -1,0 +1,2 @@
+{ "algo": "quickSort", "idPrefix": "quickSort", "titleBase": "快速排序",
+  "files": { "python": "quick_sort.py", "cpp": "quick_sort.cpp", "java": "QuickSort.java", "rust": "quick_sort.rs", "go": "quick_sort.go" } }

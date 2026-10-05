@@ -86,7 +86,7 @@ describe('V28 generated language documents', () => {
     }
   })
 
-  it('registry: six languages for LCS/KMP/Floyd, TypeScript only elsewhere; lazy docs load with labels', async () => {
+  it('registry: six languages for LCS/KMP/Floyd, TypeScript only for ids without a language chunk; lazy docs load with labels', async () => {
     for (const a of ALGOS) {
       expect(availableLanguages(a)).toEqual([...CODE_LANGUAGES])
       const docs = docsOf[a]!
@@ -99,7 +99,7 @@ describe('V28 generated language documents', () => {
         for (const an of d.anchors) expect(an.label.length).toBeGreaterThan(0)
       }
     }
-    expect(availableLanguages('bubbleSort')).toEqual(['typescript'])
+    expect(availableLanguages('tsOnlyAlgorithm')).toEqual(['typescript'])
     expect(availableLanguages(undefined)).toEqual(['typescript'])
   })
 

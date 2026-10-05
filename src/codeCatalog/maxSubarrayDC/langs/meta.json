@@ -1,0 +1,2 @@
+{ "algo": "maxSubarrayDC", "idPrefix": "maxSubarrayDC", "titleBase": "最大子数组分治",
+  "files": { "python": "max_subarray_dc.py", "cpp": "max_subarray_dc.cpp", "java": "MaxSubarrayDC.java", "rust": "max_subarray_dc.rs", "go": "max_subarray_dc.go" } }

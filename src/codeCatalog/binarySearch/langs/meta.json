@@ -1,0 +1,2 @@
+{ "algo": "binarySearch", "idPrefix": "binarySearch", "titleBase": "二分查找 · 最左匹配",
+  "files": { "python": "binary_search.py", "cpp": "binary_search.cpp", "java": "BinarySearch.java", "rust": "binary_search.rs", "go": "binary_search.go" } }

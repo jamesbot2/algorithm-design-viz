@@ -1,0 +1,2 @@
+{ "algo": "insertionSort", "idPrefix": "insertionSort", "titleBase": "插入排序",
+  "files": { "python": "insertion_sort.py", "cpp": "insertion_sort.cpp", "java": "InsertionSort.java", "rust": "insertion_sort.rs", "go": "insertion_sort.go" } }
