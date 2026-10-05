@@ -1,0 +1,2 @@
+{ "algo": "knapsack/dp2d", "idPrefix": "knapsack.dp2d", "titleBase": "0-1 背包 DP 二维",
+  "files": { "python": "knapsack_dp2d.py", "cpp": "knapsack_dp2d.cpp", "java": "KnapsackDp2d.java", "rust": "knapsack_dp2d.rs", "go": "knapsack_dp2d.go" } }

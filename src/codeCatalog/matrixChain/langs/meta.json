@@ -1,0 +1,2 @@
+{ "algo": "matrixChain", "idPrefix": "matrixChain", "titleBase": "矩阵链乘",
+  "files": { "python": "matrix_chain.py", "cpp": "matrix_chain.cpp", "java": "MatrixChain.java", "rust": "matrix_chain.rs", "go": "matrix_chain.go" } }

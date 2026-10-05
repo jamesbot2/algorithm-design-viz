@@ -13,6 +13,12 @@ import * as quickAlgo from '../src/algorithms/quickSort'
 import * as binarySearchAlgo from '../src/algorithms/binarySearch'
 import * as kadaneAlgo from '../src/algorithms/kadane'
 import * as maxSubDcAlgo from '../src/algorithms/maxSubarrayDC'
+import * as nQueensAlgo from '../src/algorithms/nQueens'
+import * as editAlgo from '../src/algorithms/editDistance'
+import * as mcAlgo from '../src/algorithms/matrixChain'
+import * as huffmanAlgo from '../src/algorithms/huffman'
+import * as activityAlgo from '../src/algorithms/activitySelection'
+import * as knapsack01Algo from '../src/algorithms/knapsack01'
 
 export type Case = { name: string; stdin: string; expected: string }
 const INF = Infinity
@@ -113,6 +119,85 @@ function maxSubDcCases(): Case[] {
   })
 }
 
+function nQueensCases(): Case[] {
+  return [1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
+    const r = nQueensAlgo.generateSteps([], n, 'all').at(-1)!.result as { solutions: number[][]; complete: boolean; truncated: boolean }
+    if (!r.complete || r.truncated) throw new Error(`nQueens n=${n}: solver result incomplete`)
+    return { name: `n=${n}`, stdin: `${n}\n`, expected: [String(r.solutions.length), ...r.solutions.map((x) => x.join(' '))].join('\n') }
+  })
+}
+
+function editCases(): Case[] {
+  const pairs: [string, string][] = [
+    [editAlgo.meta.defaultA, editAlgo.meta.defaultB], ['', ''], ['', 'abc'], ['abc', ''], ['a', 'a'], ['a', 'b'],
+    ['horse', 'ros'], ['intention', 'execution'], ['abc', 'abc'], ['abcdef', 'azced'], ['sunday', 'saturday'],
+  ]
+  return pairs.map(([a, b]) => {
+    const r = editAlgo.generateSteps([], a, b).at(-1)!.result as { distance: number }
+    return { name: `a="${a}" b="${b}"`, stdin: `${a}\n${b}\n`, expected: String(r.distance) }
+  })
+}
+
+function matrixChainCases(): Case[] {
+  const ds: number[][] = [
+    mcAlgo.meta.defaultDims, [5, 10], [10, 20, 30], [10, 10, 10, 10], [40, 20, 30, 10, 30], [1, 2, 3, 4, 3],
+    [30, 35, 15, 5, 10, 20, 25], [5, 4, 3, 2, 1],
+  ]
+  return ds.map((d) => {
+    const r = mcAlgo.generateSteps([], d).at(-1)!.result as { minCost: number; parenthesization: string }
+    return { name: `dims=[${d}]`, stdin: `${d.join(' ')}\n`, expected: `${r.minCost}\n${r.parenthesization}` }
+  })
+}
+
+/**
+ * Huffman: WPL always; the full code table only when no two weights tie at any merge (tie order is
+ * an implementation choice: the app breaks ties by node id, the references keep a stable sort).
+ */
+function huffmanCases(): Case[] {
+  const cs: [string[], number[]][] = [
+    [huffmanAlgo.meta.defaultSymbols, huffmanAlgo.meta.defaultFreqs], [['a'], [7]], [['a', 'b'], [1, 2]],
+    [['a', 'b', 'c'], [1, 2, 4]], [['x', 'y', 'z', 'w'], [10, 20, 40, 80]], [['a', 'b', 'c', 'd'], [1, 1, 1, 1]],
+    [['p', 'q', 'r', 's', 't', 'u'], [45, 13, 12, 16, 9, 5]], [['a', 'b', 'c', 'd', 'e'], [3, 3, 3, 3, 3]],
+  ]
+  return cs.map(([sym, fr]) => {
+    const steps = huffmanAlgo.generateSteps([], sym, fr)
+    const r = steps.at(-1)!.result as { wpl: number; codes: Record<string, string> }
+    const weights = [...fr, ...steps.map((s) => s.vars?.merged).filter((x): x is number => typeof x === 'number')]
+    const tieFree = new Set(weights).size === weights.length
+    const table = Object.entries(r.codes).sort(([a], [b]) => (a < b ? -1 : 1)).map(([s, c]) => `${s}=${c}`).join(' ')
+    return {
+      name: `${sym.map((s, i) => `${s}:${fr[i]}`).join(',')}${tieFree ? '' : ' (ties: WPL only)'}`,
+      stdin: `${sym.join(' ')}\n${fr.join(' ')}\n${tieFree ? 'codes' : 'wpl'}\n`,
+      expected: tieFree ? `${r.wpl}\n${table}` : String(r.wpl),
+    }
+  })
+}
+
+/** activity selection: expected = the `selected` list in the generator's final frame */
+function activityCases(): Case[] {
+  const cs: [number[], number[]][] = [
+    [activityAlgo.meta.defaultStarts, activityAlgo.meta.defaultEnds], [[0], [1]], [[1, 2, 3], [2, 3, 4]],
+    [[0, 0, 0], [5, 5, 5]], [[1, 3, 0, 5, 3, 5, 6, 8, 8, 2, 12], [4, 5, 6, 7, 9, 9, 10, 11, 12, 14, 16]], [[5, 1], [6, 2]],
+    [[1, 1, 2], [3, 2, 3]],
+  ]
+  return cs.map(([st, en]) => {
+    const sel = activityAlgo.generateSteps([], st, en).at(-1)!.arrays!.selected as string[]
+    return { name: `starts=[${st}] ends=[${en}]`, stdin: `${st.join(' ')}\n${en.join(' ')}\n`, expected: sel.join(' ') }
+  })
+}
+
+function knapsackDp2dCases(): Case[] {
+  const cs: [number[], number[], number][] = [
+    [knapsack01Algo.meta.defaultWeights, knapsack01Algo.meta.defaultValues, knapsack01Algo.meta.defaultCapacity],
+    [[1], [1], 0], [[1], [1], 1], [[5], [10], 4], [[1, 3, 4, 5], [1, 4, 5, 7], 7], [[2, 2, 2], [3, 3, 3], 5],
+    [[10, 20, 30], [60, 100, 120], 50], [[3, 4, 5], [30, 50, 60], 8],
+  ]
+  return cs.map(([w, v, W]) => {
+    const r = knapsack01Algo.generateSteps([], w, v, W).at(-1)!.result as { maxValue: number }
+    return { name: `w=[${w}] v=[${v}] W=${W}`, stdin: `${W}\n${w.join(' ')}\n${v.join(' ')}\n`, expected: String(r.maxValue) }
+  })
+}
+
 export const CASES: Record<string, () => Case[]> = {
   lcs: lcsCases,
   kmp: kmpCases,
@@ -124,4 +209,10 @@ export const CASES: Record<string, () => Case[]> = {
   binarySearch: binarySearchCases,
   kadane: kadaneCases,
   maxSubarrayDC: maxSubDcCases,
+  nQueens: nQueensCases,
+  editDistance: editCases,
+  matrixChain: matrixChainCases,
+  huffman: huffmanCases,
+  activitySelection: activityCases,
+  'knapsack/dp2d': knapsackDp2dCases,
 }

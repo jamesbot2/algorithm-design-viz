@@ -1,0 +1,2 @@
+{ "algo": "editDistance", "idPrefix": "editDistance", "titleBase": "编辑距离",
+  "files": { "python": "edit_distance.py", "cpp": "edit_distance.cpp", "java": "EditDistance.java", "rust": "edit_distance.rs", "go": "edit_distance.go" } }

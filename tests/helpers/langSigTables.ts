@@ -15,6 +15,17 @@ import * as quickAlgo from '../../src/algorithms/quickSort'
 import * as binarySearchAlgo from '../../src/algorithms/binarySearch'
 import * as kadaneAlgo from '../../src/algorithms/kadane'
 import * as maxSubDcAlgo from '../../src/algorithms/maxSubarrayDC'
+import * as nQueensAlgo from '../../src/algorithms/nQueens'
+import * as editAlgo from '../../src/algorithms/editDistance'
+import * as mcAlgo from '../../src/algorithms/matrixChain'
+import * as huffmanAlgo from '../../src/algorithms/huffman'
+import * as activityAlgo from '../../src/algorithms/activitySelection'
+import * as knapsack01Algo from '../../src/algorithms/knapsack01'
+import { getAlgo } from '../../src/algorithms/registry'
+
+/** the page's default trace (registry solve with default input) */
+export const defaultTrace = (id: string) => ({ name: 'default', steps: getAlgo(id as never)!.solve!({} as never).trace.steps as Step[] })
+const PUSH = '(push|append|add|push_back)'
 
 /** `return x` / Rust tail expression `x` */
 export const ret = (x: string) => new RegExp(`^(return)?${x};?$`)
@@ -149,5 +160,90 @@ export const P3: Record<string, P3Algo> = {
       },
     },
     traces: () => [KADANE_DEFAULT, [3], [1, -2], [-1, -2, -3]].map((a) => ({ name: `[${a}]`, steps: maxSubDcAlgo.generateSteps(a) })),
+  },
+  nQueens: {
+    algoId: 'nQueens',
+    sig: {
+      anchors: {
+        conflict: /^if\(?c===?col(\|\||or).*(abs\(c-col\)|\(c-col\)\.abs\(\)).*===?\(?row-r\)?(asi32)?.*return(false|False)/,
+        call: /dfs.*\(.*row/,
+        solution: new RegExp(`${PUSH}\\(cols(\\.slice\\(\\)|\\[:\\]|\\.clone\\(\\))?\\)|append\\(solutions,append\\(\\[\\]int\\(nil\\),cols\\.\\.\\.\\)\\)`),
+        place: /^cols\[row\]=col;?$/,
+        recurse: /^dfs\(row\+1(,.*)?\);?$/,
+        backtrack: /^cols\[row\]=-1;?$/,
+        done: /^(return)?(s\.)?solutions;?$/,
+        return: /^(return)?(s\.)?solutions;?$/,
+      },
+    },
+    traces: () => [defaultTrace('nQueens'), ...[1, 2, 3].map((n) => ({ name: `n=${n}`, steps: nQueensAlgo.generateSteps([], n, 'all') }))],
+  },
+  editDistance: {
+    algoId: 'editDistance',
+    sig: {
+      anchors: {
+        init: /dp\[i\]\[0\]=i/,
+        equal: /^if\(?(a\[i-1\]===?b\[j-1\]|a\.charAt\(i-1\)==b\.charAt\(j-1\)|ra\[i-1\]==rb\[j-1\])\)?.*dp\[i\]\[j\]=dp\[i-1\]\[j-1\]/,
+        replace: /^dp\[i\]\[j\]=1\+(?=.*min)(?=.*dp\[i-1\]\[j\])(?=.*dp\[i\]\[j-1\])(?=.*dp\[i-1\]\[j-1\])/,
+        done: /^(return)?dp\[m\]\[n\];?$/,
+        return: /^(return)?dp\[m\]\[n\];?$/,
+      },
+    },
+    traces: () => [defaultTrace('editDistance'), ...([['', 'ab'], ['a', 'a'], ['ab', 'ba']] as const).map(([a, b]) => ({ name: `${a}/${b}`, steps: editAlgo.generateSteps([], a, b) }))],
+  },
+  matrixChain: {
+    algoId: 'matrixChain',
+    sig: {
+      anchors: {
+        init: /^(?=.*dp(:|=|\(|\[|:=))(?=.*split)/,
+        lenLoop: /^for\(?(let|int)?(len|length)(=|:=|in)(range\()?2/,
+        trySplit: /^for\(?(let|int)?k(=|:=|in)(i|range\(i)/,
+        cost: /cost:?=dp\[i\]\[k\]\+dp\[k\+1\]\[j\]\+dims\[i\]\*dims\[k\+1\]\*dims\[j\+1\]/,
+        update: /^if\(?cost<dp\[i\]\[j\]\)?/,
+        done: /dp\[0\]\[n-1\]/,
+      },
+    },
+    traces: () => [defaultTrace('matrixChain'), ...[[5, 10], [10, 20, 30], [40, 20, 30, 10, 30]].map((d) => ({ name: `[${d}]`, steps: mcAlgo.generateSteps([], d) }))],
+  },
+  huffman: {
+    algoId: 'huffman',
+    sig: {
+      anchors: {
+        init: /^(?=.*nodes)(?=.*symbols)(?=.*freq)/,
+        sort: /^(nodes\.sort|std::stable_sort\(nodes|sort\.SliceStable\(nodes).*freq/i,
+        merge: new RegExp(`${PUSH}\\(.*(a\\.|a->)freq\\+(b\\.|b->)freq.*a.*b`, 'i'),
+        done: /^(return)?(nodes\[0\]|nodes\.get\(0\)|nodes\.pop\(\));?$/,
+      },
+    },
+    traces: () => [
+      defaultTrace('huffman'),
+      ...([[['a'], [3]], [['a', 'b'], [1, 2]], [['a', 'b', 'c', 'd'], [1, 1, 1, 1]], [[], []]] as [string[], number[]][]).map(([s, f]) => ({ name: `${s}`, steps: huffmanAlgo.generateSteps([], s, f) })),
+    ],
+  },
+  activitySelection: {
+    algoId: 'activitySelection',
+    sig: {
+      anchors: {
+        sort: /sort.*finish/i,
+        check: /^if\(?act\.(start|Start)(\(\))?>=last_?[fF]inish\)?/,
+        pick: new RegExp(`${PUSH}\\(.*act\\.(id|ID)(\\(\\)|\\.clone\\(\\))?\\)`),
+        done: ret('picked'),
+      },
+    },
+    traces: () => [defaultTrace('activitySelection'), ...([[[0], [1]], [[0, 0, 0], [5, 5, 5]], [[5, 1], [6, 2]]] as [number[], number[]][]).map(([a, b]) => ({ name: `${a}/${b}`, steps: activityAlgo.generateSteps([], a, b) }))],
+  },
+  'knapsack/dp2d': {
+    algoId: 'knapsack01',
+    sig: {
+      anchors: {
+        init: /dp.*(W|cap)\+1/,
+        fill: /^dp\[i\]\[w\]=dp\[i-1\]\[w\];?$/,
+        take: /take:?=dp\[i-1\]\[w-wt\]\+val;?$/,
+        takeWrite: /^if\(?take>dp\[i\]\[w\]\)?.*dp\[i\]\[w\]=take/,
+        reconstruct: new RegExp(`${PUSH}\\((selected,)?i-1\\)`),
+        done: /dp\[n\]\[(W|cap)\]/,
+        return: /dp\[n\]\[(W|cap)\]/,
+      },
+    },
+    traces: () => [defaultTrace('knapsack01'), ...([[[1], [1], 0], [[5], [10], 4], [[2, 2, 2], [3, 3, 3], 5]] as [number[], number[], number][]).map(([w, v, W]) => ({ name: `W=${W}`, steps: knapsack01Algo.generateSteps([], w, v, W) }))],
   },
 }

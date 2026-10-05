@@ -137,4 +137,28 @@ describe('V28 P3 controls through the same detector', () => {
     const bad = rebind(c, 'swap', lineOf(c, /if \(arr\[j\] > arr\[j \+ 1\]\)/))
     expect(docFailures(ts, bad, P3.bubbleSort!.sig).join('\n')).toMatch(/collapse/)
   })
+  it('editDistance python: replace bound to the match write dp[i][j] = dp[i-1][j-1] → signature + depth fail', () => {
+    const [ts, py] = [docsOf.editDistance![0]!, docsOf.editDistance!.find((x) => x.language === 'python')!]
+    const bad = rebind(py, 'replace', lineOf(py, /dp\[i\]\[j\] = dp\[i - 1\]\[j - 1\]$/))
+    const f = docFailures(ts, bad, P3.editDistance!.sig).join('\n')
+    expect(f).toMatch(/"replace" does not match/)
+    const steps = P3.editDistance!.traces()[0]!.steps.filter((s) => pickPrimaryCodeRef(s)?.anchorId === 'replace')
+    expect(steps.length).toBe(35)
+    expect(steps.every((s) => frameFailures(bad, s, P3.editDistance!.sig).length > 0)).toBe(true)
+  })
+  it('nQueens go: backtrack bound to the place line → collapse + signature fail', () => {
+    const [ts, g] = [docsOf.nQueens![0]!, docsOf.nQueens!.find((x) => x.language === 'go')!]
+    const bad = rebind(g, 'backtrack', lineOf(g, /cols\[row\] = col\b/))
+    const f = docFailures(ts, bad, P3.nQueens!.sig).join('\n')
+    expect(f).toMatch(/"backtrack" does not match/)
+    expect(f).toMatch(/"place" and "backtrack" collapse|"backtrack" and "place" collapse/)
+  })
+  it('knapsack dp2d java: takeWrite dropped → every takeWrite frame fails', () => {
+    const [ts, j] = [docsOf['knapsack/dp2d']![0]!, docsOf['knapsack/dp2d']!.find((x) => x.language === 'java')!]
+    const bad = rebind(j, 'takeWrite', 0)
+    expect(docFailures(ts, bad, P3['knapsack/dp2d']!.sig).join('\n')).toMatch(/"takeWrite" missing/)
+    const steps = P3['knapsack/dp2d']!.traces()[0]!.steps.filter((s) => pickPrimaryCodeRef(s)?.anchorId === 'takeWrite')
+    expect(steps.length).toBe(18)
+    expect(steps.every((s) => frameFailures(bad, s, P3['knapsack/dp2d']!.sig).length > 0)).toBe(true)
+  })
 })

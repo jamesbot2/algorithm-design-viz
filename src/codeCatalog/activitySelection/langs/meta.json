@@ -1,0 +1,2 @@
+{ "algo": "activitySelection", "idPrefix": "activitySelection", "titleBase": "活动选择",
+  "files": { "python": "activity_selection.py", "cpp": "activity_selection.cpp", "java": "ActivitySelection.java", "rust": "activity_selection.rs", "go": "activity_selection.go" } }

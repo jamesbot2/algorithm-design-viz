@@ -51,7 +51,7 @@ const FN: Record<Lang, RegExp> = {
   typescript: /^\s*(export\s+)?(async\s+)?function\b|=>\s*\{\s*$|^\s*(const|let)\s+\w+\s*=\s*(\([^)]*\)|\w+)\s*(:[^=]*)?=>/,
   python: /^\s*def\s/,
   cpp: /^\s*(?!(?:if|for|while|switch|else|return|do)\b)[\w:<>,*&\s]+?[\s*&]\**&?(?!(?:if|for|while|switch)\b)\w+\s*\([^;]*\)\s*(const\s*)?\{\s*$|\]\s*\([^)]*\)\s*(mutable\s*)?(->\s*[\w:<>\s]+?)?\{\s*$/,
-  java: /^\s*(?:(?:public|private|protected|static|final)\s+)+[\w<>\[\],.\s]+\s+\w+\s*\([^;]*\)\s*(throws\s[\w,\s]+)?\{\s*$/,
+  java: /^\s*(?:(?:public|private|protected|static|final)\s+)+[\w<>[\],.\s]+\s+\w+\s*\([^;]*\)\s*(throws\s[\w,\s]+)?\{\s*$/,
   rust: /^\s*(pub(\([^)]*\))?\s+)?fn\s/,
   go: /^\s*func\b|:?=\s*func\s*\(/,
   pseudocode: /^(?!\s)/,
@@ -71,6 +71,8 @@ export function relDepth(doc: CodeDocument, line1: number): number {
     if (d >= cur) continue
     cur = d
     if (fn.test(l)) return depth
+    // `): T {` closes a multi-line parameter list: the function header itself
+    if (/^\s*\).*\{\s*$/.test(l)) return depth
     depth++
   }
   return depth

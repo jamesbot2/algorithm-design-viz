@@ -1,0 +1,2 @@
+{ "algo": "nQueens", "idPrefix": "nQueens", "titleBase": "N 皇后",
+  "files": { "python": "n_queens.py", "cpp": "n_queens.cpp", "java": "NQueens.java", "rust": "n_queens.rs", "go": "n_queens.go" } }
