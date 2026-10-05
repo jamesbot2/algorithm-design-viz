@@ -1857,3 +1857,101 @@ html, body, #root {
   font-size: 0.68rem;
   font-family: var(--mono);
 }
+
+/* —— V28: code panel header — language switcher (TS / Python / C++ / Java / Rust / Go [+ 伪代码]) —— */
+.code-browser-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  min-width: 0;
+  margin-bottom: 0.3rem;
+}
+.code-lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+  padding: 3px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+.code-lang-pill {
+  flex: 0 0 auto;
+  position: relative;
+  min-height: 30px;
+  padding: 0.2rem 0.72rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.code-lang-pill:hover { background: var(--bg-hover); color: var(--text); border-color: transparent; }
+.code-lang-pill.active {
+  background: var(--lab-accent, var(--accent));
+  color: #fff;
+  font-weight: 650;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+/* not colour alone: the selected pill also carries a check mark */
+.code-lang-pill.active::before { content: '✓ '; font-weight: 700; }
+.code-lang-pill:focus-visible { outline: 2px solid var(--lab-accent, var(--accent)); outline-offset: 1px; }
+.code-lang-pill .lang-short { display: none; }
+.code-lang-sep { flex: 0 0 1px; align-self: stretch; margin: 4px 3px; background: var(--border); }
+.code-lang-spinner {
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin-left: 0.35em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  vertical-align: -0.05em;
+  animation: code-spin 0.7s linear infinite;
+}
+@keyframes code-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .code-lang-spinner { animation-duration: 2.4s; } }
+.code-copy-btn { flex: 0 0 auto; min-height: 30px; padding: 0.2rem 0.8rem; font-size: 0.8rem; }
+.code-copy-btn.copied { border-color: var(--good); color: var(--good); }
+.code-toggle { font-size: 0.74rem; white-space: nowrap; }
+.code-font { font-size: 0.74rem; display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+.code-font input[type='range'] { width: 84px; }
+.code-lang-fallback { flex: 0 0 auto; font-size: 0.74rem; color: var(--warn); margin-bottom: 0.25rem; }
+.code-skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem 1rem;
+  background: var(--bg-elev);
+  border-radius: 8px;
+}
+.code-skeleton-label { font-size: 0.78rem; color: var(--muted); }
+.code-skeleton-line {
+  display: block;
+  height: 0.7rem;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--bg-soft) 0%, var(--bg-hover) 50%, var(--bg-soft) 100%);
+  background-size: 200% 100%;
+  animation: code-shimmer 1.2s ease-in-out infinite;
+}
+@keyframes code-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .code-skeleton-line { animation: none; } }
+.code-load-error { font-size: 0.8rem; color: var(--danger); }
+@media (max-width: 560px) {
+  .code-lang-pill { min-height: 34px; padding: 0.25rem 0.75rem; }
+  .code-lang-pill[data-lang='typescript'] .lang-full { display: none; }
+  .code-lang-pill[data-lang='typescript'] .lang-short { display: inline; }
+}

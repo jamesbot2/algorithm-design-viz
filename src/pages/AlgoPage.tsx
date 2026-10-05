@@ -1122,6 +1122,7 @@ export default function AlgoPage() {
         step.phase !== 'preview'
       return (
         <CodeBrowser
+          algoId={id}
           documents={catalog}
           execAnchorId={isPreviewMode ? undefined : primary?.anchorId}
           contextAnchorIds={contexts.map((c) => c.anchorId)}
