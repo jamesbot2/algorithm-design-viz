@@ -1,0 +1,2 @@
+{ "algo": "floyd", "idPrefix": "floyd", "titleBase": "Floyd-Warshall",
+  "files": { "python": "floyd.py", "cpp": "floyd.cpp", "java": "Floyd.java", "rust": "floyd.rs", "go": "floyd.go" } }

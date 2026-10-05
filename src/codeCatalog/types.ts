@@ -12,9 +12,16 @@ export interface CodeAnchor {
   range: SourceRange
 }
 
+/**
+ * V28: the six reference-implementation languages of the code panel (order = switcher order).
+ * Pseudocode is a separate teaching view, not a language choice.
+ */
+export const CODE_LANGUAGES = ['typescript', 'python', 'cpp', 'java', 'rust', 'go'] as const
+export type CodeLanguage = (typeof CODE_LANGUAGES)[number]
+
 export interface CodeDocument {
   documentId: string
-  language: 'typescript' | 'pseudocode' | 'cpp' | 'text'
+  language: CodeLanguage | 'pseudocode' | 'text'
   title: string
   source: string
   /** SHA-256 hex of source (utf-8) when available */

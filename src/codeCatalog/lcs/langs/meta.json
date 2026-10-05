@@ -1,0 +1,2 @@
+{ "algo": "lcs", "idPrefix": "lcs", "titleBase": "LCS",
+  "files": { "python": "lcs.py", "cpp": "lcs.cpp", "java": "Lcs.java", "rust": "lcs.rs", "go": "lcs.go" } }

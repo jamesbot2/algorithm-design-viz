@@ -1,0 +1,2 @@
+{ "algo": "kmp", "idPrefix": "kmp", "titleBase": "KMP",
+  "files": { "python": "kmp.py", "cpp": "kmp.cpp", "java": "Kmp.java", "rust": "kmp.rs", "go": "kmp.go" } }
