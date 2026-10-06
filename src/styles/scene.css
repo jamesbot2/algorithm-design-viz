@@ -187,12 +187,24 @@
 /* Companion strip: required companions (compact) + aux bar, one wrapping row. */
 .scene-companions {
   flex: 0 0 auto;
+  /* V30-03: one grid cell — the live row and the run's hidden shape sizers overlap, so the
+   * strip is exactly as tall as the run's tallest legal companion content on every frame. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.scene-companions > .scene-companions-row {
+  grid-area: 1 / 1;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
   gap: 0.35rem 0.5rem;
 }
-.scene-companions > .array-buffers {
+.scene-companions > .scene-companions-sizer {
+  visibility: hidden;
+  pointer-events: none;
+}
+.scene-companions-row > .array-buffers {
   flex: 1 1 auto;
   max-height: none;
   overflow: visible;
@@ -219,10 +231,9 @@
   border-style: dashed;
   background: transparent;
 }
+/* V30-03: ghost value is a .cell-val (same font / weight / line-height as real values) — tint only. */
 .cell-ghost-val {
-  font-family: var(--mono);
-  font-size: 0.9rem;
-  line-height: 1.35;
+  color: var(--muted);
 }
 .scene-aux-bar {
   flex: 0 1 auto;

@@ -254,6 +254,21 @@ export default function Visualizer({ player, staleResult = false, context, algoI
                 transition={transition}
                 motionStep={motionStep}
                 presentation={descriptor}
+                runSteps={steps}
+                auxBarFor={
+                  treeAux || descriptor?.callStackVar
+                    ? (fs: Step) => (
+                        <AuxBar
+                          sizer
+                          callStack={descriptor?.callStackVar ? fs.vars?.[descriptor.callStackVar] : undefined}
+                          treeLabel={treeAux?.label}
+                          hasTree={Boolean(fs.searchTree)}
+                          open={auxOpen}
+                          onToggle={() => {}}
+                        />
+                      )
+                    : undefined
+                }
                 auxBar={
                   treeAux || descriptor?.callStackVar ? (
                     <AuxBar
@@ -345,18 +360,21 @@ function AuxBar({
   hasTree,
   open,
   onToggle,
+  sizer = false,
 }: {
   callStack?: string | number | boolean | null
   treeLabel?: string
   hasTree: boolean
   open: boolean
   onToggle: () => void
+  /** V30-03: inert layout clone for the companion-strip budget (no test ids, not focusable). */
+  sizer?: boolean
 }) {
   const frames = typeof callStack === 'string' && callStack !== '(empty)' ? callStack.split(' › ') : []
   return (
-    <div className="aux-bar" data-testid="scene-aux-bar">
+    <div className="aux-bar" data-testid={sizer ? undefined : 'scene-aux-bar'}>
       {typeof callStack === 'string' && (
-        <span className="aux-callstack" data-testid="aux-callstack" title={`调用栈：${callStack}`}>
+        <span className="aux-callstack" data-testid={sizer ? undefined : 'aux-callstack'} title={sizer ? undefined : `调用栈：${callStack}`}>
           调用栈 <code>{frames.length ? frames[frames.length - 1] : '（空）'}</code>
           {frames.length > 1 && <span className="muted"> · 深度 {frames.length}</span>}
         </span>
@@ -365,9 +383,10 @@ function AuxBar({
         <button
           type="button"
           className="aux-toggle"
-          data-testid="aux-toggle-recursion-tree"
+          data-testid={sizer ? undefined : 'aux-toggle-recursion-tree'}
           aria-pressed={open}
-          aria-controls="scene-aux-pane"
+          aria-controls={sizer ? undefined : 'scene-aux-pane'}
+          tabIndex={sizer ? -1 : undefined}
           disabled={!hasTree}
           onClick={onToggle}
         >

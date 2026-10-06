@@ -1043,6 +1043,8 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   companionMode = false,
   presentation,
   auxBar,
+  auxBarFor,
+  runSteps,
 }: {
   step: Step
   prevStep?: Step
@@ -1052,6 +1054,9 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   /** V30: real displayed transition + the step whose ops define it. */
   transition?: PlaybackTransition
   motionStep?: Step
+  /** V30-03: inert aux-bar clone per frame + the run, for the companion-strip budget. */
+  auxBarFor?: (s: Step) => ReactNode
+  runSteps?: Step[]
   companionMode?: boolean
   /** V24: declared array primary + companions (presentation contract). */
   presentation?: PresentationDescriptor
@@ -1070,6 +1075,8 @@ export const ArraysFromStep = memo(function ArraysFromStep({
         motionStep={motionStep}
         presentation={presentation}
         auxBar={auxBar}
+        auxBarFor={auxBarFor}
+        runSteps={runSteps}
       />
     )
   }
@@ -1152,6 +1159,93 @@ export const ArraysFromStep = memo(function ArraysFromStep({
 
 
 /**
+ * V30-03: ONE geometry template for compact companion cards. The real compact ArrayView
+ * (cells mode) renders exactly this markup per slot (label · cell-slot › cell-flip-layer ›
+ * cell[cell-idx + cell-val] · pointer-row); the empty-frame placeholder and the run-budget
+ * sizers render it through this component, so ghost and real cards share font, line-height,
+ * index track and pointer track by construction (no per-pixel padding).
+ */
+export function CompactCellsCard({
+  label,
+  values,
+  pointers,
+  placeholder = false,
+}: {
+  label: string
+  values: (number | string)[]
+  pointers?: Record<string, number>
+  placeholder?: boolean
+}) {
+  const byIdx = new Map<number, string[]>()
+  for (const [lab, idx] of Object.entries(pointers ?? {})) {
+    if (typeof idx !== 'number') continue
+    byIdx.set(idx, [...(byIdx.get(idx) ?? []), lab])
+  }
+  const shown = placeholder ? ['—'] : values
+  return (
+    <div className="array-view array-view-compact" data-placeholder={placeholder ? '1' : undefined}>
+      <div className="array-label">
+        <span>{label}</span>
+      </div>
+      <div className="array-cells" style={{ position: 'relative' }}>
+        {shown.map((v, i) => (
+          <div key={i} className="cell-slot">
+            <div className="cell-flip-layer" style={{ transform: 'none' }}>
+              <div className={`cell${placeholder ? ' cell-ghost' : ''}`}>
+                <span className="cell-idx">{placeholder ? '\u00a0' : i}</span>
+                <span className={`cell-val${placeholder ? ' cell-ghost-val muted' : ''}`}>{String(v)}</span>
+              </div>
+            </div>
+            <div className="pointer-row cell-ptrs">
+              {(byIdx.get(i) ?? []).map((lab) => (
+                <span key={lab} className="ptr-tag">
+                  {lab}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+type CompanionEntry = [string, (number | string)[]]
+
+function companionEntriesOf(step: Step, key: string, companionNames: string[]): CompanionEntry[] {
+  const arrays = step.arrays ?? {}
+  const companions = Object.entries(arrays).filter(([n]) => n !== key && companionNames.includes(n))
+  // Any other array the module did not classify stays visible as a compact companion.
+  const others = Object.entries(arrays).filter(([n]) => n !== key && !companionNames.includes(n))
+  return [...companions, ...others]
+}
+
+function auxSignature(step: Step, callStackVar?: string): string {
+  if (!callStackVar) return ''
+  const cs = step.vars?.[callStackVar]
+  if (typeof cs !== 'string' || cs === '(empty)') return `~${String(cs)}`
+  const frames = cs.split(' › ')
+  return `${frames[frames.length - 1]}|${frames.length}`
+}
+
+/** Width-relevant shape of a frame's companion strip (mono values → char count; pointer labels). */
+function companionShape(step: Step, entries: CompanionEntry[], callStackVar?: string): string {
+  const cards = entries.length
+    ? entries
+        .map(([n, vals]) => {
+          const ptrs = deriveArrayPointers(step, n)
+          const at = new Map<number, string[]>()
+          for (const [lab, i] of Object.entries(ptrs)) if (typeof i === 'number') at.set(i, [...(at.get(i) ?? []), lab])
+          return `${n}:${vals.map((v, i) => `${String(v).length}${at.has(i) ? `(${at.get(i)!.join(',')})` : ''}`).join(' ')}`
+        })
+        .join(';')
+    : '∅'
+  return `${cards}#${auxSignature(step, callStackVar)}`
+}
+
+const MAX_SIZERS = 240
+
+/**
  * V24-01: an array primary declared by the module's presentation contract.
  * Layout (top → bottom inside the stage):
  *   companion strip  — required companions (left/right, temp/key, selected) as compact
@@ -1161,6 +1255,11 @@ export const ArraysFromStep = memo(function ArraysFromStep({
  *   primary array    — takes the rest of the stage (flex basis 0); its bars/cells geometry
  *                      is computed from that allotted box (see ArrayView).
  * Auxiliaries (recursion tree) are never rendered here — Visualizer owns their pane.
+ *
+ * V30-03: the strip height is budgeted by the RUN's maximum legal content, not per-frame
+ * growth: every distinct strip shape of the run is laid out (visibility:hidden, inert) in
+ * the same grid cell as the live row, so the cell is as tall as the tallest frame — no
+ * measured min-height, no ratchet, no clipping, no font shrink.
  */
 function DeclaredArrayScene({
   step,
@@ -1172,6 +1271,8 @@ function DeclaredArrayScene({
   motionStep,
   presentation,
   auxBar,
+  auxBarFor,
+  runSteps,
 }: {
   step: Step
   prevStep?: Step
@@ -1182,15 +1283,16 @@ function DeclaredArrayScene({
   motionStep?: Step
   presentation: PresentationDescriptor
   auxBar?: ReactNode
+  /** V30-03: inert aux-bar clone for a given frame (run-budget sizers). */
+  auxBarFor?: (s: Step) => ReactNode
+  /** V30-03: the whole run (immutable trace) — used only to budget the companion strip. */
+  runSteps?: Step[]
 }) {
   const arrays = step.arrays ?? {}
   const key = presentation.primaryKey!
-  const companionNames = presentation.companions ?? []
+  const companionNames = useMemo(() => presentation.companions ?? [], [presentation.companions])
   const primaryValues = arrays[key]
-  const companions = Object.entries(arrays).filter(([n]) => n !== key && companionNames.includes(n))
-  // Any other array the module did not classify stays visible as a compact companion.
-  const others = Object.entries(arrays).filter(([n]) => n !== key && !companionNames.includes(n))
-  const compactEntries = [...companions, ...others]
+  const compactEntries = companionEntriesOf(step, key, companionNames)
   const renderOne = (name: string, values: (number | string)[], compact: boolean) => (
     <ArrayView
       key={name}
@@ -1215,6 +1317,32 @@ function DeclaredArrayScene({
       labelFormat={presentation.labelFormat?.[name]}
     />
   )
+  const hasLabelFormats = Boolean(presentation.labelFormat && Object.keys(presentation.labelFormat).some((n) => n !== key))
+  const budgetOn = Boolean(presentation.reserveCompanions && runSteps && runSteps.length > 1 && !hasLabelFormats)
+  /** One representative frame per distinct strip shape of the run (bounded). */
+  const sizerFrames = useMemo(() => {
+    if (!budgetOn || !runSteps) return [] as Step[]
+    const seen = new Map<string, Step>()
+    for (const s of runSteps) {
+      const shape = companionShape(s, companionEntriesOf(s, key, companionNames), presentation.callStackVar)
+      if (!seen.has(shape)) seen.set(shape, s)
+      if (seen.size >= MAX_SIZERS) break
+    }
+    return [...seen.values()]
+  }, [budgetOn, runSteps, key, companionNames, presentation.callStackVar])
+
+  const ghost = (sizer: boolean) => (
+    <div
+      className="array-buffers scene-companions-empty"
+      data-testid={sizer ? undefined : 'scene-companions-empty'}
+      aria-label={sizer ? undefined : `${companionNames.join(' / ')}：本步无缓冲`}
+    >
+      {companionNames.slice(0, 2).map((name) => (
+        <CompactCellsCard key={name} label={BUFFER_LABELS[name] ?? name} values={[]} placeholder />
+      ))}
+      <span className="scene-companions-note muted">本步无缓冲</span>
+    </div>
+  )
   const showStrip = compactEntries.length > 0 || presentation.reserveCompanions || auxBar
   return (
     <div
@@ -1228,39 +1356,42 @@ function DeclaredArrayScene({
           className="scene-companions"
           data-testid="scene-companions"
           data-reserved={presentation.reserveCompanions ? '1' : '0'}
+          data-budget={budgetOn ? 'run-max' : undefined}
+          data-sizers={budgetOn ? sizerFrames.length : undefined}
         >
-          {compactEntries.length > 0 ? (
-            <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
-              {compactEntries.map(([name, values]) => renderOne(name, values, true))}
-            </div>
-          ) : presentation.reserveCompanions ? (
-            // Same card geometry as real companions (label + one cell + pointer row), so the
-            // primary's allotted box does not change when buffers appear / disappear.
-            <div
-              className="array-buffers scene-companions-empty"
-              data-testid="scene-companions-empty"
-              aria-label={`${companionNames.join(' / ')}：本步无缓冲`}
-            >
-              {companionNames.slice(0, 2).map((name) => (
-                <div key={name} className="array-view array-view-compact" data-placeholder="1">
-                  <div className="array-label">
-                    <span>{BUFFER_LABELS[name] ?? name}</span>
+          <div className="scene-companions-row" data-live="1">
+            {compactEntries.length > 0 ? (
+              <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
+                {compactEntries.map(([name, values]) => renderOne(name, values, true))}
+              </div>
+            ) : presentation.reserveCompanions ? (
+              ghost(false)
+            ) : null}
+            {auxBar && <div className="scene-aux-bar">{auxBar}</div>}
+          </div>
+          {sizerFrames.map((s, k) => {
+            const entries = companionEntriesOf(s, key, companionNames)
+            const aux = auxBarFor?.(s)
+            return (
+              <div key={k} className="scene-companions-row scene-companions-sizer" aria-hidden="true" inert>
+                {entries.length > 0 ? (
+                  <div className="array-buffers">
+                    {entries.map(([name, values]) => (
+                      <CompactCellsCard
+                        key={name}
+                        label={BUFFER_LABELS[name] ?? name}
+                        values={values}
+                        pointers={deriveArrayPointers(s, name)}
+                      />
+                    ))}
                   </div>
-                  <div className="array-cells">
-                    <div className="cell-slot">
-                      <div className="cell cell-ghost">
-                        <span className="cell-idx">&nbsp;</span>
-                        <span className="cell-ghost-val muted">—</span>
-                      </div>
-                      <div className="pointer-row cell-ptrs" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <span className="scene-companions-note muted">本步无缓冲</span>
-            </div>
-          ) : null}
-          {auxBar && <div className="scene-aux-bar">{auxBar}</div>}
+                ) : (
+                  ghost(true)
+                )}
+                {aux && <div className="scene-aux-bar">{aux}</div>}
+              </div>
+            )
+          })}
         </div>
       )}
       {primaryValues ? (

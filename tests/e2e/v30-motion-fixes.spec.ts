@@ -120,6 +120,50 @@ test('V30-03 merge [4,1,3,2] buffers appear/disappear: main card fixed (≤1px)'
   expect(pp.h!, `main h p-p ${JSON.stringify(pp)}`).toBeLessThanOrEqual(1)
 })
 
+async function stepAllMain(page: Page) {
+  const frames: Sample[] = [await snap(page)]
+  await startSampler(page)
+  for (let i = 1; i < 120; i++) {
+    if (await next(page).isDisabled()) break
+    await realClick(page, next(page))
+    await waitIdx(page, i)
+    await waitSettled(page)
+    frames.push(await snap(page))
+  }
+  const cont: Sample[] = await stopSampler(page)
+  return { frames, cont }
+}
+
+test('V30-03 merge tree open: call-stack wrap does not move the main card', async ({ page }) => {
+  await prep(page, 'mergeSort', '4,1,3,2')
+  await realClick(page, page.getByTestId('aux-toggle-recursion-tree'))
+  await expect(page.getByTestId('scene-aux-pane')).toBeVisible()
+  await waitSettled(page)
+  const { frames, cont } = await stepAllMain(page)
+  for (const set of [frames, cont]) {
+    const pp = rectPP(set, 'main')
+    expect(Math.max(pp.x!, pp.y!, pp.w!, pp.h!), JSON.stringify(pp)).toBeLessThanOrEqual(1)
+  }
+})
+
+test.describe('390x844', () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+  for (const c of [
+    { id: 'insertion [1,-1] temp', algo: 'insertionSort', arr: '1,-1' },
+    { id: 'merge multi-digit', algo: 'mergeSort', arr: '100,7,35,2048,9,13' },
+  ]) {
+    test(`V30-03 ${c.id}: buffers appear/disappear, main card fixed`, async ({ page }) => {
+      await prep(page, c.algo, c.arr)
+      const { frames, cont } = await stepAllMain(page)
+      expect(new Set(frames.map((f) => f.compKind)).size).toBeGreaterThan(1)
+      for (const set of [frames, cont]) {
+        const pp = rectPP(set, 'main')
+        expect(Math.max(pp.x!, pp.y!, pp.w!, pp.h!), JSON.stringify(pp)).toBeLessThanOrEqual(1)
+      }
+    })
+  }
+})
+
 test('V30 pure autoplay [2,1]: swap travels, nothing paused, frame fixed', async ({ page }) => {
   await prep(page, 'bubbleSort', '2,1')
   await startSampler(page)
