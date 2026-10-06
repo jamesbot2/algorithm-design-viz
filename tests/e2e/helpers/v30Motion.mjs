@@ -213,3 +213,13 @@ export async function waitRunning(page, minCt = 20, timeout = 10_000) {
     { polling: 'raf', timeout },
   )
 }
+
+/** Max per-frame displacement of any element (by id) across consecutive samples — catches snaps. */
+export function maxFrameJump(samples) {
+  let m = 0
+  for (let i = 1; i < samples.length; i++) {
+    const prev = new Map((samples[i - 1].els || []).map((e) => [e.id, e.x]))
+    for (const e of samples[i].els || []) if (prev.has(e.id)) m = Math.max(m, Math.abs(e.x - prev.get(e.id)))
+  }
+  return m
+}

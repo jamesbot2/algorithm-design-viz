@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import type { Step } from '../../types/step'
 import type { Trace } from '../../core/trace/types'
 import { coordinatedStepIntervalMs } from '../../utils/playbackClock'
@@ -7,6 +7,9 @@ import { motionCssVars } from '../../theme/motion'
 import { segmentGeometry, teachableStages, type StageSegment } from '../../utils/teachableStages'
 import { shouldIgnoreKeyboard } from '../../utils/keyboardGuard'
 import type { PlaybackTransportProps } from './PlaybackTransport'
+import { initialPlaybackState, playbackReducer, type PlaybackTransition } from './playbackIntent'
+
+export type { ActionIntent, PlaybackTransition } from './playbackIntent'
 
 /** Parent sends this only on scene load / new run / explicit external seek — never from onStepIndexChange. */
 export type SeekCommand = { requestId: number | string; target: number }
@@ -29,7 +32,12 @@ export interface PlaybackController {
   idx: number
   max: number
   step: Step | undefined
+  /** Trace-adjacent previous step (data diff / matrix flash) — NOT the animation source. */
   prevStep: Step | undefined
+  /** V30: real displayed transition (from → to) + action intent for scene animation. */
+  transition: PlaybackTransition
+  /** Step whose ops describe the from→to transition (later of the two when adjacent); undefined for snapshot jumps. */
+  motionStep: Step | undefined
   playing: boolean
   speed: number
   isPreview: boolean
@@ -69,8 +77,10 @@ export function usePlaybackController({
   keyboard = true,
 }: PlaybackOptions): PlaybackController {
   const steps = useMemo(() => resolveSteps(stepsProp, trace), [stepsProp, trace])
-  const [rawIdx, setIdx] = useState(() => clampIdx(initialStepIndex, steps.length))
-  const [playing, setPlaying] = useState(false)
+  // V30: one reducer = cursor + autoplay flag + action intent / real from→to (no second cursor).
+  const [pstate, dispatch] = useReducer(playbackReducer, clampIdx(initialStepIndex, steps.length), initialPlaybackState)
+  const rawIdx = pstate.idx
+  const playing = pstate.playing
   const [speed, setSpeed] = useState(600)
   const [scrubPreview, setScrubPreview] = useState<number | null>(null)
   const [playPulse, setPlayPulse] = useState(false)
@@ -84,6 +94,14 @@ export function usePlaybackController({
   const idx = clampIdx(rawIdx, steps.length)
   const step = steps[idx] ?? steps[0]
   const prevStep = idx > 0 ? steps[idx - 1] : undefined
+  const transition = useMemo<PlaybackTransition>(
+    () => ({ ...pstate.t, from: clampIdx(pstate.t.from, steps.length), to: idx, runId }),
+    [pstate.t, idx, steps.length, runId],
+  )
+  const motionStep =
+    !transition.snapshot && Math.abs(transition.to - transition.from) === 1
+      ? steps[Math.max(transition.from, transition.to)]
+      : undefined
   const max = Math.max(0, steps.length - 1)
 
   const stageInfo = useMemo(() => teachableStages(steps, 8), [steps])
@@ -113,7 +131,8 @@ export function usePlaybackController({
     [speed, mode, stepHasSwapMotion, stepHasMoveMotion],
   )
 
-  // V29 M2: ArrayView freezes/resumes in-flight WAAPI FLIP from this flag (pause ≠ snap).
+  // Informational mirror of the autoplay flag. V30: ArrayView no longer pauses motion from it —
+  // animation pause intent is `transition.motionPaused` (explicit Pause only).
   useEffect(() => {
     setPlaybackPlaying(playing)
   }, [playing, setPlaybackPlaying])
@@ -135,23 +154,17 @@ export function usePlaybackController({
     clear()
     if (!playing) return
     if (steps.length <= 0) {
-      setPlaying(false)
+      dispatch({ type: 'stop' })
       return clear
     }
     // Single-frame: show once then complete (no infinite empty spin)
     if (max <= 0) {
-      const t = window.setTimeout(() => setPlaying(false), effectiveInterval)
+      const t = window.setTimeout(() => dispatch({ type: 'stop' }), effectiveInterval)
       timer.current = t
       return clear
     }
     timer.current = window.setInterval(() => {
-      setIdx((i) => {
-        if (i >= max) {
-          setPlaying(false)
-          return i
-        }
-        return i + 1
-      })
+      dispatch({ type: 'autoAdvance', max })
     }, effectiveInterval)
     return clear
   }, [playing, effectiveInterval, max, clear, steps.length])
@@ -161,8 +174,7 @@ export function usePlaybackController({
     if (runId === undefined) return
     if (lastRunId.current === runId) return
     lastRunId.current = runId
-    setIdx(0)
-    setPlaying(false)
+    dispatch({ type: 'seek', target: 0, len: Number.MAX_SAFE_INTEGER, intent: 'replaceRun' })
     setSnapSwap(true)
     bumpTransitionEpoch()
     const t = window.setTimeout(() => setSnapSwap(false), 50)
@@ -175,8 +187,7 @@ export function usePlaybackController({
     if (lastSeekReq.current === seekCommand.requestId) return
     lastSeekReq.current = seekCommand.requestId
     setSnapSwap(true)
-    setIdx(clampIdx(seekCommand.target, steps.length))
-    setPlaying(false)
+    dispatch({ type: 'seek', target: seekCommand.target, len: steps.length })
     bumpTransitionEpoch()
     const t = window.setTimeout(() => setSnapSwap(false), 50)
     return () => window.clearTimeout(t)
@@ -188,47 +199,38 @@ export function usePlaybackController({
   }, [idx, onStepIndexChange])
 
   const goPrev = useCallback(() => {
-    setPlaying(false)
     // V10-04: stepping creates a new FLIP via geometry change + new transitionId.
-    // Do not bump transitionEpoch here — reserved for cancel-only (pause/seek/reset/replace-run).
-    setIdx((i) => Math.max(0, i - 1))
+    // Do not bump transitionEpoch here — reserved for cancel-only (seek/reset/replace-run).
+    // V30-02: intent manualPrev; from = the frame actually displayed, so the scene travels back.
+    dispatch({ type: 'manualPrev' })
   }, [])
 
   const goNext = useCallback(() => {
-    setPlaying(false)
-    setIdx((i) => Math.min(max, i + 1))
+    // V30-01: takeover stops autoplay but the new transition plays (motionPaused=false).
+    dispatch({ type: 'manualNext', max })
   }, [max])
 
   const togglePlay = useCallback(() => {
     setPlayPulse(true)
     window.setTimeout(() => setPlayPulse(false), 180)
-    if (playing) {
-      // V29 M2: freeze mid-motion — do not bumpTransitionEpoch (that cleared transforms to end).
-      setPlaying(false)
-      return
-    }
-    if (steps.length === 0) return
-    const last = Math.max(0, steps.length - 1)
-    // completed → replay: seek 0 then play (existing trace; must NOT re-solve)
-    if (idx >= last) setIdx(0)
-    setPlaying(true)
-  }, [playing, steps.length, idx])
+    // V29 M2: Pause = freeze mid-motion (intent 'pause', motionPaused) — no bumpTransitionEpoch.
+    // Resume continues the frozen transition. Completed → replay from 0 (existing trace; no re-solve).
+    dispatch({ type: 'togglePlay', len: steps.length })
+  }, [steps.length])
 
   const reset = useCallback(() => {
-    setPlaying(false)
     // V29 M2: reset is a snapshot jump — snapSwap prevents FLIP across non-adjacent geometry.
     setSnapSwap(true)
     bumpTransitionEpoch()
-    setIdx(0)
+    dispatch({ type: 'seek', target: 0, len: Math.max(1, steps.length), intent: 'reset' })
     window.setTimeout(() => setSnapSwap(false), 50)
-  }, [bumpTransitionEpoch])
+  }, [bumpTransitionEpoch, steps.length])
 
   const seekTo = useCallback(
     (i: number) => {
-      setPlaying(false)
       setSnapSwap(true)
       bumpTransitionEpoch()
-      setIdx(clampIdx(i, steps.length))
+      dispatch({ type: 'seek', target: i, len: steps.length })
       window.setTimeout(() => setSnapSwap(false), 50)
     },
     [steps.length, bumpTransitionEpoch],
@@ -293,6 +295,8 @@ export function usePlaybackController({
     max,
     step,
     prevStep,
+    transition,
+    motionStep,
     playing,
     speed,
     isPreview,

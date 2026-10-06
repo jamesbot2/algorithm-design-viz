@@ -44,7 +44,8 @@ describe('V17-03 array/DP stage budget', () => {
 
   it('resize remasures FLIP (geometryGen clear on ResizeObserver)', () => {
     expect(av).toMatch(/geometryGen\.current \+= 1/)
-    expect(av).toMatch(/prevCenters\.current\.clear\(\)/)
+    // V30: resize re-measures the displayed layout (was prevCenters.clear) so the next step still travels
+    expect(av).toMatch(/layoutCenters\.current = measureLayout\(/)
     expect(av).toMatch(/ResizeObserver/)
   })
 })

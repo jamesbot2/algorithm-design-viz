@@ -21,6 +21,7 @@ import {
   boxOf,
   clickBox,
   waitRunning,
+  maxFrameJump,
 } from './helpers/v30Motion.mjs'
 
 test.describe.configure({ retries: 0 })
@@ -189,6 +190,50 @@ test('V30 rapid Next ×4 from paused lands correctly (no frozen, no swallowed cl
   const s: Sample = await snap(page)
   expect(s.visOrder).toEqual(['1', '2'])
   expect(frozenAtStart(s)).toEqual([])
+})
+
+for (const rep of [1, 2, 3]) {
+  test(`V30 auto→Prev mid-swap reverses from the current visible position rep ${rep}`, async ({ page }) => {
+    await prep(page, 'bubbleSort', '2,1')
+    const prevAt = await boxOf(page, prev(page))
+    await startSampler(page)
+    await realClick(page, play(page))
+    await waitRunning(page, 60)
+    await clickBox(page, prevAt)
+    await waitIdx(page, 2, '0')
+    expect(await waitSettled(page, 1500)).toBe(true)
+    const s: Sample[] = await stopSampler(page)
+    const last = s.at(-1)!
+    expect(last.visOrder).toEqual(['2', '1'])
+    expect(frozenAtStart(last)).toEqual([])
+    // distance between the two slots ≈ one column pitch; a snap would jump ≈ full pitch in one frame
+    const pitch = Math.abs(last.els[0].x - last.els[1].x)
+    expect(maxFrameJump(s), `no snap (pitch ${pitch})`).toBeLessThan(pitch * 0.5)
+    const backward = s.filter((x) => x.idx === 2 && x.els.some((e: { intent: string | null }) => e.intent === 'manualPrev'))
+    expect(backward.length, 'reverse transition tagged manualPrev actually runs').toBeGreaterThan(3)
+  })
+}
+
+test('V30 rapid Next during a swap continues motion (no snap, no freeze)', async ({ page }) => {
+  await prep(page, 'bubbleSort', '2,1')
+  for (const i of [1, 2]) {
+    await realClick(page, next(page))
+    await waitIdx(page, i)
+    await waitSettled(page)
+  }
+  const nextAt = await boxOf(page, next(page))
+  await startSampler(page)
+  await clickBox(page, nextAt)
+  await waitRunning(page, 30)
+  await clickBox(page, nextAt)
+  await waitIdx(page, 4)
+  expect(await waitSettled(page, 1500)).toBe(true)
+  const s: Sample[] = await stopSampler(page)
+  const last = s.at(-1)!
+  const pitch = Math.abs(last.els[0].x - last.els[1].x)
+  expect(last.visOrder).toEqual(['1', '2'])
+  expect(maxFrameJump(s)).toBeLessThan(pitch * 0.5)
+  expect(midMotionFrames(s).frames).toBeGreaterThan(3)
 })
 
 test.describe('reduced motion', () => {

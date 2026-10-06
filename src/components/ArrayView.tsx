@@ -14,6 +14,7 @@ import type { PresentationDescriptor } from '../types/presentation'
 import { useMotion } from '../theme/MotionContext'
 import { resolveDuration } from '../theme/motion'
 import { SHORT_BAR_PX, SIGNED_MIN_SPAN_PX, signedLabelPlacement, signedPlotLanes } from './signedPlot'
+import type { PlaybackTransition } from './workbench/playbackIntent'
 
 interface Props {
   name: string
@@ -34,6 +35,10 @@ interface Props {
   prevElementIds?: string[]
   /** When true, skip FLIP (seek jump / non-adjacent snap) */
   snapSwap?: boolean
+  /** V30: the player's real displayed transition (from → to, intent, pause intent). */
+  transition?: PlaybackTransition
+  /** V30-02: ops of the step that defines from→to (later step when adjacent) — drives travel for Next AND Prev. */
+  motionOps?: ArrayOp[]
   /** Compact buffer strip — prefer cells, smaller chart */
   compact?: boolean
   /** V24-02: label presentation for string cells (interval → id + [start,finish) card). */
@@ -181,6 +186,8 @@ function ArrayView({
   prevValues,
   prevElementIds,
   snapSwap = false,
+  transition,
+  motionOps,
   compact = false,
   labelFormat,
 }: Props) {
@@ -189,7 +196,7 @@ function ArrayView({
   const [mode, setMode] = useState<'bars' | 'cells'>(
     defaultMode ?? (compact ? 'cells' : suitable ? 'bars' : 'cells'),
   )
-  const { mode: motionMode, speedIntervalMs, transitionEpoch, playbackPlaying } = useMotion()
+  const { mode: motionMode, speedIntervalMs, transitionEpoch } = useMotion()
   const swapMs = resolveDuration(280, motionMode, speedIntervalMs)
 
   const nums = useMemo(
@@ -258,13 +265,14 @@ function ArrayView({
 
   const slotRefs = useRef<Map<number, HTMLElement | null>>(new Map())
   const layerRefs = useRef<Map<string, HTMLElement | null>>(new Map())
-  const prevCenters = useRef<Map<string, { x: number; y: number }>>(new Map())
+  /** V30: layout centres (untransformed) of the snapshot this view last displayed, by element id. */
+  const layoutCenters = useRef<Map<string, { x: number; y: number }>>(new Map())
+  /** V30-02: element ids this view last displayed (the real FLIP source, not trace idx-1). */
+  const lastIdsRef = useRef<string[] | null>(null)
   const animToken = useRef(0)
   const transitionIdRef = useRef(0)
   /** V29 M2: WAAPI FLIP animations — pause freezes, seek/epoch cancels. */
   const flipAnims = useRef<Map<string, Animation>>(new Map())
-  const playbackPlayingRef = useRef(playbackPlaying)
-  playbackPlayingRef.current = playbackPlaying
   const wrapRef = useRef<HTMLDivElement>(null)
   // V24-01A: bar geometry comes from the box this ArrayView is actually allotted
   // (its own border-box, sized by the scene layout), never from the whole stage or
@@ -367,16 +375,44 @@ function ArrayView({
       /* ignore */
     }
   }
+  const clearLayer = (el: HTMLElement) => {
+    el.style.transition = 'none'
+    el.style.transform = 'none'
+    delete el.dataset.runFlip
+    delete el.dataset.transitionId
+    delete el.dataset.transitionFrom
+    delete el.dataset.transitionTo
+    delete el.dataset.actionIntent
+    delete el.dataset.direction
+  }
   const clearTransforms = () => {
     for (const anim of flipAnims.current.values()) cancelFlipAnim(anim)
     flipAnims.current.clear()
     for (const el of layerRefs.current.values()) {
       if (!el) continue
-      el.style.transition = 'none'
-      el.style.transform = 'none'
-      delete el.dataset.runFlip
-      delete el.dataset.transitionId
+      clearLayer(el)
     }
+    overlayHostRef.current?.removeAttribute('data-flip')
+  }
+  /** V30: layout (untransformed slot) centre of every displayed element id. */
+  const measureLayout = (forIds: string[]) => {
+    const out = new Map<string, { x: number; y: number }>()
+    for (let i = 0; i < forIds.length; i++) {
+      const el = slotRefs.current.get(i)
+      if (!el) continue
+      const r = el.getBoundingClientRect()
+      out.set(forIds[i]!, { x: r.left + r.width / 2, y: r.top + r.height / 2 })
+    }
+    return out
+  }
+  /** Current animated offset of a flip layer (WAAPI fill: forwards → computed transform). */
+  const currentOffset = (el: HTMLElement | null | undefined) => {
+    if (!el) return { x: 0, y: 0 }
+    const tr = getComputedStyle(el).transform
+    const m = tr && tr !== 'none' ? tr.match(/matrix\(([^)]+)\)/) : null
+    if (!m) return { x: 0, y: 0 }
+    const p = m[1]!.split(',').map(Number)
+    return { x: p[4] || 0, y: p[5] || 0 }
   }
 
   useEffect(() => {
@@ -387,26 +423,30 @@ function ArrayView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Invalidate geometry cache on bars/cells toggle (hide→restore remounts layers)
+  // Invalidate geometry cache on bars/cells toggle (hide→restore remounts layers);
+  // re-measure the new layout so the very next step still travels.
   useEffect(() => {
     geometryGen.current += 1
-    prevCenters.current.clear()
     animToken.current += 1
     clearTransforms()
+    layoutCenters.current = measureLayout(lastIdsRef.current ?? [])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
 
-  // V29 M2: pause freezes WAAPI mid-flight; resume continues from the same progress.
-  useEffect(() => {
+  // V29 M2 / V30-01: only an explicit Pause (transition.motionPaused) freezes in-flight WAAPI;
+  // resume / manual step continues from the same progress. The autoplay flag is NOT consulted,
+  // so a manual Next during autoplay plays its new transition instead of freezing it at t=0.
+  const motionPaused = transition?.motionPaused ?? false
+  useLayoutEffect(() => {
     for (const anim of flipAnims.current.values()) {
       try {
-        if (!playbackPlaying && anim.playState === 'running') anim.pause()
-        else if (playbackPlaying && anim.playState === 'paused') anim.play()
+        if (motionPaused && anim.playState === 'running') anim.pause()
+        else if (!motionPaused && anim.playState === 'paused') anim.play()
       } catch {
         /* ignore */
       }
     }
-  }, [playbackPlaying])
+  }, [motionPaused])
 
   useEffect(() => {
     const el = wrapRef.current
@@ -420,9 +460,9 @@ function ArrayView({
       lastW = w
       lastH = h
       geometryGen.current += 1
-      prevCenters.current.clear()
       clearTransforms()
       animToken.current += 1
+      layoutCenters.current = measureLayout(lastIdsRef.current ?? [])
     })
     ro.observe(el)
     return () => ro.disconnect()
@@ -434,105 +474,123 @@ function ArrayView({
   // the brand-new FLIP that goNext just created (epoch+idx batched).
   const lastCancelEpoch = useRef(transitionEpoch)
   const lastGeomSig = useRef('')
+  const lastTransitionKey = useRef<string | null>(null)
 
   useLayoutEffect(() => {
     const epochChanged = lastCancelEpoch.current !== transitionEpoch
     lastCancelEpoch.current = transitionEpoch
-    const geomSig = `${ids.join('\0')}|${values.join('\0')}|${swapPair ? swapPair.join(',') : ''}|${arrayOps?.map((o) => o.type).join(',') ?? ''}`
+    const ops = motionOps ?? arrayOps
+    const geomSig = `${ids.join('\0')}|${values.join('\0')}|${ops?.map((o) => `${o.type}:${o.indices.join(',')}`).join(';') ?? ''}`
     const geometryChanged = lastGeomSig.current !== geomSig
     lastGeomSig.current = geomSig
+    const tKey = transition ? `${String(transition.runId ?? '')}|${transition.transitionId}` : null
+    const transitionChanged = transition ? lastTransitionKey.current !== tKey : geometryChanged
+    lastTransitionKey.current = tKey
     // Invalidate in-flight RAF/timeouts from any prior transition instance
-    if (epochChanged || snapSwap) {
-      animToken.current += 1
-    }
-    const token = ++animToken.current
-    const transitionId = ++transitionIdRef.current
+    if (epochChanged || snapSwap) animToken.current += 1
+    const transitionId = transition ? transition.transitionId : ++transitionIdRef.current
     const layers = layerRefs.current
-    const slots = slotRefs.current
-    const gen = geometryGen.current
-
-    const slotCenter = (i: number) => {
-      const el = slots.get(i)
-      if (!el) return null
-      const r = el.getBoundingClientRect()
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 }
+    const host = overlayHostRef.current
+    const newLayout = measureLayout(ids)
+    const commit = () => {
+      layoutCenters.current = newLayout
+      lastIdsRef.current = ids
     }
 
-    const seedCenters = () => {
-      for (let i = 0; i < values.length; i++) {
-        const c = slotCenter(i)
-        const id = ids[i]
-        if (c != null && id) prevCenters.current.set(id, c)
-      }
-    }
-
-    // Seek/reset/replace-run: epoch bumped without new geometry → snap-cancel (not pause-freeze).
-    if (snapSwap || (epochChanged && !geometryChanged)) {
+    // Seek/reset/replace-run/replay or a non-adjacent jump: snapshot (cancel, no travel).
+    const snapshotJump =
+      snapSwap ||
+      (epochChanged && !geometryChanged) ||
+      (transition != null &&
+        transitionChanged &&
+        (transition.snapshot || Math.abs(transition.to - transition.from) !== 1))
+    if (snapshotJump) {
       clearTransforms()
-      seedCenters()
-      overlayHostRef.current?.removeAttribute('data-flip')
+      commit()
+      return
+    }
+    // Re-render without a new transition (theme, font, data tab, pause…): keep in-flight motion.
+    if (!transitionChanged && !geometryChanged) {
+      commit()
       return
     }
 
-    // FLIP targets from element-id relocation (never guess from values alone).
-    // i==j swap → no travel. Copy/write from aux buffers stay instant.
-    const movingIds = relocatingElementIds(prevElementIds, ids)
-    const hasMoveOp = Boolean(arrayOps?.some((o) => o.type === 'move'))
-    const selfSwap = Boolean(swapPair && swapPair[0] === swapPair[1])
+    // V30-02: FLIP source = the snapshot ACTUALLY displayed (this view's last committed ids),
+    // target = current ids, matched by element identity — works for Next and Prev alike.
+    const sourceIds = lastIdsRef.current ?? prevElementIds
+    const movingIds = relocatingElementIds(sourceIds, ids)
+    const motionSwapOp = ops?.find((o) => o.type === 'swap' && o.indices.length >= 2)
+    const motionSwap = motionSwapOp ? ([motionSwapOp.indices[0]!, motionSwapOp.indices[1]!] as [number, number]) : swapPair
+    const hasMoveOp = Boolean(ops?.some((o) => o.type === 'move'))
+    const selfSwap = Boolean(motionSwap && motionSwap[0] === motionSwap[1])
     let flipIds: string[] = []
     if (selfSwap) {
       flipIds = []
-    } else if (swapPair !== null) {
-      flipIds = movingIds.length > 0 ? movingIds : [ids[swapPair[0]!]!, ids[swapPair[1]!]!].filter(Boolean)
+    } else if (motionSwap !== null) {
+      flipIds = movingIds.length > 0 ? movingIds : [ids[motionSwap[0]!]!, ids[motionSwap[1]!]!].filter(Boolean)
     } else if (hasMoveOp) {
       flipIds = movingIds
-    } else if (movingIds.length > 0 && !arrayOps?.some((o) => o.type === 'copy' || o.type === 'write')) {
+    } else if (movingIds.length > 0 && !ops?.some((o) => o.type === 'copy' || o.type === 'write')) {
       flipIds = movingIds
     }
+    const flipSet = new Set(flipIds)
 
-    const shouldFlip =
-      flipIds.length > 0 &&
-      !snapSwap &&
-      prevValues &&
-      prevValues.length === values.length &&
-      motionMode !== 'reduced' &&
-      swapMs > 0
-
-    if (!shouldFlip) {
-      clearTransforms()
-      seedCenters()
-      overlayHostRef.current?.removeAttribute('data-flip')
+    const canFlip = flipIds.length > 0 && motionMode !== 'reduced' && swapMs > 0
+    // In-flight motion of elements that are not part of this transition: keep it running when
+    // their layout slot did not move (it still lands correctly); snap it when it did.
+    for (const [id, anim] of [...flipAnims.current.entries()]) {
+      if (canFlip && flipSet.has(id)) continue
+      const a = layoutCenters.current.get(id)
+      const b = newLayout.get(id)
+      const moved = !a || !b || Math.abs(a.x - b.x) > 0.5 || Math.abs(a.y - b.y) > 0.5
+      if (moved) {
+        cancelFlipAnim(anim)
+        flipAnims.current.delete(id)
+        const layer = layers.get(id)
+        if (layer) clearLayer(layer)
+      }
+    }
+    if (!canFlip) {
+      if (flipAnims.current.size === 0) host?.removeAttribute('data-flip')
+      commit()
       return
     }
 
-    // Cancel any prior in-flight WAAPI before starting a new transition instance.
-        for (const anim of flipAnims.current.values()) cancelFlipAnim(anim)
-    flipAnims.current.clear()
-
     // V29 M1: pin chart track — disable in-slot height lerp while identity FLIP runs.
-    const host = overlayHostRef.current
     host?.setAttribute('data-flip', '1')
-
-    const idToIndex = new Map(ids.map((id, i) => [id, i]))
     const ease = 'cubic-bezier(0.2, 0, 0, 1)' // no overshoot / elastic / back
+    const direction = transition ? (transition.to >= transition.from ? 'forward' : 'backward') : 'forward'
     let started = 0
     for (const id of flipIds) {
-      const idx = idToIndex.get(id)
-      if (idx == null) continue
       const layer = layers.get(id)
-      const newCenter = slotCenter(idx)
-      const oldCenter = prevCenters.current.get(id)
-      if (!layer || newCenter == null || oldCenter == null) continue
-      const dx = oldCenter.x - newCenter.x
+      const newCenter = newLayout.get(id)
+      const base = layoutCenters.current.get(id)
+      if (!layer || newCenter == null || base == null) continue
+      // Interrupt: continue from the CURRENT rendered position (layout + in-flight offset).
+      const off = flipAnims.current.has(id) ? currentOffset(layer) : { x: 0, y: 0 }
+      const prior = flipAnims.current.get(id)
+      if (prior) {
+        flipAnims.current.delete(id)
+        cancelFlipAnim(prior)
+      }
+      const dx = base.x + off.x - newCenter.x
       // Same-row bars: horizontal move only (shared baseline / zero domain).
-      const dyRaw = oldCenter.y - newCenter.y
+      const dyRaw = base.y + off.y - newCenter.y
       const dy = Math.abs(dyRaw) < 4 ? 0 : dyRaw
-      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+        clearLayer(layer)
+        continue
+      }
       layer.style.transition = 'none'
       layer.style.transform = 'none'
       layer.dataset.transitionId = String(transitionId)
       layer.dataset.runFlip = '1'
-      layer.dataset.runId = String(transitionId)
+      layer.dataset.runId = String(transition?.runId ?? '')
+      layer.dataset.transitionFrom = String(transition?.from ?? '')
+      layer.dataset.transitionTo = String(transition?.to ?? '')
+      layer.dataset.actionIntent = transition?.intent ?? 'legacy'
+      layer.dataset.geometryVersion = String(geometryGen.current)
+      layer.dataset.direction = direction
       const anim = layer.animate(
         [
           { transform: `translate(${dx}px, ${dy}px)` },
@@ -540,36 +598,35 @@ function ArrayView({
         ],
         { duration: swapMs, easing: ease, fill: 'forwards' },
       )
+      try {
+        anim.id = `flip:${String(transition?.runId ?? '')}:${transitionId}:${id}`
+      } catch {
+        /* ignore */
+      }
       flipAnims.current.set(id, anim)
       started += 1
-      // V29 ship fix: manual Next while paused must run FLIP to finish so data-run-flip
-      // clears (E2E landed()). Pause-freeze is only for mid-flight via playbackPlaying effect.
       anim.addEventListener('finish', () => {
-        if (animToken.current !== token || geometryGen.current !== gen) return
-        if (layer.dataset.transitionId !== String(transitionId)) return
-        layer.style.transition = 'none'
-        layer.style.transform = 'none'
-        delete layer.dataset.runFlip
+        // Stale callback guard: only the animation currently owning this element may clean up.
+        if (flipAnims.current.get(id) !== anim) return
         flipAnims.current.delete(id)
-        if (flipAnims.current.size === 0) {
-          for (let k = 0; k < values.length; k++) {
-            const c = slotCenter(k)
-            const cid = ids[k]
-            if (c != null && cid) prevCenters.current.set(cid, c)
-          }
-          host?.removeAttribute('data-flip')
+        clearLayer(layer)
+        try {
+          anim.cancel() // drop fill:forwards effect; layer is at its layout slot
+        } catch {
+          /* ignore */
         }
+        if (flipAnims.current.size === 0) overlayHostRef.current?.removeAttribute('data-flip')
       })
     }
-    if (started === 0) {
-      host?.removeAttribute('data-flip')
-      seedCenters()
-    }
+    if (started === 0 && flipAnims.current.size === 0) host?.removeAttribute('data-flip')
+    commit()
   }, [
     values,
     ids,
     swapPair,
     arrayOps,
+    motionOps,
+    transition,
     snapSwap,
     prevValues,
     prevElementIds,
@@ -577,7 +634,6 @@ function ArrayView({
     swapMs,
     transitionEpoch,
   ])
-
 
   // V12-05: range masks in overlay-host coords; resize remeasure; wrap segments include top/height
   useLayoutEffect(() => {
@@ -686,7 +742,7 @@ function ArrayView({
           data-signed={signedMode ? '1' : '0'}
           data-abs-max={geo.absMax}
           data-flip={
-            swapPair !== null || arrayOps?.some((o) => o.type === 'move' || o.type === 'swap')
+            swapPair !== null || (motionOps ?? arrayOps)?.some((o) => o.type === 'move' || o.type === 'swap')
               ? '1'
               : undefined
           }
@@ -956,6 +1012,13 @@ function CompactSequenceStrip({
   )
 }
 
+/** V30-02: ops describing the displayed from→to transition (undefined → legacy target ops). */
+function motionOpsFor(motionStep: Step | undefined, transition: PlaybackTransition | undefined, name: string): ArrayOp[] | undefined {
+  if (!transition) return undefined
+  if (!motionStep) return []
+  return motionStep.arrayOps?.[name] ?? []
+}
+
 /** Aux copy buffers shown as a compact strip (not full-height second bar chart). */
 const BUFFER_ARRAY_NAMES = new Set(['temp', 'left', 'right', 'key'])
 /** String / label arrays that accompany a DP matrix (LCS X/Y) — compact labels, not primary scene. */
@@ -974,6 +1037,8 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   scaleMaxByArray,
   signedDomainByArray,
   snapSwap,
+  transition,
+  motionStep,
   /** V18-02: when matrix/board is primary, render arrays as compact companion labels */
   companionMode = false,
   presentation,
@@ -984,6 +1049,9 @@ export const ArraysFromStep = memo(function ArraysFromStep({
   scaleMaxByArray?: Record<string, number>
   signedDomainByArray?: Record<string, { hasPos: boolean; hasNeg: boolean }>
   snapSwap?: boolean
+  /** V30: real displayed transition + the step whose ops define it. */
+  transition?: PlaybackTransition
+  motionStep?: Step
   companionMode?: boolean
   /** V24: declared array primary + companions (presentation contract). */
   presentation?: PresentationDescriptor
@@ -998,6 +1066,8 @@ export const ArraysFromStep = memo(function ArraysFromStep({
         scaleMaxByArray={scaleMaxByArray}
         signedDomainByArray={signedDomainByArray}
         snapSwap={snapSwap}
+        transition={transition}
+        motionStep={motionStep}
         presentation={presentation}
         auxBar={auxBar}
       />
@@ -1035,6 +1105,8 @@ export const ArraysFromStep = memo(function ArraysFromStep({
       prevValues={prevStep?.arrays?.[name]}
       prevElementIds={prevStep?.elementIds?.[name]}
       snapSwap={snapSwap}
+      transition={transition}
+      motionOps={motionOpsFor(motionStep, transition, name)}
       compact={compact}
       defaultMode={compact ? 'cells' : undefined}
     />
@@ -1096,6 +1168,8 @@ function DeclaredArrayScene({
   scaleMaxByArray,
   signedDomainByArray,
   snapSwap,
+  transition,
+  motionStep,
   presentation,
   auxBar,
 }: {
@@ -1104,6 +1178,8 @@ function DeclaredArrayScene({
   scaleMaxByArray?: Record<string, number>
   signedDomainByArray?: Record<string, { hasPos: boolean; hasNeg: boolean }>
   snapSwap?: boolean
+  transition?: PlaybackTransition
+  motionStep?: Step
   presentation: PresentationDescriptor
   auxBar?: ReactNode
 }) {
@@ -1132,6 +1208,8 @@ function DeclaredArrayScene({
       prevValues={prevStep?.arrays?.[name]}
       prevElementIds={prevStep?.elementIds?.[name]}
       snapSwap={snapSwap}
+      transition={transition}
+      motionOps={motionOpsFor(motionStep, transition, name)}
       compact={compact}
       defaultMode={compact ? 'cells' : undefined}
       labelFormat={presentation.labelFormat?.[name]}

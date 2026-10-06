@@ -141,7 +141,7 @@ function computeSignedDomain(steps: Step[]): Record<string, { hasPos: boolean; h
  * the transport are Workbench siblings fed by the same PlaybackController.
  */
 export default function Visualizer({ player, staleResult = false, context, algoId }: Props) {
-  const { steps, idx, step, prevStep, playing, isPreview, runId, snapSwap, speedVars } = player
+  const { steps, idx, step, prevStep, playing, isPreview, runId, snapSwap, speedVars, transition, motionStep } = player
   const usedRoles = useMemo(() => collectUsedRoles(steps), [steps])
   const scaleMaxByArray = useMemo(() => computeScaleMax(steps), [steps])
   const signedDomainByArray = useMemo(() => computeSignedDomain(steps), [steps])
@@ -202,6 +202,9 @@ export default function Visualizer({ player, staleResult = false, context, algoI
       data-step-index={idx}
       data-preview={isPreview ? '1' : '0'}
       data-run-id={runId !== undefined && runId !== null ? String(runId) : undefined}
+      data-action-intent={transition?.intent}
+      data-transition-id={transition?.transitionId}
+      data-transition-from={transition?.from}
       data-testid="visualizer"
     >
       {/* ONE main step description (action + reason + result). Wraps; never half-line clipped. */}
@@ -248,6 +251,8 @@ export default function Visualizer({ player, staleResult = false, context, algoI
                 scaleMaxByArray={scaleMaxByArray}
                 signedDomainByArray={signedDomainByArray}
                 snapSwap={snapSwap}
+                transition={transition}
+                motionStep={motionStep}
                 presentation={descriptor}
                 auxBar={
                   treeAux || descriptor?.callStackVar ? (
@@ -292,6 +297,8 @@ export default function Visualizer({ player, staleResult = false, context, algoI
                 scaleMaxByArray={scaleMaxByArray}
                 signedDomainByArray={signedDomainByArray}
                 snapSwap={snapSwap}
+                transition={transition}
+                motionStep={motionStep}
                 companionMode
               />
             )}
@@ -305,6 +312,8 @@ export default function Visualizer({ player, staleResult = false, context, algoI
                 scaleMaxByArray={scaleMaxByArray}
                 signedDomainByArray={signedDomainByArray}
                 snapSwap={snapSwap}
+                transition={transition}
+                motionStep={motionStep}
                 companionMode={false}
               />
             )}
