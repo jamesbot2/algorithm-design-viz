@@ -204,6 +204,16 @@
   visibility: hidden;
   pointer-events: none;
 }
+/* Fit-guard fallback: the run-max budget would starve the main array → per-frame height (V29).
+   Sizers stay measurable (same width) but leave the flow; nothing they cover is painted. */
+.scene-companions[data-budget="frame"] {
+  position: relative;
+  overflow: clip;
+}
+.scene-companions[data-budget="frame"] > .scene-companions-sizer {
+  position: absolute;
+  inset: 0 0 auto 0;
+}
 .scene-companions-row > .array-buffers {
   flex: 1 1 auto;
   max-height: none;

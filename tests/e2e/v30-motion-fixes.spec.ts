@@ -146,6 +146,30 @@ test('V30-03 merge tree open: call-stack wrap does not move the main card', asyn
   }
 })
 
+test('V30-03 fit guard: run-max strip never pushes the main array out of the stage (merge 7, tree open)', async ({ page }) => {
+  await prep(page, 'mergeSort', '5,2,8,1,9,3,7')
+  for (const i of [1, 2, 3]) {
+    await realClick(page, next(page))
+    await waitIdx(page, i)
+    await waitSettled(page)
+  }
+  const comp = page.getByTestId('scene-companions')
+  await expect(comp).toHaveAttribute('data-budget', 'run-max')
+  await realClick(page, page.getByTestId('aux-toggle-recursion-tree'))
+  await expect(page.getByTestId('scene-aux-pane')).toBeVisible()
+  await waitSettled(page)
+  await expect(comp, 'budget does not fit next to the main floor → per-frame fallback').toHaveAttribute('data-budget', 'frame')
+  const r = await page.evaluate(() => {
+    const st = document.querySelector('[data-testid="viz-canvas"]')!.getBoundingClientRect()
+    const m = document.querySelector('[data-testid="viz-canvas"] .array-view:not(.array-view-compact)')!.getBoundingClientRect()
+    return { stTop: st.top, stBottom: st.bottom, mTop: m.top, mBottom: m.bottom }
+  })
+  expect(r.mBottom, JSON.stringify(r)).toBeLessThanOrEqual(r.stBottom + 1)
+  await realClick(page, page.getByTestId('aux-toggle-recursion-tree'))
+  await expect(page.getByTestId('scene-aux-pane')).toHaveCount(0)
+  await expect(comp).toHaveAttribute('data-budget', 'run-max')
+})
+
 test.describe('390x844', () => {
   test.use({ viewport: { width: 390, height: 844 } })
   for (const c of [

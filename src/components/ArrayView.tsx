@@ -1420,6 +1420,44 @@ function DeclaredArrayScene({
     }
     return [...seen.values()]
   }, [budgetOn, runSteps, key, companionNames, presentation.callStackVar])
+  /**
+   * V30-03 fit guard: the run-max strip is only used when it still leaves the main array its
+   * floor inside the stage viewport. Otherwise (narrow split pane with the tree open, very short
+   * stage) the strip falls back to per-frame height (V29 behaviour) so the main array is never
+   * pushed out of view. Decided from measured geometry, not a magic padding.
+   */
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [budgetFits, setBudgetFits] = useState(true)
+  useLayoutEffect(() => {
+    if (!budgetOn) return
+    const panel = panelRef.current
+    const stage = panel?.closest('[data-stage-viewport]') as HTMLElement | null
+    if (!panel || !stage) return
+    const px = (v: string) => (Number.isFinite(parseFloat(v)) ? parseFloat(v) : 0)
+    const check = () => {
+      const strip = panel.querySelector(':scope > .scene-companions') as HTMLElement | null
+      const main = panel.querySelector(':scope > .array-view') as HTMLElement | null
+      if (!strip || !main) return
+      let sizerMax = 0
+      for (const s of Array.from(strip.querySelectorAll(':scope > .scene-companions-sizer'))) {
+        sizerMax = Math.max(sizerMax, (s as HTMLElement).offsetHeight)
+      }
+      const pcs = getComputedStyle(panel)
+      const pane = panel.parentElement
+      const acs = pane ? getComputedStyle(pane) : null
+      const mcs = getComputedStyle(main)
+      const chrome =
+        px(pcs.rowGap) + px(pcs.paddingTop) + px(pcs.paddingBottom) +
+        (acs ? px(acs.paddingTop) + px(acs.paddingBottom) : 0) + px(mcs.marginTop) + px(mcs.marginBottom)
+      const fits = sizerMax + px(mcs.minHeight) + chrome <= stage.clientHeight + 0.5
+      setBudgetFits((prev) => (prev === fits ? prev : fits))
+    }
+    check()
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(check) : null
+    ro?.observe(stage)
+    ro?.observe(panel)
+    return () => ro?.disconnect()
+  }, [budgetOn, sizerFrames])
 
   const ghost = (sizer: boolean) => (
     <div
@@ -1436,6 +1474,7 @@ function DeclaredArrayScene({
   const showStrip = compactEntries.length > 0 || presentation.reserveCompanions || auxBar
   return (
     <div
+      ref={panelRef}
       className="arrays-panel"
       data-array-order="primary-first"
       data-declared-primary={key}
@@ -1446,7 +1485,7 @@ function DeclaredArrayScene({
           className="scene-companions"
           data-testid="scene-companions"
           data-reserved={presentation.reserveCompanions ? '1' : '0'}
-          data-budget={budgetOn ? 'run-max' : undefined}
+          data-budget={budgetOn ? (budgetFits ? 'run-max' : 'frame') : undefined}
           data-sizers={budgetOn ? sizerFrames.length : undefined}
         >
           <div className="scene-companions-row" data-live="1">
