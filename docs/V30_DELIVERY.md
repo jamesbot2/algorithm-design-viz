@@ -4,10 +4,10 @@
 
 ---
 
-# V30 最终交付（本地，未推送 / 未部署）
+# V30 最终交付（分支已推送 origin/v30-motion-fixes；未合并 main / 未部署）
 
-- 分支 `v30-motion-fixes`，基线 `fb5f44c`（V29）。代码最终提交 **5233e5e**；其后仅追加本文档提交（docs/V30_DELIVERY.md，不改代码）。
-- build-info 仍为 **V29**（未升版本）。未 push、未部署、未改 remote；`git stash` 与约 302 个 docs/screenshots、docs/traces 未暂存改动均未触碰（全部只用显式路径 git add）。
+- 分支 `v30-motion-fixes`，基线 `fb5f44c`（V29）。代码最终提交 **d0db816**（M4 补丁：844x390 树打开主卡漂移，见下节；之前为 5233e5e）；其后仅追加本文档提交（docs/V30_DELIVERY.md，不改代码）。
+- build-info 仍为 **V29**（未升版本）。仅经授权 `git push origin v30-motion-fixes`（非 force）；未推 main、未部署、未升版本；`git stash` 与约 302 个 docs/screenshots、docs/traces 未暂存改动均未触碰（全部只用显式路径 git add）。
 - 所有 E2E 均在完整 HTTP 应用中用真实鼠标/键盘驱动；无 force click、evaluate(click)、预先 scrollIntoView、放大视口或自动恢复；本地 retries=0。
 
 ## V30-01 自动播放中手动 Next 接管时交换动画冻结
@@ -33,7 +33,17 @@
 - 视频：`/workspace/v30/videos/{before,after}-m0-repro-M0-repro-V30-03-m-228ff-ar-main-card-drift-1366x768.webm`、`…-V30-03-g-273a2-ompanion-geometry-computed-.webm`
 - 数据：samples/before/v30-03-merge-1366.json（pp y 4.328，4 次跳变）→ samples/after-videos/v30-03-merge-1366.json（pp 0，无跳变）；矩阵 samples/before/buffer/*.json（before 0/24 通过，m2-buffer-before.log）→ samples/final2-buffer/buffer/*.json；运动矩阵 samples/final2-motion/motion/。
 
-## 测试结果（@5233e5e，均为零重试）
+## V30-03c（M4/M5）844x390 递归树打开时主卡漂移
+- 复现：merge [4,1,3,2]，844x390，打开递归树后逐步 Next（两种动效偏好）。5233e5e：主数组 y p-p **30.19px**（V29 34.52px）。
+- 根因：伴随条（缓冲区）按整次运行最大内容预留的 run-max 预算在树打开时放不进舞台 ⇒ 5233e5e 的适配保护回退到逐帧高度（data-budget=frame），伴随条每帧变高变矮，主卡随之移动 30.19px。
+- 修复：
+  - 03be108 先提交失败回归（回退带必须稳定：844x390 树打开、merge 7 树打开 @1366）。
+  - bd38852 run-max 放不进时改为“封顶的稳定伴随带”（整次运行固定高度，内容在带内裁切/滚动），不再逐帧变高。
+  - d0db816 封顶带的预算预留主卡的真实内容需求（按非弹性内容测量主卡 need、隐藏 tab 跳过测量、观察主卡子元素尺寸变化），修复 bd38852 下主卡被压缩导致的 v24 回归。
+- 结果（@d0db816，零重试）：缓冲矩阵 **48/48**（全部 main x/y/w/h p-p 0px，含 844x390 树打开两种动效）；v24 17/17；V30 spec ×3 87/87（含 03be108 两条回归 ×3）；运动矩阵 83/83；tsc 0；lint 0 错误；单元 672/672；完整 E2E **347/347 passed，0 failed，0 flaky**（29.2 min，logs/full-e2e-m5.log）；干净 clone 生产构建 exit 0：`index-DfMqJ_yq.js`、`index-Ban0OfYW.css`，build-info `V29 · d0db816`（logs/build-d0db816.log）。
+- 首次失败（如实记录）：bd38852 的 m4 链 v24 2 失败（“recursion tree open/close … a stays readable”、“merge 390x844 tabs round trip … keeps a readable”）——真实回归，由 d0db816 修复，m5 v24 17/17；m4 运动矩阵 82/83（crossrow-390-cells rep2 “not settled”），m5 83/83 及完整 E2E 未复现，原因未解释。
+
+## 测试结果（@5233e5e，均为零重试；@d0db816 结果见上节）
 | 项目 | 结果 | 日志 |
 |---|---|---|
 | tsc -b | exit 0 | logs/tsc-5233e5e.log |
@@ -61,10 +71,10 @@
 - 完整 E2E #1（@9888172 树拷贝）：341/4 失败——v23 build-info `V29 · unknown`（拷贝无 .git，环境问题）；v24 tree-open ×2（真实问题 → 5233e5e 修复）；v30:323（检测器 → 14f4a0b）。#2 @5233e5e：346/346。
 
 ## 遗留 / 未验证
-1. 844x390 merge 树打开：run-max 预算放不进舞台 ⇒ 适配保护回退逐帧高度，主数组 y p-p **30.19px**（V29 同场景 34.52px；主数组不再被裁切）。属取舍，非完全修复。
+1. ~~844x390 merge 树打开主数组 y p-p 30.19px~~ → 已由 bd38852 / d0db816 修复（p-p 0px，见 V30-03c）。
 2. 产品侧瞬态：Run 后舞台高度约 40ms 内 406→331px 收缩（V29 既有，未在 V30 修改）。
-3. crossrow-390-bars 偶发 “not settled” 一次，未解释。
+3. crossrow-390-bars（9888172 链）与 crossrow-390-cells（m4 链）各偶发 “not settled” 一次，未解释，均未复现。
 4. 未验证：六种语言 CDN 实际加载、Worker 路径、Firefox / WebKit、真实设备、真实浏览器缩放。
 
 ## 授权说明
-本地交付完成，代码 HEAD 5233e5e（+ 文档提交）已具备 push / deploy 条件；**等待用户授权** push、部署及是否升版本号（当前 build-info 保持 V29）。
+代码 HEAD d0db816（+ 文档提交）已按授权推送到 `origin/v30-motion-fixes`（非 force）。**未**合并/推送 main、**未**部署、**未**升版本号（build-info 保持 V29）；这些仍需用户另行授权。
