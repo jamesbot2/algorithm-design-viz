@@ -146,6 +146,22 @@ test('V30-03 merge tree open: call-stack wrap does not move the main card', asyn
   }
 })
 
+/** Main card vs stage, and whether the recursion-tree toggle is inside the strip's visible box. */
+async function stageFacts(page: Page) {
+  return page.evaluate(() => {
+    const st = document.querySelector('[data-testid="viz-canvas"]')!.getBoundingClientRect()
+    const m = document.querySelector('[data-testid="viz-canvas"] .array-view:not(.array-view-compact)')!.getBoundingClientRect()
+    const live = document.querySelector('[data-testid="scene-companions"] > .scene-companions-row[data-live]')!.getBoundingClientRect()
+    const t = document.querySelector('[data-testid="aux-toggle-recursion-tree"]')!.getBoundingClientRect()
+    return {
+      stBottom: st.bottom,
+      mTop: m.top,
+      mBottom: m.bottom,
+      toggleInStrip: t.top >= live.top - 0.5 && t.bottom <= live.bottom + 0.5 && t.height > 0,
+    }
+  })
+}
+
 test('V30-03 fit guard: run-max strip never pushes the main array out of the stage (merge 7, tree open)', async ({ page }) => {
   await prep(page, 'mergeSort', '5,2,8,1,9,3,7')
   for (const i of [1, 2, 3]) {
@@ -158,16 +174,64 @@ test('V30-03 fit guard: run-max strip never pushes the main array out of the sta
   await realClick(page, page.getByTestId('aux-toggle-recursion-tree'))
   await expect(page.getByTestId('scene-aux-pane')).toBeVisible()
   await waitSettled(page)
-  await expect(comp, 'budget does not fit next to the main floor → per-frame fallback').toHaveAttribute('data-budget', 'frame')
-  const r = await page.evaluate(() => {
-    const st = document.querySelector('[data-testid="viz-canvas"]')!.getBoundingClientRect()
-    const m = document.querySelector('[data-testid="viz-canvas"] .array-view:not(.array-view-compact)')!.getBoundingClientRect()
-    return { stTop: st.top, stBottom: st.bottom, mTop: m.top, mBottom: m.bottom }
-  })
-  expect(r.mBottom, JSON.stringify(r)).toBeLessThanOrEqual(r.stBottom + 1)
+  await expect(comp, 'run-max does not fit next to the main floor → capped stable strip').toHaveAttribute('data-budget', 'capped')
+  // Every remaining frame: main card fixed (≤1px), inside the stage, tree toggle reachable in the strip.
+  const frames: Sample[] = [await snap(page)]
+  const facts = [await stageFacts(page)]
+  await startSampler(page)
+  for (let i = 4; i < 120; i++) {
+    if (await next(page).isDisabled()) break
+    await realClick(page, next(page))
+    await waitIdx(page, i)
+    await waitSettled(page)
+    frames.push(await snap(page))
+    facts.push(await stageFacts(page))
+  }
+  const cont: Sample[] = await stopSampler(page)
+  expect(new Set(frames.map((f) => f.compKind)).size, 'covers empty and real buffers').toBeGreaterThan(1)
+  for (const set of [frames, cont]) {
+    const pp = rectPP(set, 'main')
+    expect(Math.max(pp.x!, pp.y!, pp.w!, pp.h!), JSON.stringify(pp)).toBeLessThanOrEqual(1)
+  }
+  for (const f of facts) {
+    expect(f.mBottom, JSON.stringify(f)).toBeLessThanOrEqual(f.stBottom + 1)
+    expect(f.toggleInStrip, `tree toggle visible in the strip ${JSON.stringify(f)}`).toBe(true)
+  }
   await realClick(page, page.getByTestId('aux-toggle-recursion-tree'))
   await expect(page.getByTestId('scene-aux-pane')).toHaveCount(0)
   await expect(comp).toHaveAttribute('data-budget', 'run-max')
+})
+
+test.describe('844x390', () => {
+  test.use({ viewport: { width: 844, height: 390 } })
+  test('V30-03 merge [4,1,3,2] tree open: main card fixed, tree toggle stays in the strip', async ({ page }) => {
+    await prep(page, 'mergeSort', '4,1,3,2')
+    const base = await stageFacts(page)
+    await realClick(page, page.getByTestId('aux-toggle-recursion-tree'))
+    await expect(page.getByTestId('scene-aux-pane')).toBeVisible()
+    await waitSettled(page)
+    const facts = [await stageFacts(page)]
+    const frames: Sample[] = [await snap(page)]
+    await startSampler(page)
+    for (let i = 1; i < 120; i++) {
+      if (await next(page).isDisabled()) break
+      await realClick(page, next(page))
+      await waitIdx(page, i)
+      await waitSettled(page)
+      frames.push(await snap(page))
+      facts.push(await stageFacts(page))
+    }
+    const cont: Sample[] = await stopSampler(page)
+    for (const set of [frames, cont]) {
+      const pp = rectPP(set, 'main')
+      expect(Math.max(pp.x!, pp.y!, pp.w!, pp.h!), JSON.stringify(pp)).toBeLessThanOrEqual(1)
+    }
+    for (const f of facts) {
+      expect(f.toggleInStrip, JSON.stringify(f)).toBe(true)
+      // opening the tree never pushes the main card further down than the tree-closed layout
+      expect(f.mTop, `main top ${f.mTop} vs tree closed ${base.mTop}`).toBeLessThanOrEqual(base.mTop + 1)
+    }
+  })
 })
 
 test.describe('390x844', () => {
