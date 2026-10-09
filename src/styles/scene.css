@@ -287,9 +287,38 @@
   margin-top: 0.15rem;
   gap: 2px;
 }
-.cell-ptrs .ptr-tag {
+.cell-ptrs .ptr-tag,
+.cell-ptrs .ptr-tag-sizer {
   font-size: 0.62rem;
   padding: 0 0.25rem;
+}
+/* V30-03b: pointer track = one grid cell; the live tags and a hidden copy of the run's worst
+   stack overlap, so the track height is the run maximum (pointers never move plot / rows). */
+.pointer-row[data-ptr-budget] {
+  display: grid;
+}
+.pointer-row[data-ptr-budget] > .ptr-live,
+.pointer-row[data-ptr-budget] > .ptr-sizer {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+  gap: inherit;
+  min-width: 0;
+}
+.ptr-sizer {
+  visibility: hidden;
+  pointer-events: none;
+}
+.bars-strut {
+  flex: 0 0 0;
+  width: 0;
+  min-width: 0;
+  /* cancel the flex gap this zero-width item would add (bars-wrap gap: 6px) */
+  margin-left: -6px;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* Short bars: the value sits just above the bar (never inside a 5px sliver, never on the index). */

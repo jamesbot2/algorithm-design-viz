@@ -164,6 +164,31 @@ test.describe('390x844', () => {
   }
 })
 
+test('V30-03b merge [4,1,3,2] bars: plot baseline fixed when the tallest element is parked in a buffer', async ({ page }) => {
+  await prep(page, 'mergeSort', '4,1,3,2')
+  const { frames, cont } = await stepAllMain(page)
+  const rows = new Set(frames.flatMap((f) => f.els.map((e: { row: number }) => e.row)))
+  expect([...rows], 'one baseline over the whole run').toHaveLength(1)
+  expect(maxVerticalDrift(cont.filter((s) => s.els?.length === 4)), 'no in-card vertical shake').toBeLessThanOrEqual(1)
+})
+
+test.describe('390x844 pointer track', () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+  test('V30-03b cells: wrapped rows do not move when pointers appear / stack', async ({ page }) => {
+    await prep(page, 'bubbleSort', '9,8,7,6,5,4,3,2,1,0,11,10', { mode: 'cells' })
+    const frames: Sample[] = [await snap(page)]
+    for (const i of [1, 2]) {
+      await realClick(page, next(page))
+      await waitIdx(page, i)
+      await waitSettled(page)
+      frames.push(await snap(page))
+    }
+    expect(new Set(frames[0]!.els.map((e: { row: number }) => e.row)).size, 'really wraps').toBeGreaterThan(1)
+    const y = (f: Sample, id: string) => f.els.find((e: { id: string }) => e.id === id)!.y
+    for (const id of ['b5', 'b10']) for (const f of frames) expect(Math.abs(y(f, id) - y(frames[0]!, id)), id).toBeLessThanOrEqual(1)
+  })
+})
+
 test('V30 pure autoplay [2,1]: swap travels, nothing paused, frame fixed', async ({ page }) => {
   await prep(page, 'bubbleSort', '2,1')
   await startSampler(page)

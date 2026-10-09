@@ -330,6 +330,7 @@ export default function Visualizer({ player, staleResult = false, context, algoI
                 transition={transition}
                 motionStep={motionStep}
                 companionMode={false}
+                runSteps={steps}
               />
             )}
             {primaryScene !== 'matrix' && primaryScene !== 'board' && stepForMatrix?.matrices && (

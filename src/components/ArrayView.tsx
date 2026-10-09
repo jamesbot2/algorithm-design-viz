@@ -43,6 +43,12 @@ interface Props {
   compact?: boolean
   /** V24-02: label presentation for string cells (interval → id + [start,finish) card). */
   labelFormat?: 'interval-card'
+  /**
+   * V30-03b: run budget for the pointer track (main view only) — the worst stacked label set
+   * any single slot carries across the whole run. The track is a fixed template sized by it,
+   * so pointers appearing / stacking never move the plot or the next wrapped row.
+   */
+  pointerBudget?: PointerBudget
 }
 
 const ROLE_CLASS: Record<HighlightRole, string> = {
@@ -170,6 +176,47 @@ function resolveIds(values: (number | string)[], elementIds?: string[]): string[
   return values.map((_, i) => `el-${i}`)
 }
 
+export type PointerBudget = { labels: string[] }
+
+const pointerBudgetCache = new WeakMap<Step[], Map<string, PointerBudget | undefined>>()
+/** Worst per-slot pointer stack of `name` over the immutable run (by count, then label length). */
+function pointerBudgetOf(runSteps: Step[] | undefined, name: string): PointerBudget | undefined {
+  if (!runSteps || runSteps.length === 0) return undefined
+  let byName = pointerBudgetCache.get(runSteps)
+  if (!byName) {
+    byName = new Map()
+    pointerBudgetCache.set(runSteps, byName)
+  }
+  if (byName.has(name)) return byName.get(name)
+  let best: string[] | null = null
+  const score = (l: string[]) => l.length * 1000 + l.join('').length
+  for (const s of runSteps) {
+    const len = s.arrays?.[name]?.length ?? 0
+    const at = new Map<number, string[]>()
+    for (const [lab, idx] of Object.entries(deriveArrayPointers(s, name))) {
+      if (typeof idx !== 'number' || idx < 0 || idx >= len) continue
+      at.set(idx, [...(at.get(idx) ?? []), lab])
+    }
+    for (const l of at.values()) if (!best || score(l) > score(best)) best = l
+  }
+  const out = best ? { labels: best } : undefined
+  byName.set(name, out)
+  return out
+}
+
+/** Hidden, inert copy of the run's worst pointer stack: shares the track's grid cell. */
+function PtrSizer({ labels }: { labels: string[] }) {
+  return (
+    <span className="ptr-sizer" aria-hidden="true">
+      {labels.map((l) => (
+        <span key={l} className="ptr-tag-sizer">
+          {l}
+        </span>
+      ))}
+    </span>
+  )
+}
+
 function ArrayView({
   name,
   label,
@@ -190,6 +237,7 @@ function ArrayView({
   motionOps,
   compact = false,
   labelFormat,
+  pointerBudget,
 }: Props) {
   const numeric = values.every((v) => typeof v === 'number' && Number.isFinite(v as number))
   const suitable = barSuitable(values)
@@ -232,6 +280,7 @@ function ArrayView({
   }, [pointers, values.length])
 
   const hasPointers = pointersByIndex.size > 0
+  const ptrBudget = compact ? undefined : pointerBudget
   const lanes = signedPlotLanes(signedMode ? geo : null, maxH)
   /** Largest span s ≤ avail with s + lanes(s) ≤ avail (V25-02: lanes never starve the plot). */
   const fitSpanRef = useRef((avail: number) => Math.max(32, avail))
@@ -316,6 +365,8 @@ function ArrayView({
         }
         colChrome = Math.max(colChrome, 30)
       }
+      // V30-03b: the plot strut reads the same measured column chrome (no re-render needed).
+      if (wrap && !signedMode) wrap.style.setProperty('--bars-col-chrome', `${colChrome}px`)
       const budget = Math.floor(box - chromeY - labelH - noteH - wrapPad - colChrome - 2)
       if (signedMode) {
         // Readable floor: the box never gets smaller than label + a SIGNED_MIN_SPAN_PX plot (with
@@ -771,6 +822,16 @@ function ArrayView({
           )}
           {/* V25-02: y(0) = pad + lane-top + zero-ratio·span (CSS), the same line the plot uses */}
           {signedMode && <div className="bar-baseline" data-zero-line aria-hidden />}
+          {/* V30-03b: zero-width plot strut = the run's tallest column (scaleMax → maxH + measured
+              chrome). A frame whose tallest element is parked in a buffer keeps the same baseline
+              instead of lifting every bar; it never exceeds what a full frame already occupies. */}
+          {!signedMode && (
+            <span
+              className="bars-strut"
+              aria-hidden
+              style={{ height: `calc(${maxH}px + var(--bars-col-chrome, 30px))` }}
+            />
+          )}
           {values.map((v, i) => {
             const role = roleForIndex(i, highlights, roles, arrayOps)
             const h = geo.heights[i]!
@@ -841,12 +902,25 @@ function ArrayView({
                   flipLayer
                 )}
                 <span className="bar-idx">{i}</span>
-                <div className="pointer-row" data-ptr-count={ptrs.length}>
-                  {ptrs.map((p) => (
-                    <span key={p} className="ptr-tag">
-                      {p}
-                    </span>
-                  ))}
+                <div className="pointer-row" data-ptr-count={ptrs.length} data-ptr-budget={ptrBudget ? ptrBudget.labels.length : undefined}>
+                  {ptrBudget ? (
+                    <>
+                      <span className="ptr-live">
+                        {ptrs.map((p) => (
+                          <span key={p} className="ptr-tag">
+                            {p}
+                          </span>
+                        ))}
+                      </span>
+                      <PtrSizer labels={ptrBudget.labels} />
+                    </>
+                  ) : (
+                    ptrs.map((p) => (
+                      <span key={p} className="ptr-tag">
+                        {p}
+                      </span>
+                    ))
+                  )}
                 </div>
               </div>
             )
@@ -914,15 +988,29 @@ function ArrayView({
                       )}
                     </div>
                   </div>
-                  {(hasPointers || compact) && (
+                  {(hasPointers || compact || ptrBudget) && (
                     // V24: pointer tags sit under THEIR slot (aligned with value / index);
                     // compact companions always reserve the row so their height is stable.
-                    <div className="pointer-row cell-ptrs">
-                      {(pointersByIndex.get(i) ?? []).map((p) => (
-                        <span key={p} className="ptr-tag" title={`${p}=${i}`}>
-                          {p}
-                        </span>
-                      ))}
+                    // V30-03b: the main view reserves the run's worst stack (hidden sizer).
+                    <div className="pointer-row cell-ptrs" data-ptr-budget={ptrBudget ? ptrBudget.labels.length : undefined}>
+                      {ptrBudget ? (
+                        <>
+                          <span className="ptr-live">
+                            {(pointersByIndex.get(i) ?? []).map((p) => (
+                              <span key={p} className="ptr-tag" title={`${p}=${i}`}>
+                                {p}
+                              </span>
+                            ))}
+                          </span>
+                          <PtrSizer labels={ptrBudget.labels} />
+                        </>
+                      ) : (
+                        (pointersByIndex.get(i) ?? []).map((p) => (
+                          <span key={p} className="ptr-tag" title={`${p}=${i}`}>
+                            {p}
+                          </span>
+                        ))
+                      )}
                     </div>
                   )}
                 </div>
@@ -1116,6 +1204,7 @@ export const ArraysFromStep = memo(function ArraysFromStep({
       motionOps={motionOpsFor(motionStep, transition, name)}
       compact={compact}
       defaultMode={compact ? 'cells' : undefined}
+      pointerBudget={compact ? undefined : pointerBudgetOf(runSteps, name)}
     />
   )
   if (companionMode) {
@@ -1315,6 +1404,7 @@ function DeclaredArrayScene({
       compact={compact}
       defaultMode={compact ? 'cells' : undefined}
       labelFormat={presentation.labelFormat?.[name]}
+      pointerBudget={compact ? undefined : pointerBudgetOf(runSteps, name)}
     />
   )
   const hasLabelFormats = Boolean(presentation.labelFormat && Object.keys(presentation.labelFormat).some((n) => n !== key))

@@ -538,7 +538,8 @@ button.icon-btn {
   min-height: 1.35rem;
   margin-top: 0.2rem;
 }
-.ptr-tag {
+.ptr-tag,
+.ptr-tag-sizer {
   font-size: 0.65rem;
   font-family: var(--mono);
   font-weight: 700;
