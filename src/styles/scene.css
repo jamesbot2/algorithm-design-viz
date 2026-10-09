@@ -204,18 +204,33 @@
   visibility: hidden;
   pointer-events: none;
 }
-/* Fit-guard fallback: the run-max budget would starve the main array → per-frame height (V29).
-   Sizers stay measurable (same width) but leave the flow; nothing they cover is painted. */
-.scene-companions[data-budget="frame"] {
+/* Fit-guard fallback (run-max would starve the main array): ONE fixed band height for the run
+   (--companion-cap, measured in ArrayView). Oversized frames scroll locally inside the band;
+   hidden sizers leave the flow (still measurable at the same width) and never paint. */
+.scene-companions[data-budget="capped"] {
+  height: var(--companion-cap);
+  grid-template-rows: minmax(0, 1fr);
   position: relative;
   overflow: clip;
 }
-.scene-companions[data-budget="frame"] > .scene-companions-sizer {
+.scene-companions[data-budget="capped"] > .scene-companions-sizer {
   position: absolute;
   inset: 0 0 auto 0;
 }
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* the tree toggle never scrolls out of the band */
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] > .scene-aux-bar {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-elev);
+}
+/* Buffers hug their content; the aux bar takes the rest of the line (below). */
 .scene-companions-row > .array-buffers {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   max-height: none;
   overflow: visible;
   padding: 0.2rem 0.4rem;
@@ -245,11 +260,17 @@
 .cell-ghost-val {
   color: var(--muted);
 }
+/* V30-03 M4: basis 0 → the aux bar stays on the buffers' line whenever its min-content fits
+   (call-stack text wraps inside it) instead of dropping to its own line on long-label frames. */
 .scene-aux-bar {
-  flex: 0 1 auto;
+  flex: 1 1 0;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   margin-left: auto;
+}
+.scene-aux-bar > .aux-bar {
+  justify-content: flex-end;
 }
 .aux-bar {
   display: flex;

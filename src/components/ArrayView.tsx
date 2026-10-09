@@ -1423,11 +1423,15 @@ function DeclaredArrayScene({
   /**
    * V30-03 fit guard: the run-max strip is only used when it still leaves the main array its
    * floor inside the stage viewport. Otherwise (narrow split pane with the tree open, very short
-   * stage) the strip falls back to per-frame height (V29 behaviour) so the main array is never
-   * pushed out of view. Decided from measured geometry, not a magic padding.
+   * stage) the strip becomes a CAPPED band of one fixed height for the whole run:
+   *   cap = clamp(stage − main floor − chrome, smallest run shape, run-max)
+   * Frames whose companions exceed the cap scroll locally inside the band (the tree toggle is
+   * sticky in it), so the main array keeps one allocation on every frame and is never pushed
+   * lower than the smallest legal strip would put it. Decided from measured geometry only.
    */
   const panelRef = useRef<HTMLDivElement>(null)
-  const [budgetFits, setBudgetFits] = useState(true)
+  /** null = run-max fits; number = capped band height (px). */
+  const [budgetCap, setBudgetCap] = useState<number | null>(null)
   useLayoutEffect(() => {
     if (!budgetOn) return
     const panel = panelRef.current
@@ -1439,9 +1443,13 @@ function DeclaredArrayScene({
       const main = panel.querySelector(':scope > .array-view') as HTMLElement | null
       if (!strip || !main) return
       let sizerMax = 0
+      let sizerMin = Infinity
       for (const s of Array.from(strip.querySelectorAll(':scope > .scene-companions-sizer'))) {
-        sizerMax = Math.max(sizerMax, (s as HTMLElement).offsetHeight)
+        const h = (s as HTMLElement).getBoundingClientRect().height
+        sizerMax = Math.max(sizerMax, h)
+        sizerMin = Math.min(sizerMin, h)
       }
+      if (!Number.isFinite(sizerMin)) return
       const pcs = getComputedStyle(panel)
       const pane = panel.parentElement
       const acs = pane ? getComputedStyle(pane) : null
@@ -1449,13 +1457,18 @@ function DeclaredArrayScene({
       const chrome =
         px(pcs.rowGap) + px(pcs.paddingTop) + px(pcs.paddingBottom) +
         (acs ? px(acs.paddingTop) + px(acs.paddingBottom) : 0) + px(mcs.marginTop) + px(mcs.marginBottom)
-      const fits = sizerMax + px(mcs.minHeight) + chrome <= stage.clientHeight + 0.5
-      setBudgetFits((prev) => (prev === fits ? prev : fits))
+      const avail = stage.clientHeight - px(mcs.minHeight) - chrome
+      const cap = sizerMax <= avail + 0.5 ? null : Math.max(sizerMin, Math.min(avail, sizerMax))
+      setBudgetCap((prev) =>
+        prev === cap || (prev !== null && cap !== null && Math.abs(prev - cap) < 0.5) ? prev : cap,
+      )
     }
     check()
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(check) : null
     ro?.observe(stage)
     ro?.observe(panel)
+    // capped sizers are out of flow: a shape change (fonts, width) does not resize the panel
+    for (const sz of Array.from(panel.querySelectorAll(':scope > .scene-companions > .scene-companions-sizer'))) ro?.observe(sz)
     return () => ro?.disconnect()
   }, [budgetOn, sizerFrames])
 
@@ -1485,7 +1498,8 @@ function DeclaredArrayScene({
           className="scene-companions"
           data-testid="scene-companions"
           data-reserved={presentation.reserveCompanions ? '1' : '0'}
-          data-budget={budgetOn ? (budgetFits ? 'run-max' : 'frame') : undefined}
+          data-budget={budgetOn ? (budgetCap === null ? 'run-max' : 'capped') : undefined}
+          style={budgetOn && budgetCap !== null ? ({ '--companion-cap': `${budgetCap}px` } as CSSProperties) : undefined}
           data-sizers={budgetOn ? sizerFrames.length : undefined}
         >
           <div className="scene-companions-row" data-live="1">
