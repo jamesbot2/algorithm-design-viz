@@ -122,17 +122,23 @@ export async function waitIdx(page, idx, playing) {
   )
 }
 
-/** Settled = no running/paused WAAPI on main layers and no data-run-flip, for 3 consecutive rAFs. */
+/** Settled = no running/paused WAAPI on main layers, no data-run-flip and unchanged layer rects, for 3 consecutive rAFs. */
 export async function waitSettled(page, timeout = 3000) {
   return page
     .waitForFunction(
       () => {
         const main = document.querySelector('[data-testid="viz-canvas"] .array-view:not(.array-view-compact)')
         if (!main) return true
-        const busy = [...main.querySelectorAll('[data-flip-layer]')].some(
+        const layers = [...main.querySelectorAll('[data-flip-layer]')]
+        const busy = layers.some(
           (l) => l.dataset.runFlip === '1' || (l.getAnimations?.() || []).some((a) => a.playState === 'running' || a.playState === 'paused'),
         )
-        window.__settleN = busy ? 0 : (window.__settleN || 0) + 1
+        // V30 M3: also require GEOMETRY to be still (first-frame bar refit lands a frame or two
+        // after the animations are idle; sampling earlier reads a transient layout).
+        const sig = layers.map((l) => { const b = l.getBoundingClientRect(); return `${b.x.toFixed(1)},${b.y.toFixed(1)},${b.height.toFixed(1)}` }).join('|')
+        const moved = sig !== window.__settleSig
+        window.__settleSig = sig
+        window.__settleN = busy || moved ? 0 : (window.__settleN || 0) + 1
         return window.__settleN >= 3
       },
       null,
