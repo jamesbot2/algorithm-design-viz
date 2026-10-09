@@ -175,6 +175,23 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+/* V30-03 (ship): run-budgeted banner — live text + the run's narrations share one grid cell. */
+.viz-banner-text[data-reserve] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.viz-banner-text[data-reserve] > .viz-banner-live,
+.viz-banner-text[data-reserve] > .viz-banner-sizer {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.viz-banner-text[data-reserve] > .viz-banner-sizer {
+  visibility: hidden;
+  pointer-events: none;
+}
+.viz-banner-text[data-reserve] > .viz-banner-sizer::before {
+  content: attr(data-msg);
+}
 .viz-banner-controls {
   flex: 0 0 auto;
   display: flex;

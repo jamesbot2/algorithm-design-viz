@@ -193,6 +193,23 @@ export default function Visualizer({ player, staleResult = false, context, algoI
   const runForestDepth = useMemo(() => (primaryScene === 'forest' ? forestMaxDepth(steps) : 0), [primaryScene, steps])
   const arraysCompanion = primaryScene === 'matrix' || primaryScene === 'board'
   const displayMessage = step?.message ?? '就绪：调整输入后点击「运行」。'
+  /**
+   * V30-03 (ship): on a reserved-companion array scene the banner is budgeted like the
+   * companion strip — as tall as the run's longest narration at the current width — so a
+   * step whose narration wraps to one more line (narrow phone, wider CJK fallback font) does
+   * not push the stage down on just that frame. The run's distinct messages overlap the live
+   * text in one grid cell as empty, hidden pseudo-content spans (no textContent / innerText).
+   */
+  const reserveBanner = Boolean(declaredArray && descriptor?.reserveCompanions && steps.length > 1)
+  const bannerSizers = useMemo(() => {
+    if (!reserveBanner) return [] as string[]
+    const seen = new Set<string>()
+    for (const s of steps) {
+      if (typeof s.message === 'string' && s.message) seen.add(s.message)
+      if (seen.size >= MAX_BANNER_SIZERS) break
+    }
+    return [...seen]
+  }, [reserveBanner, steps])
 
   return (
     <div
@@ -209,8 +226,16 @@ export default function Visualizer({ player, staleResult = false, context, algoI
     >
       {/* ONE main step description (action + reason + result). Wraps; never half-line clipped. */}
       <div className="viz-banner viz-banner-slot" data-testid="viz-banner" role="status">
-        <div className="viz-banner-text" data-testid="viz-banner-text" title={displayMessage}>
-          {displayMessage}
+        <div
+          className="viz-banner-text"
+          data-testid="viz-banner-text"
+          title={displayMessage}
+          data-reserve={bannerSizers.length > 0 ? '1' : undefined}
+        >
+          {bannerSizers.length > 0 ? <span className="viz-banner-live">{displayMessage}</span> : displayMessage}
+          {bannerSizers.map((m, k) => (
+            <span key={k} className="viz-banner-sizer" data-msg={m} aria-hidden="true" />
+          ))}
         </div>
         <div className="viz-banner-controls" data-testid="viz-banner-controls">
           {staleResult && <span className="stale-result-badge">上一轮结果</span>}
@@ -353,6 +378,8 @@ export default function Visualizer({ player, staleResult = false, context, algoI
   )
 }
 
+
+const MAX_BANNER_SIZERS = 240
 
 /** V24: switchable-auxiliary controls for an array primary (recursion tree + call-stack summary). */
 function AuxBar({

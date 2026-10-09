@@ -120,8 +120,9 @@ test('V30-03 merge [4,1,3,2] buffers appear/disappear: main card fixed (≤1px)'
   expect(pp.h!, `main h p-p ${JSON.stringify(pp)}`).toBeLessThanOrEqual(1)
 })
 
-async function stepAllMain(page: Page) {
+async function stepAllMain(page: Page, onFrame?: () => Promise<void>) {
   const frames: Sample[] = [await snap(page)]
+  await onFrame?.()
   await startSampler(page)
   for (let i = 1; i < 120; i++) {
     if (await next(page).isDisabled()) break
@@ -129,6 +130,7 @@ async function stepAllMain(page: Page) {
     await waitIdx(page, i)
     await waitSettled(page)
     frames.push(await snap(page))
+    await onFrame?.()
   }
   const cont: Sample[] = await stopSampler(page)
   return { frames, cont }
@@ -250,6 +252,26 @@ test.describe('390x844', () => {
       }
     })
   }
+})
+
+// V30 ship (CI E2E 37946827394): a step narration that wraps to one more line on a narrow
+// phone (here at 375 with the box fonts, at 390 with CI's WenQuanYi) pushed the stage down by
+// that line on just those frames. The banner budgets the run's longest narration instead.
+test.describe('375x812 narration wrap', () => {
+  test.use({ viewport: { width: 375, height: 812 } })
+  test('V30-03 merge multi-digit: a wrapping step narration does not move the main card', async ({ page }) => {
+    await prep(page, 'mergeSort', '100,7,35,2048,9,13')
+    const banner = page.getByTestId('viz-banner')
+    const bannerH = new Set<number>()
+    const { frames, cont } = await stepAllMain(page, async () => {
+      bannerH.add(Math.round(((await banner.boundingBox())?.height ?? 0) * 10) / 10)
+    })
+    expect([...bannerH], 'one banner height over the whole run').toHaveLength(1)
+    for (const set of [frames, cont]) {
+      const pp = rectPP(set, 'main')
+      expect(Math.max(pp.x!, pp.y!, pp.w!, pp.h!), JSON.stringify(pp)).toBeLessThanOrEqual(1)
+    }
+  })
 })
 
 test('V30-03b merge [4,1,3,2] bars: plot baseline fixed when the tallest element is parked in a buffer', async ({ page }) => {
