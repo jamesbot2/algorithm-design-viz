@@ -323,6 +323,12 @@
      otherwise left a stale strut height on the first frame) */
   transition-property: none;
 }
+/* V30 M3: signed plot geometry is calc(var(--plot-*)) — same reduced-motion stale-first-frame
+   failure (plot +75px until the first step, also in the V29 baseline). Geometry never transitions. */
+.bars-wrap.signed .bar-plot,
+.bars-wrap.signed .bar-flip-layer {
+  transition-property: none;
+}
 
 /* Short bars: the value sits just above the bar (never inside a 5px sliver, never on the index). */
 .bars-wrap:not(.signed) .bar.bar-short {

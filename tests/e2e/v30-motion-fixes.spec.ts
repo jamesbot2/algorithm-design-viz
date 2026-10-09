@@ -316,8 +316,12 @@ test.describe('reduced motion', () => {
     await waitSettled(page)
     expect((await snap(page)).visOrder).toEqual(['2', '1'])
   })
-  test('V30 reduced: first frame lands on the same geometry as after Next→Prev (no stale strut)', async ({ page }) => {
-    await prep(page, 'bubbleSort', '2,1')
+  for (const c of [
+    { algo: 'bubbleSort', arr: '2,1', id: 'unsigned strut' },
+    { algo: 'insertionSort', arr: '1,-1', id: 'signed plot' },
+  ])
+  test(`V30 reduced: first frame lands on the same geometry as after Next→Prev (${c.id})`, async ({ page }) => {
+    await prep(page, c.algo, c.arr)
     const f0: Sample = await snap(page)
     await realClick(page, next(page))
     await waitIdx(page, 1)
