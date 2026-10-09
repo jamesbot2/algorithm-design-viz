@@ -1438,7 +1438,15 @@ function DeclaredArrayScene({
     const stage = panel?.closest('[data-stage-viewport]') as HTMLElement | null
     if (!panel || !stage) return
     const px = (v: string) => (Number.isFinite(parseFloat(v)) ? parseFloat(v) : 0)
+    /**
+     * Main card need: its floor, raised (never lowered, per main width) when non-elastic content
+     * (cells rows; elastic .bars-wrap is skipped) overflows the card. Layout boxes of the card's direct children only — FLIP
+     * transforms inside them never count, so motion cannot ratchet the budget mid-run.
+     */
+    let need = { width: -1, px: 0 }
     const check = () => {
+      // hidden tab / collapsed stage: nothing to measure — keep the last decision
+      if (stage.clientHeight <= 0 || panel.getClientRects().length === 0) return
       const strip = panel.querySelector(':scope > .scene-companions') as HTMLElement | null
       const main = panel.querySelector(':scope > .array-view') as HTMLElement | null
       if (!strip || !main) return
@@ -1449,7 +1457,7 @@ function DeclaredArrayScene({
         sizerMax = Math.max(sizerMax, h)
         sizerMin = Math.min(sizerMin, h)
       }
-      if (!Number.isFinite(sizerMin)) return
+      if (!Number.isFinite(sizerMin) || sizerMax <= 0) return
       const pcs = getComputedStyle(panel)
       const pane = panel.parentElement
       const acs = pane ? getComputedStyle(pane) : null
@@ -1457,7 +1465,18 @@ function DeclaredArrayScene({
       const chrome =
         px(pcs.rowGap) + px(pcs.paddingTop) + px(pcs.paddingBottom) +
         (acs ? px(acs.paddingTop) + px(acs.paddingBottom) : 0) + px(mcs.marginTop) + px(mcs.marginBottom)
-      const avail = stage.clientHeight - px(mcs.minHeight) - chrome
+      if (need.width !== main.clientWidth) need = { width: main.clientWidth, px: px(mcs.minHeight) }
+      const mr = main.getBoundingClientRect()
+      let contentBottom = mr.top
+      for (const c of Array.from(main.children)) {
+        // bars refit to whatever height they are given (their floor is min-height); cells rows don't
+        if (c.classList.contains('bars-wrap')) continue
+        const cr = c.getBoundingClientRect()
+        if (cr.height > 0) contentBottom = Math.max(contentBottom, cr.bottom + px(getComputedStyle(c).marginBottom))
+      }
+      const innerBottom = mr.bottom - px(mcs.paddingBottom) - px(mcs.borderBottomWidth)
+      if (contentBottom > innerBottom + 0.5) need.px = Math.max(need.px, mr.height + (contentBottom - innerBottom))
+      const avail = stage.clientHeight - need.px - chrome
       const cap = sizerMax <= avail + 0.5 ? null : Math.max(sizerMin, Math.min(avail, sizerMax))
       setBudgetCap((prev) =>
         prev === cap || (prev !== null && cap !== null && Math.abs(prev - cap) < 0.5) ? prev : cap,
@@ -1465,11 +1484,25 @@ function DeclaredArrayScene({
     }
     check()
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(check) : null
+    const observeMainKids = () => {
+      const main = panel.querySelector(':scope > .array-view')
+      if (main) for (const c of Array.from(main.children)) ro?.observe(c)
+    }
     ro?.observe(stage)
     ro?.observe(panel)
     // capped sizers are out of flow: a shape change (fonts, width) does not resize the panel
     for (const sz of Array.from(panel.querySelectorAll(':scope > .scene-companions > .scene-companions-sizer'))) ro?.observe(sz)
-    return () => ro?.disconnect()
+    observeMainKids()
+    // bars ↔ cells swaps the main card's content element
+    const mo = typeof MutationObserver !== 'undefined'
+      ? new MutationObserver(() => { observeMainKids(); check() })
+      : null
+    const mainEl = panel.querySelector(':scope > .array-view')
+    if (mainEl) mo?.observe(mainEl, { childList: true })
+    return () => {
+      ro?.disconnect()
+      mo?.disconnect()
+    }
   }, [budgetOn, sizerFrames])
 
   const ghost = (sizer: boolean) => (
