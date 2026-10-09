@@ -319,6 +319,9 @@
   margin-left: -6px;
   visibility: hidden;
   pointer-events: none;
+  /* geometry, not motion: never transitions (the reduced-motion 0.01ms global transition
+     otherwise left a stale strut height on the first frame) */
+  transition-property: none;
 }
 
 /* Short bars: the value sits just above the bar (never inside a 5px sliver, never on the index). */
