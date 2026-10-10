@@ -1,4 +1,4 @@
-import { launch, prep, stepTo, settle } from './measure.mjs'
+import { launch, prep, stepTo } from './measure.mjs'
 const [base, vw, vh, n, idx] = process.argv.slice(2)
 const browser = await launch()
 const page = await browser.newPage({ viewport: { width: +vw, height: +vh } })

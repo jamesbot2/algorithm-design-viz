@@ -95,7 +95,7 @@ for (const c of cases) {
   await page2.close()
   const pp = (key2) => { const o = {}; ['x', 'y', 'w', 'h'].forEach((k, i) => { const v = frames.map((f) => f[key2]?.[i]).filter((x) => typeof x === 'number'); o[k] = v.length ? +(Math.max(...v) - Math.min(...v)).toFixed(2) : null }); return o }
   const res = { tag, ver, n: c.n, vp: c.vp, tree: !!c.tree, cells: !!c.cells, frames: frames.length, runIds: [...new Set(frames.map((f) => f.runId))], key,
-    keyFrames: Object.fromEntries(Object.entries(key).map(([k, v]) => [k, v == null ? null : (({ cards, tags, mainVals, ...rest }) => rest)(frames[v])])),
+    keyFrames: Object.fromEntries(Object.entries(key).map(([k, v]) => [k, v == null ? null : (({ cards: _c, tags: _t, mainVals: _m, ...rest }) => rest)(frames[v])])),
     mainPP: pp('main'), compPP: pp('comp'), budgets: [...new Set(frames.map((f) => `${f.budget}/${f.reason}`))],
     minShare: Math.min(...frames.map((f) => f.main[3] / (f.main[3] + f.comp[3]))),
     overflowFrames: frames.filter((f) => f.liveOver).length, overflowNoAffordance: frames.filter((f) => f.liveOver && !(f.overflow && f.more)).map((f) => f.idx),
