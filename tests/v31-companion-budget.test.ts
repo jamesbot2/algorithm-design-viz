@@ -52,4 +52,24 @@ describe('V31-01 companion budget (main-scene priority)', () => {
     expect(companionBudget({ scene: 0, mainNeed: 160, shapes: n16 })).toBeNull()
     expect(companionBudget({ scene: 400, mainNeed: 160, shapes: [] })).toBeNull()
   })
+  it('compact layout: capped band = tallest compact frame (all cards / names / pointer tracks fit)', () => {
+    const d = companionBudget({ scene: 440, mainNeed: 160, shapes: n16, compact: [87, 117, 117] })!
+    expect(d.cap).toBe(117)
+    expect(d.reason).toBe('compact')
+  })
+  it('compact layout too tall for the room left by the main need → compact-tight (stage scrolls), never cut', () => {
+    const d = companionBudget({ scene: 440, mainNeed: 359, shapes: [87, 117, 648], compact: [87, 117] })!
+    expect(d.cap).toBe(117)
+    expect(d.reason).toBe('compact-tight')
+  })
+  it('compact no shorter than the natural tallest frame → natural run-max (nothing scrolls)', () => {
+    const d = companionBudget({ scene: 200, mainNeed: 160, shapes: [60, 90], compact: [95] })!
+    expect(d.cap).toBeNull()
+    expect(d.reason).toBe('run-max')
+  })
+  it('natural run-max still preferred whenever it fits the share', () => {
+    const d = companionBudget({ scene: 1100, mainNeed: 160, shapes: n16, compact: [117] })!
+    expect(d.cap).toBeNull()
+  })
 })
+
