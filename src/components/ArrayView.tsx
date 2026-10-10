@@ -91,6 +91,8 @@ function roleForIndex(
 
 /** V31: readable minimum bar column / gap and the bars-wrap side padding (styles.css .bar-col / .bars-wrap). */
 const BAR_MIN_COL_PX = 18
+/** unsigned bars: minimum plot height (tallest bar) before the card must grow / the stage scroll */
+const BAR_MIN_PLOT_PX = 32
 const BAR_MIN_GAP_PX = 1
 const BARS_WRAP_PAD_X = 8
 function barSuitable(values: (number | string)[]): boolean {
@@ -391,7 +393,13 @@ function ArrayView({
       }
       // signed: `budget` is the whole plot (lanes + span); pick the largest span whose
       // own lanes still fit — lanes are evaluated for the CANDIDATE span, not the current one.
-      const next = signedMode ? fitSpanRef.current(budget) : Math.max(32, budget)
+      const next = signedMode ? fitSpanRef.current(budget) : Math.max(BAR_MIN_PLOT_PX, budget)
+      if (!signedMode) {
+        // V31: the box this chart needs for its minimum plot — chrome is independent of the bar
+        // heights (layer-excluded column chrome), so the value is stable across frames / motion
+        const floor = String(Math.ceil(box - budget + BAR_MIN_PLOT_PX))
+        if (self.dataset.barsFloor !== floor) self.dataset.barsFloor = floor
+      }
       setMaxH((prev) => {
         if (Math.abs(prev - next) < 2) return prev
         // A re-fit is geometry, not data: land it without the 220ms height transition
@@ -1487,7 +1495,8 @@ function DeclaredArrayScene({
     const px = (v: string) => (Number.isFinite(parseFloat(v)) ? parseFloat(v) : 0)
     /**
      * Main card need: its floor, raised (never lowered, per main width) when non-elastic content
-     * (cells rows; elastic .bars-wrap is skipped) overflows the card. Layout boxes of the card's direct children only — FLIP
+     * (cells rows; elastic .bars-wrap is skipped) overflows the card, or to the unsigned bars' own
+     * floor (chrome + minimum plot, published by the bar fit as data-bars-floor). Layout boxes of the card's direct children only — FLIP
      * transforms inside them never count, so motion cannot ratchet the budget mid-run.
      */
     let need = { width: -1, px: 0 }
@@ -1527,13 +1536,17 @@ function DeclaredArrayScene({
       const mr = main.getBoundingClientRect()
       let contentBottom = mr.top
       for (const c of Array.from(main.children)) {
-        // bars refit to whatever height they are given (their floor is min-height); cells rows don't
+        // bars refit to whatever height they are given (their floor is published below); cells rows don't
         if (c.classList.contains('bars-wrap')) continue
         const cr = c.getBoundingClientRect()
         if (cr.height > 0) contentBottom = Math.max(contentBottom, cr.bottom + px(getComputedStyle(c).marginBottom))
       }
       const innerBottom = mr.bottom - px(mcs.paddingBottom) - px(mcs.borderBottomWidth)
       if (contentBottom > innerBottom + 0.5) need.px = Math.max(need.px, mr.height + (contentBottom - innerBottom))
+      // unsigned bars: the card's measured chrome + the 32px minimum plot (data-bars-floor, set by the
+      // bar fit). Below it the bars overhang the card (844x390: 9.5px past it, last ~1px unreachable).
+      const barsFloor = main.querySelector(':scope > .bars-wrap:not(.signed)') ? Number(main.dataset.barsFloor) : NaN
+      if (Number.isFinite(barsFloor)) need.px = Math.max(need.px, barsFloor)
       const d = companionBudget({ scene: stage.clientHeight - stacked - chrome, mainNeed: need.px, shapes, compact })
       if (!d) return
       const cap = d.cap
@@ -1561,7 +1574,7 @@ function DeclaredArrayScene({
       ? new MutationObserver(() => { observeMainKids(); check() })
       : null
     const mainEl = panel.querySelector(':scope > .array-view')
-    if (mainEl) mo?.observe(mainEl, { childList: true })
+    if (mainEl) mo?.observe(mainEl, { childList: true, attributes: true, attributeFilter: ['data-bars-floor'] })
     return () => {
       ro?.disconnect()
       mo?.disconnect()

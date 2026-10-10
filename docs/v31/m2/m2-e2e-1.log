@@ -1,0 +1,46 @@
+
+Running 10 tests using 1 worker
+
+(node:446984) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 375x812 › V31 M2 n=16 whole run 375x812: one main allocation, companions readable, same-step data, nothing unreachable (25.0s)
+  ✓   2 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 390x844 › V31 M2 n=16 whole run 390x844: one main allocation, companions readable, same-step data, nothing unreachable (23.2s)
+  ✓   3 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 844x390 › V31 M2 n=16 whole run 844x390: one main allocation, companions readable, same-step data, nothing unreachable (22.9s)
+  ✓   4 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 1024x600 › V31 M2 n=16 whole run 1024x600: one main allocation, companions readable, same-step data, nothing unreachable (25.5s)
+  ✓   5 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 1366x768 › V31 M2 n=16 whole run 1366x768: one main allocation, companions readable, same-step data, nothing unreachable (25.4s)
+  ✓   6 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 1920x1080 › V31 M2 n=16 whole run 1920x1080: one main allocation, companions readable, same-step data, nothing unreachable (25.1s)
+  ✓   7 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 375x812 › V31 M2 n=24 375x812: every main slot reachable; real wheel scroll paints the last slot (5.3s)
+  ✓   8 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 375x812 › V31 M2 n=32 375x812: every main slot reachable; real wheel scroll paints the last slot (6.9s)
+  ✘   9 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 844x390 › V31 M2 n=24 844x390: every main slot reachable; real wheel scroll paints the last slot (6.1s)
+(node:450343) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  10 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 844x390 › V31 M2 n=32 844x390: every main slot reachable; real wheel scroll paints the last slot (6.7s)
+
+
+  1) [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 844x390 › V31 M2 n=24 844x390: every main slot reachable; real wheel scroll paints the last slot 
+
+    Error: last main slot painted after real wheel scrolling
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 0.99
+    Received:    0.9888600074266617
+
+      188 |           p = await lastPainted()
+      189 |         }
+    > 190 |         expect(p.frac, 'last main slot painted after real wheel scrolling').toBeGreaterThanOrEqual(0.99)
+          |                                                                             ^
+      191 |         expect(p.hit).toBe(true)
+      192 |         // companions keep their readable band and the data stay in step after scrolling
+      193 |         expect((await page.evaluate(FRAME_FACTS)).runId).toBe(f.runId)
+        at /workspace/algorithm-design-viz/tests/e2e/v31-mobile-budget.spec.ts:190:77
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/v31-mobile-budget-M2-large-9c084-scroll-paints-the-last-slot-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/v31-mobile-budget-M2-large-9c084-scroll-paints-the-last-slot-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 844x390 › V31 M2 n=24 844x390: every main slot reachable; real wheel scroll paints the last slot 
+  9 passed (2.9m)

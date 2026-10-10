@@ -1,0 +1,21 @@
+
+Running 13 tests using 1 worker
+
+(node:454053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:36:3 › 375x812 phone › V31-01 n=16 frame 31/144: main array has priority, companions are not the majority (6.0s)
+  ✓   2 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:52:3 › 375x812 phone › V31-01 n=7: no oversized companion band (aux bar not squeezed into a glyph column) (1.9s)
+  ✓   3 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:63:3 › 375x812 phone › V31-01 n=16 whole run: one main allocation, overflow frames scroll in-band with affordance and readable pointers (22.2s)
+  ✓   4 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 375x812 › V31 M2 n=16 whole run 375x812: one main allocation, companions readable, same-step data, nothing unreachable (23.3s)
+  ✓   5 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 390x844 › V31 M2 n=16 whole run 390x844: one main allocation, companions readable, same-step data, nothing unreachable (23.2s)
+  ✓   6 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 844x390 › V31 M2 n=16 whole run 844x390: one main allocation, companions readable, same-step data, nothing unreachable (23.1s)
+  ✓   7 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 1024x600 › V31 M2 n=16 whole run 1024x600: one main allocation, companions readable, same-step data, nothing unreachable (24.3s)
+  ✓   8 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 1366x768 › V31 M2 n=16 whole run 1366x768: one main allocation, companions readable, same-step data, nothing unreachable (25.4s)
+  ✓   9 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:134:5 › M2 1920x1080 › V31 M2 n=16 whole run 1920x1080: one main allocation, companions readable, same-step data, nothing unreachable (26.0s)
+  ✓  10 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 375x812 › V31 M2 n=24 375x812: every main slot reachable; real wheel scroll paints the last slot (5.2s)
+  ✓  11 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 375x812 › V31 M2 n=32 375x812: every main slot reachable; real wheel scroll paints the last slot (6.9s)
+  ✓  12 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 844x390 › V31 M2 n=24 844x390: every main slot reachable; real wheel scroll paints the last slot (5.7s)
+  ✓  13 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:168:7 › M2 large n 844x390 › V31 M2 n=32 844x390: every main slot reachable; real wheel scroll paints the last slot (6.9s)
+
+  13 passed (3.4m)
+EXIT 0
