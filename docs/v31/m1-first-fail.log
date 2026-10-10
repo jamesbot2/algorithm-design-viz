@@ -1,0 +1,94 @@
+
+Running 3 tests using 1 worker
+
+(node:403652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 10:53:10 AM [vite] (client) [Unhandled error] Error: ResizeObserver loop completed with undelivered notifications.
+[WebServer]  > ../../algorithm-design-viz/@vite/client:305:50
+[WebServer] 
+  ✘  1 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:36:3 › 375x812 phone › V31-01 n=16 frame 31/144: main array has priority, companions are not the majority (5.2s)
+(node:403830) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:52:3 › 375x812 phone › V31-01 n=7: no oversized companion band (aux bar not squeezed into a glyph column) (1.9s)
+(node:403999) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:63:3 › 375x812 phone › V31-01 n=16 whole run: one main allocation, overflow frames scroll in-band with affordance and readable pointers (15.5s)
+
+
+  1) [chromium] › tests/e2e/v31-mobile-budget.spec.ts:36:3 › 375x812 phone › V31-01 n=16 frame 31/144: main array has priority, companions are not the majority 
+
+    Error: main share {"idx":30,"runId":"run_mv1suprz_hb65g6r","counter":"31 / 144 · merge","stage":{"x":14.578125,"y":251.640625,"w":345.84375,"h":451.75},"stageClientH":452,"stageScrollH":462,"comp":{"x":14.578125,"y":251.640625,"w":345.84375,"h":286.390625},"budget":"capped","live":{"sh":286,"ch":286,"st":0,"ov":"auto"},"overflow":null,"more":false,"main":{"x":14.578125,"y":543.625,"w":345.84375,"h":160},"mode":"bars","maxBar":32,"nBars":16}
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 0.55
+    Received:    0.3584304665896601
+
+      41 |     expect(b.counter, info).toMatch(/^31 \/ 144/)
+      42 |     expect(b.mode).toBe('bars')
+    > 43 |     expect(share(b), `main share ${info}`).toBeGreaterThanOrEqual(0.55)
+         |                                            ^
+      44 |     expect(b.comp!.h, `companion band ≤ 36% of stage ${info}`).toBeLessThanOrEqual(0.36 * b.stageClientH)
+      45 |     expect(b.maxBar, `bars clearly taller than V30's 32px ${info}`).toBeGreaterThanOrEqual(100)
+      46 |     for (const e of await companionReadable(page)) {
+        at /workspace/algorithm-design-viz/tests/e2e/v31-mobile-budget.spec.ts:43:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/v31-mobile-budget-375x812--bad3c-anions-are-not-the-majority-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/v31-mobile-budget-375x812--bad3c-anions-are-not-the-majority-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/v31-mobile-budget.spec.ts:52:3 › 375x812 phone › V31-01 n=7: no oversized companion band (aux bar not squeezed into a glyph column) 
+
+    Error: {"idx":5,"runId":"run_mv1suu49_g10ot1y","counter":"6 / 50 · split","stage":{"x":14.578125,"y":251.640625,"w":345.84375,"h":451.75},"stageClientH":452,"stageScrollH":452,"comp":{"x":14.578125,"y":251.640625,"w":345.84375,"h":203.46875},"budget":"run-max","live":{"sh":203,"ch":203,"st":0,"ov":"visible"},"overflow":null,"more":false,"main":{"x":14.578125,"y":460.703125,"w":345.84375,"h":242.6875},"mode":"bars","maxBar":94,"nBars":7}
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 162.72
+    Received:    203.46875
+
+      54 |     await stepTo(page, 5)
+      55 |     const b = await budget(page)
+    > 56 |     expect(b.comp!.h, JSON.stringify(b)).toBeLessThanOrEqual(0.36 * b.stageClientH)
+         |                                          ^
+      57 |     expect(share(b), JSON.stringify(b)).toBeGreaterThanOrEqual(0.6)
+      58 |     // the tree toggle stays one readable line
+      59 |     const t = await page.getByTestId('aux-toggle-recursion-tree').boundingBox()
+        at /workspace/algorithm-design-viz/tests/e2e/v31-mobile-budget.spec.ts:56:42
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/v31-mobile-budget-375x812--c145a-ueezed-into-a-glyph-column--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/v31-mobile-budget-375x812--c145a-ueezed-into-a-glyph-column--chromium/error-context.md
+
+  3) [chromium] › tests/e2e/v31-mobile-budget.spec.ts:63:3 › 375x812 phone › V31-01 n=16 whole run: one main allocation, overflow frames scroll in-band with affordance and readable pointers 
+
+    Error: frame 118 overflow flagged
+
+    expect(received).not.toBeNull()
+
+    Received: null
+
+      68 |         overflowFrames.push(b.idx)
+      69 |         expect(b.live.ov, `frame ${b.idx} band scrolls`).toMatch(/auto|scroll/)
+    > 70 |         expect(b.overflow, `frame ${b.idx} overflow flagged`).not.toBeNull()
+         |                                                                   ^
+      71 |         expect(b.more, `frame ${b.idx} visible scroll affordance`).toBe(true)
+      72 |         const tags = (await companionReadable(page)).filter((e) => e.t !== 'left' && e.t !== 'right' && e.t !== 'temp · key' && e.t !== 'key')
+      73 |         expect(tags.length).toBeGreaterThan(0)
+        at each (/workspace/algorithm-design-viz/tests/e2e/v31-mobile-budget.spec.ts:70:67)
+        at allFrames (/workspace/algorithm-design-viz/tests/e2e/v31-mobile-budget.spec.ts:28:21)
+        at /workspace/algorithm-design-viz/tests/e2e/v31-mobile-budget.spec.ts:66:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/v31-mobile-budget-375x812--e57ed-dance-and-readable-pointers-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/v31-mobile-budget-375x812--e57ed-dance-and-readable-pointers-chromium/error-context.md
+
+  3 failed
+    [chromium] › tests/e2e/v31-mobile-budget.spec.ts:36:3 › 375x812 phone › V31-01 n=16 frame 31/144: main array has priority, companions are not the majority 
+    [chromium] › tests/e2e/v31-mobile-budget.spec.ts:52:3 › 375x812 phone › V31-01 n=7: no oversized companion band (aux bar not squeezed into a glyph column) 
+    [chromium] › tests/e2e/v31-mobile-budget.spec.ts:63:3 › 375x812 phone › V31-01 n=16 whole run: one main allocation, overflow frames scroll in-band with affordance and readable pointers 
