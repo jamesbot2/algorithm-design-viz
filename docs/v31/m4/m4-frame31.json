@@ -1,0 +1,596 @@
+[
+ {
+  "ver": "V29",
+  "n": 7,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xc5qu_fpafwjg",
+   "counter": "1 / 50 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 236.41,
+    "w": 345.84,
+    "h": 466.98,
+    "bottom": 703.39
+   },
+   "stageClientH": 467,
+   "stageScrollH": 467,
+   "comp": {
+    "x": 14.58,
+    "y": 236.41,
+    "w": 345.84,
+    "h": 112.69,
+    "bottom": 349.09
+   },
+   "compBudget": null,
+   "compMode": null,
+   "compScroll": null,
+   "main": {
+    "x": 14.58,
+    "y": 354.69,
+    "w": 345.84,
+    "h": 348.7,
+    "bottom": 703.39
+   },
+   "maxBar": 217,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 394.05,
+    "w": 324.66,
+    "h": 298.14,
+    "bottom": 692.19
+   },
+   "nBars": 7,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ },
+ {
+  "ver": "V29",
+  "n": 16,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xc71i_nyrth1j",
+   "counter": "1 / 144 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 236.41,
+    "w": 345.84,
+    "h": 466.98,
+    "bottom": 703.39
+   },
+   "stageClientH": 467,
+   "stageScrollH": 467,
+   "comp": {
+    "x": 14.58,
+    "y": 236.41,
+    "w": 345.84,
+    "h": 112.69,
+    "bottom": 349.09
+   },
+   "compBudget": null,
+   "compMode": null,
+   "compScroll": null,
+   "main": {
+    "x": 14.58,
+    "y": 354.69,
+    "w": 345.84,
+    "h": 348.7,
+    "bottom": 703.39
+   },
+   "maxBar": 218,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 394.05,
+    "w": 324.66,
+    "h": 299.14,
+    "bottom": 693.19
+   },
+   "nBars": 16,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  },
+  "f31": {
+   "idx": 30,
+   "runId": "run_mv1xc71i_nyrth1j",
+   "counter": "31 / 144 · merge",
+   "banner": "比较 left[0]=12 与 right[0]=11图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 236.41,
+    "w": 345.84,
+    "h": 466.98,
+    "bottom": 703.39
+   },
+   "stageClientH": 467,
+   "stageScrollH": 467,
+   "comp": {
+    "x": 14.58,
+    "y": 236.41,
+    "w": 345.84,
+    "h": 117.02,
+    "bottom": 353.42
+   },
+   "compBudget": null,
+   "compMode": null,
+   "compScroll": null,
+   "main": {
+    "x": 14.58,
+    "y": 359.02,
+    "w": 345.84,
+    "h": 344.38,
+    "bottom": 703.39
+   },
+   "maxBar": 197,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 398.38,
+    "w": 324.66,
+    "h": 278.14,
+    "bottom": 676.52
+   },
+   "nBars": 16,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ },
+ {
+  "ver": "V29",
+  "n": 32,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xc8dj_lz8xxe4",
+   "counter": "1 / 336 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 236.41,
+    "w": 345.84,
+    "h": 466.98,
+    "bottom": 703.39
+   },
+   "stageClientH": 467,
+   "stageScrollH": 574,
+   "comp": {
+    "x": 14.58,
+    "y": 236.41,
+    "w": 345.84,
+    "h": 112.69,
+    "bottom": 349.09
+   },
+   "compBudget": null,
+   "compMode": null,
+   "compScroll": null,
+   "main": {
+    "x": 14.58,
+    "y": 354.69,
+    "w": 345.84,
+    "h": 348.7,
+    "bottom": 703.39
+   },
+   "maxBar": null,
+   "barsWrap": null,
+   "nBars": 0,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ },
+ {
+  "ver": "V30",
+  "n": 7,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xc93y_ayo2vr6",
+   "counter": "1 / 50 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 451.75,
+    "bottom": 703.39
+   },
+   "stageClientH": 452,
+   "stageScrollH": 452,
+   "comp": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 203.47,
+    "bottom": 455.11
+   },
+   "compBudget": "run-max",
+   "compMode": null,
+   "compScroll": {
+    "sh": 203,
+    "ch": 203
+   },
+   "main": {
+    "x": 14.58,
+    "y": 460.7,
+    "w": 345.84,
+    "h": 242.69,
+    "bottom": 703.39
+   },
+   "maxBar": 94,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 500.06,
+    "w": 324.66,
+    "h": 193,
+    "bottom": 693.06
+   },
+   "nBars": 7,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ },
+ {
+  "ver": "V30",
+  "n": 16,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xc9th_yyqoegm",
+   "counter": "1 / 144 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 451.75,
+    "bottom": 703.39
+   },
+   "stageClientH": 452,
+   "stageScrollH": 462,
+   "comp": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 286.39,
+    "bottom": 538.03
+   },
+   "compBudget": "capped",
+   "compMode": null,
+   "compScroll": {
+    "sh": 286,
+    "ch": 286
+   },
+   "main": {
+    "x": 14.58,
+    "y": 543.63,
+    "w": 345.84,
+    "h": 160,
+    "bottom": 703.63
+   },
+   "maxBar": 32,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 582.98,
+    "w": 324.66,
+    "h": 130.16,
+    "bottom": 713.14
+   },
+   "nBars": 16,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  },
+  "f31": {
+   "idx": 30,
+   "runId": "run_mv1xc9th_yyqoegm",
+   "counter": "31 / 144 · merge",
+   "banner": "比较 left[0]=12 与 right[0]=11图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 451.75,
+    "bottom": 703.39
+   },
+   "stageClientH": 452,
+   "stageScrollH": 462,
+   "comp": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 286.39,
+    "bottom": 538.03
+   },
+   "compBudget": "capped",
+   "compMode": null,
+   "compScroll": {
+    "sh": 286,
+    "ch": 286
+   },
+   "main": {
+    "x": 14.58,
+    "y": 543.63,
+    "w": 345.84,
+    "h": 160,
+    "bottom": 703.63
+   },
+   "maxBar": 32,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 582.98,
+    "w": 324.66,
+    "h": 130.16,
+    "bottom": 713.14
+   },
+   "nBars": 16,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ },
+ {
+  "ver": "V30",
+  "n": 32,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xcbdr_hoz7dp7",
+   "counter": "1 / 336 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 451.75,
+    "bottom": 703.39
+   },
+   "stageClientH": 452,
+   "stageScrollH": 775,
+   "comp": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 86.83,
+    "bottom": 338.47
+   },
+   "compBudget": "capped",
+   "compMode": null,
+   "compScroll": {
+    "sh": 135,
+    "ch": 87
+   },
+   "main": {
+    "x": 14.58,
+    "y": 344.06,
+    "w": 345.84,
+    "h": 359.33,
+    "bottom": 703.39
+   },
+   "maxBar": null,
+   "barsWrap": null,
+   "nBars": 0,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ },
+ {
+  "ver": "V31",
+  "n": 7,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xcc8h_csl227s",
+   "counter": "1 / 50 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 451.75,
+    "bottom": 703.39
+   },
+   "stageClientH": 452,
+   "stageScrollH": 452,
+   "comp": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 117.02,
+    "bottom": 368.66
+   },
+   "compBudget": "capped",
+   "compMode": null,
+   "compScroll": {
+    "sh": 117,
+    "ch": 117
+   },
+   "main": {
+    "x": 14.58,
+    "y": 374.25,
+    "w": 345.84,
+    "h": 329.14,
+    "bottom": 703.39
+   },
+   "maxBar": 180,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 413.61,
+    "w": 324.66,
+    "h": 279,
+    "bottom": 692.61
+   },
+   "nBars": 7,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ },
+ {
+  "ver": "V31",
+  "n": 16,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xcd0b_bbp9jp3",
+   "counter": "1 / 144 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 451.75,
+    "bottom": 703.39
+   },
+   "stageClientH": 452,
+   "stageScrollH": 452,
+   "comp": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 117.02,
+    "bottom": 368.66
+   },
+   "compBudget": "capped",
+   "compMode": null,
+   "compScroll": {
+    "sh": 117,
+    "ch": 117
+   },
+   "main": {
+    "x": 14.58,
+    "y": 374.25,
+    "w": 345.84,
+    "h": 329.14,
+    "bottom": 703.39
+   },
+   "maxBar": 181,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 413.61,
+    "w": 324.66,
+    "h": 280,
+    "bottom": 693.61
+   },
+   "nBars": 16,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  },
+  "f31": {
+   "idx": 30,
+   "runId": "run_mv1xcd0b_bbp9jp3",
+   "counter": "31 / 144 · merge",
+   "banner": "比较 left[0]=12 与 right[0]=11图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 451.75,
+    "bottom": 703.39
+   },
+   "stageClientH": 452,
+   "stageScrollH": 452,
+   "comp": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 117.02,
+    "bottom": 368.66
+   },
+   "compBudget": "capped",
+   "compMode": null,
+   "compScroll": {
+    "sh": 117,
+    "ch": 117
+   },
+   "main": {
+    "x": 14.58,
+    "y": 374.25,
+    "w": 345.84,
+    "h": 329.14,
+    "bottom": 703.39
+   },
+   "maxBar": 181,
+   "barsWrap": {
+    "x": 25.17,
+    "y": 413.61,
+    "w": 324.66,
+    "h": 280,
+    "bottom": 693.61
+   },
+   "nBars": 16,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ },
+ {
+  "ver": "V31",
+  "n": 32,
+  "f0": {
+   "idx": 0,
+   "runId": "run_mv1xcfut_9zaj2ss",
+   "counter": "1 / 336 · init",
+   "banner": "开始归并排序图例比较读取更新接受已确定/路径最优",
+   "stage": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 451.75,
+    "bottom": 703.39
+   },
+   "stageClientH": 452,
+   "stageScrollH": 813,
+   "comp": {
+    "x": 14.58,
+    "y": 251.64,
+    "w": 345.84,
+    "h": 117.02,
+    "bottom": 368.66
+   },
+   "compBudget": "capped",
+   "compMode": null,
+   "compScroll": {
+    "sh": 117,
+    "ch": 117
+   },
+   "main": {
+    "x": 14.58,
+    "y": 374.25,
+    "w": 345.84,
+    "h": 690.53,
+    "bottom": 1064.78
+   },
+   "maxBar": null,
+   "barsWrap": null,
+   "nBars": 0,
+   "tree": "false",
+   "vp": {
+    "w": 375,
+    "h": 812
+   }
+  }
+ }
+]
