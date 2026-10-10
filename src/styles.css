@@ -487,8 +487,11 @@ button.icon-btn {
 .bars-wrap {
   display: flex;
   align-items: flex-end;
-  justify-content: center;
-  gap: 6px;
+  /* V31: overflow (only possible when the user picks bars that do not fit) goes to the reachable
+   * end side, never past the start edge; tight rows close the gap down to 1px before overflowing */
+  justify-content: safe center;
+  --bars-gap: clamp(1px, calc((100% - var(--bar-n, 1) * 18px) / max(1, var(--bar-n, 1) - 1)), 6px);
+  gap: var(--bars-gap);
   /* V29 ship fix: keep static 180px floor — measured --bar-chart-h floor prevented shrink
    * and clipped primary bars when companions/tree reclaim height. data-flip still snaps heights. */
   min-height: 180px;

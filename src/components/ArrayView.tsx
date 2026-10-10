@@ -89,6 +89,10 @@ function roleForIndex(
   return LEGACY_ORDER[0]!
 }
 
+/** V31: readable minimum bar column / gap and the bars-wrap side padding (styles.css .bar-col / .bars-wrap). */
+const BAR_MIN_COL_PX = 18
+const BAR_MIN_GAP_PX = 1
+const BARS_WRAP_PAD_X = 8
 function barSuitable(values: (number | string)[]): boolean {
   if (!values.length) return false
   if (!values.every((v) => typeof v === 'number' && Number.isFinite(v as number))) return false
@@ -242,9 +246,17 @@ function ArrayView({
 }: Props) {
   const numeric = values.every((v) => typeof v === 'number' && Number.isFinite(v as number))
   const suitable = barSuitable(values)
-  const [mode, setMode] = useState<'bars' | 'cells'>(
-    defaultMode ?? (compact ? 'cells' : suitable ? 'bars' : 'cells'),
-  )
+  /**
+   * V31: an explicit choice (toggle) wins; otherwise the default is bars when the values suit bars
+   * AND the bars fit the card's measured width at their readable minimum column (18px + 1px gap).
+   * Bars that cannot fit used to overflow both sides of a centred row — the leading columns and
+   * their pointers were clipped with no way to reach them (375px phone, n ≥ 17).
+   */
+  const [userMode, setUserMode] = useState<'bars' | 'cells' | null>(null)
+  const [barsFit, setBarsFit] = useState(true)
+  const autoMode: 'bars' | 'cells' = defaultMode ?? (compact ? 'cells' : suitable && barsFit ? 'bars' : 'cells')
+  const mode = userMode ?? autoMode
+  const setMode = setUserMode
   const { mode: motionMode, speedIntervalMs, transitionEpoch } = useMotion()
   const swapMs = resolveDuration(280, motionMode, speedIntervalMs)
 
@@ -739,6 +751,22 @@ function ArrayView({
     }
   }, [values, ranges, mode, ids])
 
+  useLayoutEffect(() => {
+    const el = wrapRef.current
+    if (compact || defaultMode || !suitable || !el) return
+    const n = values.length
+    const check = () => {
+      const cs = getComputedStyle(el)
+      const inner = el.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - BARS_WRAP_PAD_X
+      if (inner <= 0) return
+      setBarsFit(n * BAR_MIN_COL_PX + Math.max(0, n - 1) * BAR_MIN_GAP_PX <= inner + 0.5)
+    }
+    check()
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(check) : null
+    ro?.observe(el)
+    return () => ro?.disconnect()
+  }, [compact, defaultMode, suitable, values.length])
+
   const floorOn = signedMode && !compact && mode === 'bars' && signedFloor != null
   const curBand = rangeStyle(ranges?.current, values.length)
   const bestBand = rangeStyle(ranges?.best, values.length)
@@ -783,6 +811,7 @@ function ArrayView({
           style={
             {
               position: 'relative',
+              '--bar-n': values.length,
               // signed: plot span + edge lanes; the annotation tracks are laid out below the plot
               '--bar-chart-h': `${signedMode ? maxH + lanes.top + lanes.bottom : maxH + 24}px`,
               '--plot-span': `${maxH}px`,
@@ -1422,6 +1451,22 @@ function DeclaredArrayScene({
     return [...seen.values()]
   }, [budgetOn, runSteps, key, companionNames, presentation.callStackVar])
   /**
+   * V31-01: one representative frame per distinct COMPACT shape (card names / placeholder + aux
+   * text); in the compact layout each card is one row, so values and pointer positions do not
+   * change the height. Always laid out (out of flow), so the decision never depends on the mode.
+   */
+  const compactFrames = useMemo(() => {
+    if (!budgetOn || !runSteps) return [] as Step[]
+    const seen = new Map<string, Step>()
+    for (const s of runSteps) {
+      const entries = companionEntriesOf(s, key, companionNames)
+      const k = `${entries.map(([n]) => n).join(',') || '∅'}#${auxSignature(s, presentation.callStackVar)}`
+      if (!seen.has(k)) seen.set(k, s)
+      if (seen.size >= MAX_SIZERS) break
+    }
+    return [...seen.values()]
+  }, [budgetOn, runSteps, key, companionNames, presentation.callStackVar])
+  /**
    * V31-01 main-scene-priority budget (supersedes the V30-03 fit guard, which gave the band
    * everything but the main floor). See companionBudget.ts: the main card keeps its need, the band
    * takes at most a share of the measured scene (never less than the run's typical strip), and is
@@ -1433,6 +1478,7 @@ function DeclaredArrayScene({
   /** null = run-max fits; number = capped band height (px). */
   const [budgetCap, setBudgetCap] = useState<number | null>(null)
   const [budgetReason, setBudgetReason] = useState<BudgetDecision['reason'] | null>(null)
+  const [mainNeed, setMainNeed] = useState<number | null>(null)
   useLayoutEffect(() => {
     if (!budgetOn) return
     const panel = panelRef.current
@@ -1445,15 +1491,22 @@ function DeclaredArrayScene({
      * transforms inside them never count, so motion cannot ratchet the budget mid-run.
      */
     let need = { width: -1, px: 0 }
+    /** the main card's readable floor (--primary-floor, default 10rem) — never the published need */
+    const floorPx = (main: HTMLElement) => {
+      const v = getComputedStyle(main).getPropertyValue('--primary-floor').trim() || '10rem'
+      const root = px(getComputedStyle(document.documentElement).fontSize) || 16
+      return v.endsWith('rem') ? parseFloat(v) * root : px(v)
+    }
     const check = () => {
       // hidden tab / collapsed stage: nothing to measure — keep the last decision
       if (stage.clientHeight <= 0 || panel.getClientRects().length === 0) return
       const strip = panel.querySelector(':scope > .scene-companions') as HTMLElement | null
       const main = panel.querySelector(':scope > .array-view') as HTMLElement | null
       if (!strip || !main) return
-      const shapes = Array.from(strip.querySelectorAll(':scope > .scene-companions-sizer')).map(
-        (s) => (s as HTMLElement).getBoundingClientRect().height,
-      )
+      const hOf = (sel: string) =>
+        Array.from(strip.querySelectorAll(sel)).map((s) => (s as HTMLElement).getBoundingClientRect().height)
+      const shapes = hOf(':scope > .scene-companions-sizer:not(.scene-companions-csizer)')
+      const compact = hOf(':scope > .scene-companions-csizer')
       const pcs = getComputedStyle(panel)
       const pane = panel.parentElement
       const acs = pane ? getComputedStyle(pane) : null
@@ -1470,7 +1523,7 @@ function DeclaredArrayScene({
         const pr = pane.getBoundingClientRect()
         if (ar.top >= pr.bottom - 1) stacked = ar.height + px(getComputedStyle(split).rowGap)
       }
-      if (need.width !== main.clientWidth) need = { width: main.clientWidth, px: px(mcs.minHeight) }
+      if (need.width !== main.clientWidth) need = { width: main.clientWidth, px: floorPx(main) }
       const mr = main.getBoundingClientRect()
       let contentBottom = mr.top
       for (const c of Array.from(main.children)) {
@@ -1481,10 +1534,13 @@ function DeclaredArrayScene({
       }
       const innerBottom = mr.bottom - px(mcs.paddingBottom) - px(mcs.borderBottomWidth)
       if (contentBottom > innerBottom + 0.5) need.px = Math.max(need.px, mr.height + (contentBottom - innerBottom))
-      const d = companionBudget({ scene: stage.clientHeight - stacked - chrome, mainNeed: need.px, shapes })
+      const d = companionBudget({ scene: stage.clientHeight - stacked - chrome, mainNeed: need.px, shapes, compact })
       if (!d) return
       const cap = d.cap
       setBudgetReason(d.reason)
+      // the main card's real need is a hard floor (compact band too tall for the room → the stage scrolls)
+      const needPx = Math.round(need.px * 100) / 100
+      setMainNeed((prev) => (prev !== null && Math.abs(prev - needPx) < 0.5 ? prev : needPx))
       setBudgetCap((prev) =>
         prev === cap || (prev !== null && cap !== null && Math.abs(prev - cap) < 0.5) ? prev : cap,
       )
@@ -1510,7 +1566,7 @@ function DeclaredArrayScene({
       ro?.disconnect()
       mo?.disconnect()
     }
-  }, [budgetOn, sizerFrames])
+  }, [budgetOn, sizerFrames, compactFrames])
 
   /**
    * V31-01 in-band overflow: when the live frame's companions are taller than the capped band,
@@ -1594,6 +1650,7 @@ function DeclaredArrayScene({
       data-array-order="primary-first"
       data-declared-primary={key}
       data-testid="arrays-panel"
+      style={budgetOn && mainNeed !== null ? ({ '--primary-need': `${mainNeed}px` } as CSSProperties) : undefined}
     >
       {showStrip && (
         <div
@@ -1616,11 +1673,16 @@ function DeclaredArrayScene({
             ) : null}
             {auxBar && <div className="scene-aux-bar">{auxBar}</div>}
           </div>
-          {sizerFrames.map((s, k) => {
+          {[...sizerFrames.map((s) => [s, false] as const), ...compactFrames.map((s) => [s, true] as const)].map(([s, compact], k) => {
             const entries = companionEntriesOf(s, key, companionNames)
             const aux = auxBarFor?.(s)
             return (
-              <div key={k} className="scene-companions-row scene-companions-sizer" aria-hidden="true" inert>
+              <div
+                key={`${compact ? 'c' : 'n'}${k}`}
+                className={`scene-companions-row scene-companions-sizer${compact ? ' scene-companions-csizer' : ''}`}
+                aria-hidden="true"
+                inert
+              >
                 {entries.length > 0 ? (
                   <div className="array-buffers">
                     {entries.map(([name, values]) => (

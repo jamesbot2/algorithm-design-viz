@@ -168,7 +168,8 @@
 }
 .stage-primary-pane > .arrays-panel[data-declared-primary] > .array-view {
   flex: 1 1 0;
-  min-height: var(--primary-floor, 10rem);
+  /* V31-01: --primary-need = measured real need (cells rows / tracks) when above the floor */
+  min-height: max(var(--primary-floor, 10rem), var(--primary-need, 0px));
   overflow: visible;
   padding: 0.45rem 0.6rem;
 }
@@ -187,6 +188,7 @@
 /* Companion strip: required companions (compact) + aux bar, one wrapping row. */
 .scene-companions {
   flex: 0 0 auto;
+  position: relative;
   /* V30-03: one grid cell — the live row and the run's hidden shape sizers overlap, so the
    * strip is exactly as tall as the run's tallest legal companion content on every frame. */
   display: grid;
@@ -212,8 +214,12 @@
 .scene-companions[data-budget="capped"] {
   height: var(--companion-cap);
   grid-template-rows: minmax(0, 1fr);
-  position: relative;
   overflow: clip;
+}
+/* V31-01 compact-layout sizers: always out of flow (measurable at the band width in both modes) */
+.scene-companions > .scene-companions-csizer {
+  position: absolute;
+  inset: 0 0 auto 0;
 }
 .scene-companions[data-budget="capped"] > .scene-companions-sizer {
   position: absolute;
@@ -263,16 +269,25 @@
 /* Capped band: the buffers take the full line and each card is ONE row of cells that scrolls
    horizontally (cards share a line while two fit), so the compared slots of every card (left[i] AND
    right[j]) fit in the band at once; the current pointers are followed (DeclaredArrayScene). */
-.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] > .array-buffers {
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] > .array-buffers,
+.scene-companions > .scene-companions-csizer > .array-buffers {
   flex: 1 1 100%;
   min-width: 0;
 }
-.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] .array-view-compact {
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] .array-view-compact,
+.scene-companions > .scene-companions-csizer .array-view-compact {
   position: relative;
   flex: 1 1 0;
   min-width: min(100%, 9.5rem);
 }
-.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] .array-view-compact > .array-cells {
+/* placeholder cards (one "—" slot) hug their content so the "本步无缓冲" note stays on their line */
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] .array-view-compact[data-placeholder],
+.scene-companions > .scene-companions-csizer .array-view-compact[data-placeholder] {
+  flex: 0 1 auto;
+  min-width: 4.5rem;
+}
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] .array-view-compact > .array-cells,
+.scene-companions > .scene-companions-csizer .array-view-compact > .array-cells {
   flex-wrap: nowrap;
   min-width: 0;
   overflow-x: auto;
@@ -431,8 +446,8 @@
   flex: 0 0 0;
   width: 0;
   min-width: 0;
-  /* cancel the flex gap this zero-width item would add (bars-wrap gap: 6px) */
-  margin-left: -6px;
+  /* cancel the flex gap this zero-width item would add (bars-wrap --bars-gap; % = same container width) */
+  margin-left: calc(-1 * var(--bars-gap, 6px));
   visibility: hidden;
   pointer-events: none;
   /* geometry, not motion: never transitions (the reduced-motion 0.01ms global transition
