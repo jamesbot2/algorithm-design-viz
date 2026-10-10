@@ -64,14 +64,20 @@ test.describe('375x812 phone', () => {
     await prep(page, 'mergeSort', desc(16))
     const overflowFrames: number[] = []
     const frames = await allFrames(page, async (b) => {
-      if (b.live && b.live.sh > b.live.ch + 1) {
+      const hidden = await page.evaluate(() =>
+        [...document.querySelectorAll('[data-testid="scene-companions"] > .scene-companions-row[data-live] .array-cells')].some(
+          (c) => c.scrollWidth > c.clientWidth + 1,
+        ),
+      )
+      if ((b.live && b.live.sh > b.live.ch + 1) || hidden) {
         overflowFrames.push(b.idx)
-        expect(b.live.ov, `frame ${b.idx} band scrolls`).toMatch(/auto|scroll/)
         expect(b.overflow, `frame ${b.idx} overflow flagged`).not.toBeNull()
         expect(b.more, `frame ${b.idx} visible scroll affordance`).toBe(true)
-        const tags = (await companionReadable(page)).filter((e) => e.t !== 'left' && e.t !== 'right' && e.t !== 'temp · key' && e.t !== 'key')
-        expect(tags.length).toBeGreaterThan(0)
-        expect(tags.some((e) => e.frac >= 0.99 && e.hit), `frame ${b.idx} a current pointer is painted in the band`).toBe(true)
+      }
+      // every frame: each companion name and EVERY current pointer tag (i, j, …) is painted and hit-testable
+      for (const e of await companionReadable(page)) {
+        expect(e.frac, `frame ${b.idx} companion ${e.t} painted`).toBeGreaterThanOrEqual(0.99)
+        expect(e.hit, `frame ${b.idx} companion ${e.t} hit-tests`).toBe(true)
       }
     })
     expect(frames.length).toBe(144)

@@ -1,0 +1,22 @@
+
+Running 3 tests using 1 worker
+
+(node:409479) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 10:59:35 AM [vite] (client) [Unhandled error] Error: ResizeObserver loop completed with undelivered notifications.
+[WebServer]  > ../../algorithm-design-viz/@vite/client:305:50
+[WebServer] 
+[WebServer] 10:59:35 AM [vite] (client) [Unhandled error] Error: ResizeObserver loop completed with undelivered notifications.
+[WebServer]  > ../../algorithm-design-viz/@vite/client:305:50
+[WebServer] 
+[WebServer] 10:59:35 AM [vite] (client) [Unhandled error] Error: ResizeObserver loop completed with undelivered notifications.
+[WebServer]  > ../../algorithm-design-viz/@vite/client:305:50
+[WebServer] 
+  ✓  1 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:36:3 › 375x812 phone › V31-01 n=16 frame 31/144: main array has priority, companions are not the majority (5.2s)
+  ✓  2 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:52:3 › 375x812 phone › V31-01 n=7: no oversized companion band (aux bar not squeezed into a glyph column) (1.9s)
+[WebServer] 10:59:42 AM [vite] (client) [Unhandled error] Error: ResizeObserver loop completed with undelivered notifications.
+[WebServer]  > ../../algorithm-design-viz/@vite/client:305:50
+[WebServer] 
+  ✓  3 [chromium] › tests/e2e/v31-mobile-budget.spec.ts:63:3 › 375x812 phone › V31-01 n=16 whole run: one main allocation, overflow frames scroll in-band with affordance and readable pointers (20.4s)
+
+  3 passed (29.4s)

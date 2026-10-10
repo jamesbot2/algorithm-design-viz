@@ -13,6 +13,7 @@ import { deriveArrayPointers } from '../types/step'
 import type { PresentationDescriptor } from '../types/presentation'
 import { useMotion } from '../theme/MotionContext'
 import { resolveDuration } from '../theme/motion'
+import { companionBudget, type BudgetDecision } from './companionBudget'
 import { SHORT_BAR_PX, SIGNED_MIN_SPAN_PX, signedLabelPlacement, signedPlotLanes } from './signedPlot'
 import type { PlaybackTransition } from './workbench/playbackIntent'
 
@@ -1421,17 +1422,17 @@ function DeclaredArrayScene({
     return [...seen.values()]
   }, [budgetOn, runSteps, key, companionNames, presentation.callStackVar])
   /**
-   * V30-03 fit guard: the run-max strip is only used when it still leaves the main array its
-   * floor inside the stage viewport. Otherwise (narrow split pane with the tree open, very short
-   * stage) the strip becomes a CAPPED band of one fixed height for the whole run:
-   *   cap = clamp(stage − main floor − chrome, smallest run shape, run-max)
-   * Frames whose companions exceed the cap scroll locally inside the band (the tree toggle is
-   * sticky in it), so the main array keeps one allocation on every frame and is never pushed
-   * lower than the smallest legal strip would put it. Decided from measured geometry only.
+   * V31-01 main-scene-priority budget (supersedes the V30-03 fit guard, which gave the band
+   * everything but the main floor). See companionBudget.ts: the main card keeps its need, the band
+   * takes at most a share of the measured scene (never less than the run's typical strip), and is
+   * ONE fixed height for the whole run. Frames taller than the band scroll locally inside it (the
+   * tree toggle is sticky in it) with a visible affordance; the current pointers are followed.
+   * Decided from measured geometry only; re-decided on resize / width / content-mode change.
    */
   const panelRef = useRef<HTMLDivElement>(null)
   /** null = run-max fits; number = capped band height (px). */
   const [budgetCap, setBudgetCap] = useState<number | null>(null)
+  const [budgetReason, setBudgetReason] = useState<BudgetDecision['reason'] | null>(null)
   useLayoutEffect(() => {
     if (!budgetOn) return
     const panel = panelRef.current
@@ -1450,14 +1451,9 @@ function DeclaredArrayScene({
       const strip = panel.querySelector(':scope > .scene-companions') as HTMLElement | null
       const main = panel.querySelector(':scope > .array-view') as HTMLElement | null
       if (!strip || !main) return
-      let sizerMax = 0
-      let sizerMin = Infinity
-      for (const s of Array.from(strip.querySelectorAll(':scope > .scene-companions-sizer'))) {
-        const h = (s as HTMLElement).getBoundingClientRect().height
-        sizerMax = Math.max(sizerMax, h)
-        sizerMin = Math.min(sizerMin, h)
-      }
-      if (!Number.isFinite(sizerMin) || sizerMax <= 0) return
+      const shapes = Array.from(strip.querySelectorAll(':scope > .scene-companions-sizer')).map(
+        (s) => (s as HTMLElement).getBoundingClientRect().height,
+      )
       const pcs = getComputedStyle(panel)
       const pane = panel.parentElement
       const acs = pane ? getComputedStyle(pane) : null
@@ -1465,6 +1461,15 @@ function DeclaredArrayScene({
       const chrome =
         px(pcs.rowGap) + px(pcs.paddingTop) + px(pcs.paddingBottom) +
         (acs ? px(acs.paddingTop) + px(acs.paddingBottom) : 0) + px(mcs.marginTop) + px(mcs.marginBottom)
+      // narrow stage + tree open: the aux pane is stacked BELOW the primary pane in the same stage
+      let stacked = 0
+      const split = pane?.parentElement
+      const aux = split?.querySelector(':scope > .stage-aux-pane') as HTMLElement | null
+      if (pane && aux && split) {
+        const ar = aux.getBoundingClientRect()
+        const pr = pane.getBoundingClientRect()
+        if (ar.top >= pr.bottom - 1) stacked = ar.height + px(getComputedStyle(split).rowGap)
+      }
       if (need.width !== main.clientWidth) need = { width: main.clientWidth, px: px(mcs.minHeight) }
       const mr = main.getBoundingClientRect()
       let contentBottom = mr.top
@@ -1476,8 +1481,10 @@ function DeclaredArrayScene({
       }
       const innerBottom = mr.bottom - px(mcs.paddingBottom) - px(mcs.borderBottomWidth)
       if (contentBottom > innerBottom + 0.5) need.px = Math.max(need.px, mr.height + (contentBottom - innerBottom))
-      const avail = stage.clientHeight - need.px - chrome
-      const cap = sizerMax <= avail + 0.5 ? null : Math.max(sizerMin, Math.min(avail, sizerMax))
+      const d = companionBudget({ scene: stage.clientHeight - stacked - chrome, mainNeed: need.px, shapes })
+      if (!d) return
+      const cap = d.cap
+      setBudgetReason(d.reason)
       setBudgetCap((prev) =>
         prev === cap || (prev !== null && cap !== null && Math.abs(prev - cap) < 0.5) ? prev : cap,
       )
@@ -1505,6 +1512,68 @@ function DeclaredArrayScene({
     }
   }, [budgetOn, sizerFrames])
 
+  /**
+   * V31-01 in-band overflow: when the live frame's companions are taller than the capped band,
+   * (a) flag it on the band (data-overflow = "up" / "down" / "up down") so the scroll affordance
+   * shows, and (b) on every step keep the current pointers (i / j / key tags) inside the band's
+   * visible box by scrolling the band's own scroller — never an ancestor, never the main card.
+   */
+  const stripRef = useRef<HTMLDivElement>(null)
+  const liveRef = useRef<HTMLDivElement>(null)
+  const capped = budgetOn && budgetCap !== null
+  useLayoutEffect(() => {
+    const strip = stripRef.current
+    const live = liveRef.current
+    if (!strip || !live) return
+    if (!capped) {
+      strip.removeAttribute('data-overflow')
+      return
+    }
+    const scrollers = () => Array.from(live.querySelectorAll(':scope > .array-buffers > .array-view-compact > .array-cells')) as HTMLElement[]
+    const flag = () => {
+      const max = live.scrollHeight - live.clientHeight
+      let x = false
+      for (const sc of scrollers()) {
+        const card = sc.parentElement as HTMLElement
+        const h = [sc.scrollLeft > 0.5 ? 'l' : '', sc.scrollWidth - sc.clientWidth - sc.scrollLeft > 0.5 ? 'r' : ''].filter(Boolean).join(' ')
+        if (h) { card.setAttribute('data-hscroll', h); x = true } else card.removeAttribute('data-hscroll')
+      }
+      const t = [live.scrollTop > 0.5 ? 'up' : '', max - live.scrollTop > 0.5 ? 'down' : '', x ? 'x' : ''].filter(Boolean).join(' ')
+      if (t) strip.setAttribute('data-overflow', t)
+      else strip.removeAttribute('data-overflow')
+    }
+    // pointer follow, horizontal (step change): each one-row card shows its current pointer slots
+    for (const sc of scrollers()) {
+      if (sc.scrollWidth <= sc.clientWidth + 0.5) {
+        if (sc.scrollLeft) sc.scrollLeft = 0
+        continue
+      }
+      const cr = sc.getBoundingClientRect()
+      let l = Infinity
+      let r = -Infinity
+      for (const tag of Array.from(sc.querySelectorAll('.ptr-tag'))) {
+        const sr = (tag.closest('.cell-slot') ?? tag).getBoundingClientRect()
+        l = Math.min(l, sr.left - cr.left + sc.scrollLeft)
+        r = Math.max(r, sr.right - cr.left + sc.scrollLeft)
+      }
+      if (!Number.isFinite(l)) continue
+      if (l < sc.scrollLeft || r > sc.scrollLeft + sc.clientWidth) {
+        sc.scrollLeft = r - l <= sc.clientWidth ? (l < sc.scrollLeft ? Math.max(0, l - 4) : r - sc.clientWidth + 4) : l
+      }
+    }
+    flag()
+    // capture: card scrollers' scroll events do not bubble
+    live.addEventListener('scroll', flag, { passive: true, capture: true })
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(flag) : null
+    ro?.observe(live)
+    for (const c of Array.from(live.children)) ro?.observe(c)
+    for (const sc of scrollers()) ro?.observe(sc)
+    return () => {
+      live.removeEventListener('scroll', flag, { capture: true })
+      ro?.disconnect()
+    }
+  }, [capped, budgetCap, step])
+
   const ghost = (sizer: boolean) => (
     <div
       className="array-buffers scene-companions-empty"
@@ -1528,14 +1597,16 @@ function DeclaredArrayScene({
     >
       {showStrip && (
         <div
+          ref={stripRef}
           className="scene-companions"
           data-testid="scene-companions"
           data-reserved={presentation.reserveCompanions ? '1' : '0'}
           data-budget={budgetOn ? (budgetCap === null ? 'run-max' : 'capped') : undefined}
+          data-budget-reason={budgetOn && budgetReason ? budgetReason : undefined}
           style={budgetOn && budgetCap !== null ? ({ '--companion-cap': `${budgetCap}px` } as CSSProperties) : undefined}
           data-sizers={budgetOn ? sizerFrames.length : undefined}
         >
-          <div className="scene-companions-row" data-live="1">
+          <div ref={liveRef} className="scene-companions-row" data-live="1">
             {compactEntries.length > 0 ? (
               <div className="array-buffers" data-testid="array-buffers" aria-label="临时缓冲">
                 {compactEntries.map(([name, values]) => renderOne(name, values, true))}
@@ -1568,6 +1639,13 @@ function DeclaredArrayScene({
               </div>
             )
           })}
+          {capped && (
+            <span className="scene-companions-more" data-testid="scene-companions-more" aria-hidden="true">
+              <span className="more-up">▲ 上方还有</span>
+              <span className="more-down">▼ 下方还有</span>
+              <span className="more-x">◀ ▶ 左右滑动</span>
+            </span>
+          )}
         </div>
       )}
       {primaryValues ? (

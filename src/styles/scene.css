@@ -201,6 +201,8 @@
   gap: 0.35rem 0.5rem;
 }
 .scene-companions > .scene-companions-sizer {
+  /* V31-01: natural height (not stretched to the shared cell) so the budget reads real shapes */
+  align-self: start;
   visibility: hidden;
   pointer-events: none;
 }
@@ -221,6 +223,86 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+/* V31-01: a frame taller than the band scrolls in it — each card keeps its name in view while
+   its rows scroll, and a visible affordance says which way the hidden rows are. */
+.scene-companions[data-budget="capped"] .array-view-compact > .array-label {
+  position: sticky;
+  top: 0;
+}
+.scene-companions-more {
+  position: absolute;
+  left: 0.35rem;
+  bottom: 0.2rem;
+  z-index: 2;
+  display: none;
+  gap: 0.4rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--bg-elev);
+  color: var(--accent);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  pointer-events: none;
+}
+.scene-companions[data-overflow] > .scene-companions-more {
+  display: inline-flex;
+}
+.scene-companions-more > span {
+  display: none;
+}
+.scene-companions[data-overflow~="down"] > .scene-companions-more > .more-down,
+.scene-companions[data-overflow~="up"]:not([data-overflow~="down"]) > .scene-companions-more > .more-up,
+.scene-companions[data-overflow~="x"] > .scene-companions-more > .more-x {
+  display: inline;
+}
+.scene-companions[data-overflow~="down"] {
+  box-shadow: inset 0 -10px 8px -8px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+/* Capped band: the buffers take the full line and each card is ONE row of cells that scrolls
+   horizontally (cards share a line while two fit), so the compared slots of every card (left[i] AND
+   right[j]) fit in the band at once; the current pointers are followed (DeclaredArrayScene). */
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] > .array-buffers {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] .array-view-compact {
+  position: relative;
+  flex: 1 1 0;
+  min-width: min(100%, 9.5rem);
+}
+.scene-companions[data-budget="capped"] > .scene-companions-row[data-live] .array-view-compact > .array-cells {
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+.scene-companions[data-budget="capped"] .array-view-compact[data-hscroll]::after,
+.scene-companions[data-budget="capped"] .array-view-compact[data-hscroll]::before {
+  content: none;
+  position: absolute;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 0.9rem;
+  pointer-events: none;
+  color: var(--accent);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+}
+.scene-companions[data-budget="capped"] .array-view-compact[data-hscroll~="r"]::after {
+  content: "›";
+  right: 0;
+  justify-content: flex-end;
+  background: linear-gradient(to right, transparent, var(--bg-elev) 70%);
+}
+.scene-companions[data-budget="capped"] .array-view-compact[data-hscroll~="l"]::before {
+  content: "‹";
+  left: 2.4rem;
+  justify-content: flex-start;
+  background: linear-gradient(to left, transparent, var(--bg-elev) 70%);
 }
 /* the tree toggle never scrolls out of the band */
 .scene-companions[data-budget="capped"] > .scene-companions-row[data-live] > .scene-aux-bar {
@@ -280,10 +362,13 @@
   font-size: 0.78rem;
 }
 .aux-callstack code {
+  white-space: nowrap;
   font-family: var(--mono);
   font-size: 0.76rem;
 }
 .aux-toggle {
+  /* V31-01: one line — a CJK label may otherwise break per glyph when the bar is squeezed */
+  white-space: nowrap;
   padding: 0.2rem 0.55rem;
   font-size: 0.78rem;
   line-height: 1.3;
