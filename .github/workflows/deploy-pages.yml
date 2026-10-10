@@ -1,13 +1,17 @@
-# V11: Pages deploy requires CI + E2E success on the *same* SHA.
-# workflow_run still listens to CI completion, then e2e-gate verifies E2E green
-# for that SHA before build/deploy. Manual dispatch similarly requires both.
+# V31-02: Pages deploy requires CI + E2E success on the *same* SHA, in EITHER completion order.
+# Triggered by the completion of BOTH workflows (and manual dispatch). The early event finds the
+# other workflow still running and exits cleanly with "waiting for <other>"; the late event sees
+# both green and deploys. Failure / cancel of either → blocked (red, no deploy). A SHA that is no
+# longer the tip of main is skipped ("stale") at the gate AND again right before deploying, and
+# the deploy job is serialized (concurrency `pages`, no cancel) with a same-SHA duplicate check.
+# Logic: scripts/deploy-gate.cjs (unit-tested with mocked REST: tests/v31-deploy-gate.test.ts).
 #
 # DO NOT deploy a SHA whose E2E is red even if CI is green.
 name: Deploy to GitHub Pages
 
 on:
   workflow_run:
-    workflows: ['CI']
+    workflows: ['CI', 'E2E']
     types: [completed]
     branches: [main]
   workflow_dispatch:
@@ -17,87 +21,44 @@ permissions:
   pages: write
   id-token: write
   actions: read
+  deployments: read
 
+# One gate per (SHA, triggering workflow): events never cancel each other across SHAs or orders.
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: pages-gate-${{ github.event.workflow_run.head_sha || github.sha }}-${{ github.event.workflow_run.name || 'dispatch' }}
+  cancel-in-progress: false
 
 jobs:
-  ci-gate:
+  gate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
-      target_sha: ${{ steps.sha.outputs.sha }}
+      decision: ${{ steps.gate.outputs.decision }}
+      target_sha: ${{ steps.gate.outputs.sha }}
     steps:
-      - name: Resolve target SHA
-        id: sha
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Checkout gate script (default branch)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+          sparse-checkout-cone-mode: true
 
-      - name: Require successful CI on same SHA
+      - name: Same-SHA CI + E2E gate (either order)
+        id: gate
         uses: actions/github-script@v7
         with:
           script: |
-            const sha = '${{ steps.sha.outputs.sha }}';
-            const { owner, repo } = context.repo;
-            const workflows = await github.rest.actions.listWorkflowRuns({
-              owner, repo, workflow_id: 'ci.yml', per_page: 50,
-            });
-            const hit = (workflows.data.workflow_runs || []).find(
-              (r) => r.head_sha === sha && r.conclusion === 'success' && r.status === 'completed'
-            );
-            if (!hit) {
-              core.setFailed(`Deploy blocked: no successful CI run for SHA ${sha}`);
-            } else {
-              core.info(`CI gate OK: run ${hit.id} for ${sha}`);
-            }
-
-  e2e-gate:
-    needs: [ci-gate]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Require successful E2E on same SHA
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const sha = '${{ needs.ci-gate.outputs.target_sha }}';
-            const { owner, repo } = context.repo;
-            // Prefer workflow file e2e.yml
-            const workflows = await github.rest.actions.listWorkflowRuns({
-              owner, repo, workflow_id: 'e2e.yml', per_page: 50,
-            });
-            const hit = (workflows.data.workflow_runs || []).find(
-              (r) => r.head_sha === sha && r.conclusion === 'success' && r.status === 'completed'
-            );
-            if (!hit) {
-              core.setFailed(
-                `Deploy blocked: no successful E2E run for SHA ${sha}. ` +
-                `CI alone is insufficient (V11 same-SHA gate).`
-              );
-            } else {
-              core.info(`E2E gate OK: run ${hit.id} for ${sha}`);
-            }
+            const gate = require(`${process.env.GITHUB_WORKSPACE}/scripts/deploy-gate.cjs`)
+            await gate.runGate({ github, context, core })
 
   build:
-    needs: [ci-gate, e2e-gate]
-    if: >
-      always() &&
-      needs.ci-gate.result == 'success' &&
-      needs.e2e-gate.result == 'success' && (
-        (github.event_name == 'workflow_run' &&
-         github.event.workflow_run.conclusion == 'success' &&
-         github.event.workflow_run.event == 'push') ||
-        github.event_name == 'workflow_dispatch'
-      )
+    needs: [gate]
+    if: needs.gate.outputs.decision == 'deploy'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.ci-gate.outputs.target_sha }}
+          ref: ${{ needs.gate.outputs.target_sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -117,13 +78,32 @@ jobs:
           path: dist
 
   deploy:
-    needs: build
-    if: always() && needs.build.result == 'success'
+    needs: [gate, build]
+    if: needs.build.result == 'success'
     runs-on: ubuntu-latest
+    # serialized: an in-flight deploy is never cancelled; a queued one re-checks before deploying
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout gate script (default branch)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+          sparse-checkout-cone-mode: true
+
+      - name: Still tip of main and not yet deployed
+        id: pre
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const gate = require(`${process.env.GITHUB_WORKSPACE}/scripts/deploy-gate.cjs`)
+            await gate.preDeploy({ github, context, core, sha: '${{ needs.gate.outputs.target_sha }}', manual: context.eventName === 'workflow_dispatch' })
+
       - name: Deploy to GitHub Pages
+        if: steps.pre.outputs.go == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
