@@ -44,7 +44,10 @@ describe('V7 R1 async run identity', () => {
     await user.click(screen.getByTestId('run-btn'))
     await screen.findByTestId('run-status')
 
-    // Navigate via sidebar link (same AlgoPage instance, different :id)
+    // Navigate via sidebar link (same AlgoPage instance, different :id).
+    // V32: at the default 1024px viewport the desktop nav is the rail; the catalog opens from its entry.
+    const entry = screen.queryByTestId('catalog-entry')
+    if (entry) await user.click(entry)
     const dij = screen.getAllByRole('link').find((a) => a.getAttribute('href')?.includes('dijkstra') && !a.getAttribute('href')?.includes('Heap'))
     expect(dij).toBeTruthy()
     await user.click(dij!)
