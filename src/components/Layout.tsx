@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { chapters } from '../data/chapters'
 import { algorithms } from '../algorithms'
-import { byDesignThought, byProblemType, completionLabel } from '../data/curriculum'
+import { NavCatalog, type NavMode } from './nav/NavCatalog'
+import { NavIcon, type NavIconName } from './nav/NavIcons'
 import { useMotion } from '../theme/MotionContext'
 import { useLabTheme, type LabThemeId } from '../theme/LabThemeContext'
 import { BUILD_INFO, buildInfoLabel } from '../buildInfo'
@@ -15,10 +16,17 @@ export default function Layout() {
     () => typeof window !== 'undefined' && !!window.matchMedia?.('(min-width: 961px) and (max-width: 1439px)').matches,
   )
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && !!window.matchMedia?.('(max-width: 960px)').matches,
+  )
+  /** V32: desktop rail → non-modal catalog popover (does not change workbench width) */
+  const [catalogOpen, setCatalogOpen] = useState(false)
+  const catalogBtnRef = useRef<HTMLButtonElement>(null)
+  const catalogPopRef = useRef<HTMLDivElement>(null)
+  const [folded, setFolded] = useState<ReadonlySet<string>>(() => new Set())
   const mainRef = useRef<HTMLElement>(null)
   const [budget, setBudget] = useState<WorkspaceBudget>({ viewportHeight: 0, viewportWidth: 0 })
-  const [navMode, setNavMode] = useState<'design' | 'problem'>('design')
+  const [navMode, setNavMode] = useState<NavMode>('design')
   const [algoFilter, setAlgoFilter] = useState('')
   const { userPref, setUserPref, density, setDensity } = useMotion()
   const { theme, setTheme } = useLabTheme()
@@ -26,17 +34,43 @@ export default function Layout() {
   const menuBtnRef = useRef<HTMLButtonElement>(null)
   const drawerCloseRef = useRef<HTMLButtonElement>(null)
   const prevBodyOverflow = useRef<string | null>(null)
-  const navModules = useMemo(
-    () => (navMode === 'design' ? byDesignThought.modules : byProblemType.modules),
-    [navMode],
-  )
 
   /** Modal drawer only when both mobile breakpoint and open flag hold */
   const mobileModalOpen = isMobile && mobileDrawerOpen
 
   useEffect(() => {
     setMobileDrawerOpen(false)
+    setCatalogOpen(false)
   }, [location.pathname])
+
+  const rail = desktopCollapsed && !isMobile
+  const popOpen = rail && catalogOpen
+  const closeCatalog = (restoreFocus: boolean) => {
+    setCatalogOpen(false)
+    if (restoreFocus) catalogBtnRef.current?.focus()
+  }
+
+  // V32: popover catalog — ESC and outside pointer close it; focus returns to the rail entry.
+  useEffect(() => {
+    if (!popOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        closeCatalog(true)
+      }
+    }
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Node
+      if (catalogPopRef.current?.contains(t) || catalogBtnRef.current?.contains(t)) return
+      setCatalogOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    document.addEventListener('pointerdown', onDown, true)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.removeEventListener('pointerdown', onDown, true)
+    }
+  }, [popOpen])
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 960px)')
@@ -138,38 +172,31 @@ export default function Layout() {
     return '算法设计与分析'
   })()
 
-  const filterLower = algoFilter.trim().toLowerCase()
-  const matchFilter = (label: string) => !filterLower || label.toLowerCase().includes(filterLower)
-
-  const sidebarCls = [
-    'sidebar',
-    desktopCollapsed ? 'collapsed' : '',
-    mobileDrawerOpen ? 'open' : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
-
-  const renderAlgoLinks = (aids: string[]) =>
-    aids.map((aid) => {
-      const a = algorithms[aid]
-      if (!a) return null
-      if (!matchFilter(a.meta.title)) return null
-      return (
-        <NavLink
-          key={aid}
-          to={`/algo/${aid}`}
-          className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')}
-          onClick={() => setMobileDrawerOpen(false)}
-          title={a.meta.title}
-        >
-          {a.meta.title}
-        </NavLink>
-      )
-    })
-
-  /** Catalog always rendered in DOM for mobile drawer; desktopCollapsed only hides labels on desktop */
-  const showExpandedLabels = !desktopCollapsed || mobileDrawerOpen
+  const sidebarCls = ['sidebar', rail ? 'collapsed' : '', mobileDrawerOpen ? 'open' : ''].filter(Boolean).join(' ')
   const sidebarInert = isMobile && !mobileDrawerOpen
+  const closeDrawer = () => setMobileDrawerOpen(false)
+  const toggleFold = (id: string) =>
+    setFolded((f) => {
+      const n = new Set(f)
+      if (n.has(id)) n.delete(id)
+      else n.add(id)
+      return n
+    })
+  const catalogProps = {
+    mode: navMode,
+    setMode: setNavMode,
+    filter: algoFilter,
+    setFilter: setAlgoFilter,
+    folded,
+    toggleFold,
+  }
+  const primaryNav: { to: string; label: string; icon: NavIconName; end?: boolean; match?: string }[] = [
+    { to: '/', label: '全部算法', icon: 'home', end: true },
+    { to: '/practice', label: '练习台', icon: 'practice' },
+    { to: '/experiment', label: '实验台', icon: 'lab' },
+    { to: '/lab/core', label: '实验讲义', icon: 'notes', match: '/lab/' },
+  ]
+  const onAlgoPage = isAlgo || isTeach
 
   return (
     <div
@@ -195,169 +222,108 @@ export default function Layout() {
         aria-hidden={sidebarInert ? true : false}
         aria-label={mobileModalOpen ? '导航菜单' : undefined}
         data-testid="app-sidebar"
-        // Entire offscreen sidebar (brand + close + nav) not tabbable when closed on mobile
+        // Entire offscreen sidebar not tabbable when the mobile drawer is closed (inert covers all descendants)
         inert={sidebarInert ? true : undefined}
       >
         <div className="sidebar-top">
-          <Link to="/" className="brand" onClick={() => setMobileDrawerOpen(false)} tabIndex={sidebarInert ? -1 : undefined}>
-            <span className="brand-mark">Σ</span>
-            <span className="brand-text">
-              <strong>算法设计与分析</strong>
-              <small>交互可视化教程</small>
-            </span>
+          <Link
+            to="/"
+            className="brand"
+            onClick={closeDrawer}
+            aria-label={rail ? '算法设计与分析 · 首页' : undefined}
+            title={rail ? '算法设计与分析 · 首页' : undefined}
+          >
+            <span className="brand-mark" aria-hidden={rail ? true : undefined}>Σ</span>
+            {!rail && (
+              <span className="brand-text">
+                <strong>算法设计与分析</strong>
+                <small>交互可视化教程</small>
+              </span>
+            )}
           </Link>
-          <button
-            type="button"
-            className="ghost icon-btn sidebar-toggle desktop-collapse-btn"
-            title={desktopCollapsed ? '展开侧栏' : '折叠侧栏'}
-            aria-label={desktopCollapsed ? '展开侧栏' : '折叠侧栏'}
-            data-testid="desktop-collapse-btn"
-            tabIndex={sidebarInert ? -1 : undefined}
-            onClick={() => setDesktopCollapsed((c) => !c)}
-          >
-            {desktopCollapsed ? '»' : '«'}
-          </button>
-          <button
-            type="button"
-            className="ghost icon-btn mobile-drawer-close"
-            ref={drawerCloseRef}
-            aria-label="关闭菜单"
-            data-testid="mobile-drawer-close"
-            tabIndex={sidebarInert ? -1 : undefined}
-            onClick={() => {
-              setMobileDrawerOpen(false)
-              menuBtnRef.current?.focus()
-            }}
-          >
-            ×
-          </button>
+          {!isMobile && (
+            <button
+              type="button"
+              className="ghost icon-btn sidebar-toggle desktop-collapse-btn"
+              title={desktopCollapsed ? '展开侧栏' : '折叠侧栏'}
+              aria-label={desktopCollapsed ? '展开侧栏' : '折叠侧栏'}
+              aria-expanded={!desktopCollapsed}
+              aria-controls="app-sidebar"
+              data-testid="desktop-collapse-btn"
+              onClick={() => {
+                setCatalogOpen(false)
+                setDesktopCollapsed((c) => !c)
+              }}
+            >
+              <NavIcon name={desktopCollapsed ? 'expand' : 'collapse'} />
+            </button>
+          )}
+          {isMobile && (
+            <button
+              type="button"
+              className="ghost icon-btn mobile-drawer-close"
+              ref={drawerCloseRef}
+              aria-label="关闭菜单"
+              data-testid="mobile-drawer-close"
+              tabIndex={sidebarInert ? -1 : undefined}
+              onClick={() => {
+                setMobileDrawerOpen(false)
+                menuBtnRef.current?.focus()
+              }}
+            >
+              ×
+            </button>
+          )}
         </div>
 
-        <nav className="nav-scroll" data-testid="nav-scroll">
-          <div className="nav-group">导航视图</div>
-          {showExpandedLabels && (
-            <label className="nav-search">
-              <span className="sr-only">搜索算法</span>
-              <input
-                type="search"
-                placeholder="搜索算法…"
-                value={algoFilter}
-                onChange={(e) => setAlgoFilter(e.target.value)}
-                aria-label="搜索算法"
-                data-testid="algo-search"
-                tabIndex={sidebarInert ? -1 : undefined}
-              />
-            </label>
-          )}
-          <div className="nav-mode-toggle compact">
-            <button
-              type="button"
-              className={navMode === 'design' ? 'active' : ''}
-              onClick={() => setNavMode('design')}
-              tabIndex={sidebarInert ? -1 : undefined}
-            >
-              按设计思想
-            </button>
-            <button
-              type="button"
-              className={navMode === 'problem' ? 'active' : ''}
-              onClick={() => setNavMode('problem')}
-              tabIndex={sidebarInert ? -1 : undefined}
-            >
-              按问题类型
-            </button>
-          </div>
-          {navModules.map((m) => (
-            <div key={m.id}>
-              <div className="nav-item nav-mod-label" title={m.title}>
-                <span className="nav-dot" aria-hidden />
-                <span className="nav-item-label">
-                  {m.title}
-                  {m.planned ? ' · 规划' : ''}
-                </span>
-              </div>
-              <div className={`nav-algos${desktopCollapsed && !mobileDrawerOpen ? ' nav-algos-compact' : ''}`}>
-                {showExpandedLabels && (
-                  <span className="nav-completion muted">{completionLabel(m.completion)}</span>
-                )}
-                {renderAlgoLinks(m.items)}
-                {(m.id === 'knapsack-family' || m.id === 'dp' || m.id === 'backtrack') &&
-                  matchFilter('背包多策略') && (
-                    <NavLink
-                      to="/teach/knapsack"
-                      className={({ isActive }) => (isActive ? 'nav-algo active' : 'nav-algo')}
-                      onClick={() => setMobileDrawerOpen(false)}
-                      title="背包多策略"
-                      tabIndex={sidebarInert ? -1 : undefined}
-                    >
-                      背包多策略
-                    </NavLink>
-                  )}
-              </div>
-            </div>
-          ))}
-          <div className="nav-group">章节讲义</div>
-          {chapters.map((ch) => (
-            <div key={ch.id}>
-              <NavLink
-                to={`/chapter/${ch.id}`}
-                className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-                onClick={() => setMobileDrawerOpen(false)}
-                title={ch.title}
-                tabIndex={sidebarInert ? -1 : undefined}
-              >
-                <span className="nav-dot" aria-hidden />
-                <span className="nav-item-label">{ch.title}</span>
-              </NavLink>
-              <div className={`nav-algos${desktopCollapsed && !mobileDrawerOpen ? ' nav-algos-compact' : ''}`}>
-                {renderAlgoLinks(ch.algos)}
-              </div>
-            </div>
-          ))}
-          <div className="nav-group">导航</div>
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-            onClick={() => setMobileDrawerOpen(false)}
-            title="全部算法"
-            tabIndex={sidebarInert ? -1 : undefined}
-          >
-            <span className="nav-dot" aria-hidden />
-            <span className="nav-item-label">全部算法</span>
-          </NavLink>
-          <NavLink
-            to="/practice"
-            className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-            onClick={() => setMobileDrawerOpen(false)}
-            title="练习台"
-            tabIndex={sidebarInert ? -1 : undefined}
-          >
-            <span className="nav-dot" aria-hidden />
-            <span className="nav-item-label">练习台</span>
-          </NavLink>
-          <NavLink
-            to="/experiment"
-            className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-            onClick={() => setMobileDrawerOpen(false)}
-            title="实验台"
-            tabIndex={sidebarInert ? -1 : undefined}
-          >
-            <span className="nav-dot" aria-hidden />
-            <span className="nav-item-label">实验台</span>
-          </NavLink>
-          <NavLink
-            to="/lab/core"
-            className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
-            onClick={() => setMobileDrawerOpen(false)}
-            title="实验讲义"
-            tabIndex={sidebarInert ? -1 : undefined}
-          >
-            <span className="nav-dot" aria-hidden />
-            <span className="nav-item-label">实验讲义</span>
-          </NavLink>
+        <nav className="nav-scroll" data-testid="nav-scroll" aria-label="主导航">
+          <ul className="nav-primary">
+            {primaryNav.slice(0, 1).map((n) => (
+              <li key={n.to}>
+                <NavLink to={n.to} end={n.end} className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')} onClick={closeDrawer} title={rail ? n.label : undefined} aria-label={rail ? n.label : undefined}>
+                  <NavIcon name={n.icon} />
+                  {!rail && <span className="nav-item-label">{n.label}</span>}
+                </NavLink>
+              </li>
+            ))}
+            {rail && (
+              <li>
+                <button
+                  type="button"
+                  ref={catalogBtnRef}
+                  className={`nav-item nav-catalog-entry${onAlgoPage ? ' has-current' : ''}`}
+                  aria-label="算法目录"
+                  title="算法目录（搜索 / 分组）"
+                  aria-expanded={popOpen}
+                  aria-controls="nav-catalog-pop"
+                  aria-haspopup="dialog"
+                  data-testid="catalog-entry"
+                  onClick={() => setCatalogOpen((o) => !o)}
+                >
+                  <NavIcon name="catalog" />
+                </button>
+              </li>
+            )}
+            {primaryNav.slice(1).map((n) => (
+              <li key={n.to}>
+                <NavLink
+                  to={n.to}
+                  end={n.end}
+                  className={({ isActive }) => (isActive || (n.match && location.pathname.startsWith(n.match)) ? 'nav-item active' : 'nav-item')}
+                  onClick={closeDrawer}
+                  title={rail ? n.label : undefined}
+                  aria-label={rail ? n.label : undefined}
+                >
+                  <NavIcon name={n.icon} />
+                  {!rail && <span className="nav-item-label">{n.label}</span>}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+          {!rail && <NavCatalog {...catalogProps} onNavigate={closeDrawer} idPrefix="nav-side" />}
         </nav>
-        <footer className="side-foot">
+        {!rail && (
+          <footer className="side-foot">
           GitHub Pages · 本地可视化
           <div
             className="build-info muted"
@@ -369,7 +335,13 @@ export default function Layout() {
             {buildInfoLabel()}
           </div>
         </footer>
+        )}
       </aside>
+      {popOpen && (
+        <div className="nav-pop" id="nav-catalog-pop" role="dialog" aria-labelledby="nav-pop-title" ref={catalogPopRef} data-testid="catalog-pop">
+          <NavCatalog {...catalogProps} onNavigate={() => setCatalogOpen(false)} autoFocusSearch idPrefix="nav-pop" />
+        </div>
+      )}
 
       <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'}>
         <header className="topbar">

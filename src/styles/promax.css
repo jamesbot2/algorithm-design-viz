@@ -71,10 +71,6 @@ textarea:hover { border-color: var(--pm-border-strong); }
 input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color: var(--pm-accent); }
 
 /* ——— app shell ——— */
-.sidebar {
-  background: linear-gradient(180deg, rgba(109, 135, 251, 0.05), transparent 220px), var(--pm-surface-1);
-  border-right-color: var(--pm-border-subtle);
-}
 .brand-mark {
   background: var(--pm-accent-gradient);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, var(--pm-glow-accent);
@@ -82,22 +78,6 @@ input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color:
   letter-spacing: 0;
 }
 .brand-text strong, .brand-text b { letter-spacing: var(--pm-tracking-tight); }
-.nav-group {
-  color: var(--pm-text-3);
-  letter-spacing: var(--pm-tracking-caps);
-  font-weight: var(--pm-fw-semibold);
-}
-.nav-item, .nav-algo { transition: background var(--pm-dur-fast) var(--pm-ease-out), color var(--pm-dur-fast) var(--pm-ease-out); }
-.nav-item:hover, .nav-algo:hover { background: var(--pm-state-hover); color: var(--pm-text-1); }
-.nav-item.active, .nav-algo.active {
-  background: var(--pm-state-selected);
-  color: var(--pm-text-1);
-  box-shadow: inset 2px 0 0 var(--pm-accent);
-}
-.nav-item.active .nav-dot, .nav-algo.active .nav-dot { background: var(--pm-accent); box-shadow: 0 0 0 3px var(--pm-accent-soft); }
-.nav-search input { background: var(--pm-surface-0); }
-.side-foot { border-top-color: var(--pm-border-subtle); }
-
 .topbar {
   background: var(--pm-surface-glass);
   border-bottom-color: var(--pm-border-subtle);
@@ -107,7 +87,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color:
 .topbar-title { font-weight: var(--pm-fw-semibold); letter-spacing: var(--pm-tracking-tight); }
 .topbar-motion select { background: var(--pm-surface-2); border-color: var(--pm-border); }
 
-/* segmented control (course-nav toggle, sidebar toggle) */
+/* segmented control (Home course-nav toggle; the sidebar catalog uses .nav-seg in nav.css) */
 .nav-mode-toggle {
   background: var(--pm-surface-1);
   border: 1px solid var(--pm-border);

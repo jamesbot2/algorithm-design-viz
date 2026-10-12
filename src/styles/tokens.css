@@ -125,7 +125,11 @@
   --lab-bg: var(--pm-canvas);
   --lab-surface: var(--pm-surface-2);
   --lab-accent: var(--pm-accent);
-  --sidebar: var(--pm-surface-1);
+  --sidebar: var(--pm-canvas);
+  /* V32 nav: shell continues the workbench canvas; only the divider + current-state accent mark it */
+  --pm-nav-bg: var(--pm-canvas);
+  --pm-nav-divider: var(--pm-border-subtle);
+  --pm-nav-pop-bg: var(--pm-surface-1);
   --bg: var(--pm-canvas);
   --bg-elev: var(--pm-surface-2);
   --bg-soft: var(--pm-surface-4);
@@ -191,7 +195,11 @@
   --lab-bg: var(--pm-canvas);
   --lab-surface: var(--pm-surface-2);
   --lab-accent: var(--pm-accent);
-  --sidebar: var(--pm-surface-1);
+  --sidebar: var(--pm-canvas);
+  /* V32 nav: shell continues the workbench canvas; only the divider + current-state accent mark it */
+  --pm-nav-bg: var(--pm-canvas);
+  --pm-nav-divider: var(--pm-border-subtle);
+  --pm-nav-pop-bg: var(--pm-surface-1);
   --bg: var(--pm-canvas);
   --bg-elev: var(--pm-surface-2);
   --bg-soft: var(--pm-surface-4);

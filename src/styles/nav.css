@@ -1,0 +1,239 @@
+/* V32 — app shell navigation: sidebar (expanded), desktop rail (collapsed), catalog popover,
+ * mobile drawer. Single owner of every .sidebar / .nav-* rule (V31 rules in styles.css and
+ * promax.css were deleted). Colours come from tokens.css (--pm-nav-*, --pm-state-*). */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.65rem 0.5rem;
+  background: var(--pm-nav-bg);
+  border-right: 1px solid var(--pm-nav-divider);
+  z-index: 40;
+}
+.sidebar.collapsed {
+  width: 60px;
+  padding: 0.65rem 0.5rem;
+}
+
+/* brand + collapse button: same 36px grid row in both states */
+.sidebar-top {
+  display: grid;
+  grid-template-columns: 1fr 36px;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 44px;
+}
+.sidebar.collapsed .sidebar-top {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  row-gap: 0.35rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--pm-nav-divider);
+}
+.brand {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  min-width: 0;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--pm-r-md, 10px);
+  color: var(--pm-text-1);
+}
+.sidebar.collapsed .brand { padding: 0.15rem; }
+.brand:hover { background: var(--pm-state-hover); color: var(--pm-text-1); }
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--pm-text-on-accent);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+.brand strong { display: block; font-size: 0.88rem; line-height: 1.25; }
+.brand small { color: var(--pm-text-3); font-size: 0.7rem; }
+.sidebar-toggle { color: var(--pm-text-2); }
+.mobile-drawer-close { justify-self: end; }
+
+.nav-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 0.5rem;
+}
+.nav-icon { flex-shrink: 0; display: block; }
+
+/* primary destinations */
+.nav-primary {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0 0.45rem;
+  border-bottom: 1px solid var(--pm-nav-divider);
+  display: grid;
+  gap: 2px;
+}
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 36px;
+  padding: 0.4rem 0.6rem;
+  border: 0;
+  border-radius: var(--pm-r-sm, 8px);
+  background: transparent;
+  color: var(--pm-text-2);
+  font: inherit;
+  font-size: 0.86rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--pm-dur-fast) var(--pm-ease-out), color var(--pm-dur-fast) var(--pm-ease-out);
+}
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  margin: 0 auto;
+}
+
+/* catalog list */
+.nav-catalog { padding: 0.5rem 0.15rem 0; }
+.nav-catalog-title {
+  margin: 0.1rem 0.45rem 0.4rem;
+  font-size: 0.78rem;
+  font-weight: var(--pm-fw-semibold);
+  letter-spacing: var(--pm-tracking-caps);
+  color: var(--pm-text-3);
+}
+.nav-search { display: block; margin: 0 0.3rem 0.45rem; }
+.nav-search input { width: 100%; font-size: 0.85rem; padding: 0.35rem 0.55rem; background: var(--pm-surface-0); }
+.nav-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 0 0.3rem 0.35rem;
+  padding: 2px;
+  border: 1px solid var(--pm-border-subtle);
+  border-radius: var(--pm-r-sm, 8px);
+}
+.nav-seg button {
+  flex: 1 1 auto;
+  padding: 0.22rem 0.4rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--pm-text-2);
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+.nav-seg button:hover { background: var(--pm-state-hover); color: var(--pm-text-1); }
+.nav-seg button.active { background: var(--pm-state-selected); color: var(--pm-text-1); font-weight: var(--pm-fw-semibold); }
+
+.nav-sec { border-top: 1px solid var(--pm-nav-divider); padding: 0.2rem 0; }
+.nav-sec:first-of-type { border-top: 0; }
+.nav-sec-head { display: flex; align-items: center; gap: 0.35rem; padding-right: 0.4rem; }
+.nav-sec-toggle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--pm-text-1);
+  font-size: 0.8rem;
+  font-weight: var(--pm-fw-semibold);
+  text-align: left;
+}
+.nav-sec-toggle:hover { background: var(--pm-state-hover); }
+.nav-chev { width: 14px; height: 14px; color: var(--pm-text-3); transition: transform var(--pm-dur-fast) var(--pm-ease-out); }
+.nav-sec-toggle[aria-expanded="true"] .nav-chev { transform: rotate(90deg); }
+.nav-sec-note { font-size: 0.68rem; color: var(--pm-text-3); white-space: nowrap; }
+.nav-list { list-style: none; margin: 0 0 0.15rem; padding: 0; }
+.nav-algo {
+  position: relative;
+  display: block;
+  padding: 0.3rem 0.6rem 0.3rem 1.55rem;
+  border-radius: 6px;
+  color: var(--pm-text-2);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  transition: background var(--pm-dur-fast) var(--pm-ease-out), color var(--pm-dur-fast) var(--pm-ease-out);
+}
+.nav-algo.is-notes { color: var(--pm-text-3); font-size: 0.78rem; }
+.nav-empty { margin: 0.5rem 0.45rem; font-size: 0.8rem; color: var(--pm-text-3); }
+
+/* states — shared by .nav-item / .nav-algo: hover = neutral tint, selected = low-sat tint + 2px bar + weight */
+.nav-item:hover, .nav-algo:hover { background: var(--pm-state-hover); color: var(--pm-text-1); }
+.nav-item.active, .nav-algo.active {
+  background: var(--pm-state-selected);
+  color: var(--pm-text-1);
+  font-weight: var(--pm-fw-semibold);
+}
+.nav-item.active::before, .nav-algo.active::before,
+.nav-catalog-entry.has-current::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--pm-accent);
+}
+.nav-catalog-entry[aria-expanded="true"] { background: var(--pm-state-selected); color: var(--pm-text-1); }
+
+/* catalog popover from the rail: overlays the workbench, never resizes it */
+.nav-pop {
+  position: fixed;
+  top: 0;
+  left: 60px;
+  bottom: 0;
+  width: min(300px, calc(100vw - 60px));
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0.65rem 0.4rem 1rem;
+  background: var(--pm-nav-pop-bg);
+  border-right: 1px solid var(--pm-border);
+  box-shadow: 8px 0 24px -16px rgba(0, 0, 0, 0.45);
+  z-index: 45;
+}
+
+.side-foot {
+  margin-top: auto;
+  padding: 0.55rem 0.5rem 0.25rem;
+  border-top: 1px solid var(--pm-nav-divider);
+  font-size: 0.7rem;
+  color: var(--pm-text-3);
+}
+
+/* mobile drawer (≤960): off-canvas full catalog; desktop rail never shows here */
+@media (max-width: 960px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: min(300px, 86vw);
+    height: 100dvh;
+    padding-top: max(0.65rem, env(safe-area-inset-top));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    background: var(--pm-nav-pop-bg);
+    transform: translateX(-105%);
+    transition: transform var(--pm-dur-base, 200ms) var(--pm-ease-out, ease);
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4); }
+  .sidebar-backdrop.visible { display: block; }
+}

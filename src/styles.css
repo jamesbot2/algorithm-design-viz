@@ -1,5 +1,4 @@
 :root {
-  --sidebar: #171717;
   --bg: #212121;
   --bg-elev: #2f2f2f;
   --bg-soft: #3a3a3a;
@@ -81,119 +80,7 @@ button.icon-btn {
   position: relative;
 }
 
-.sidebar {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  width: var(--sidebar-w);
-  flex-shrink: 0;
-  overflow: auto;
-  background: var(--sidebar);
-  border-right: 1px solid var(--border-soft);
-  padding: 0.75rem 0.65rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  transition: width var(--transition), padding var(--transition), transform var(--transition);
-  z-index: 40;
-}
-.sidebar.collapsed {
-  width: 60px;
-  padding: 0.75rem 0.4rem;
-}
-.sidebar.collapsed .brand-text,
-.sidebar.collapsed .nav-group,
-.sidebar.collapsed .nav-item-label,
-.sidebar.collapsed .side-foot,
-.sidebar.collapsed .nav-algo {
-  display: none;
-}
-.sidebar.collapsed .brand { justify-content: center; padding: 0.4rem; }
-.sidebar.collapsed .sidebar-toggle { margin: 0 auto; }
-
-.sidebar-top {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  margin-bottom: 0.5rem;
-}
-.sidebar-toggle {
-  flex-shrink: 0;
-}
-
-.brand {
-  display: flex;
-  gap: 0.65rem;
-  align-items: center;
-  color: var(--text);
-  padding: 0.45rem 0.55rem;
-  border-radius: 12px;
-  flex: 1;
-  min-width: 0;
-}
-.brand:hover { background: var(--bg-hover); color: var(--text); }
-.brand-mark {
-  width: 32px; height: 32px; border-radius: 10px;
-  display: grid; place-items: center;
-  background: var(--accent);
-  color: #fff; font-weight: 800; font-size: 0.95rem;
-  flex-shrink: 0;
-}
-.brand strong { display: block; font-size: 0.88rem; line-height: 1.25; }
-.brand small { color: var(--muted-2); font-size: 0.7rem; }
-
-.nav-scroll { flex: 1; overflow: auto; padding-bottom: 0.5rem; }
-
-.nav-group {
-  margin: 0.85rem 0.55rem 0.3rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  color: var(--muted-2);
-  font-weight: 600;
-}
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.7rem;
-  border-radius: 12px;
-  color: var(--muted);
-  font-size: 0.88rem;
-  margin: 1px 0;
-}
-.nav-item:hover {
-  background: var(--bg-hover);
-  color: var(--text);
-}
-.nav-item.active {
-  background: var(--bg-soft);
-  color: var(--text);
-  font-weight: 500;
-}
-.nav-item.active .nav-dot { background: var(--accent); }
-.nav-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--muted-2); flex-shrink: 0;
-}
-
-.nav-algos { margin: 0.15rem 0 0.35rem 0.35rem; padding-left: 0.35rem; border-left: 1px solid var(--border-soft); }
-.nav-algo {
-  display: block;
-  padding: 0.32rem 0.6rem;
-  border-radius: 8px;
-  color: var(--muted-2);
-  font-size: 0.8rem;
-}
-.nav-algo:hover { background: var(--bg-hover); color: var(--text); }
-.nav-algo.active { color: var(--accent); background: var(--accent-soft); }
-
-.side-foot {
-  margin-top: auto;
-  font-size: 0.72rem;
-  color: var(--muted-2);
-  padding: 0.65rem 0.55rem 0.35rem;
-  border-top: 1px solid var(--border-soft);
-}
+/* V32: sidebar / rail / catalog rules live in src/styles/nav.css */
 
 /* Main column */
 .main-wrap {
@@ -710,23 +597,6 @@ button.icon-btn {
 
 @media (max-width: 960px) {
   .app-shell { display: block; }
-  .sidebar {
-    position: fixed;
-    left: 0; top: 0;
-    transform: translateX(-105%);
-    box-shadow: 8px 0 32px rgba(0,0,0,0.4);
-  }
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  .sidebar.collapsed { width: var(--sidebar-w); }
-  .sidebar.collapsed .brand-text,
-  .sidebar.collapsed .nav-group,
-  .sidebar.collapsed .nav-item-label,
-  .sidebar.collapsed .side-foot,
-  .sidebar.collapsed .nav-algo { display: initial; }
-  .sidebar.collapsed .nav-algo { display: block; }
-  .sidebar-backdrop.visible { display: block; }
   .topbar { display: flex; }
   .main { padding: 1rem 1rem 2.5rem; }
   .viz-toolbar { border-radius: 16px; }
@@ -836,10 +706,6 @@ button.icon-btn {
   border-color: transparent;
   color: #fff;
 }
-.nav-mode-toggle.compact {
-  flex-direction: column;
-  margin: 0.25rem 0.75rem;
-}
 .nav-mod-card {
   border: 1px solid var(--border, #333);
   border-radius: 10px;
@@ -881,16 +747,6 @@ button.icon-btn {
   overflow: auto;
   font-size: 0.85rem;
 }
-.nav-completion {
-  display: block;
-  font-size: 0.7rem;
-  padding: 0.1rem 0.5rem;
-}
-.nav-mod-label {
-  pointer-events: none;
-  opacity: 0.95;
-}
-
 /* —— V11-01 signed bars: shared y(0); pos up / neg down; zero height 0 ——
  * V25-02: explicit chart model. Each column = plot area (.bar-plot, explicit height:
  * lane-top + span + lane-bottom; the zero line at lane-top + zero-ratio·span) followed
@@ -1283,7 +1139,6 @@ button.icon-btn {
   --lab-bg: #0F1117;
   --lab-surface: #161b22;
   --lab-accent: #5B8DEF;
-  --sidebar: #0d1117;
   --bg: var(--lab-bg);
   --bg-elev: var(--lab-surface);
   --bg-soft: #21262d;
@@ -1317,7 +1172,6 @@ button.icon-btn {
   --lab-bg: #F6F8FC;
   --lab-surface: #ffffff;
   --lab-accent: #5B8DEF;
-  --sidebar: #eef2f8;
   --bg: var(--lab-bg);
   --bg-elev: var(--lab-surface);
   --bg-soft: #e8eef8;
@@ -1684,14 +1538,7 @@ html, body, #root {
   max-height: none;
 }
 
-/* UI-07: desktop collapse vs mobile drawer */
-.mobile-drawer-close { display: none; }
-.nav-search { display: block; margin: 0.35rem 0.75rem; }
-.nav-search input {
-  width: 100%;
-  font-size: 0.85rem;
-  padding: 0.35rem 0.5rem;
-}
+/* visually hidden, still announced */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1702,27 +1549,6 @@ html, body, #root {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-@media (max-width: 960px) {
-  .mobile-drawer-close { display: inline-flex; }
-  .desktop-collapse-btn { display: none; }
-  /* Off-screen sidebar when not .open — CSS already translates; inert handles focus */
-}
-@media (min-width: 961px) {
-  /* V23: compact rail shows the bullets only (mode toggle + search live in the expanded nav) */
-  .sidebar.collapsed .nav-mode-toggle,
-  .sidebar.collapsed .nav-search {
-    display: none;
-  }
-  .sidebar.collapsed .nav-algos-compact .nav-algo {
-    /* keep links reachable with title tooltips */
-    font-size: 0;
-    padding: 0.35rem;
-  }
-  .sidebar.collapsed .nav-algos-compact .nav-algo::before {
-    content: '•';
-    font-size: 0.85rem;
-  }
 }
 
 /* UI-11 practice feedback */
