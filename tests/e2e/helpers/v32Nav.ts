@@ -104,6 +104,16 @@ export async function wbState(page: Page) {
         const g = [...cm.querySelectorAll('.cm-lineNumbers .cm-gutterElement')].find((e) => e.getBoundingClientRect().bottom > top + 1 && /\d/.test(e.textContent ?? ''))
         return g ? Number(g.textContent) : null
       })(),
+      /** variables / inspector readout and the executing source line (code position) */
+      vars: document.querySelector('[data-testid="viz-inspector"]')?.textContent?.replace(/\s+/g, ' ').trim() ?? null,
+      execLine: (() => {
+        const l = document.querySelector('.cm-exec-line') as HTMLElement | null
+        if (!l) return null
+        const all = [...document.querySelectorAll('.cm-content > .cm-line')]
+        return all.indexOf(l)
+      })(),
+      /** running Web Animations inside the stage (animation state) */
+      anims: viz ? viz.getAnimations({ subtree: true }).filter((a) => a.playState === 'running').length : null,
       cmCount: document.querySelectorAll('.cm-editor').length,
       cmNode: (() => {
         const e = document.querySelector('.cm-editor') as (HTMLElement & { __v32?: string }) | null

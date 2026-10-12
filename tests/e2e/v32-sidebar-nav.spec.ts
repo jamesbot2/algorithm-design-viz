@@ -20,7 +20,10 @@ async function midRun(page: Page, id: string, steps: number) {
   await page.getByTestId('run-btn').click()
   await expect(page.getByTestId('next-step-btn')).toBeEnabled({ timeout: 20_000 })
   for (let i = 0; i < steps; i++) await page.getByTestId('next-step-btn').click()
-  await page.waitForTimeout(500)
+  // let the finite step transitions settle so the animation state is a stable baseline
+  await expect
+    .poll(() => page.evaluate(() => document.querySelector('[data-testid="visualizer"]')!.getAnimations({ subtree: true }).filter((a) => a.playState === 'running').length), { timeout: 5_000 })
+    .toBe(0)
   // scroll the code reader somewhere specific (reading position)
   const cm = page.locator('.cm-scroller').first()
   await cm.hover()
@@ -182,6 +185,12 @@ for (const vp of [
     await page.keyboard.press('Escape')
     await expect(menu).toBeFocused()
     expect(await page.evaluate(() => document.body.style.overflow)).not.toBe('hidden')
+    // tap on the backdrop closes and releases the scroll lock
+    await menu.tap()
+    expect(await page.evaluate(() => document.body.style.overflow)).toBe('hidden')
+    await page.touchscreen.tap(vp.width - 8, Math.round(vp.height / 2))
+    await expect(page.locator('.app-shell')).toHaveAttribute('data-mobile-drawer', '0')
+    expect(await page.evaluate(() => document.body.style.overflow)).not.toBe('hidden')
     // reopen, search and tap
     await menu.tap()
     await sb.getByTestId('algo-search').tap()
@@ -229,7 +238,9 @@ for (const [id, steps] of [
     await sw.getByTestId('tab-ts').click()
     await page.waitForTimeout(300)
     const s3 = await wbState(page)
-    expect([s3.runId, s3.step, s3.playing, s3.banner, s3.solveCount]).toEqual([s0.runId, s0.step, s0.playing, s0.banner, s0.solveCount])
+    expect([s3.runId, s3.step, s3.playing, s3.banner, s3.solveCount, s3.vars, s3.anims]).toEqual([s0.runId, s0.step, s0.playing, s0.banner, s0.solveCount, s0.vars, s0.anims])
+    expect(s0.execLine, 'executing line present').not.toBeNull()
+    expect(s3.execLine, 'code position restored after language round-trip').toBe(s0.execLine)
   })
 }
 
