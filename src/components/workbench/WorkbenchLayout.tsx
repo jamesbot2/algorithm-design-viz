@@ -109,9 +109,12 @@ export default function WorkbenchLayout({
 
   // Content-calibrated data height: monotonic within a run so stepping never
   // makes the scene (and graph camera) jitter; resets on a new run.
-  useEffect(() => {
-    setDataContentH(0)
-  }, [runKey])
+  // V34: the reset is the FIRST measurement of the new run, taken in the same layout
+  // pass as the run commit. (V33 reset to 0 in a passive effect: the docked data
+  // region collapsed for one painted frame, the stage grew ~75px, the bar fit
+  // measured that transient box and the next frame painted over-tall bars clipped
+  // by the stage — the merge7 1366x768 init flake.)
+  const measuredRunRef = useRef<unknown>(undefined)
   useLayoutEffect(() => {
     const el = dataContentRef.current
     if (!el || typeof ResizeObserver === 'undefined') return
@@ -131,6 +134,10 @@ export default function WorkbenchLayout({
       }
       if (probeHost) for (const p of Array.from(probeHost.children)) h = Math.max(h, (p as HTMLElement).scrollHeight)
       setDataContentH((prev) => (h > prev ? h : prev))
+    }
+    if (measuredRunRef.current !== runKey) {
+      measuredRunRef.current = runKey
+      setDataContentH(0) // batched with read() below: one commit, final value = this run's height
     }
     read()
     const ro = new ResizeObserver(read)

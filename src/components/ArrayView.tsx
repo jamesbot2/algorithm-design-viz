@@ -382,13 +382,18 @@ function ArrayView({
       }
       // V30-03b: the plot strut reads the same measured column chrome (no re-render needed).
       if (wrap && !signedMode) wrap.style.setProperty('--bars-col-chrome', `${colChrome}px`)
-      const budget = Math.floor(box - chromeY - labelH - noteH - wrapPad - colChrome - 2)
+      // V34: floors are derived from the measured chrome only, never from `box - budget`
+      // (that difference carries box's sub-pixel fraction, so the published floor flipped
+      // N <-> N+1 as the card box moved, fed --primary-need, resized the card and re-fired this
+      // observer: the 'ResizeObserver loop' warnings at 375x812 merge n=16).
+      const chromeTotal = chromeY + labelH + noteH + wrapPad + colChrome + 2
+      const budget = Math.floor(box - chromeTotal)
       if (signedMode) {
         // Readable floor: the box never gets smaller than label + a SIGNED_MIN_SPAN_PX plot (with
         // its own lanes) + the measured annotation tracks; a shorter stage scrolls (scene.css)
         // instead of squashing the plot and cutting the index / pointer tracks.
         const l = floorLanesRef.current()
-        const floor = Math.ceil(box - budget + SIGNED_MIN_SPAN_PX + l.top + l.bottom)
+        const floor = Math.ceil(chromeTotal + SIGNED_MIN_SPAN_PX + l.top + l.bottom)
         setSignedFloor((prev) => (prev != null && Math.abs(prev - floor) < 1 ? prev : floor))
       }
       // signed: `budget` is the whole plot (lanes + span); pick the largest span whose
@@ -397,7 +402,7 @@ function ArrayView({
       if (!signedMode) {
         // V31: the box this chart needs for its minimum plot — chrome is independent of the bar
         // heights (layer-excluded column chrome), so the value is stable across frames / motion
-        const floor = String(Math.ceil(box - budget + BAR_MIN_PLOT_PX))
+        const floor = String(Math.ceil(chromeTotal + BAR_MIN_PLOT_PX))
         if (self.dataset.barsFloor !== floor) self.dataset.barsFloor = floor
       }
       setMaxH((prev) => {
