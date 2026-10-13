@@ -10,7 +10,7 @@
 import { test, expect, type Page } from '@playwright/test'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { waitForRunReady } from './helpers/runReadiness'
+import { waitForRunReady, waitForStageLayoutStable } from './helpers/runReadiness'
 import { ensureInputEditing } from './helpers/ensureInputEditing'
 import {
   measureStageObjects,
@@ -180,7 +180,7 @@ test.describe('V24 merge sort — primary a vs buffers vs recursion tree', () =>
     let treeNodesMax = 0
     for (let i = 0; i < n; i++) {
       if (i > 0) await clickNext(page)
-      await page.waitForTimeout(40)
+      await waitForStageLayoutStable(page) // V34: explicit, bounded layout-ready (was a fixed 40ms)
       const m = await assertArrayFrame(page, 'merge7 bars', 7)
       const ph = phaseOf(m.frame.banner)
       if (!seen.has(ph)) keyFrames.push(i)
@@ -202,7 +202,7 @@ test.describe('V24 merge sort — primary a vs buffers vs recursion tree', () =>
     await setMode(page, 'cells')
     for (const target of [...keyFrames, 20].sort((a, b) => b - a)) {
       while ((await stepIdx(page)) > target) await clickPrev(page)
-      await page.waitForTimeout(60)
+      await waitForStageLayoutStable(page) // V34: was a fixed 60ms
       const m = await assertArrayFrame(page, 'merge7 cells', 7)
       if (target === 20) {
         record('merge7-21of55-1366-cells', brief(m))

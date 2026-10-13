@@ -105,3 +105,54 @@ export async function prepareDijkstraN3Ready(page: Page) {
   const runId = await page.getByTestId('visualizer').getAttribute('data-run-id')
   return waitForRunReady(page, { expectRunId: runId ?? undefined, minSteps: 2 })
 }
+
+/**
+ * V34: explicit, bounded, observable layout-ready contract for the stage (replaces fixed sleeps).
+ * Ready = no FLIP layer in flight, no bar re-fit pending (data-refit), and the primary array's slot /
+ * bar / card geometry identical over `frames` consecutive animation frames. Fails loudly (with the
+ * last two geometry snapshots) after `timeout` ms — never resolves on a timer.
+ */
+export async function waitForStageLayoutStable(page: Page, opts: { frames?: number; timeout?: number; array?: string } = {}) {
+  const frames = opts.frames ?? 3
+  const timeout = opts.timeout ?? 5_000
+  const array = opts.array ?? 'a'
+  const res = await page.evaluate(
+    ({ frames, timeout, array }) =>
+      new Promise<{ ok: boolean; frames: number; ms: number; last: string; prev: string }>((resolve) => {
+        const t0 = performance.now()
+        const snap = () => {
+          const stage = document.querySelector('[data-testid="viz-canvas"]')
+          const view = stage
+            ? [...stage.querySelectorAll(`.array-view[data-array="${array}"]`)].find((v) => !v.closest('.array-buffers'))
+            : undefined
+          const busy = !!stage?.querySelector('[data-run-flip="1"], .bars-wrap[data-refit="1"]')
+          const r = (el: Element | null | undefined) => {
+            if (!el) return '-'
+            const b = el.getBoundingClientRect()
+            return `${b.top.toFixed(2)},${b.height.toFixed(2)}`
+          }
+          const parts = [r(stage), r(view)]
+          if (view) for (const s of view.querySelectorAll('[data-slot-index]')) parts.push(r(s), r(s.querySelector('.bar, .bar-zero-marker')))
+          return { busy, key: parts.join('|') }
+        }
+        let prev = ''
+        let same = 0
+        let n = 0
+        const tick = () => {
+          n++
+          const s = snap()
+          same = !s.busy && s.key === prev ? same + 1 : 0
+          const last = prev
+          prev = s.key
+          const ms = performance.now() - t0
+          if (same >= frames - 1) return resolve({ ok: true, frames: n, ms, last: s.key, prev: last })
+          if (ms > timeout) return resolve({ ok: false, frames: n, ms, last: s.key, prev: last })
+          requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+      }),
+    { frames, timeout, array },
+  )
+  expect(res.ok, `stage layout not stable after ${Math.round(res.ms)}ms / ${res.frames} frames: ${res.prev} -> ${res.last}`).toBe(true)
+  return res
+}
