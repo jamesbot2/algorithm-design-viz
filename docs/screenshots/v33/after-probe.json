@@ -1,0 +1,159 @@
+{
+  "1366-lab-dark": {
+    "s0": {
+      "runId": "run_mv67lian_yiv61yi",
+      "idx": "1",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "下一步",
+      "body": ""
+    },
+    "s1": {
+      "runId": "run_mv67lian_yiv61yi",
+      "idx": "1",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "冒泡排序",
+      "body": ""
+    }
+  },
+  "1366-lab-light": {
+    "s0": {
+      "runId": "run_mv67lkar_m290mi8",
+      "idx": "1",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "下一步",
+      "body": ""
+    },
+    "s1": {
+      "runId": "run_mv67lkar_m290mi8",
+      "idx": "1",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "冒泡排序",
+      "body": ""
+    }
+  },
+  "resize": {
+    "a": {
+      "runId": "run_mv67lm9l_iitm4of",
+      "idx": "1",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 260,
+      "focus": "下一步",
+      "body": ""
+    },
+    "b": {
+      "runId": "run_mv67lm9l_iitm4of",
+      "idx": "1",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "下一步",
+      "body": ""
+    }
+  },
+  "390x844": {
+    "aside": {
+      "role": "dialog",
+      "modal": "true",
+      "inert": true
+    },
+    "escapedAt": null,
+    "afterEsc": {
+      "runId": "preview",
+      "idx": "0",
+      "playing": "0",
+      "solveCount": "0",
+      "sbW": 300,
+      "focus": "☰",
+      "body": ""
+    }
+  },
+  "844x390": {
+    "aside": {
+      "role": "dialog",
+      "modal": "true",
+      "inert": true
+    },
+    "escapedAt": null,
+    "afterEsc": {
+      "runId": "preview",
+      "idx": "0",
+      "playing": "0",
+      "solveCount": "0",
+      "sbW": 300,
+      "focus": "☰",
+      "body": ""
+    }
+  },
+  "midrun-lcs": {
+    "a": {
+      "runId": "run_mv67lque_cg5zq36",
+      "idx": "3",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "下一步",
+      "body": ""
+    },
+    "b": {
+      "runId": "run_mv67lque_cg5zq36",
+      "idx": "3",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "",
+      "body": ""
+    },
+    "same": true
+  },
+  "midrun-mergeSort": {
+    "a": {
+      "runId": "run_mv67ltdc_lsjh71s",
+      "idx": "3",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "下一步",
+      "body": ""
+    },
+    "b": {
+      "runId": "run_mv67ltdc_lsjh71s",
+      "idx": "3",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "",
+      "body": ""
+    },
+    "same": true
+  },
+  "midrun-dijkstra": {
+    "a": {
+      "runId": "run_mv67lw61_yvtaydq",
+      "idx": "3",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "下一步",
+      "body": ""
+    },
+    "b": {
+      "runId": "run_mv67lw61_yvtaydq",
+      "idx": "3",
+      "playing": "0",
+      "solveCount": "1",
+      "sbW": 60,
+      "focus": "",
+      "body": ""
+    },
+    "same": true
+  }
+}
