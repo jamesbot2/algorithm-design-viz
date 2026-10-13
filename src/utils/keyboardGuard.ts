@@ -141,13 +141,55 @@ function isArrowKey(e: KeyboardEvent): boolean {
 }
 
 /**
+ * V33-01: keyboard scopes. Any element marked `data-kbd-scope` (nav root, catalog
+ * popover, mobile drawer) owns its keys; links (`a[href]`) and menu/dialog/listbox
+ * roles own them too. Stage shortcuts only run when no owner is in the path.
+ */
+export const KBD_SCOPE_ATTR = 'data-kbd-scope'
+
+const OWNER_ROLES = new Set(['dialog', 'alertdialog', 'menu', 'menubar', 'listbox', 'tree', 'grid', 'tablist', 'combobox'])
+
+export function isScopeOwner(el: Element): boolean {
+  if (el.hasAttribute(KBD_SCOPE_ATTR)) return true
+  if (tagOf(el) === 'A' && el.hasAttribute('href')) return true
+  return OWNER_ROLES.has(roleOf(el))
+}
+
+/** True when the key's composed path (or target ancestry) crosses a link / nav scope / menu / dialog. */
+export function eventInOwnedScope(e: KeyboardEvent): boolean {
+  if (typeof e.composedPath === 'function') {
+    for (const n of e.composedPath()) if (isElement(n) && isScopeOwner(n)) return true
+  }
+  const t = e.target as Element | null
+  if (isElement(t) && t.closest(`[${KBD_SCOPE_ATTR}], a[href], [role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]`)) return true
+  return false
+}
+
+/** An open modal (aria-modal) anywhere in the document owns the keyboard, even if focus fell to <body>. */
+export function modalIsOpen(doc: Document | undefined = typeof document !== 'undefined' ? document : undefined): boolean {
+  return !!doc?.querySelector('[aria-modal="true"]')
+}
+
+/**
  * @returns true → Visualizer must NOT handle this key (ignore).
+ *
+ * Ownership priority (first match wins):
+ *   0. already handled (defaultPrevented) / IME composing / modifier chord
+ *   1. active modal (aria-modal) — mobile drawer
+ *   2. menu / catalog / nav scope / link (data-kbd-scope, a[href], role=menu|dialog|listbox…)
+ *   3. native interactive controls (editing, then activation)
+ *   4. editor (CodeMirror / code browser / separators / sliders)
+ *   5. otherwise → stage shortcuts
  */
 export function shouldIgnoreKeyboard(e: KeyboardEvent): boolean {
   if (e.defaultPrevented) return true
-  if (e.isComposing) return true
+  if (e.isComposing || e.keyCode === 229) return true
   // Modifier chords belong to the browser / other shortcuts
   if (e.altKey || e.ctrlKey || e.metaKey) return true
+
+  // V33-01: modal, then nav / catalog / link scopes
+  if (modalIsOpen()) return true
+  if (eventInOwnedScope(e)) return true
 
   // V15-01: editing controls ALWAYS own first (drawer included)
   if (eventTargetsEditingControl(e)) return true

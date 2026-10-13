@@ -9,12 +9,24 @@ import { useLabTheme, type LabThemeId } from '../theme/LabThemeContext'
 import { BUILD_INFO, buildInfoLabel } from '../buildInfo'
 import { WorkspaceBudgetContext, type WorkspaceBudget } from './workbench/WorkspaceBudget'
 
+const RAIL_MQ = '(min-width: 961px) and (max-width: 1439px)'
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+function focusablesIn(root: HTMLElement): HTMLElement[] {
+  return [...root.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((e) => e.tabIndex >= 0 && e.getClientRects().length > 0 && !e.closest('[inert]'))
+}
+
 export default function Layout() {
-  // V23: compact nav rail by default when the desktop is too narrow for nav + demo + code
-  // (the user never has to collapse nav / shrink the browser); the toggle still wins.
-  const [desktopCollapsed, setDesktopCollapsed] = useState(
-    () => typeof window !== 'undefined' && !!window.matchMedia?.('(min-width: 961px) and (max-width: 1439px)').matches,
+  // V23: compact nav rail by default when the desktop is too narrow for nav + demo + code.
+  // V33-03: the automatic default FOLLOWS the breakpoint live (not only on first load);
+  // once the user toggles, their choice (userCollapsed) wins for the rest of the session.
+  // Not persisted (no localStorage key): a reload returns to the responsive default.
+  const [autoCollapsed, setAutoCollapsed] = useState(
+    () => typeof window !== 'undefined' && !!window.matchMedia?.(RAIL_MQ).matches,
   )
+  const [userCollapsed, setUserCollapsed] = useState<boolean | null>(null)
+  const desktopCollapsed = userCollapsed ?? autoCollapsed
+  const toggleDesktopCollapsed = () => setUserCollapsed(!desktopCollapsed)
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== 'undefined' && !!window.matchMedia?.('(max-width: 960px)').matches,
@@ -33,6 +45,7 @@ export default function Layout() {
   const location = useLocation()
   const menuBtnRef = useRef<HTMLButtonElement>(null)
   const drawerCloseRef = useRef<HTMLButtonElement>(null)
+  const sidebarRef = useRef<HTMLElement>(null)
   const prevBodyOverflow = useRef<string | null>(null)
 
   /** Modal drawer only when both mobile breakpoint and open flag hold */
@@ -73,6 +86,14 @@ export default function Layout() {
   }, [popOpen])
 
   useEffect(() => {
+    const mq = window.matchMedia(RAIL_MQ)
+    const apply = () => setAutoCollapsed(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+
+  useEffect(() => {
     const mq = window.matchMedia('(max-width: 960px)')
     const apply = () => {
       const mobile = mq.matches
@@ -85,15 +106,69 @@ export default function Layout() {
     return () => mq.removeEventListener('change', apply)
   }, [])
 
+  // V33-02: modal drawer keyboard — Esc closes; Tab / Shift+Tab cycle inside the drawer only.
   useEffect(() => {
+    if (!mobileModalOpen) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && mobileModalOpen) {
+      if (e.key === 'Escape') {
+        e.preventDefault()
         setMobileDrawerOpen(false)
-        menuBtnRef.current?.focus()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const box = sidebarRef.current
+      if (!box) return
+      const items = focusablesIn(box)
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      const cur = document.activeElement as HTMLElement | null
+      const inside = !!cur && box.contains(cur) && items.includes(cur)
+      if (!inside) {
+        e.preventDefault()
+        ;(e.shiftKey ? last : first).focus()
+      } else if (e.shiftKey && cur === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && cur === last) {
+        e.preventDefault()
+        first.focus()
       }
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    // focused item removed (search filtering / group fold) → keep focus inside the dialog
+    const onFocusOut = (e: FocusEvent) => {
+      const box = sidebarRef.current
+      if (!box) return
+      if (e.relatedTarget && box.contains(e.relatedTarget as Node)) return
+      requestAnimationFrame(() => {
+        const a = document.activeElement
+        if (!a || a === document.body || !a.isConnected) {
+          ;(box.querySelector<HTMLElement>('[data-testid="algo-search"]') ?? drawerCloseRef.current)?.focus()
+        }
+      })
+    }
+    document.addEventListener('keydown', onKey)
+    const box = sidebarRef.current
+    box?.addEventListener('focusout', onFocusOut)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      box?.removeEventListener('focusout', onFocusOut)
+    }
+  }, [mobileModalOpen])
+
+  // V33-02: every close path (Esc, ×, backdrop, link, resize out of mobile) returns focus
+  // to the trigger when focus was in the drawer or got lost.
+  const wasModal = useRef(false)
+  useEffect(() => {
+    if (wasModal.current && !mobileModalOpen) {
+      const a = document.activeElement
+      if (!a || a === document.body || sidebarRef.current?.contains(a)) {
+        const btn = menuBtnRef.current
+        if (btn && btn.getClientRects().length) btn.focus()
+        else document.querySelector<HTMLElement>('main')?.focus?.()
+      }
+    }
+    wasModal.current = mobileModalOpen
   }, [mobileModalOpen])
 
   // Body scroll lock — save/restore previous overflow; only while mobile modal open
@@ -211,7 +286,6 @@ export default function Layout() {
         onClick={() => {
           if (!mobileModalOpen) return
           setMobileDrawerOpen(false)
-          menuBtnRef.current?.focus()
         }}
         aria-hidden={!mobileModalOpen}
         hidden={!mobileModalOpen}
@@ -219,6 +293,10 @@ export default function Layout() {
       <aside
         className={sidebarCls}
         id="app-sidebar"
+        ref={sidebarRef}
+        data-kbd-scope="nav"
+        role={mobileModalOpen ? 'dialog' : undefined}
+        aria-modal={mobileModalOpen ? true : undefined}
         aria-hidden={sidebarInert ? true : false}
         aria-label={mobileModalOpen ? '导航菜单' : undefined}
         data-testid="app-sidebar"
@@ -252,7 +330,7 @@ export default function Layout() {
               data-testid="desktop-collapse-btn"
               onClick={() => {
                 setCatalogOpen(false)
-                setDesktopCollapsed((c) => !c)
+                toggleDesktopCollapsed()
               }}
             >
               <NavIcon name={desktopCollapsed ? 'expand' : 'collapse'} />
@@ -338,12 +416,12 @@ export default function Layout() {
         )}
       </aside>
       {popOpen && (
-        <div className="nav-pop" id="nav-catalog-pop" role="dialog" aria-labelledby="nav-pop-title" ref={catalogPopRef} data-testid="catalog-pop">
+        <div className="nav-pop" id="nav-catalog-pop" role="dialog" aria-labelledby="nav-pop-title" data-kbd-scope="catalog" ref={catalogPopRef} data-testid="catalog-pop">
           <NavCatalog {...catalogProps} onNavigate={() => setCatalogOpen(false)} autoFocusSearch idPrefix="nav-pop" />
         </div>
       )}
 
-      <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'}>
+      <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'} inert={mobileModalOpen ? true : undefined}>
         <header className="topbar">
           <button
             type="button"
@@ -355,7 +433,7 @@ export default function Layout() {
             ref={menuBtnRef}
             onClick={() => {
               if (isMobile) setMobileDrawerOpen((o) => !o)
-              else setDesktopCollapsed((c) => !c)
+              else toggleDesktopCollapsed()
             }}
           >
             ☰
