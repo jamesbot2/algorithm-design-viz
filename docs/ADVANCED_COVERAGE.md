@@ -21,6 +21,7 @@
 | 最近公共祖先 LCA（倍增） (`lca`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
 | 最长上升子序列 LIS (`lis`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
 | 数论：gcd / exgcd / 快速幂 / 逆元 / 筛法 (`number-theory`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| vector 与迭代器实验 (`stl-vector`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
 
 测试：`tests/advanced/advanced.test.ts`（vitest）、`tests/e2e/adv-p1.spec.ts`（Playwright，真实鼠标键盘、0 次重试）、`scripts/advanced-validate.mjs`（真实工具链）。
 
@@ -28,7 +29,6 @@
 
 | 主题 | 分组 | 状态 |
 |---|---|---|
-| vector / 迭代器实验 / vector & iterators | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | queue / deque 实验 / queue / deque | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | unique + erase 实验 / unique + erase | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | set / multiset / map 实验 / set / map | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |

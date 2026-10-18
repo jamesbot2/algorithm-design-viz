@@ -513,6 +513,49 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    prereqs: [
+      "数组",
+      "指针/迭代器的概念"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<cstddef>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "0-based 下标；begin() + i 是第 i 个元素的迭代器",
+      interval: "insert 位置 i ∈ [0, size]；erase 位置 i ∈ [0, size)",
+      limits: "capacity 的增长倍数由实现决定（libstdc++ 翻倍）；重新分配后所有迭代器 / 指针 / 引用失效",
+      timeComplexity: "push_back 摊还 O(1)；insert / erase O(n)；reserve / resize 重新分配时 O(n)",
+      spaceComplexity: "O(capacity)"
+    },
+    contestNote: "竞赛版直接调用标准库的同一组函数，没有额外控制流；教学版只是把每个调用单独成函数以便逐行对应。两者在每一步产生同样的容器状态（已用真实 g++ 逐条对拍）。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "3 1 2 3\n6\npush 4\npush 5\nreserve 10\nresize 6\nerase 0\nshrink\n",
+      output: "size=4 cap=6 re=1 [1 2 3 4]\nsize=5 cap=6 re=0 [1 2 3 4 5]\nsize=5 cap=10 re=1 [1 2 3 4 5]\nsize=6 cap=10 re=0 [1 2 3 4 5 0]\nsize=5 cap=10 re=0 [2 3 4 5 0]\nsize=5 cap=5 re=1 [2 3 4 5 0]\n",
+      note: "初始 3 个元素、capacity 3。push 4 时满了，翻倍成 6（re=1：缓冲区搬家）；reserve 10 再次搬家；resize 6 创建了一个新的 0；erase 不改 capacity；shrink_to_fit 把 capacity 收到 5。"
+    },
+    counterexample: {
+      title: "拿着迭代器 push_back",
+      explanation: "vector 满时 push_back 会重新分配缓冲区，旧迭代器指向已释放的内存。解引用它是未定义行为：可能\"碰巧还能用\"，也可能崩溃或读到垃圾。本站实验在执行这种解引用之前停止，而不是画一个编造的值。",
+      input: "v = {1,2,3}（capacity 3）；auto it = v.begin() + 1; v.push_back(4); *it",
+      wrong: "认为 *it 仍然是 2（旧缓冲区可能已被释放）",
+      correct: "push_back 之后重新获取迭代器，或先 reserve 足够空间再取迭代器"
+    },
+    ioProtocol: "第 1 行 k 与 k 个初始整数；第 2 行操作数 m；随后 m 行 \"push x | reserve n | resize n | insert i x | erase i | shrink | it i | use\"。每个操作输出一行 \"size=.. cap=.. re=.. [内容]\"，re=1 表示缓冲区搬家。",
+    id: "stl-vector",
+    topicId: "stl-vector",
+    title: "vector 与迭代器实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

@@ -143,6 +143,9 @@
 | `number-theory|teach|go|run` | 通过 | 300 | go vet; go run | 6489201d1285 |
 | `number-theory|contest-core|cpp|run` | 通过 | 300 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 2c5eb5a73edf |
 | `number-theory|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | d8f6ced0cd54 |
+| `stl-vector|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | 57a78ce36d4b |
+| `stl-vector|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 8afed492eb05 |
+| `stl-vector|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 8098ed01ceea |
 
 ## 命令与退出码
 

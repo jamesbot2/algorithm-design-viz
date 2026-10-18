@@ -31,6 +31,7 @@ import * as stlBounds from './stlBounds'
 import * as stlPq from './stlPriorityQueue'
 import type { FamId, FamInput, FamSpec } from './famTypes'
 import { FAMILIES } from './families'
+import { parseLabOps, checkLabOps } from './labCommon'
 
 export type AdvancedAlgoId = FamId | 'dsu' | 'fenwick' | 'segtree' | 'segtree-lazy' | 'stl-bounds' | 'stl-priority-queue'
 
@@ -65,7 +66,14 @@ function famEntry(spec: FamSpec): AdvancedEntry {
     const out: FamInput = {}
     for (const f of spec.fields) {
       const v = r[f.key]
-      if (f.kind === 'int') {
+      if (f.kind === 'ops') {
+        const o = checkLabOps(v, f.key, f.grammar ?? {}, f.maxOps ?? 12)
+        if (!o.ok) return { ok: false, issues: o.issues }
+        out[f.key] = o.value
+      } else if (f.kind === 'word') {
+        if (typeof v !== 'string' || !/^[a-z]{0,8}$/.test(v)) return issue(f.key, `${f.label} 须为 0..8 个小写字母`)
+        out[f.key] = v
+      } else if (f.kind === 'int') {
         if (typeof v !== 'number' || !Number.isSafeInteger(v) || Math.abs(v) > ADV_LIMITS.absValue) return issue(f.key, `${f.label} 须为整数（绝对值 ≤ ${ADV_LIMITS.absValue}）`)
         if (f.min !== undefined && v < f.min) return issue(f.key, `${f.label} 须 ≥ ${f.min}`)
         if (f.max !== undefined && v > f.max) return issue(f.key, `${f.label} 须 ≤ ${f.max}`)
@@ -87,7 +95,7 @@ function famEntry(spec: FamSpec): AdvancedEntry {
     id: spec.id,
     meta: spec.meta,
     catalogId: spec.catalogId,
-    languages: 'six',
+    languages: spec.cppOnly ? 'cpp-only' : 'six',
     fields: spec.fields,
     presentation: ADV,
     defaultDraft: spec.defaultDraft,
@@ -95,7 +103,13 @@ function famEntry(spec: FamSpec): AdvancedEntry {
       const typed: Record<string, unknown> = {}
       const issues: ValidationIssue[] = []
       for (const f of spec.fields) {
-        if (f.kind === 'int') {
+        if (f.kind === 'ops') {
+          const o = parseLabOps(d[f.key] ?? '', f.key, f.grammar ?? {}, f.maxOps ?? 12)
+          if (!o.ok) issues.push(...o.issues)
+          else typed[f.key] = o.value
+        } else if (f.kind === 'word') {
+          typed[f.key] = (d[f.key] ?? '').trim()
+        } else if (f.kind === 'int') {
           const n = parseIntToken((d[f.key] ?? '').trim())
           if (n === null) issues.push({ field: f.key, reason: `${f.label} 须为整数` })
           else typed[f.key] = n

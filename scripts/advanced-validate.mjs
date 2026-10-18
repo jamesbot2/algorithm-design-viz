@@ -24,6 +24,8 @@ const sha = (s) => createHash('sha256').update(s, 'utf8').digest('hex')
 
 const { TESTSET_VERSION, SOURCE_HASHES } = await imp('src/features/advanced/templates/hashes.generated.ts')
 const { default: contestSources } = await imp('src/features/advanced/templates/sources.generated.ts')
+import { dirname as dirnameFn } from 'node:path'
+import { LAB } from './advanced-labs.mjs'
 import { FAM, caseInput, driver, coreDriver, mulberry32 as famRng } from './advanced-families.mjs'
 const { TEMPLATES } = await imp('src/features/advanced/templates/meta.ts')
 
@@ -413,6 +415,7 @@ const need = (r, what) => {
 
 async function validateTopic(id) {
   if (FAM[id]) return validateFam(id)
+  if (LAB[id]) return validateLab(id)
   const dir = id.replace(/-/g, '_')
   const gens = { dsu: [genDsu, naiveDsu, dsuInput, checkDsu], fenwick: [genFenwick, naiveFenwick, fwInput, checkFenwick], segtree: [genSeg, naiveSeg, segInput, checkFenwick], 'segtree-lazy': [genLazy, naiveLazy, lazyInput, checkFenwick], 'stl-bounds': [genBounds, null, bdInput, checkBounds], 'stl-priority-queue': [genPq, null, pqInput, checkPq] }
   const [gen, naive, inp, chk] = gens[id]
@@ -637,6 +640,87 @@ async function validateFam(id) {
     })
   }
 }
+// ---------- STL labs: real std containers, real g++ + sanitizers, golden dumps ----------
+async function validateLab(id) {
+  const L = LAB[id]
+  const cases = L.gen(20260101 + id.length * 11)
+  const docs = await teachDocs(id)
+  const hashes = SOURCE_HASHES[id]
+  const cs = contestSources[id]
+  const mainSrc = cs.full.source.slice(cs.core.source.length)
+  const wrapped = mainSrc.replace(/int main\(\)/, 'int lab_main()') + '\nint main() { int T; if (std::scanf("%d", &T) != 1) return 1; while (T-- > 0) lab_main(); return 0; }\n'
+  const input = `${cases.length}\n` + cases.map((c) => c.input).join('')
+  const compile = (d, src, out) => {
+    writeFileSync(join(d, out + '.cpp'), src)
+    const c = need(run('g++', [...CXX, out + '.cpp', '-o', out], { cwd: d }), 'g++ compile')
+    if (/warning:/.test(c.stderr)) throw new Error('compiler warnings: ' + c.stderr.slice(0, 500))
+  }
+  let golden = null
+  const doc = docs.cpp
+  const tkey = `${id}|teach|cpp|run`
+  const th = sha(doc.source)
+  if (th !== hashes.teach.cpp || th !== doc.sourceHash) record(tkey, th, 'fail', 0, 'displayed-source hash mismatch')
+  else
+    guard(tkey, th, () => {
+      const d = tmp(`${id}-teach`)
+      compile(d, doc.source + '\n#include <cstdio>\n#include <cstring>\n' + wrapped, 'teach')
+      const r = need(run('./teach', [], { cwd: d, input, env: ASAN_ENV }), 'run under ASan/UBSan')
+      golden = r.stdout.replace(/\n$/, '').split('\n')
+      record(tkey, th, 'pass', cases.length, 'g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded', { toolchain: tcOf('cpp') })
+    })
+  const ckey = `${id}|contest-core|cpp|run`
+  const ch = sha(cs.core.source)
+  if (ch !== hashes.contest.core || ch !== cs.core.hash) record(ckey, ch, 'fail', 0, 'displayed-source hash mismatch')
+  else
+    guard(ckey, ch, () => {
+      if (!golden) throw new Error('no teaching golden (teaching run failed)')
+      const d = tmp(`${id}-core`)
+      compile(d, cs.core.source + '\n#include <cstdio>\n#include <cstring>\n' + wrapped, 'core')
+      const r = need(run('./core', [], { cwd: d, input, env: ASAN_ENV }), 'run under ASan/UBSan')
+      const got = r.stdout.replace(/\n$/, '').split('\n')
+      if (got.length !== golden.length || got.some((x, i) => x !== golden[i])) throw new Error('contest core output differs from the teaching file output')
+      record(ckey, ch, 'pass', cases.length, 'core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan', { toolchain: tcOf('cpp') })
+    })
+  const fkey = `${id}|contest-full|cpp|run`
+  const fh = sha(cs.full.source)
+  if (fh !== hashes.contest.full || fh !== cs.full.hash) record(fkey, fh, 'fail', 0, 'displayed-source hash mismatch')
+  else
+    guard(fkey, fh, () => {
+      if (!golden) throw new Error('no teaching golden')
+      const d = tmp(`${id}-full`)
+      writeFileSync(join(d, 'full.cpp'), cs.full.source)
+      const c = need(run('g++', [...CXX, 'full.cpp', '-o', 'full'], { cwd: d }), 'g++ compile full')
+      if (/warning:/.test(c.stderr)) throw new Error('compiler warnings: ' + c.stderr.slice(0, 500))
+      const t = TEMPLATES.find((x) => x.id === id)
+      const s1 = need(run('./full', [], { cwd: d, input: t.sample.input, env: ASAN_ENV }), 'sample run')
+      if (s1.stdout !== t.sample.output) throw new Error(`sample output mismatch: got ${JSON.stringify(s1.stdout)} want ${JSON.stringify(t.sample.output)}`)
+      let off = 0
+      let n = 1
+      for (let k = 0; k < cases.length; k++) {
+        const per = Number(L.opCount(cases[k]))
+        if (k % 4 === 0) {
+          const o = need(run('./full', [], { cwd: d, input: cases[k].input, env: ASAN_ENV }), 'full random')
+          const got = o.stdout.replace(/\n$/, '').split('\n')
+          const want = golden.slice(off, off + per)
+          if (got.join('\n') !== want.join('\n')) throw new Error(`full: case ${k} differs from golden\n${cases[k].input}`)
+          n++
+        }
+        off += per
+      }
+      record(fkey, fh, 'pass', n, 'full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan', { toolchain: tcOf('cpp') })
+    })
+  if (golden && results[tkey]?.status === 'pass' && results[ckey]?.status === 'pass' && results[fkey]?.status === 'pass') {
+    const gp = join(ROOT, 'tests/advanced/stl-golden.json')
+    const all = existsSync(gp) ? JSON.parse(readFileSync(gp, 'utf8')) : {}
+    all[id] = cases.slice(0, 120).map((c, k) => {
+      let o = 0
+      for (let j = 0; j < k; j++) o += Number(L.opCount(cases[j]))
+      return { fields: c.fields, lines: golden.slice(o, o + Number(L.opCount(c))) }
+    })
+    mkdirSync(dirnameFn(gp), { recursive: true })
+    writeFileSync(gp, JSON.stringify(all) + '\n')
+  }
+}
 const tcOf = (lang) => ({ python: toolchain.python, typescript: toolchain.node, cpp: toolchain.gpp, java: toolchain.javac, rust: toolchain.rustc, go: toolchain.go })[lang]
 
 // random stdin for contest "full" mains (each uses the template's documented protocol)
@@ -741,7 +825,7 @@ function randomStdin(id, d, r) {
   return 1
 }
 
-const ids = ['stl-bounds', 'stl-priority-queue', 'dsu', 'fenwick', 'segtree', 'segtree-lazy', ...Object.keys(FAM)].filter((i) => !only || i === only)
+const ids = ['stl-bounds', 'stl-priority-queue', 'dsu', 'fenwick', 'segtree', 'segtree-lazy', ...Object.keys(FAM), ...Object.keys(LAB)].filter((i) => !only || i === only)
 for (const id of ids) await validateTopic(id)
 
 const outPath = join(ROOT, 'src/features/advanced/templates/validation.json')

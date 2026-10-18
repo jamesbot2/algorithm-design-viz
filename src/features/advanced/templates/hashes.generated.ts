@@ -200,5 +200,14 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "core": "145f24b07a75f019ed99d20fc18db0706a2debfc30ff41a85cd28b3b6c3c4b75",
       "full": "d159ba32bae4133e092c9a4627ac10756abf31b788add96e3d5d0b258222a10f"
     }
+  },
+  "stl-vector": {
+    "teach": {
+      "cpp": "57a78ce36d4bb1805112a8aea776e9e8dd044c0a243af168e6c928765bdf26b4"
+    },
+    "contest": {
+      "core": "8afed492eb058dbcffc72b61cc79fd6eea779df90723f604a6314845fd4d68e1",
+      "full": "8098ed01ceea39f4d8ca4a03ac980c5bc0a2bf9466e6514865204bb32aa74be5"
+    }
   }
 }

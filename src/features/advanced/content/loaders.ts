@@ -16,5 +16,6 @@ export const CONTENT_LOADERS: Record<string, () => Promise<TopicContent>> = {
   'lca': () => import('./lca').then((m) => m.default),
   'lis': () => import('./lis').then((m) => m.default),
   'number-theory': () => import('./number-theory').then((m) => m.default),
+  'stl-vector': () => import('./stl-vector').then((m) => m.default),
   fenwick: () => import('./fenwick').then((m) => m.default),
 }

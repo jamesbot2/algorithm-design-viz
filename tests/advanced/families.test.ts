@@ -36,7 +36,7 @@ const fv = (s: Step) => s.advanced as FamView
 const docsGlob = import.meta.glob('../../src/codeCatalog/*/langs.generated.ts', { eager: true }) as Record<string, { default: { language: string; source: string; anchors: { id: string }[] }[] }>
 const idxGlob = import.meta.glob('../../src/codeCatalog/*/index.ts', { eager: true }) as Record<string, Record<string, () => { typescript: { language: string; source: string; anchors: { id: string }[] } }>>
 const allDocs = (dir: string) => {
-  const six = docsGlob[`../../src/codeCatalog/${dir}/langs.generated.ts`]!.default
+  const six = docsGlob[`../../src/codeCatalog/${dir}/langs.generated.ts`]?.default ?? []
   const m = idxGlob[`../../src/codeCatalog/${dir}/index.ts`]!
   const ts = Object.values(m).find((f) => typeof f === 'function')!().typescript
   return [ts, ...six]
@@ -53,12 +53,13 @@ describe('generic families: contract', () => {
       const need = new Set(r.steps.flatMap((s) => (s.codeRefs ?? []).map((c) => c.anchorId)))
       expect(need.size).toBeGreaterThanOrEqual(3)
       const docs = allDocs(f.catalogId)
-      expect(docs.map((d) => d.language).sort()).toEqual(['cpp', 'go', 'java', 'python', 'rust', 'typescript'])
+      expect(docs.map((d) => d.language).sort()).toEqual(f.cppOnly ? ['cpp'] : ['cpp', 'go', 'java', 'python', 'rust', 'typescript'])
       for (const d of docs) {
         const ids = new Set(d.anchors.map((a) => a.id))
         for (const a of need) expect(ids.has(a), `${f.catalogId}/${d.language} lacks anchor ${a}`).toBe(true)
         expect(d.source).not.toContain('@a:')
         expect(sha(d.source)).toBe(SOURCE_HASHES[f.id]!.teach![d.language])
+        void 0
       }
       // every field rejects garbage with a field-level issue
       for (const fld of f.fields) {

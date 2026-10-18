@@ -261,6 +261,45 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    "id": "stl-vector",
+    "section": "stl",
+    "titleZh": "vector 与迭代器实验",
+    "titleEn": "vector & iterators",
+    "aliases": [
+      "vector",
+      "capacity",
+      "size",
+      "reserve",
+      "resize",
+      "迭代器失效",
+      "iterator invalidation",
+      "shrink_to_fit",
+      "push_back",
+      "动态数组"
+    ],
+    "tags": [
+      "STL",
+      "vector",
+      "迭代器",
+      "容量"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "size 与 capacity 是两回事：reserve 只改 capacity，resize 才创建元素；一旦重新分配，所有迭代器失效。",
+    "routeOrder": 3,
+    "demoId": "stl-vector",
+    "templateId": "stl-vector",
+    "relatedAlgos": [],
+    "standard": "C++17 <vector>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

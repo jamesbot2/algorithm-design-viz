@@ -779,6 +779,27 @@
       "tests": 151,
       "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
       "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "stl-vector|teach|cpp|run": {
+      "hash": "57a78ce36d4bb1805112a8aea776e9e8dd044c0a243af168e6c928765bdf26b4",
+      "status": "pass",
+      "tests": 250,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded"
+    },
+    "stl-vector|contest-core|cpp|run": {
+      "hash": "8afed492eb058dbcffc72b61cc79fd6eea779df90723f604a6314845fd4d68e1",
+      "status": "pass",
+      "tests": 250,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan"
+    },
+    "stl-vector|contest-full|cpp|run": {
+      "hash": "8098ed01ceea39f4d8ca4a03ac980c5bc0a2bf9466e6514865204bb32aa74be5",
+      "status": "pass",
+      "tests": 64,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan"
     }
   }
 }

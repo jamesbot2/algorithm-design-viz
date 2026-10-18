@@ -8,6 +8,7 @@ import { spec as topo } from './topo'
 import { spec as lca } from './lca'
 import { spec as lis } from './lis'
 import { spec as numberTheory } from './numberTheory'
+import { spec as stlVector } from './stlVector'
 
 /** Registered generic families (each file exports `spec`). */
-export const FAMILIES: FamSpec[] = [prefixDiff, discretize, bsAnswer, monoStack, monoQueue, topo, lca, lis, numberTheory]
+export const FAMILIES: FamSpec[] = [prefixDiff, discretize, bsAnswer, monoStack, monoQueue, topo, lca, lis, numberTheory, stlVector]
