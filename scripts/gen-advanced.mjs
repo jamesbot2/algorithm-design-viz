@@ -24,7 +24,7 @@ const SRC = join(ROOT, 'src', 'features', 'advanced', 'sources')
 const TPL = join(ROOT, 'src', 'features', 'advanced', 'templates')
 
 export const SIX = ['dsu', 'fenwick', 'segtree', 'segtree_lazy', 'prefix_diff', 'discretize', 'bs_answer', 'mono_stack', 'mono_queue', 'topo', 'lca', 'lis', 'number_theory']
-export const CPP_ONLY = ['stl_bounds', 'stl_priority_queue']
+export const CPP_ONLY = ['stl_bounds', 'stl_priority_queue', 'stl_vector', 'stl_deque', 'stl_unique', 'stl_set_map', 'stl_string', 'stl_algo', 'stl_numeric', 'stl_comparator']
 export const TESTSET_VERSION = 'adv-tests-v1'
 
 const pascal = (id) => id.replace(/(^|_)(\w)/g, (_, __, c) => c.toUpperCase())

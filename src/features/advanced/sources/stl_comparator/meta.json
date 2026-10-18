@@ -1,0 +1,2 @@
+{ "id": "stl_comparator", "title": "迭代器与比较器实验（C++17）", "file": "stl_comparator.cpp",
+  "labels": { "cFirst": "比较器 ByFirst：只比 first（严格 <，满足严格弱序）", "cSecD": "比较器 BySecondDesc：second 大的在前", "cLex": "sort：pair 默认字典序（全序，结果唯一）", "cGreater": "sort + greater：字典序降序", "cStableFirst": "stable_sort：按 first，first 相同的保持原来的先后", "cStableSec": "stable_sort：按 second 降序，second 相同的保持原来的先后", "cRev": "reverse：翻转", "cRbegin": "rbegin：反向迭代器，*rbegin() 是最后一个元素", "cMin": "min_element：第一个最小元素的下标", "cLb": "lower_bound + 比较 lambda：在按 first 排好序的区间里二分" } }

@@ -1,0 +1,2 @@
+{ "id": "stl_set_map", "title": "set / multiset / map 实验（C++17）", "file": "stl_set_map.cpp",
+  "labels": { "sIns": "set::insert：已存在则不插入（返回 second = false）", "sDel": "set::erase(值)：返回删除个数 0 或 1", "mIns": "multiset::insert：允许重复", "mDelAll": "multiset::erase(值)：删除所有相同的值", "mDelOne": "erase(find(值))：只删除一个", "mCnt": "multiset::count：相同值的个数", "sLb": "set::lower_bound：第一个 ≥ x（可能是 end）", "pInc": "p[k]++：k 不存在时先插入 0 再加 1", "pGet": "p[k]（只想读也会插入 k → 0）", "pFind": "p.find(k)：只读，不插入" } }

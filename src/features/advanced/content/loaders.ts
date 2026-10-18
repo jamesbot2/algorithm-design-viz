@@ -16,5 +16,13 @@ export const CONTENT_LOADERS: Record<string, () => Promise<TopicContent>> = {
   'lca': () => import('./lca').then((m) => m.default),
   'lis': () => import('./lis').then((m) => m.default),
   'number-theory': () => import('./number-theory').then((m) => m.default),
+  'stl-vector': () => import('./stl-vector').then((m) => m.default),
+  'stl-deque': () => import('./stl-deque').then((m) => m.default),
+  'stl-unique': () => import('./stl-unique').then((m) => m.default),
+  'stl-set-map': () => import('./stl-set-map').then((m) => m.default),
+  'stl-string': () => import('./stl-string').then((m) => m.default),
+  'stl-algo': () => import('./stl-algo').then((m) => m.default),
+  'stl-numeric': () => import('./stl-numeric').then((m) => m.default),
+  'stl-comparator': () => import('./stl-comparator').then((m) => m.default),
   fenwick: () => import('./fenwick').then((m) => m.default),
 }

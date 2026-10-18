@@ -1,0 +1,2 @@
+{ "id": "stl_numeric", "title": "numeric 与 bitset 实验（C++17）", "file": "stl_numeric.cpp",
+  "labels": { "nIota": "iota：依次填入 x, x+1, x+2, …", "nAcc": "accumulate：求和（init 的类型决定累加类型）", "nPsum": "partial_sum：前缀和（原地）", "nAdiff": "adjacent_difference：相邻差（原地，首项不变）", "nGcd": "gcd：逐个折叠求最大公约数（C++17）", "bSet": "bitset::set(i)：把第 i 位置 1", "bFlip": "bitset::flip(i)：翻转第 i 位", "bCnt": "bitset::count：1 的个数", "bShl": "operator<<=：整体左移，移出 16 位的丢弃" } }

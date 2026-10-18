@@ -513,6 +513,532 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    prereqs: [
+      "数组",
+      "指针/迭代器的概念"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<cstddef>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "0-based 下标；begin() + i 是第 i 个元素的迭代器",
+      interval: "insert 位置 i ∈ [0, size]；erase 位置 i ∈ [0, size)",
+      limits: "capacity 的增长倍数由实现决定（libstdc++ 翻倍）；重新分配后所有迭代器 / 指针 / 引用失效",
+      timeComplexity: "push_back 摊还 O(1)；insert / erase O(n)；reserve / resize 重新分配时 O(n)",
+      spaceComplexity: "O(capacity)"
+    },
+    contestNote: "竞赛版直接调用标准库的同一组函数，没有额外控制流；教学版只是把每个调用单独成函数以便逐行对应。两者在每一步产生同样的容器状态（已用真实 g++ 逐条对拍）。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "3 1 2 3\n6\npush 4\npush 5\nreserve 10\nresize 6\nerase 0\nshrink\n",
+      output: "size=4 cap=6 re=1 [1 2 3 4]\nsize=5 cap=6 re=0 [1 2 3 4 5]\nsize=5 cap=10 re=1 [1 2 3 4 5]\nsize=6 cap=10 re=0 [1 2 3 4 5 0]\nsize=5 cap=10 re=0 [2 3 4 5 0]\nsize=5 cap=5 re=1 [2 3 4 5 0]\n",
+      note: "初始 3 个元素、capacity 3。push 4 时满了，翻倍成 6（re=1：缓冲区搬家）；reserve 10 再次搬家；resize 6 创建了一个新的 0；erase 不改 capacity；shrink_to_fit 把 capacity 收到 5。"
+    },
+    counterexample: {
+      title: "拿着迭代器 push_back",
+      explanation: "vector 满时 push_back 会重新分配缓冲区，旧迭代器指向已释放的内存。解引用它是未定义行为：可能\"碰巧还能用\"，也可能崩溃或读到垃圾。本站实验在执行这种解引用之前停止，而不是画一个编造的值。",
+      input: "v = {1,2,3}（capacity 3）；auto it = v.begin() + 1; v.push_back(4); *it",
+      wrong: "认为 *it 仍然是 2（旧缓冲区可能已被释放）",
+      correct: "push_back 之后重新获取迭代器，或先 reserve 足够空间再取迭代器"
+    },
+    ioProtocol: "第 1 行 k 与 k 个初始整数；第 2 行操作数 m；随后 m 行 \"push x | reserve n | resize n | insert i x | erase i | shrink | it i | use\"。每个操作输出一行 \"size=.. cap=.. re=.. [内容]\"，re=1 表示缓冲区搬家。",
+    id: "stl-vector",
+    topicId: "stl-vector",
+    title: "vector 与迭代器实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "数组",
+      "队列的先进先出"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<deque>",
+        "<queue>"
+      ],
+      depends: [],
+      indexing: "deque 支持 d[i]（0 = 队首）；queue 只有 front/back",
+      interval: "无区间参数",
+      limits: "front/back/pop 在空容器上是未定义行为；deque 两端操作不使元素引用失效，但会使迭代器失效",
+      timeComplexity: "两端 push/pop 均摊 O(1)；d[i] O(1)；中间插入 O(n)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用：BFS 用 queue（push / front / pop），滑动窗口用 deque（两端都要操作）。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "3 1 2 3\n6\npushf 0\npushb 4\nfront\nback\npopf\npopb\n",
+      output: "r=- size=4 [0 1 2 3]\nr=- size=5 [0 1 2 3 4]\nr=0 size=5 [0 1 2 3 4]\nr=4 size=5 [0 1 2 3 4]\nr=- size=4 [1 2 3 4]\nr=- size=3 [1 2 3]\n",
+      note: "front / back 只读不删除；popf 就是 queue::pop；pushf 与 popb 是 deque 才有的。"
+    },
+    counterexample: {
+      title: "在空队列上 front() / pop()",
+      explanation: "BFS 循环写成 while (true) { auto u = q.front(); q.pop(); ... } 而忘了检查 q.empty()：队列空时 front() 是未定义行为。本站实验在执行这种调用之前停止，不画一个编造的值。",
+      input: "q 为空；q.front()",
+      wrong: "认为会得到 0 或抛出异常",
+      correct: "循环条件写 while (!q.empty())"
+    },
+    ioProtocol: "第 1 行 k 与 k 个初始整数（队首→队尾）；第 2 行操作数 m；随后 m 行 \"pushb x | pushf x | popb | popf | front | back\"。每个操作输出一行 \"r=<读到的值或-> size=.. [队首..队尾]\"。",
+    id: "stl-deque",
+    topicId: "stl-deque",
+    title: "queue / deque 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "vector",
+      "迭代器"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<algorithm>",
+        "<cstddef>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "返回值是新终点的下标（begin() 起算）",
+      interval: "[begin, end)；erase(new_end, end)",
+      limits: "unique 只合并相邻相等元素：要得到不同值须先 sort；新终点之后的值有效但未指定",
+      timeComplexity: "unique / remove O(n)；sort O(n log n)",
+      spaceComplexity: "O(1)"
+    },
+    contestNote: "竞赛里写成一行：v.erase(std::unique(v.begin(), v.end()), v.end())。教学版把\"返回新终点\"和\"erase\"分成两个函数，便于看到 size 在 erase 之前不变。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "8 1 1 2 2 2 3 1 1\n2 0\n",
+      output: "k=3 kept=[1 2 3] final=[1 2 3] size_before_erase=8\n",
+      note: "模式 2：先 sort 得 [1,1,1,1,2,2,2,3]，再 unique 得到 [1,2,3]；erase 之前 size 仍是 8。模式 0（不排序）会得到 k=4 [1 2 3 1]。"
+    },
+    counterexample: {
+      title: "不排序就 unique",
+      explanation: "[1,1,2,2,2,3,1,1] 直接 unique 只合并相邻重复，得到 [1,2,3,1]：最后的 1 与前面的 1 不相邻，被保留。想要\"不同值\"必须先 sort。另外忘了 erase 时，size() 仍是 8。",
+      input: "v = [1,1,2,2,2,3,1,1]；v.erase(unique(v.begin(), v.end()), v.end())",
+      wrong: "认为结果是 [1,2,3]",
+      correct: "结果是 [1,2,3,1]；先 sort 再 unique 才是 [1,2,3]"
+    },
+    ioProtocol: "第 1 行 k 与 k 个整数；第 2 行 \"mode x\"（0 = unique，1 = remove x，2 = 先 sort 再 unique）。输出一行 \"k=<新大小> kept=[erase 前的前缀] final=[erase 后] size_before_erase=<原 size>\"。",
+    id: "stl-unique",
+    topicId: "stl-unique",
+    title: "unique + erase 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "二叉搜索树的概念"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<map>",
+        "<set>"
+      ],
+      depends: [],
+      indexing: "按键升序遍历",
+      interval: "lower_bound(x) = 第一个 ≥ x 的迭代器，没有则 end()",
+      limits: "键须可比较（严格弱序）；operator[] 需要值类型可默认构造；multiset::erase(值) 删除全部相同值",
+      timeComplexity: "insert / erase / find / count(set) / lower_bound：O(log n)；multiset::count O(log n + k)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用；教学版把每个调用单独成函数。每步容器内容逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "10\nsins 5\nsins 5\nmins 3\nmins 3\nmdel1 3\nmapget 7\nmapinc 7\nslb 6\nslb 5\nmdel 3\n",
+      output: "r=1 S=[5] M=[] P=[]\nr=0 S=[5] M=[] P=[]\nr=- S=[5] M=[3] P=[]\nr=- S=[5] M=[3 3] P=[]\nr=1 S=[5] M=[3] P=[]\nr=0 S=[5] M=[3] P=[7:0]\nr=- S=[5] M=[3] P=[7:1]\nr=end S=[5] M=[3] P=[7:1]\nr=5 S=[5] M=[3] P=[7:1]\nr=1 S=[5] M=[] P=[7:1]\n",
+      note: "第二次 sins 5 返回 0（已存在）；mapget 7 只想读，却把键 7 插入为 0；slb 6 越过末尾得 end；最后 mdel 3 删除剩下的所有 3。"
+    },
+    counterexample: {
+      title: "用 map[k] 判断键是否存在",
+      explanation: "if (p[k] == 0) 看起来只是读，但 p[k] 会在 k 不存在时插入 k → 0，使 map 变大，之后 size() 与遍历都被污染。判断存在应使用 count(k) 或 find(k) != end()。",
+      input: "map p 为空；p[7]；p.size()",
+      wrong: "认为 p.size() 仍是 0",
+      correct: "p.size() 变成 1（键 7 → 0 已被插入）"
+    },
+    ioProtocol: "第 1 行 m；随后 m 行 \"op x\"，op ∈ sins sdel mins mdel mdel1 mcnt slb mapinc mapget mapfind。每个操作输出一行 \"r=<结果或-> S=[set] M=[multiset] P=[k:v]\"（slb 越过末尾输出 end）。",
+    id: "stl-set-map",
+    topicId: "stl-set-map",
+    title: "set / multiset / map 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "数组与下标",
+      "字典序"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<string>",
+        "<utility>",
+        "<tuple>"
+      ],
+      depends: [],
+      indexing: "s[i] 0 起；pos == size() 对 substr / insert 合法",
+      interval: "无区间参数",
+      limits: "pos > size() 时 substr / erase / insert 抛 out_of_range；find 失败返回 npos（size_t 最大值）",
+      timeComplexity: "find 最坏 O(n·m)；substr / erase / insert O(n)；比较 O(元素个数)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "abcab 9\napp ab\nfind ab\nrfind ab\nfind zz\nsub 1 3\ners 0 2\nins 2 xy\npless 1 2 1 3\ntless 1 2 3 1 2 4\n",
+      output: "r=- s=abcabab\nr=0 s=abcabab\nr=5 s=abcabab\nr=npos s=abcabab\nr=bca s=abcabab\nr=- s=cabab\nr=- s=caxybab\nr=1 s=caxybab\nr=1 s=caxybab\n",
+      note: "find 失败打印 npos；substr(1,3) 不改变原串；erase / insert 会移动后面的字符；pair / tuple 先比第一个元素。"
+    },
+    counterexample: {
+      title: "把 find 的结果当 int 与 -1 比较",
+      explanation: "if (s.find(\"zz\") < 0) 永远为假：find 返回 size_t，失败时是 npos（最大的无符号数）。应写 s.find(x) == std::string::npos。本实验用同一输入显示 find zz 的结果是 npos。",
+      input: "s = abcabab；s.find(\"zz\")",
+      wrong: "认为结果小于 0",
+      correct: "与 std::string::npos 比较"
+    },
+    ioProtocol: "第 1 行初始字符串（\"-\" 表示空串）与操作数 m；随后 m 行 \"app w | sub p n | find w | rfind w | ers p n | ins p w | pless a b c d | tless a b c d e f\"。每个操作输出一行 \"r=<结果或-> s=<当前字符串>\"（find / rfind 失败输出 npos）。",
+    id: "stl-string",
+    topicId: "stl-string",
+    title: "string / pair / tuple 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "数组",
+      "排序的基本概念"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<algorithm>",
+        "<functional>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "区间 [begin, end) 左闭右开",
+      interval: "v.begin() + k 不得越过 v.end()",
+      limits: "lower_bound 要求区间已排序；nth_element 只保证第 k 位；sort 不稳定",
+      timeComplexity: "sort O(n log n)；nth_element 平均 O(n)；next_permutation O(n)；lower_bound O(log n)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "3 3 1 2\n9\nnperm\nnperm\nnth 1\nsrt\nlbd 2\nrot 1\nrsrt\ncnt 3\nmx\n",
+      output: "r=1 v=[3 2 1]\nr=0 v=[1 2 3]\nr=2 v=[1 2 3]\nr=- v=[1 2 3]\nr=1 v=[1 2 3]\nr=- v=[2 3 1]\nr=- v=[3 2 1]\nr=1 v=[3 2 1]\nr=0 v=[3 2 1]\n",
+      note: "nperm 把 3 1 2 变成 3 2 1，再调用就回绕成 1 2 3 并返回 0；nth 1 取到第 1 小（下标从 0）。"
+    },
+    counterexample: {
+      title: "从没排序的数组开始枚举全排列",
+      explanation: "next_permutation 只给出\"当前排列的下一个\"。从 3 1 2 开始，它只会走 3 2 1 然后回绕，漏掉 1 2 3 等排列。要枚举所有排列，必须先 sort 再循环 do { … } while (next_permutation(…))。",
+      input: "v = 3 1 2；连续两次 next_permutation",
+      wrong: "以为会枚举全部 6 种",
+      correct: "先 std::sort，再 do-while"
+    },
+    ioProtocol: "第 1 行 k 与 k 个整数；第 2 行操作数 m；随后 m 行 \"srt | rsrt | rev | rot k | nperm | pperm | nth k | cnt x | mx | lbd x\"（lbd 只能紧跟在 srt 之后）。每个操作输出一行 \"r=<结果或-> v=[数组内容]\"。",
+    id: "stl-algo",
+    topicId: "stl-algo",
+    title: "标准算法实验：sort / nth_element / next_permutation",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "前缀和与差分",
+      "二进制位"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<numeric>",
+        "<bitset>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "bitset 第 0 位是最低位，to_string 先打印第 15 位",
+      interval: "无区间参数",
+      limits: "accumulate 的初值类型决定累加类型；bitset 大小须是编译期常量；gcd / lcm 需要 C++17",
+      timeComplexity: "iota / accumulate / partial_sum / adjacent_difference O(n)；bitset 单点 O(1)，count / 移位 O(N/64)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "4 4 6 8 10\n9\ngcdall\nacc\npsum\nadiff\niota 5\nbset 3\nbflip 0\nbcnt\nbshl 2\n",
+      output: "r=2 v=[4 6 8 10] b=0000000000000000\nr=28 v=[4 6 8 10] b=0000000000000000\nr=- v=[4 10 18 28] b=0000000000000000\nr=- v=[4 6 8 10] b=0000000000000000\nr=- v=[5 6 7 8] b=0000000000000000\nr=- v=[5 6 7 8] b=0000000000001000\nr=- v=[5 6 7 8] b=0000000000001001\nr=2 v=[5 6 7 8] b=0000000000001001\nr=- v=[5 6 7 8] b=0000000000100100\n",
+      note: "psum 之后 adiff 恢复原数组；bset 3 与 bflip 0 得 1001（二进制），再左移 2 位得 100100。"
+    },
+    counterexample: {
+      title: "accumulate 的初值写 0",
+      explanation: "std::accumulate(v.begin(), v.end(), 0) 在 int 里累加；当总和超过 int 范围时是有符号溢出（未定义行为）。要求 long long 总和就写初值 0LL。本页不演示溢出后的\"某个数\"，因为那是未定义行为。",
+      input: "v = {2000000000, 2000000000}",
+      wrong: "accumulate(…, 0)",
+      correct: "accumulate(…, 0LL)"
+    },
+    ioProtocol: "第 1 行 k 与 k 个整数；第 2 行操作数 m；随后 m 行 \"iota x | acc | psum | adiff | gcdall | bset i | bflip i | bcnt | bshl k\"（位下标 0..15，bitset<16> 初始全 0）。每个操作输出一行 \"r=<结果或-> v=[数组] b=<16 位，第 15 位在前>\"。",
+    id: "stl-numeric",
+    topicId: "stl-numeric",
+    title: "numeric 与 bitset 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "sort 的基本用法",
+      "pair 的字典序"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<algorithm>",
+        "<functional>",
+        "<utility>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "迭代器 begin() 指向首元素，end() 在末尾之后；rbegin() 指向最后一个",
+      interval: "区间 [begin, end) 左闭右开",
+      limits: "比较器必须是严格弱序：comp(a, a) 为 false、非对称、可传递；用 <= 是未定义行为",
+      timeComplexity: "sort / stable_sort O(n log n)；min_element O(n)；lower_bound O(log n)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "4 2 5 1 5 2 3 1 9\n7\nsfirst\nssecd\nsortlex\nrbeg\nminel\nlbf 2\ngrtr\n",
+      output: "r=- v=[1:5 1:9 2:5 2:3]\nr=- v=[1:9 1:5 2:5 2:3]\nr=- v=[1:5 1:9 2:3 2:5]\nr=2:5 v=[1:5 1:9 2:3 2:5]\nr=0 v=[1:5 1:9 2:3 2:5]\nr=2 v=[1:5 1:9 2:3 2:5]\nr=- v=[2:5 2:3 1:9 1:5]\n",
+      note: "sfirst 之后 1:5 仍在 1:9 前面（稳定）；ssecd 按 second 降序；lbf 2 在按 first 排好序的数组里返回第一个 first ≥ 2 的位置。"
+    },
+    counterexample: {
+      title: "比较器写成 <=",
+      explanation: "[](const P& a, const P& b) { return a.first <= b.first; } 违反\"对相等元素返回 false\"，不是严格弱序，std::sort 可能越界、崩溃或死循环（未定义行为）。本页只给出这条文字说明，不执行它，也不显示任何\"结果\"。",
+      input: "存在 first 相同的元素",
+      wrong: "return a.first <= b.first",
+      correct: "return a.first < b.first"
+    },
+    ioProtocol: "第 1 行 k 与 k 对整数 \"a b\"；第 2 行操作数 m；随后 m 行 \"sortlex | grtr | sfirst | ssecd | rev | rbeg | minel | lbf x\"（lbf 只能紧跟在 sortlex / sfirst 之后）。每个操作输出一行 \"r=<结果或-> v=[a:b …]\"。",
+    id: "stl-comparator",
+    topicId: "stl-comparator",
+    title: "迭代器与比较器实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "数组与下标",
+      "字典序"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<string>",
+        "<utility>",
+        "<tuple>"
+      ],
+      depends: [],
+      indexing: "s[i] 0 起；pos == size() 对 substr / insert 合法",
+      interval: "无区间参数",
+      limits: "pos > size() 时 substr / erase / insert 抛 out_of_range；find 失败返回 npos（size_t 最大值）",
+      timeComplexity: "find 最坏 O(n·m)；substr / erase / insert O(n)；比较 O(元素个数)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "abcab 9\napp ab\nfind ab\nrfind ab\nfind zz\nsub 1 3\ners 0 2\nins 2 xy\npless 1 2 1 3\ntless 1 2 3 1 2 4\n",
+      output: "r=- s=abcabab\nr=0 s=abcabab\nr=5 s=abcabab\nr=npos s=abcabab\nr=bca s=abcabab\nr=- s=cabab\nr=- s=caxybab\nr=1 s=caxybab\nr=1 s=caxybab\n",
+      note: "find 失败打印 npos；substr(1,3) 不改变原串；erase / insert 会移动后面的字符；pair / tuple 先比第一个元素。"
+    },
+    counterexample: {
+      title: "把 find 的结果当 int 与 -1 比较",
+      explanation: "if (s.find(\"zz\") < 0) 永远为假：find 返回 size_t，失败时是 npos（最大的无符号数）。应写 s.find(x) == std::string::npos。本实验用同一输入显示 find zz 的结果是 npos。",
+      input: "s = abcabab；s.find(\"zz\")",
+      wrong: "认为结果小于 0",
+      correct: "与 std::string::npos 比较"
+    },
+    ioProtocol: "第 1 行初始字符串（\"-\" 表示空串）与操作数 m；随后 m 行 \"app w | sub p n | find w | rfind w | ers p n | ins p w | pless a b c d | tless a b c d e f\"。每个操作输出一行 \"r=<结果或-> s=<当前字符串>\"（find / rfind 失败输出 npos）。",
+    id: "stl-string",
+    topicId: "stl-string",
+    title: "string / pair / tuple 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "数组",
+      "排序的基本概念"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<algorithm>",
+        "<functional>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "区间 [begin, end) 左闭右开",
+      interval: "v.begin() + k 不得越过 v.end()",
+      limits: "lower_bound 要求区间已排序；nth_element 只保证第 k 位；sort 不稳定",
+      timeComplexity: "sort O(n log n)；nth_element 平均 O(n)；next_permutation O(n)；lower_bound O(log n)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "3 3 1 2\n9\nnperm\nnperm\nnth 1\nsrt\nlbd 2\nrot 1\nrsrt\ncnt 3\nmx\n",
+      output: "r=1 v=[3 2 1]\nr=0 v=[1 2 3]\nr=2 v=[1 2 3]\nr=- v=[1 2 3]\nr=1 v=[1 2 3]\nr=- v=[2 3 1]\nr=- v=[3 2 1]\nr=1 v=[3 2 1]\nr=0 v=[3 2 1]\n",
+      note: "nperm 把 3 1 2 变成 3 2 1，再调用就回绕成 1 2 3 并返回 0；nth 1 取到第 1 小（下标从 0）。"
+    },
+    counterexample: {
+      title: "从没排序的数组开始枚举全排列",
+      explanation: "next_permutation 只给出\"当前排列的下一个\"。从 3 1 2 开始，它只会走 3 2 1 然后回绕，漏掉 1 2 3 等排列。要枚举所有排列，必须先 sort 再循环 do { … } while (next_permutation(…))。",
+      input: "v = 3 1 2；连续两次 next_permutation",
+      wrong: "以为会枚举全部 6 种",
+      correct: "先 std::sort，再 do-while"
+    },
+    ioProtocol: "第 1 行 k 与 k 个整数；第 2 行操作数 m；随后 m 行 \"srt | rsrt | rev | rot k | nperm | pperm | nth k | cnt x | mx | lbd x\"（lbd 只能紧跟在 srt 之后）。每个操作输出一行 \"r=<结果或-> v=[数组内容]\"。",
+    id: "stl-algo",
+    topicId: "stl-algo",
+    title: "标准算法实验：sort / nth_element / next_permutation",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "前缀和与差分",
+      "二进制位"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<numeric>",
+        "<bitset>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "bitset 第 0 位是最低位，to_string 先打印第 15 位",
+      interval: "无区间参数",
+      limits: "accumulate 的初值类型决定累加类型；bitset 大小须是编译期常量；gcd / lcm 需要 C++17",
+      timeComplexity: "iota / accumulate / partial_sum / adjacent_difference O(n)；bitset 单点 O(1)，count / 移位 O(N/64)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "4 4 6 8 10\n9\ngcdall\nacc\npsum\nadiff\niota 5\nbset 3\nbflip 0\nbcnt\nbshl 2\n",
+      output: "r=2 v=[4 6 8 10] b=0000000000000000\nr=28 v=[4 6 8 10] b=0000000000000000\nr=- v=[4 10 18 28] b=0000000000000000\nr=- v=[4 6 8 10] b=0000000000000000\nr=- v=[5 6 7 8] b=0000000000000000\nr=- v=[5 6 7 8] b=0000000000001000\nr=- v=[5 6 7 8] b=0000000000001001\nr=2 v=[5 6 7 8] b=0000000000001001\nr=- v=[5 6 7 8] b=0000000000100100\n",
+      note: "psum 之后 adiff 恢复原数组；bset 3 与 bflip 0 得 1001（二进制），再左移 2 位得 100100。"
+    },
+    counterexample: {
+      title: "accumulate 的初值写 0",
+      explanation: "std::accumulate(v.begin(), v.end(), 0) 在 int 里累加；当总和超过 int 范围时是有符号溢出（未定义行为）。要求 long long 总和就写初值 0LL。本页不演示溢出后的\"某个数\"，因为那是未定义行为。",
+      input: "v = {2000000000, 2000000000}",
+      wrong: "accumulate(…, 0)",
+      correct: "accumulate(…, 0LL)"
+    },
+    ioProtocol: "第 1 行 k 与 k 个整数；第 2 行操作数 m；随后 m 行 \"iota x | acc | psum | adiff | gcdall | bset i | bflip i | bcnt | bshl k\"（位下标 0..15，bitset<16> 初始全 0）。每个操作输出一行 \"r=<结果或-> v=[数组] b=<16 位，第 15 位在前>\"。",
+    id: "stl-numeric",
+    topicId: "stl-numeric",
+    title: "numeric 与 bitset 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "sort 的基本用法",
+      "pair 的字典序"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<algorithm>",
+        "<functional>",
+        "<utility>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "迭代器 begin() 指向首元素，end() 在末尾之后；rbegin() 指向最后一个",
+      interval: "区间 [begin, end) 左闭右开",
+      limits: "比较器必须是严格弱序：comp(a, a) 为 false、非对称、可传递；用 <= 是未定义行为",
+      timeComplexity: "sort / stable_sort O(n log n)；min_element O(n)；lower_bound O(log n)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "4 2 5 1 5 2 3 1 9\n7\nsfirst\nssecd\nsortlex\nrbeg\nminel\nlbf 2\ngrtr\n",
+      output: "r=- v=[1:5 1:9 2:5 2:3]\nr=- v=[1:9 1:5 2:5 2:3]\nr=- v=[1:5 1:9 2:3 2:5]\nr=2:5 v=[1:5 1:9 2:3 2:5]\nr=0 v=[1:5 1:9 2:3 2:5]\nr=2 v=[1:5 1:9 2:3 2:5]\nr=- v=[2:5 2:3 1:9 1:5]\n",
+      note: "sfirst 之后 1:5 仍在 1:9 前面（稳定）；ssecd 按 second 降序；lbf 2 在按 first 排好序的数组里返回第一个 first ≥ 2 的位置。"
+    },
+    counterexample: {
+      title: "比较器写成 <=",
+      explanation: "[](const P& a, const P& b) { return a.first <= b.first; } 违反\"对相等元素返回 false\"，不是严格弱序，std::sort 可能越界、崩溃或死循环（未定义行为）。本页只给出这条文字说明，不执行它，也不显示任何\"结果\"。",
+      input: "存在 first 相同的元素",
+      wrong: "return a.first <= b.first",
+      correct: "return a.first < b.first"
+    },
+    ioProtocol: "第 1 行 k 与 k 对整数 \"a b\"；第 2 行操作数 m；随后 m 行 \"sortlex | grtr | sfirst | ssecd | rev | rbeg | minel | lbf x\"（lbf 只能紧跟在 sortlex / sfirst 之后）。每个操作输出一行 \"r=<结果或-> v=[a:b …]\"。",
+    id: "stl-comparator",
+    topicId: "stl-comparator",
+    title: "迭代器与比较器实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

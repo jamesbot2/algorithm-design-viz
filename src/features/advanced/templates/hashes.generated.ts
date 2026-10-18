@@ -200,5 +200,77 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "core": "145f24b07a75f019ed99d20fc18db0706a2debfc30ff41a85cd28b3b6c3c4b75",
       "full": "d159ba32bae4133e092c9a4627ac10756abf31b788add96e3d5d0b258222a10f"
     }
+  },
+  "stl-vector": {
+    "teach": {
+      "cpp": "57a78ce36d4bb1805112a8aea776e9e8dd044c0a243af168e6c928765bdf26b4"
+    },
+    "contest": {
+      "core": "8afed492eb058dbcffc72b61cc79fd6eea779df90723f604a6314845fd4d68e1",
+      "full": "8098ed01ceea39f4d8ca4a03ac980c5bc0a2bf9466e6514865204bb32aa74be5"
+    }
+  },
+  "stl-deque": {
+    "teach": {
+      "cpp": "ae98c60e3da1bf44956b59296abadb21439c75c9945a6f7b7fed943e8ed1b876"
+    },
+    "contest": {
+      "core": "3c212b8890345e7f2a02b0d6c8e03125bbba63bee778e5ea74a94c17fc407272",
+      "full": "4d8c5cbeffc18d280a535efa40a91d4e3cf52d6ae0296a1b33514ec11ae31d0c"
+    }
+  },
+  "stl-unique": {
+    "teach": {
+      "cpp": "d3d6fccd9bb6181e240536d468b355a0223897c89dfc2f6653b2549fbd01feab"
+    },
+    "contest": {
+      "core": "d037e6d43f15b95593d13995eea6bc4fa3f209b1a02495c3731f0d51c0198a4e",
+      "full": "a477b0a0631616e6fb8c212bdd326c658f4e2bce57928816e097476eec99073b"
+    }
+  },
+  "stl-set-map": {
+    "teach": {
+      "cpp": "a8bdf747e8c2b0dc14f194effe6f8d2229231b22872f41a46c0909d44439ac65"
+    },
+    "contest": {
+      "core": "46b885a3be083eff44cab347fa2f7cc5ffd696ce0b387e54a48d5cc55cf80b7e",
+      "full": "7e2aa96ba92132325ab6a0b99216fa5d5b38237abaf910ff38677485f1512591"
+    }
+  },
+  "stl-string": {
+    "teach": {
+      "cpp": "a8e158fc4628372d7d6938eed4f9e2dfd02f51b33cae048a6e0843ff5d2d9296"
+    },
+    "contest": {
+      "core": "96762667944df265d9238849271c508d262f362b90b2d17bfc91bc21596fea27",
+      "full": "c883c0c3ac5813caf10c4dd4ba66da53556c06fd22392e2edb3ed4b56aad94f8"
+    }
+  },
+  "stl-algo": {
+    "teach": {
+      "cpp": "8d06d6d9ee11d1707f88042d1511a71b8f7f7809e43fa715fad05ebd50e8d41e"
+    },
+    "contest": {
+      "core": "a0bf301826c894caac90ecff15a2f0870a54e4c49cc6dc0d114ce65c445768ab",
+      "full": "5398587bccd0566628336bab6c989d8e2b453417ac7ddea0b226ca9c8c0c56c7"
+    }
+  },
+  "stl-numeric": {
+    "teach": {
+      "cpp": "6c31b04a9479b5f0ebbe15924065e498970e8e7a820aeae805d0fba7714a5a19"
+    },
+    "contest": {
+      "core": "a2309069c4a79b4f6ff17fdec8d6cd0a3d5553291c600840b4328e71dc05ac98",
+      "full": "cc93c848688490fa9fdc85eb720836b41e734fb9f110e519fa642cc24efbfac7"
+    }
+  },
+  "stl-comparator": {
+    "teach": {
+      "cpp": "c459bb2fa730493e8ec0fa6fffa8413a897683bb9fa4b33023fad2af1a33863b"
+    },
+    "contest": {
+      "core": "701ce94f58a6424160111a3eaf01596c11139c54edb95fa1e01e6aac0aeddda9",
+      "full": "817dd56c254fb900383b5395ca77718944af5b78f8a2a3b5ec49986808fe35b0"
+    }
   }
 }

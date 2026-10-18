@@ -1,0 +1,6 @@
+{ "id": "stl_vector", "title": "vector 与迭代器实验（C++17）", "file": "stl_vector.cpp",
+  "labels": {
+    "vPush": "push_back：满了才重新分配", "vReserve": "reserve：只改 capacity，size 不变", "vResize": "resize：改 size（可能补 0 / 截断）",
+    "vInsert": "insert：插入点之后的元素后移", "vErase": "erase：删除点之后的元素前移", "vShrink": "shrink_to_fit：capacity 收缩到 size（非强制）",
+    "vIter": "取得迭代器 begin() + i", "vUse": "解引用迭代器（失效则未定义行为）"
+  } }

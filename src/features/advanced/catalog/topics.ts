@@ -261,6 +261,505 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    "id": "stl-vector",
+    "section": "stl",
+    "titleZh": "vector 与迭代器实验",
+    "titleEn": "vector & iterators",
+    "aliases": [
+      "vector",
+      "capacity",
+      "size",
+      "reserve",
+      "resize",
+      "迭代器失效",
+      "iterator invalidation",
+      "shrink_to_fit",
+      "push_back",
+      "动态数组"
+    ],
+    "tags": [
+      "STL",
+      "vector",
+      "迭代器",
+      "容量"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "size 与 capacity 是两回事：reserve 只改 capacity，resize 才创建元素；一旦重新分配，所有迭代器失效。",
+    "routeOrder": 3,
+    "demoId": "stl-vector",
+    "templateId": "stl-vector",
+    "relatedAlgos": [],
+    "standard": "C++17 <vector>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-deque",
+    "section": "stl",
+    "titleZh": "queue / deque 实验",
+    "titleEn": "queue / deque",
+    "aliases": [
+      "queue",
+      "deque",
+      "双端队列",
+      "队列",
+      "push_front",
+      "pop_front",
+      "front",
+      "back",
+      "BFS 队列"
+    ],
+    "tags": [
+      "STL",
+      "队列",
+      "双端队列",
+      "固定槽位"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "两端的加入 / 移除都不移动其他元素：每个元素占固定槽位。queue 只是 deque 的适配器。",
+    "routeOrder": 4,
+    "demoId": "stl-deque",
+    "templateId": "stl-deque",
+    "relatedAlgos": [
+      "bfs"
+    ],
+    "standard": "C++17 <queue> <deque>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-unique",
+    "section": "stl",
+    "titleZh": "unique + erase 实验",
+    "titleEn": "unique + erase",
+    "aliases": [
+      "unique",
+      "erase",
+      "remove",
+      "erase-remove",
+      "去重",
+      "逻辑新终点",
+      "sort unique"
+    ],
+    "tags": [
+      "STL",
+      "算法",
+      "去重",
+      "erase-remove"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "unique / remove 只移动元素并返回逻辑新终点，size() 不变；必须 erase 才真的缩小；unique 只合并相邻重复。",
+    "routeOrder": 5,
+    "demoId": "stl-unique",
+    "templateId": "stl-unique",
+    "relatedAlgos": [
+      "discretize"
+    ],
+    "standard": "C++17 <algorithm>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-set-map",
+    "section": "stl",
+    "titleZh": "set / multiset / map 实验",
+    "titleEn": "set / multiset / map",
+    "aliases": [
+      "set",
+      "multiset",
+      "map",
+      "operator[]",
+      "lower_bound",
+      "erase",
+      "count",
+      "find",
+      "红黑树",
+      "有序容器"
+    ],
+    "tags": [
+      "STL",
+      "set",
+      "map",
+      "multiset",
+      "有序容器"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "set 唯一有序，multiset 可重复（erase(值) 删全部），map 的 operator[] 在键不存在时会插入。",
+    "routeOrder": 6,
+    "demoId": "stl-set-map",
+    "templateId": "stl-set-map",
+    "relatedAlgos": [
+      "stl-bounds"
+    ],
+    "standard": "C++17 <set> <map>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-string",
+    "section": "stl",
+    "titleZh": "string / pair / tuple 实验",
+    "titleEn": "string / pair / tuple",
+    "aliases": [
+      "string",
+      "std::string",
+      "find",
+      "substr",
+      "npos",
+      "pair",
+      "tuple",
+      "tie",
+      "字符串",
+      "字典序比较"
+    ],
+    "tags": [
+      "STL",
+      "字符串",
+      "pair",
+      "tuple"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "字符串的查找（npos）、截取、删除、插入，以及 pair / tuple 的字典序比较。",
+    "routeOrder": 7,
+    "demoId": "stl-string",
+    "templateId": "stl-string",
+    "relatedAlgos": [
+      "kmp",
+      "z-function"
+    ],
+    "standard": "C++17 <string> <utility> <tuple>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-algo",
+    "section": "stl",
+    "titleZh": "标准算法实验：sort / nth_element / next_permutation",
+    "titleEn": "Standard algorithms",
+    "aliases": [
+      "sort",
+      "stable_sort",
+      "nth_element",
+      "next_permutation",
+      "prev_permutation",
+      "rotate",
+      "reverse",
+      "lower_bound",
+      "max_element",
+      "count",
+      "algorithm",
+      "全排列"
+    ],
+    "tags": [
+      "STL",
+      "算法",
+      "排序",
+      "排列"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "对 vector<int> 逐个调用 sort、reverse、rotate、next_permutation、nth_element、count、max_element、lower_bound。",
+    "routeOrder": 8,
+    "demoId": "stl-algo",
+    "templateId": "stl-algo",
+    "relatedAlgos": [
+      "merge-sort",
+      "stl-bounds"
+    ],
+    "standard": "C++17 <algorithm> <functional>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-numeric",
+    "section": "stl",
+    "titleZh": "numeric 与 bitset 实验",
+    "titleEn": "numeric / bitset",
+    "aliases": [
+      "numeric",
+      "iota",
+      "accumulate",
+      "partial_sum",
+      "adjacent_difference",
+      "gcd",
+      "bitset",
+      "前缀和",
+      "popcount",
+      "位集"
+    ],
+    "tags": [
+      "STL",
+      "numeric",
+      "bitset",
+      "前缀和"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "iota、accumulate、partial_sum、adjacent_difference、gcd，以及 bitset<16> 的 set / flip / count / 左移。",
+    "routeOrder": 9,
+    "demoId": "stl-numeric",
+    "templateId": "stl-numeric",
+    "relatedAlgos": [
+      "prefix-diff",
+      "number-theory"
+    ],
+    "standard": "C++17 <numeric> <bitset>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-comparator",
+    "section": "stl",
+    "titleZh": "迭代器与比较器实验",
+    "titleEn": "Iterators / comparators",
+    "aliases": [
+      "comparator",
+      "比较器",
+      "strict weak ordering",
+      "严格弱序",
+      "stable_sort",
+      "rbegin",
+      "迭代器",
+      "lower_bound",
+      "自定义排序",
+      "cmp"
+    ],
+    "tags": [
+      "STL",
+      "比较器",
+      "迭代器",
+      "严格弱序"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "对 vector<pair<int,int>> 使用默认比较、自定义比较器、stable_sort、反向迭代器与 lower_bound，并说明严格弱序。",
+    "routeOrder": 10,
+    "demoId": "stl-comparator",
+    "templateId": "stl-comparator",
+    "relatedAlgos": [
+      "merge-sort",
+      "stl-bounds"
+    ],
+    "standard": "C++17 <algorithm> <functional> <utility>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-string",
+    "section": "stl",
+    "titleZh": "string / pair / tuple 实验",
+    "titleEn": "string / pair / tuple",
+    "aliases": [
+      "string",
+      "std::string",
+      "find",
+      "substr",
+      "npos",
+      "pair",
+      "tuple",
+      "tie",
+      "字符串",
+      "字典序比较"
+    ],
+    "tags": [
+      "STL",
+      "字符串",
+      "pair",
+      "tuple"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "字符串的查找（npos）、截取、删除、插入，以及 pair / tuple 的字典序比较。",
+    "routeOrder": 7,
+    "demoId": "stl-string",
+    "templateId": "stl-string",
+    "relatedAlgos": [
+      "kmp",
+      "z-function"
+    ],
+    "standard": "C++17 <string> <utility> <tuple>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-algo",
+    "section": "stl",
+    "titleZh": "标准算法实验：sort / nth_element / next_permutation",
+    "titleEn": "Standard algorithms",
+    "aliases": [
+      "sort",
+      "stable_sort",
+      "nth_element",
+      "next_permutation",
+      "prev_permutation",
+      "rotate",
+      "reverse",
+      "lower_bound",
+      "max_element",
+      "count",
+      "algorithm",
+      "全排列"
+    ],
+    "tags": [
+      "STL",
+      "算法",
+      "排序",
+      "排列"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "对 vector<int> 逐个调用 sort、reverse、rotate、next_permutation、nth_element、count、max_element、lower_bound。",
+    "routeOrder": 8,
+    "demoId": "stl-algo",
+    "templateId": "stl-algo",
+    "relatedAlgos": [
+      "merge-sort",
+      "stl-bounds"
+    ],
+    "standard": "C++17 <algorithm> <functional>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-numeric",
+    "section": "stl",
+    "titleZh": "numeric 与 bitset 实验",
+    "titleEn": "numeric / bitset",
+    "aliases": [
+      "numeric",
+      "iota",
+      "accumulate",
+      "partial_sum",
+      "adjacent_difference",
+      "gcd",
+      "bitset",
+      "前缀和",
+      "popcount",
+      "位集"
+    ],
+    "tags": [
+      "STL",
+      "numeric",
+      "bitset",
+      "前缀和"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "iota、accumulate、partial_sum、adjacent_difference、gcd，以及 bitset<16> 的 set / flip / count / 左移。",
+    "routeOrder": 9,
+    "demoId": "stl-numeric",
+    "templateId": "stl-numeric",
+    "relatedAlgos": [
+      "prefix-diff",
+      "number-theory"
+    ],
+    "standard": "C++17 <numeric> <bitset>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-comparator",
+    "section": "stl",
+    "titleZh": "迭代器与比较器实验",
+    "titleEn": "Iterators / comparators",
+    "aliases": [
+      "comparator",
+      "比较器",
+      "strict weak ordering",
+      "严格弱序",
+      "stable_sort",
+      "rbegin",
+      "迭代器",
+      "lower_bound",
+      "自定义排序",
+      "cmp"
+    ],
+    "tags": [
+      "STL",
+      "比较器",
+      "迭代器",
+      "严格弱序"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "对 vector<pair<int,int>> 使用默认比较、自定义比较器、stable_sort、反向迭代器与 lower_bound，并说明严格弱序。",
+    "routeOrder": 10,
+    "demoId": "stl-comparator",
+    "templateId": "stl-comparator",
+    "relatedAlgos": [
+      "merge-sort",
+      "stl-bounds"
+    ],
+    "standard": "C++17 <algorithm> <functional> <utility>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

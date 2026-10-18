@@ -1,0 +1,2 @@
+{ "id": "stl_algo", "title": "标准算法实验：sort / nth_element / next_permutation 等（C++17）", "file": "stl_algo.cpp",
+  "labels": { "aSort": "sort：升序（不稳定，内部顺序未指定）", "aRSort": "sort + greater：降序", "aRev": "reverse：整体翻转", "aRot": "rotate：左移 k 位，v[k] 成为新的首元素", "aNext": "next_permutation：变成字典序下一个排列，已是最大则变成最小并返回 false", "aPrev": "prev_permutation：字典序上一个排列", "aNth": "nth_element：只保证第 k 位正确（在副本上运行）", "aCnt": "count：等于 x 的个数", "aMax": "max_element：第一个最大元素的下标", "aLb": "lower_bound：第一个 ≥ x（要求已排序）" } }

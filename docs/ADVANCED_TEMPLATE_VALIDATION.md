@@ -143,6 +143,30 @@
 | `number-theory|teach|go|run` | 通过 | 300 | go vet; go run | 6489201d1285 |
 | `number-theory|contest-core|cpp|run` | 通过 | 300 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 2c5eb5a73edf |
 | `number-theory|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | d8f6ced0cd54 |
+| `stl-vector|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | 57a78ce36d4b |
+| `stl-vector|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 8afed492eb05 |
+| `stl-vector|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 8098ed01ceea |
+| `stl-deque|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | ae98c60e3da1 |
+| `stl-deque|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 3c212b889034 |
+| `stl-deque|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 4d8c5cbeffc1 |
+| `stl-unique|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | d3d6fccd9bb6 |
+| `stl-unique|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | d037e6d43f15 |
+| `stl-unique|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | a477b0a06316 |
+| `stl-set-map|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | a8bdf747e8c2 |
+| `stl-set-map|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 46b885a3be08 |
+| `stl-set-map|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 7e2aa96ba921 |
+| `stl-string|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | a8e158fc4628 |
+| `stl-string|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 96762667944d |
+| `stl-string|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | c883c0c3ac58 |
+| `stl-algo|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | 8d06d6d9ee11 |
+| `stl-algo|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | a0bf301826c8 |
+| `stl-algo|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 5398587bccd0 |
+| `stl-numeric|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | 6c31b04a9479 |
+| `stl-numeric|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | a2309069c4a7 |
+| `stl-numeric|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | cc93c8486884 |
+| `stl-comparator|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | c459bb2fa730 |
+| `stl-comparator|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 701ce94f58a6 |
+| `stl-comparator|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 817dd56c254f |
 
 ## 命令与退出码
 
