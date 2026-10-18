@@ -473,7 +473,7 @@ describe('template sources, hashes and validation binding', () => {
   it('validation.json is bound to the CURRENT hashes and test-set version; a changed hash is stale, never verified', () => {
     expect(validationJson.testsetVersion).toBe(TESTSET_VERSION)
     const keys = Object.keys(validationJson.entries)
-    expect(keys.length).toBe(38)
+    expect(keys.length).toBe(Object.values(SOURCE_HASHES).reduce((n, h) => n + Object.keys(h.teach ?? {}).length + (h.contest ? 2 : 0), 0))
     for (const k of keys) {
       const [id, variant, lang] = k.split('|') as [string, string, string]
       const cur = variant === 'teach' ? SOURCE_HASHES[id]!.teach![lang] : SOURCE_HASHES[id]!.contest![variant === 'contest-core' ? 'core' : 'full']

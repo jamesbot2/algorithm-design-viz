@@ -234,6 +234,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'prefix-diff',
+    topicId: 'prefix-diff',
+    title: '前缀和与差分数组',
+    category: '数组',
+    difficulty: '竞赛基础',
+    prereqs: ['半开区间 [l, r)'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<vector>'],
+      depends: [],
+      indexing: '对外 0-based；p 与 d 均开 n+1 个槽',
+      interval: '半开区间 [l, r)：sum = p[r] − p[l]；区间加 d[l] += v, d[r] −= v',
+      limits: 'C++/Java/Rust/Go 用 64 位；TypeScript 为 Number（|和| ≤ 2^53−1）；Python 任意精度',
+      timeComplexity: '前缀和 O(n) 建、O(1) 查；差分 O(1) 改、O(n) 还原',
+      spaceComplexity: 'O(n)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版把前缀和与差分拆成 Prefix / Diff 两个结构体，接口与教学版的纯函数不同：作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '5 2 3\n1 2 3 4 5\n0 3 10\n2 5 -1\n0 5\n1 4\n3 3\n', output: '42\n27\n0\n', note: '先对 a=[1,2,3,4,5] 做两次区间加（[0,3)+10，[2,5)−1）得 [11,12,12,3,4]；再回答 [0,5)=42、[1,4)=27、[3,3)=0（空区间）。' },
+    counterexample: {
+      title: '差分的抵消点写成 d[r+1]',
+      explanation: '对半开区间 [l,r) 加 v，抵消点是 d[r]。写成 d[r+1] 会让 a[r] 也被多加一次 v。例：a=[0,0,0]，add(0,2,5) 应得 [5,5,0]，错误写法得 [5,5,5]。',
+      input: 'a = [0,0,0]；add(0, 2, 5)',
+      wrong: '[5, 5, 5]（d[3] 抵消，a[2] 被多加）',
+      correct: '[5, 5, 0]（d[2] −= 5）',
+    },
+    ioProtocol: '第 1 行 N U Q；第 2 行 a_0..a_{N−1}；随后 U 行 l r x（a[l..r) += x）；再 Q 行 l r（输出全部更新后 a[l..r) 的和）。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

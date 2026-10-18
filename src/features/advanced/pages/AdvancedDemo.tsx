@@ -226,6 +226,18 @@ function DemoInner({ entry, topic }: { entry: AdvancedEntry; topic: TopicMeta })
 }
 
 function DraftFields({ entry, draft, patch }: { entry: AdvancedEntry; draft: Record<string, string>; patch: (k: string, v: string) => void }) {
+  if (entry.fields) {
+    return (
+      <>
+        {entry.fields.map((f) => (
+          <label key={f.key}>
+            {f.label}
+            <input data-testid={`adv-input-${f.key}`} value={draft[f.key] ?? ''} inputMode={f.kind === 'int' ? 'numeric' : 'text'} onChange={(e) => patch(f.key, e.target.value)} />
+          </label>
+        ))}
+      </>
+    )
+  }
   if (entry.id === 'stl-bounds') {
     return (
       <>

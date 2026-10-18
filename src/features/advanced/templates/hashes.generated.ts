@@ -57,6 +57,20 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "full": "e01f685f33e44a4a418090ddf405f0e1ea7ce9c349247eeeefeaa7712972daef"
     }
   },
+  "prefix-diff": {
+    "teach": {
+      "typescript": "f2cdbf35463378866bdd6fbaaef07039dca1ddf95e7bbecee79fa13f0f41abdd",
+      "python": "65a20297c4e2f5194d9581d4b90385d240ba32f6e385cc08dd726ca4d4b4ab66",
+      "cpp": "fb5a5e1b848c1036129a3c1fa2eb7d3cf1e942415055ddce367276346c24b18d",
+      "java": "ea786fbbb874f4747aed7cc3e353d9b994015b354370102dff33e05139bfa27f",
+      "rust": "d047053f76a7c230ff51d0b3a040ef0f9527fd618234bbf586561bdc1aa5592a",
+      "go": "c79eedf13a587bd69c1fb5d3434e66d31f4e94bbf8ae8995106a95bb6eccfa98"
+    },
+    "contest": {
+      "core": "2efe1fa60c7cca3645cfcc96fbbfdc28f281706060813bb9db13978aa5d7bc17",
+      "full": "c689b9e157807a0b03093cdbf6e9eb3d8ff5f5a8a28694eff18562826fbfc441"
+    }
+  },
   "stl-bounds": {
     "teach": {
       "cpp": "e695e94ca5682d1b1046fe8bfe5f980ec5fdbe9a8851cadf696c6386909198ed"

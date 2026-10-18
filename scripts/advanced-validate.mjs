@@ -24,6 +24,7 @@ const sha = (s) => createHash('sha256').update(s, 'utf8').digest('hex')
 
 const { TESTSET_VERSION, SOURCE_HASHES } = await imp('src/features/advanced/templates/hashes.generated.ts')
 const { default: contestSources } = await imp('src/features/advanced/templates/sources.generated.ts')
+import { FAM, caseInput, driver, coreDriver, mulberry32 as famRng } from './advanced-families.mjs'
 const { TEMPLATES } = await imp('src/features/advanced/templates/meta.ts')
 
 // ---------- toolchain ----------
@@ -373,7 +374,7 @@ async function teachDocs(id) {
   const dir = id.replace(/-/g, '_')
   const cap = id.split('-').map((w) => w[0].toUpperCase() + w.slice(1)).join('')
   const out = {}
-  if (['dsu', 'fenwick', 'segtree', 'segtree-lazy'].includes(id)) {
+  if (['dsu', 'fenwick', 'segtree', 'segtree-lazy'].includes(id) || FAM[id]) {
     const idx = await imp(`src/codeCatalog/${dir}/index.ts`)
     const cat = idx[`get${cap}Catalog`]()
     out.typescript = cat.typescript
@@ -411,6 +412,7 @@ const need = (r, what) => {
 }
 
 async function validateTopic(id) {
+  if (FAM[id]) return validateFam(id)
   const dir = id.replace(/-/g, '_')
   const gens = { dsu: [genDsu, naiveDsu, dsuInput, checkDsu], fenwick: [genFenwick, naiveFenwick, fwInput, checkFenwick], segtree: [genSeg, naiveSeg, segInput, checkFenwick], 'segtree-lazy': [genLazy, naiveLazy, lazyInput, checkFenwick], 'stl-bounds': [genBounds, null, bdInput, checkBounds], 'stl-priority-queue': [genPq, null, pqInput, checkPq] }
   const [gen, naive, inp, chk] = gens[id]
@@ -513,6 +515,121 @@ async function validateTopic(id) {
         n = 1
         const r2 = mulberry32(777 + id.length)
         for (let k = 0; k < 150; k++) n += randomStdin(id, d, r2)
+        checks = 'full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan'
+      }
+      record(key, h, 'pass', n, checks, { toolchain: tcOf('cpp') })
+    })
+  }
+}
+
+// ---------- generic families ----------
+async function validateFam(id) {
+  const F = FAM[id]
+  const cases = F.gen(20260101 + id.length * 7)
+  const want = cases.map((c) => F.naive(c))
+  const input = caseInput(cases)
+  const check = (text, what) => {
+    const lines = text.replace(/\n$/, '').split('\n')
+    const per = want[0].length
+    if (lines.length !== cases.length * per) throw new Error(`${what}: ${lines.length} output lines, want ${cases.length * per}`)
+    cases.forEach((c, ci) => {
+      const got = lines.slice(ci * per, ci * per + per)
+      if (F.check) F.check(c, got, want[ci])
+      else if (got.map((x) => x.trim()).join('|') !== want[ci].join('|')) throw new Error(`${id} case ${ci} ${JSON.stringify({ k: c.k, a: c.a.slice(0, 8), b: c.b.slice(0, 8), c: c.c.slice(0, 8) })}: got ${JSON.stringify(got).slice(0, 160)} want ${JSON.stringify(want[ci]).slice(0, 160)}`)
+    })
+  }
+  const dir = F.dir
+  const docs = await teachDocs(id)
+  const hashes = SOURCE_HASHES[id]
+  for (const [lang, doc] of Object.entries(docs)) {
+    const key = `${id}|teach|${lang}|run`
+    const h = sha(doc.source)
+    if (h !== hashes.teach[lang] || h !== doc.sourceHash) {
+      record(key, h, 'fail', 0, `displayed-source hash ${h.slice(0, 12)} != bound ${String(hashes.teach[lang]).slice(0, 12)}`)
+      continue
+    }
+    guard(key, h, () => {
+      const d = tmp(`${id}-${lang}`)
+      const drv = driver(lang, dir, F.calls[lang])
+      let r
+      let checks
+      if (lang === 'python') {
+        writeFileSync(join(d, `${dir}.py`), doc.source)
+        writeFileSync(join(d, 'main.py'), drv)
+        r = need(run('python3', ['-X', 'dev', 'main.py'], { cwd: d, input }), 'python3')
+        checks = 'python3 -X dev'
+      } else if (lang === 'typescript') {
+        writeFileSync(join(d, `${dir}.ts`), doc.source)
+        writeFileSync(join(d, 'main.ts'), drv)
+        r = need(run('node', ['--experimental-strip-types', '--no-warnings', 'main.ts'], { cwd: d, input }), 'node')
+        checks = 'node strip-types (displayed .ts imported unchanged)'
+      } else if (lang === 'cpp') {
+        writeFileSync(join(d, 'main.cpp'), doc.source + '\n' + drv)
+        const c = need(run('g++', [...CXX, 'main.cpp', '-o', 'main'], { cwd: d }), 'g++ compile')
+        if (/warning:/.test(c.stderr)) throw new Error('compiler warnings: ' + c.stderr.slice(0, 500))
+        r = need(run('./main', [], { cwd: d, input, env: ASAN_ENV }), 'run under ASan/UBSan')
+        checks = 'g++ -std=c++17 ASan+UBSan -Wall -Wextra clean'
+      } else if (lang === 'java') {
+        writeFileSync(join(d, `${F.cls}.java`), doc.source)
+        writeFileSync(join(d, 'Main.java'), drv)
+        need(run('javac', ['-Xlint:all', `${F.cls}.java`, 'Main.java'], { cwd: d }), 'javac')
+        r = need(run('java', ['-ea', '-cp', d, 'Main'], { cwd: d, input }), 'java')
+        checks = 'javac -Xlint:all; java -ea'
+      } else if (lang === 'rust') {
+        writeFileSync(join(d, `${dir}.rs`), doc.source)
+        writeFileSync(join(d, 'main.rs'), drv)
+        need(run('rustc', ['--edition', '2021', '-C', 'debuginfo=0', '-C', 'overflow-checks=on', '-D', 'warnings', 'main.rs', '-o', 'main'], { cwd: d }), 'rustc')
+        r = need(run('./main', [], { cwd: d, input }), 'rust run')
+        checks = 'rustc -D warnings, overflow-checks=on'
+      } else {
+        writeFileSync(join(d, `${dir}.go`), doc.source)
+        writeFileSync(join(d, 'main.go'), drv)
+        writeFileSync(join(d, 'go.mod'), 'module advtmp\ngo 1.21\n')
+        const env = { ...process.env, GOFLAGS: '-mod=mod', GOCACHE: join(d, '.cache') }
+        need(run('go', ['vet', './...'], { cwd: d, env }), 'go vet')
+        r = need(run('go', ['run', '.'], { cwd: d, input, env }), 'go run')
+        checks = 'go vet; go run'
+      }
+      check(r.stdout, `${id}/${lang}`)
+      record(key, h, 'pass', cases.length, checks, { toolchain: tcOf(lang) })
+    })
+  }
+  const cs = contestSources[id]
+  for (const form of ['core', 'full']) {
+    const key = `${id}|contest-${form}|cpp|run`
+    const h = sha(cs[form].source)
+    if (h !== hashes.contest[form] || h !== cs[form].hash) {
+      record(key, h, 'fail', 0, 'displayed-source hash mismatch')
+      continue
+    }
+    guard(key, h, () => {
+      const d = tmp(`${id}-c-${form}`)
+      let n
+      let checks
+      if (form === 'core') {
+        writeFileSync(join(d, 'core.cpp'), cs.core.source)
+        writeFileSync(join(d, 'main.cpp'), coreDriver(F.core))
+        const c = need(run('g++', [...CXX, 'main.cpp', '-o', 'main'], { cwd: d }), 'g++ compile')
+        if (/warning:/.test(c.stderr)) throw new Error('compiler warnings: ' + c.stderr.slice(0, 500))
+        const r = need(run('./main', [], { cwd: d, input, env: ASAN_ENV }), 'run under ASan/UBSan')
+        check(r.stdout, `${id}/contest-core`)
+        n = cases.length
+        checks = 'core compiled as displayed + driver; ASan+UBSan; naive baseline'
+      } else {
+        writeFileSync(join(d, 'full.cpp'), cs.full.source)
+        const c = need(run('g++', [...CXX, 'full.cpp', '-o', 'full'], { cwd: d }), 'g++ compile full')
+        if (/warning:/.test(c.stderr)) throw new Error('compiler warnings: ' + c.stderr.slice(0, 500))
+        const t = TEMPLATES.find((x) => x.id === id)
+        const s1 = need(run('./full', [], { cwd: d, input: t.sample.input, env: ASAN_ENV }), 'sample run')
+        if (s1.stdout !== t.sample.output) throw new Error(`sample output mismatch: got ${JSON.stringify(s1.stdout)} want ${JSON.stringify(t.sample.output)}`)
+        n = 1
+        const r2 = famRng(777 + id.length)
+        for (let k = 0; k < 150; k++) {
+          const { input: inp, expected } = F.full(r2)
+          const o = need(run('./full', [], { cwd: d, input: inp, env: ASAN_ENV }), 'full random')
+          if (o.stdout !== expected) throw new Error(`${id} full: random stdin mismatch\n${inp}\ngot ${JSON.stringify(o.stdout)} want ${JSON.stringify(expected)}`)
+          n++
+        }
         checks = 'full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan'
       }
       record(key, h, 'pass', n, checks, { toolchain: tcOf('cpp') })
@@ -623,7 +740,7 @@ function randomStdin(id, d, r) {
   return 1
 }
 
-const ids = ['stl-bounds', 'stl-priority-queue', 'dsu', 'fenwick', 'segtree', 'segtree-lazy'].filter((i) => !only || i === only)
+const ids = ['stl-bounds', 'stl-priority-queue', 'dsu', 'fenwick', 'segtree', 'segtree-lazy', ...Object.keys(FAM)].filter((i) => !only || i === only)
 for (const id of ids) await validateTopic(id)
 
 const outPath = join(ROOT, 'src/features/advanced/templates/validation.json')

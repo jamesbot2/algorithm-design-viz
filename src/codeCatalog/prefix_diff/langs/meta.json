@@ -1,0 +1,12 @@
+{ "algo": "prefix-diff", "idPrefix": "prefixDiff", "titleBase": "前缀和与差分 Prefix Sums & Difference（教学版）",
+  "files": { "python": "prefix_diff.py", "cpp": "prefix_diff.cpp", "java": "PrefixDiff.java", "rust": "prefix_diff.rs", "go": "prefix_diff.go" },
+  "ts": "prefix_diff.ts.txt",
+  "labels": {
+    "prefixInit": "前缀和：p[0] = 0（空前缀）",
+    "prefixStep": "前缀和：p[i+1] = p[i] + a[i]",
+    "rangeSumRet": "区间和：sum[l,r) = p[r] − p[l]",
+    "diffL": "差分：区间起点 d[l] += v",
+    "diffR": "差分：区间终点 d[r] −= v（抵消）",
+    "restoreRun": "还原：对 d 做前缀和 run += d[i]",
+    "restoreOut": "还原：a′[i] = a[i] + run"
+  } }

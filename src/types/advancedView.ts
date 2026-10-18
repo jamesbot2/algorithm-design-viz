@@ -106,4 +106,34 @@ export interface SegView {
   adding?: { l: number; r: number; v: number }
 }
 
-export type AdvancedView = DsuView | FenwickView | HeapView | BoundsView | SegView
+export type FamMark = 'cur' | 'hit' | 'done' | 'warn' | 'range' | 'pivot'
+export interface FamRow {
+  id: string
+  label: string
+  cells: (number | string | null)[]
+  marks?: Record<number, FamMark>
+  /** label of the first cell (default 0): index row shows offset+i */
+  offset?: number
+}
+export interface FamGraph {
+  n: number
+  edges: [number, number][]
+  directed: boolean
+  /** 'tree' = layered by depth (needs depth[]), 'circle' = nodes on a circle */
+  layout: 'circle' | 'tree'
+  depth?: number[]
+  marks?: Record<number, FamMark>
+  /** key `${u}-${v}` */
+  edgeMarks?: Record<string, FamMark>
+}
+/** Generic multi-row scene for the array / graph / number families (prefix, discretization, monotone, topo, LCA, LIS, math…). */
+export interface FamView {
+  kind: 'fam'
+  op: string
+  rows: FamRow[]
+  graph?: FamGraph
+  scalars?: { id: string; label: string; value: string | number }[]
+  result?: (number | string)[]
+}
+
+export type AdvancedView = DsuView | FenwickView | HeapView | BoundsView | SegView | FamView

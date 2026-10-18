@@ -29,8 +29,10 @@ import * as segtree from './segtree'
 import * as segtreeLazy from './segtreeLazy'
 import * as stlBounds from './stlBounds'
 import * as stlPq from './stlPriorityQueue'
+import type { FamId, FamInput, FamSpec } from './famTypes'
+import { FAMILIES } from './families'
 
-export type AdvancedAlgoId = 'dsu' | 'fenwick' | 'segtree' | 'segtree-lazy' | 'stl-bounds' | 'stl-priority-queue'
+export type AdvancedAlgoId = FamId | 'dsu' | 'fenwick' | 'segtree' | 'segtree-lazy' | 'stl-bounds' | 'stl-priority-queue'
 
 export interface AdvancedEntry {
   id: AdvancedAlgoId
@@ -38,6 +40,8 @@ export interface AdvancedEntry {
   /** catalog id of the code documents shown for this demo (src/codeCatalog/<catalogId>) */
   catalogId: string
   languages: 'six' | 'cpp-only'
+  /** generic family: field definitions used to render the draft form */
+  fields?: FamSpec['fields']
   presentation: PresentationDescriptor
   /** draft text fields → typed input (the only way a run input is produced) */
   parseDraft: (draft: Record<string, string>) => ValidateResult<unknown>
@@ -55,7 +59,62 @@ const merge = <T,>(...rs: ValidateResult<unknown>[]): ValidationIssue[] | null =
 
 const ADV: PresentationDescriptor = { primaryKind: 'advanced' }
 
+function famEntry(spec: FamSpec): AdvancedEntry {
+  const checkTyped = (raw: unknown): ValidateResult<FamInput> => {
+    const r = (raw ?? {}) as Record<string, unknown>
+    const out: FamInput = {}
+    for (const f of spec.fields) {
+      const v = r[f.key]
+      if (f.kind === 'int') {
+        if (typeof v !== 'number' || !Number.isSafeInteger(v) || Math.abs(v) > ADV_LIMITS.absValue) return issue(f.key, `${f.label} 须为整数（绝对值 ≤ ${ADV_LIMITS.absValue}）`)
+        if (f.min !== undefined && v < f.min) return issue(f.key, `${f.label} 须 ≥ ${f.min}`)
+        if (f.max !== undefined && v > f.max) return issue(f.key, `${f.label} 须 ≤ ${f.max}`)
+        out[f.key] = v
+      } else {
+        if (!Array.isArray(v) || !v.every((x) => Number.isSafeInteger(x) && Math.abs(x as number) <= ADV_LIMITS.absValue)) return issue(f.key, `${f.label} 须为整数列表`)
+        const a = v as number[]
+        if (a.length < (f.minLen ?? 0) || a.length > (f.maxLen ?? 16)) return issue(f.key, `${f.label} 长度须为 ${f.minLen ?? 0}..${f.maxLen ?? 16}`)
+        const bad = a.findIndex((x) => (f.min !== undefined && x < f.min) || (f.max !== undefined && x > f.max))
+        if (bad >= 0) return issue(f.key, `${f.label} 的第 ${bad + 1} 项 ${a[bad]} 超出范围 [${f.min ?? '-∞'}, ${f.max ?? '+∞'}]`)
+        out[f.key] = a
+      }
+    }
+    const c = spec.check?.(out)
+    if (c) return issue(c.field, c.reason)
+    return { ok: true, value: out }
+  }
+  return {
+    id: spec.id,
+    meta: spec.meta,
+    catalogId: spec.catalogId,
+    languages: 'six',
+    fields: spec.fields,
+    presentation: ADV,
+    defaultDraft: spec.defaultDraft,
+    parseDraft: (d) => {
+      const typed: Record<string, unknown> = {}
+      const issues: ValidationIssue[] = []
+      for (const f of spec.fields) {
+        if (f.kind === 'int') {
+          const n = parseIntToken((d[f.key] ?? '').trim())
+          if (n === null) issues.push({ field: f.key, reason: `${f.label} 须为整数` })
+          else typed[f.key] = n
+        } else {
+          const l = parseIntList(d[f.key] ?? '', f.key, f.maxLen ?? 16)
+          if (!l.ok) issues.push(...l.issues)
+          else typed[f.key] = l.value
+        }
+      }
+      if (issues.length) return { ok: false, issues }
+      return checkTyped(typed)
+    },
+    validate: checkTyped,
+    solve: (i) => spec.generate(i as FamInput),
+  }
+}
+
 export const advancedEntries: Record<AdvancedAlgoId, AdvancedEntry> = {
+  ...(Object.fromEntries(FAMILIES.map((f) => [f.id, famEntry(f)])) as Record<FamId, AdvancedEntry>),
   dsu: {
     id: 'dsu',
     meta: dsu.meta,

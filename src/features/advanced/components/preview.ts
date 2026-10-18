@@ -1,9 +1,18 @@
 import type { Step } from '../../../types/step'
 import { parseIntList, parseIntToken, ADV_LIMITS } from '../inputs'
+import { advancedEntries, isAdvancedId } from '../../../algorithms/advanced/registry'
 
 /** Ready-not-executed frames (no solve): the structure as it is BEFORE any operation. Null when the draft is unreadable. */
 export function buildPreview(id: string, draft: Record<string, string>): Step | null {
   const base = { id: 0, vars: {}, phase: 'preview' } as const
+  if (isAdvancedId(id) && advancedEntries[id].fields) {
+    // generic family: the first frame of the pure generator (no worker solve, no counter bump) shown as "ready, not run"
+    const e = advancedEntries[id]
+    const p = e.parseDraft(draft)
+    if (!p.ok) return null
+    const first = e.solve(p.value).steps[0]
+    return first ? { ...first, id: 0, phase: 'preview', message: `就绪：${first.message} 点击「运行」逐步执行。`, codeRefs: [] } : null
+  }
   if (id === 'dsu') {
     const n = parseIntToken((draft.n ?? '').trim())
     if (n === null || n < 1 || n > ADV_LIMITS.dsuN) return null

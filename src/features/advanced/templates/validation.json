@@ -275,6 +275,62 @@
       "tests": 151,
       "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
       "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "prefix-diff|teach|typescript|run": {
+      "hash": "f2cdbf35463378866bdd6fbaaef07039dca1ddf95e7bbecee79fa13f0f41abdd",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "v24.20.0",
+      "checks": "node strip-types (displayed .ts imported unchanged)"
+    },
+    "prefix-diff|teach|python|run": {
+      "hash": "65a20297c4e2f5194d9581d4b90385d240ba32f6e385cc08dd726ca4d4b4ab66",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "Python 3.13.5",
+      "checks": "python3 -X dev"
+    },
+    "prefix-diff|teach|cpp|run": {
+      "hash": "fb5a5e1b848c1036129a3c1fa2eb7d3cf1e942415055ddce367276346c24b18d",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean"
+    },
+    "prefix-diff|teach|java|run": {
+      "hash": "ea786fbbb874f4747aed7cc3e353d9b994015b354370102dff33e05139bfa27f",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "javac 21.0.12.1",
+      "checks": "javac -Xlint:all; java -ea"
+    },
+    "prefix-diff|teach|rust|run": {
+      "hash": "d047053f76a7c230ff51d0b3a040ef0f9527fd618234bbf586561bdc1aa5592a",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "checks": "rustc -D warnings, overflow-checks=on"
+    },
+    "prefix-diff|teach|go|run": {
+      "hash": "c79eedf13a587bd69c1fb5d3434e66d31f4e94bbf8ae8995106a95bb6eccfa98",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "checks": "go vet; go run"
+    },
+    "prefix-diff|contest-core|cpp|run": {
+      "hash": "2efe1fa60c7cca3645cfcc96fbbfdc28f281706060813bb9db13978aa5d7bc17",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline"
+    },
+    "prefix-diff|contest-full|cpp|run": {
+      "hash": "c689b9e157807a0b03093cdbf6e9eb3d8ff5f5a8a28694eff18562826fbfc441",
+      "status": "pass",
+      "tests": 151,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
     }
   }
 }

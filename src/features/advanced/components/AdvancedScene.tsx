@@ -3,6 +3,7 @@ import type { BoundsView, DsuView, FenwickView, HeapView } from '../../../types/
 import { Frame } from './frame'
 import { cell } from './cell'
 import { SegScene } from './SegScene'
+import { FamScene } from './FamScene'
 import { dsuLayout, fenwickCover, heapSlot, levelsFor, lowbit } from './scenes'
 import './advanced.css'
 
@@ -17,6 +18,7 @@ export default function AdvancedScene({ step }: { step: Step; prevStep?: Step })
       {v.kind === 'heap' && <HeapScene v={v} />}
       {v.kind === 'bounds' && <BoundsScene v={v} />}
       {v.kind === 'seg' && <SegScene v={v} />}
+      {v.kind === 'fam' && <FamScene v={v} />}
     </div>
   )
 }

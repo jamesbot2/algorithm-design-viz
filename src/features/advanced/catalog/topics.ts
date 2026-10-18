@@ -108,6 +108,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'prefix-diff',
+    section: 'algorithms',
+    titleZh: '前缀和与差分',
+    titleEn: 'Prefix Sums & Difference Arrays',
+    aliases: ['prefix sum', 'difference array', '前缀和', '差分', '区间加', '离线区间修改'],
+    tags: ['数组', '区间查询', '区间修改'],
+    difficulty: 'basic',
+    prereqs: [],
+    summary: '前缀和回答静态区间和；差分把"区间加"变成两个单点修改，最后做一次前缀和还原。',
+    routeOrder: 6,
+    demoId: 'prefix-diff',
+    templateId: 'prefix-diff',
+    relatedAlgos: ['kadane'],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)
