@@ -99,6 +99,20 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "full": "136cc73325da8703760194afcd0bbea734473c3c23a71c86c63b2ec47f90939f"
     }
   },
+  "mono-stack": {
+    "teach": {
+      "typescript": "f5df684baed06ae26eaf884beddff463dc5f7f4f0c743e2ffe03f52fbe8b2644",
+      "python": "e82551f8d693320ee2029d67038410b40e124c765058f9426a9831d14dc53c06",
+      "cpp": "0239cc48b4e8316f068621eb46165347596447c4ca298d7fd140391fc0bfc944",
+      "java": "45eca5c9eacd888e7c5ac9d4dba9194f033c711eaa630656837cc93c4a0f5d6c",
+      "rust": "e78f102d98e5ca413f500d4c04955b4fc9fb9a8817153ac8f9440f0b234dcc31",
+      "go": "55e12d463a279ba951ea19ab1f460dcce624fb8590c3d24a0428436bea12cc6c"
+    },
+    "contest": {
+      "core": "0f97b0e7a15e28d62988219af41732db0a40ad7cd788ee96a6d6386536b6096c",
+      "full": "4ea5ce3c9373c1645275f2c2709fcc7acb8ee82bdc08d741952fab09465d6b00"
+    }
+  },
   "stl-bounds": {
     "teach": {
       "cpp": "e695e94ca5682d1b1046fe8bfe5f980ec5fdbe9a8851cadf696c6386909198ed"

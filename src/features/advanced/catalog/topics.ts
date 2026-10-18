@@ -159,6 +159,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'mono-stack',
+    section: 'algorithms',
+    titleZh: '单调栈',
+    titleEn: 'Monotonic Stack',
+    aliases: ['monotonic stack', 'next greater', '下一个更大元素', '最大矩形', 'histogram', '单调栈'],
+    tags: ['栈', '数组', '线性扫描'],
+    difficulty: 'intermediate',
+    prereqs: [],
+    summary: '栈里放"还在等答案"的下标：新元素打破单调时，被弹出的栈顶就找到了答案。下一个更大元素 + 柱状图最大矩形。',
+    routeOrder: 9,
+    demoId: 'mono-stack',
+    templateId: 'mono-stack',
+    relatedAlgos: [],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

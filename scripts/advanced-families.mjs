@@ -221,3 +221,61 @@ FAM['bs-answer'] = {
     return { input: `${n} ${k}\n${a.join(' ')}\n`, expected: best + '\n' }
   },
 }
+
+// ───────────────────────── mono-stack ─────────────────────────
+FAM['mono-stack'] = {
+  dir: 'mono_stack',
+  cls: 'MonoStack',
+  gen(seed) {
+    const r = mulberry32(seed)
+    const cs = []
+    for (let t = 0; t < 400; t++) {
+      const n = t < 4 ? t : rint(r, 1, 30)
+      const span = t % 3 === 0 ? 3 : 20
+      cs.push({ k: 0, a: Array.from({ length: n }, () => (t % 13 === 0 ? rint(r, 0, 1_000_000_000) : rint(r, 0, span))), b: [], c: [] })
+    }
+    return cs
+  },
+  naive(c) {
+    const a = c.a
+    const ng = a.map((x, i) => {
+      for (let j = i + 1; j < a.length; j++) if (a[j] > x) return j
+      return -1
+    })
+    let best = 0
+    for (let l = 0; l < a.length; l++) {
+      let mn = Infinity
+      for (let r = l; r < a.length; r++) {
+        mn = Math.min(mn, a[r])
+        best = Math.max(best, mn * (r - l + 1))
+      }
+    }
+    return [S(ng), String(best)]
+  },
+  calls: {
+    python: ['next_greater(a)', '[largest_rectangle(a)]'],
+    typescript: ['M.nextGreater(a)', '[M.largestRectangle(a)]'],
+    cpp: ['next_greater(a)', 'std::vector<long long>{largest_rectangle(a)}'],
+    java: ['MonoStack.nextGreater(a)', 'new long[]{MonoStack.largestRectangle(a)}'],
+    rust: ['next_greater(&a)', 'vec![largest_rectangle(&a)]'],
+    go: ['NextGreater(a)', '[]int64{LargestRectangle(a)}'],
+  },
+  core: ['{auto g=next_greater(a);pr(std::vector<long long>(g.begin(),g.end()));}', 'pr(std::vector<long long>{largest_rect(a)});'],
+  full(r) {
+    const n = rint(r, 1, 12)
+    const a = Array.from({ length: n }, () => rint(r, 0, 6))
+    const ng = a.map((x, i) => {
+      for (let j = i + 1; j < n; j++) if (a[j] > x) return j
+      return -1
+    })
+    let best = 0
+    for (let l = 0; l < n; l++) {
+      let mn = Infinity
+      for (let rr = l; rr < n; rr++) {
+        mn = Math.min(mn, a[rr])
+        best = Math.max(best, mn * (rr - l + 1))
+      }
+    }
+    return { input: `${n}\n${a.join(' ')}\n`, expected: ng.join(' ') + '\n' + best + '\n' }
+  },
+}

@@ -11,6 +11,7 @@ export const CATALOG_LOADERS: Record<string, () => Promise<CatalogBundle>> = {
   prefix_diff: () => import('../../../codeCatalog/prefix_diff').then((m) => m.getPrefixDiffCatalog()),
   discretize: () => import('../../../codeCatalog/discretize').then((m) => m.getDiscretizeCatalog()),
   bs_answer: () => import('../../../codeCatalog/bs_answer').then((m) => m.getBsAnswerCatalog()),
+  mono_stack: () => import('../../../codeCatalog/mono_stack').then((m) => m.getMonoStackCatalog()),
   stl_bounds: () => import('../../../codeCatalog/stl_bounds').then((m) => m.getStlBoundsCatalog()),
   stl_priority_queue: () => import('../../../codeCatalog/stl_priority_queue').then((m) => m.getStlPriorityQueueCatalog()),
 }

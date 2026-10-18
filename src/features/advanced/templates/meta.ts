@@ -327,6 +327,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'mono-stack',
+    topicId: 'mono-stack',
+    title: '单调栈（下一个更大 + 最大矩形）',
+    category: '数组',
+    difficulty: '竞赛基础',
+    prereqs: ['栈'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<algorithm>', '<vector>'],
+      depends: [],
+      indexing: '0-based 下标；结果 −1 表示没有更大元素',
+      interval: '最大矩形：弹出时的窗口为半开区间 [left, i)，宽度 = i − left',
+      limits: '下一个更大：严格大于；柱高须 ≥ 0；面积用 64 位（TypeScript 为 Number，≤ 2^53−1）',
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(n)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版把弹栈循环压成单行并用 vector<int> 作栈，控制流与教学版（分行 + 显式栈操作）不同构：作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '8\n2 1 5 6 2 3 6 6\n', output: '2 2 3 -1 5 6 -1 -1\n12\n', note: 'a = [2,1,5,6,2,3,6,6]：下标 3 的 6 右边没有严格更大的元素（−1），两个末尾的 6 同理；把 a 当柱状图，最大矩形是高 2、宽 6（下标 2..7）= 12。' },
+    counterexample: {
+      title: '最大矩形忘了末尾哨兵 0',
+      explanation: '如果循环只跑到 n−1，不追加高度 0 的哨兵，栈里剩下的递增柱子永远不会被结算。例：h=[2,3,4]，正确答案 6（高 2 宽 3 或高 3 宽 2 … 取最大 6）。不加哨兵时没有任何柱子被弹出，面积保持 0。',
+      input: 'h = [2, 3, 4]（循环到 i < n，没有哨兵）',
+      wrong: '0（没有任何柱子被结算）',
+      correct: '6（哨兵 0 依次弹出 4、3、2，面积 4、6、6）',
+    },
+    ioProtocol: '第 1 行 N；第 2 行 a_0..a_{N−1}（非负）。输出：第 1 行每个元素的下一个严格更大元素下标（没有为 −1）；第 2 行以 a 为柱高的最大矩形面积。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

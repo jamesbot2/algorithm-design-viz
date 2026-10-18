@@ -187,3 +187,53 @@ describe('bs-answer vs independent reference', () => {
     expect(solve('bs-answer', { arr: [10, 1], k: 3 }).result.answer).toBe(10)
   })
 })
+
+describe('mono-stack vs independent reference', () => {
+  it('next-greater indices and largest rectangle equal O(n²) brute force; the scene row shows the same numbers', () => {
+    const r = prng(13)
+    for (let c = 0; c < 250; c++) {
+      const a = Array.from({ length: ri(r, 1, 12) }, () => ri(r, 0, c % 3 === 0 ? 3 : 15))
+      const { result, steps } = solve('mono-stack', { arr: a })
+      const ng = a.map((x, i) => {
+        for (let j = i + 1; j < a.length; j++) if (a[j]! > x) return j
+        return -1
+      })
+      let best = 0
+      for (let l = 0; l < a.length; l++) {
+        let mn = Infinity
+        for (let q = l; q < a.length; q++) {
+          mn = Math.min(mn, a[q]!)
+          best = Math.max(best, mn * (q - l + 1))
+        }
+      }
+      expect(result.nextGreater, `${a}`).toEqual(ng)
+      expect(result.best).toBe(best)
+      // every popped frame of part 1 is consistent: the popped index's recorded answer is the current i and a[popped] < a[i]
+      for (const s of steps) {
+        const id = s.codeRefs?.[1]?.anchorId
+        if (id === 'msPop') {
+          const i = s.vars.i as number
+          const t = s.vars.popped as number
+          expect(a[t]! < a[i]!).toBe(true)
+          expect(ng[t]).toBe(i)
+        }
+      }
+      const gotNg = steps.map(fv).filter((v) => v.op === '下一个更大').pop()!.rows.find((x) => x.id === 'res')!.cells
+      expect(gotNg).toEqual(ng)
+    }
+  })
+  it('counterexample: without the sentinel pass h=[2,3,4] is never settled (area 0); product gives 6', () => {
+    const h = [2, 3, 4]
+    const st: number[] = []
+    let best = 0
+    for (let i = 0; i < h.length; i++) {
+      while (st.length && h[st[st.length - 1]!]! >= h[i]!) {
+        const t = st.pop()!
+        best = Math.max(best, h[t]! * (i - (st.length ? st[st.length - 1]! + 1 : 0)))
+      }
+      st.push(i)
+    }
+    expect(best).toBe(0)
+    expect(solve('mono-stack', { arr: h }).result.best).toBe(6)
+  })
+})

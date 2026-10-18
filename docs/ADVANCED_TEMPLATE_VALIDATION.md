@@ -95,6 +95,14 @@
 | `bs-answer|teach|go|run` | 通过 | 400 | go vet; go run | f1800f1cdbf1 |
 | `bs-answer|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | d0395009ff35 |
 | `bs-answer|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 136cc73325da |
+| `mono-stack|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | f5df684baed0 |
+| `mono-stack|teach|python|run` | 通过 | 400 | python3 -X dev | e82551f8d693 |
+| `mono-stack|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | 0239cc48b4e8 |
+| `mono-stack|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | 45eca5c9eacd |
+| `mono-stack|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | e78f102d98e5 |
+| `mono-stack|teach|go|run` | 通过 | 400 | go vet; go run | 55e12d463a27 |
+| `mono-stack|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 0f97b0e7a15e |
+| `mono-stack|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 4ea5ce3c9373 |
 
 ## 命令与退出码
 

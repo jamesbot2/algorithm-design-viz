@@ -443,6 +443,62 @@
       "tests": 151,
       "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
       "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "mono-stack|teach|typescript|run": {
+      "hash": "f5df684baed06ae26eaf884beddff463dc5f7f4f0c743e2ffe03f52fbe8b2644",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "v24.20.0",
+      "checks": "node strip-types (displayed .ts imported unchanged)"
+    },
+    "mono-stack|teach|python|run": {
+      "hash": "e82551f8d693320ee2029d67038410b40e124c765058f9426a9831d14dc53c06",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "Python 3.13.5",
+      "checks": "python3 -X dev"
+    },
+    "mono-stack|teach|cpp|run": {
+      "hash": "0239cc48b4e8316f068621eb46165347596447c4ca298d7fd140391fc0bfc944",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean"
+    },
+    "mono-stack|teach|java|run": {
+      "hash": "45eca5c9eacd888e7c5ac9d4dba9194f033c711eaa630656837cc93c4a0f5d6c",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "javac 21.0.12.1",
+      "checks": "javac -Xlint:all; java -ea"
+    },
+    "mono-stack|teach|rust|run": {
+      "hash": "e78f102d98e5ca413f500d4c04955b4fc9fb9a8817153ac8f9440f0b234dcc31",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "checks": "rustc -D warnings, overflow-checks=on"
+    },
+    "mono-stack|teach|go|run": {
+      "hash": "55e12d463a279ba951ea19ab1f460dcce624fb8590c3d24a0428436bea12cc6c",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "checks": "go vet; go run"
+    },
+    "mono-stack|contest-core|cpp|run": {
+      "hash": "0f97b0e7a15e28d62988219af41732db0a40ad7cd788ee96a6d6386536b6096c",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline"
+    },
+    "mono-stack|contest-full|cpp|run": {
+      "hash": "4ea5ce3c9373c1645275f2c2709fcc7acb8ee82bdc08d741952fab09465d6b00",
+      "status": "pass",
+      "tests": 151,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
     }
   }
 }

@@ -1,0 +1,15 @@
+{ "algo": "mono-stack", "idPrefix": "monoStack", "titleBase": "单调栈 Monotonic Stack（教学版）",
+  "files": { "python": "mono_stack.py", "cpp": "mono_stack.cpp", "java": "MonoStack.java", "rust": "mono_stack.rs", "go": "mono_stack.go" },
+  "ts": "mono_stack.ts.txt",
+  "labels": {
+    "msInit": "结果数组全部初始化为 −1（还没找到更大的元素）",
+    "msPopCheck": "栈顶元素 < 当前元素吗？是 → 当前元素就是栈顶的\"下一个更大\"",
+    "msPop": "弹出栈顶，记录它的下一个更大元素下标 = i",
+    "msPush": "当前下标入栈（栈中值保持不增）",
+    "msReturn": "返回结果；仍留在栈里的下标没有更大元素（−1）",
+    "lrPopCheck": "栈顶高度 ≥ 当前高度吗？是 → 栈顶那根柱子的右边界到此为止",
+    "lrPop": "弹出栈顶，取它的高度",
+    "lrArea": "左边界 = 新栈顶 + 1（栈空则 0）；面积 = 高度 × (i − 左边界)，更新最大值",
+    "lrPush": "当前下标入栈（栈中高度严格递增）",
+    "lrReturn": "返回最大矩形面积（末尾的哨兵高度 0 已清空栈）"
+  } }
