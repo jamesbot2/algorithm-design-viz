@@ -110,3 +110,325 @@ describe('prefix-diff vs independent reference', () => {
     expect([0, 1, 2].map((i) => (run += wrong[i]!))).toEqual([5, 5, 5])
   })
 })
+
+describe('discretize vs independent reference', () => {
+  it('unique, ranks and query counts equal set-based brute force; ranks are compact and order-preserving', () => {
+    const r = prng(9)
+    for (let c = 0; c < 200; c++) {
+      const arr = Array.from({ length: ri(r, 1, 12) }, () => ri(r, -6, 6))
+      const qs = Array.from({ length: ri(r, 0, 6) }, () => ri(r, -8, 8))
+      const { steps, result } = solve('discretize', { arr, qs })
+      const dist = [...new Set(arr)].sort((x, y) => x - y)
+      const less = (x: number) => dist.filter((v) => v < x).length
+      expect(result.unique).toEqual(dist)
+      expect(result.ranks).toEqual(arr.map(less))
+      expect(result.queryRanks).toEqual(qs.map(less))
+      expect([...new Set(result.ranks as number[])].sort((a, b) => a - b)).toEqual(dist.map((_, i) => i)) // compact 0..m-1
+      for (let i = 0; i < arr.length; i++) for (let j = 0; j < arr.length; j++) expect(Math.sign(arr[i]! - arr[j]!)).toBe(Math.sign(result.ranks[i] - result.ranks[j]))
+      const last = fv(steps[steps.length - 1]!)
+      expect(last.rows.find((x) => x.id === 'r')!.cells).toEqual(arr.map(less))
+    }
+  })
+  it('counterexample: skipping the dedup step leaves holes in the ranks (a=[5,5,7] → [0,0,2])', () => {
+    const sorted = [5, 5, 7]
+    const lbound = (x: number) => sorted.findIndex((v) => v >= x)
+    expect([5, 5, 7].map(lbound)).toEqual([0, 0, 2])
+    expect(solve('discretize', { arr: [5, 5, 7], qs: [] }).result.ranks).toEqual([0, 0, 1])
+  })
+})
+
+describe('bs-answer vs independent reference', () => {
+  const brute = (a: number[], k: number) => {
+    let best = Infinity
+    const go = (i: number, parts: number, mx: number) => {
+      if (i === a.length) return void (best = Math.min(best, mx))
+      if (parts === k) return
+      let s = 0
+      for (let j = i; j < a.length; j++) {
+        s += a[j]!
+        go(j + 1, parts + 1, Math.max(mx, s))
+      }
+    }
+    go(0, 0, 0)
+    return best
+  }
+  it('answer equals exhaustive partition search; every tested cap ≥ answer is ✓ and every cap < answer is ✗', () => {
+    const r = prng(11)
+    for (let c = 0; c < 200; c++) {
+      const arr = Array.from({ length: ri(r, 1, 8) }, () => ri(r, 1, 25))
+      const k = ri(r, 1, arr.length + 1)
+      const { result, steps } = solve('bs-answer', { arr, k })
+      expect(result.answer, `${arr} k=${k}`).toBe(brute(arr, k))
+      for (const t of result.tried as string[]) {
+        const cap = parseInt(t)
+        expect(t.endsWith('✓')).toBe(cap >= result.answer)
+      }
+      const last = fv(steps[steps.length - 1]!)
+      expect(last.scalars!.find((s) => s.id === 'lo')!.value).toBe(brute(arr, k))
+      expect(last.result).toEqual([brute(arr, k)])
+    }
+  })
+  it('counterexample: with lo = 0 the same search returns 0 for a=[10,1], k=3 (cap < max(a) is misjudged feasible); the product returns 10', () => {
+    const greedy = (a: number[], cap: number) => {
+      let cnt = 1, cur = 0
+      for (const x of a) {
+        if (cur + x > cap) { cnt++; cur = x } else cur += x
+      }
+      return cnt
+    }
+    expect(greedy([10, 1], 0)).toBe(3) // "feasible" for k = 3 although 10 > 0
+    let lo = 0, hi = 11 // BUG: lo should be max(a)
+    while (lo < hi) {
+      const mid = lo + ((hi - lo) >> 1)
+      if (greedy([10, 1], mid) <= 3) hi = mid
+      else lo = mid + 1
+    }
+    expect(lo).toBe(0)
+    expect(solve('bs-answer', { arr: [10, 1], k: 3 }).result.answer).toBe(10)
+  })
+})
+
+describe('mono-stack vs independent reference', () => {
+  it('next-greater indices and largest rectangle equal O(n²) brute force; the scene row shows the same numbers', () => {
+    const r = prng(13)
+    for (let c = 0; c < 250; c++) {
+      const a = Array.from({ length: ri(r, 1, 12) }, () => ri(r, 0, c % 3 === 0 ? 3 : 15))
+      const { result, steps } = solve('mono-stack', { arr: a })
+      const ng = a.map((x, i) => {
+        for (let j = i + 1; j < a.length; j++) if (a[j]! > x) return j
+        return -1
+      })
+      let best = 0
+      for (let l = 0; l < a.length; l++) {
+        let mn = Infinity
+        for (let q = l; q < a.length; q++) {
+          mn = Math.min(mn, a[q]!)
+          best = Math.max(best, mn * (q - l + 1))
+        }
+      }
+      expect(result.nextGreater, `${a}`).toEqual(ng)
+      expect(result.best).toBe(best)
+      // every popped frame of part 1 is consistent: the popped index's recorded answer is the current i and a[popped] < a[i]
+      for (const s of steps) {
+        const id = s.codeRefs?.[1]?.anchorId
+        if (id === 'msPop') {
+          const i = s.vars.i as number
+          const t = s.vars.popped as number
+          expect(a[t]! < a[i]!).toBe(true)
+          expect(ng[t]).toBe(i)
+        }
+      }
+      const gotNg = steps.map(fv).filter((v) => v.op === '下一个更大').pop()!.rows.find((x) => x.id === 'res')!.cells
+      expect(gotNg).toEqual(ng)
+    }
+  })
+  it('counterexample: without the sentinel pass h=[2,3,4] is never settled (area 0); product gives 6', () => {
+    const h = [2, 3, 4]
+    const st: number[] = []
+    let best = 0
+    for (let i = 0; i < h.length; i++) {
+      while (st.length && h[st[st.length - 1]!]! >= h[i]!) {
+        const t = st.pop()!
+        best = Math.max(best, h[t]! * (i - (st.length ? st[st.length - 1]! + 1 : 0)))
+      }
+      st.push(i)
+    }
+    expect(best).toBe(0)
+    expect(solve('mono-stack', { arr: h }).result.best).toBe(6)
+  })
+})
+
+describe('mono-queue vs independent reference', () => {
+  it('window maxima/minima equal brute force; deque invariant (values strictly decrease front→back) holds in every frame', () => {
+    const r = prng(17)
+    for (let c = 0; c < 200; c++) {
+      const a = Array.from({ length: ri(r, 1, 12) }, () => ri(r, -9, 9))
+      const k = ri(r, 1, a.length)
+      const { result, steps } = solve('mono-queue', { arr: a, k })
+      const mx: number[] = []
+      const mn: number[] = []
+      for (let i = 0; i + k <= a.length; i++) {
+        mx.push(Math.max(...a.slice(i, i + k)))
+        mn.push(Math.min(...a.slice(i, i + k)))
+      }
+      expect(result.max, `${a} k=${k}`).toEqual(mx)
+      expect(result.min).toEqual(mn)
+      for (const s of steps) {
+        const dv = fv(s).rows.find((x) => x.id === 'dv')!.cells.filter((x) => typeof x === 'number') as number[]
+        for (let i = 1; i < dv.length; i++) expect(dv[i - 1]! > dv[i]!).toBe(true)
+        const dq = fv(s).rows.find((x) => x.id === 'dq')!.cells.filter((x) => typeof x === 'number') as number[]
+        expect(dq.length).toBeLessThanOrEqual(k + 1)
+      }
+    }
+  })
+  it('counterexample: expiry test "front < i − k" (off by one) outputs [5,5] for a=[5,1,1], k=2; product gives [5,1]', () => {
+    const a = [5, 1, 1]
+    const k = 2
+    const dq: number[] = []
+    const out: number[] = []
+    for (let i = 0; i < a.length; i++) {
+      while (dq.length && a[dq[dq.length - 1]!]! <= a[i]!) dq.pop()
+      dq.push(i)
+      if (dq[0]! < i - k) dq.shift() // BUG
+      if (i >= k - 1) out.push(a[dq[0]!]!)
+    }
+    expect(out).toEqual([5, 5])
+    expect(solve('mono-queue', { arr: a, k }).result.max).toEqual([5, 1])
+  })
+})
+
+describe('topo vs independent reference (transitive closure)', () => {
+  it('status, processed set and edge order agree with closure-based reference; cycle runs end honestly', () => {
+    const r = prng(23)
+    let cyc = 0
+    for (let c = 0; c < 300; c++) {
+      const n = ri(r, 1, 8)
+      const m = ri(r, 0, 12)
+      const e: number[] = []
+      for (let i = 0; i < m; i++) e.push(ri(r, 0, n - 1), ri(r, 0, n - 1))
+      const { result, steps } = solve('topo', { n, edges: e })
+      const reach = Array.from({ length: n }, () => new Array<boolean>(n).fill(false))
+      for (let i = 0; i < e.length; i += 2) reach[e[i]!]![e[i + 1]!] = true
+      for (let k = 0; k < n; k++) for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) if (reach[i]![k] && reach[k]![j]) reach[i]![j] = true
+      const blocked = (v: number) => reach[v]![v] || reach.some((_, u) => reach[u]![u] && reach[u]![v])
+      const proc = [...Array(n).keys()].filter((v) => !blocked(v))
+      expect([...result.order].sort((a: number, b: number) => a - b), `${n} ${e}`).toEqual(proc)
+      expect(result.status).toBe(proc.length === n ? 1 : 0)
+      if (!result.status) {
+        cyc++
+        expect(steps[steps.length - 1]!.message).toContain('有环')
+      }
+      const pos = new Map<number, number>(result.order.map((x: number, i: number) => [x, i]))
+      for (let i = 0; i < e.length; i += 2) if (pos.has(e[i]!) && pos.has(e[i + 1]!)) expect(pos.get(e[i]!)!).toBeLessThan(pos.get(e[i + 1]!)!)
+    }
+    expect(cyc).toBeGreaterThan(20)
+  })
+  it('counterexample: ignoring "processed == n" returns [0] for 0→1,1→2,2→1; product reports status 0 with stuck {1,2}', () => {
+    const { result } = solve('topo', { n: 3, edges: [0, 1, 1, 2, 2, 1] })
+    expect(result).toEqual({ status: 0, order: [0], stuck: [1, 2] })
+  })
+  it('sample matches contest sample 4 5 2 0 3 1', () => {
+    expect(solve('topo', { n: 6, edges: [5, 2, 5, 0, 4, 0, 4, 1, 2, 3, 3, 1] }).result.order).toEqual([4, 5, 2, 0, 3, 1])
+  })
+})
+
+describe('lca vs independent parent-walk reference', () => {
+  it('answers equal the naive ancestor-chain LCA; sample 0 0 1 7', () => {
+    const r = prng(31)
+    for (let c = 0; c < 200; c++) {
+      const n = ri(r, 1, 9)
+      const par: number[] = []
+      for (let v = 1; v < n; v++) par.push(ri(r, 0, v - 1))
+      const q: number[] = []
+      for (let i = 0; i < ri(r, 1, 4); i++) q.push(ri(r, 0, n - 1), ri(r, 0, n - 1))
+      const chain = (x: number) => {
+        const s: number[] = [x]
+        while (x !== 0) s.push((x = par[x - 1]!))
+        return s
+      }
+      const want: number[] = []
+      for (let i = 0; i < q.length; i += 2) {
+        const cu = new Set(chain(q[i]!))
+        want.push(chain(q[i + 1]!).find((x) => cu.has(x))!)
+      }
+      expect(solve('lca', { par, queries: q }).result.answers, `${par} / ${q}`).toEqual(want)
+    }
+    expect(solve('lca', { par: [0, 0, 1, 1, 2, 2, 4], queries: [3, 6, 5, 7, 3, 4, 7, 7] }).result.answers).toEqual([0, 0, 1, 7])
+  })
+  it('counterexample: no u==v check after lifting answers 0 for chain par=[0,1], query (2,1); product answers 1', () => {
+    const par = [0, 1]
+    const LOG = 2
+    const depth = [0, 1, 2]
+    const up = [[0, 0, 1], [0, 0, 0]]
+    let u = 2
+    let v = 1
+    for (let j = 0; j < LOG; j++) if (((depth[u]! - depth[v]!) >> j) & 1) u = up[j]![u]!
+    for (let j = LOG - 1; j >= 0; j--) if (up[j]![u] !== up[j]![v]) [u, v] = [up[j]![u]!, up[j]![v]!]
+    u = up[0]![u]! // BUG: parent taken even though u === v
+    expect(u).toBe(0)
+    expect(par.length).toBe(2)
+    expect(solve('lca', { par, queries: [2, 1] }).result.answers).toEqual([1])
+  })
+})
+
+describe('lis vs independent O(n²) dp', () => {
+  const dp = (a: number[]) => {
+    const d = a.map(() => 1)
+    for (let i = 0; i < a.length; i++) for (let j = 0; j < i; j++) if (a[j]! < a[i]!) d[i] = Math.max(d[i]!, d[j]! + 1)
+    return Math.max(...d)
+  }
+  it('length equals the dp; recovered sequence is a strictly increasing subsequence', () => {
+    const r = prng(41)
+    for (let c = 0; c < 300; c++) {
+      const a = Array.from({ length: ri(r, 1, 10) }, () => ri(r, -4, 4))
+      const { result } = solve('lis', { arr: a })
+      expect(result.length, `${a}`).toBe(dp(a))
+      expect(result.seq).toHaveLength(result.length)
+      for (let i = 1; i < result.seq.length; i++) expect(result.seq[i - 1]).toBeLessThan(result.seq[i])
+      let p = 0
+      for (const x of a) if (p < result.seq.length && x === result.seq[p]) p++
+      expect(p).toBe(result.seq.length)
+    }
+    expect(solve('lis', { arr: [10, 9, 2, 5, 3, 7, 101, 18] }).result.seq).toEqual([2, 3, 7, 18])
+  })
+  it('counterexamples: tails=[1,3] for [2,5,3,1] is not a subsequence; upper_bound (non-strict) gives 2 for [2,2]', () => {
+    const tails: number[] = []
+    for (const x of [2, 5, 3, 1]) {
+      let lo = 0
+      while (lo < tails.length && tails[lo]! < x) lo++
+      tails[lo] = x
+    }
+    expect(tails).toEqual([1, 3])
+    const ub: number[] = []
+    for (const x of [2, 2]) {
+      let lo = 0
+      while (lo < ub.length && ub[lo]! <= x) lo++
+      ub[lo] = x
+    }
+    expect(ub.length).toBe(2)
+    expect(solve('lis', { arr: [2, 2] }).result.length).toBe(1)
+    const s = solve('lis', { arr: [2, 5, 3, 1] }).result
+    expect(s.length).toBe(2)
+    expect(s.seq).not.toEqual([1, 3])
+  })
+})
+
+describe('number-theory vs independent brute force', () => {
+  const bgcd = (a: number, b: number) => {
+    for (let d = Math.max(a, b); d >= 1; d--) if (a % d === 0 && b % d === 0) return d
+    return 0
+  }
+  it('gcd, exgcd identity, powMod, invMod and sieve agree with brute force over random inputs', () => {
+    const r = prng(53)
+    for (let c = 0; c < 200; c++) {
+      const a = ri(r, 0, 60)
+      const b = ri(r, 1, 60)
+      const power = ri(r, 0, 30)
+      const m = ri(r, 1, 60)
+      const n = ri(r, 2, 40)
+      const { result } = solve('number-theory', { a, b, power, m, n })
+      expect(result.gcd, `${a},${b}`).toBe(bgcd(a, b))
+      const [g, x, y] = result.exgcd
+      expect(g).toBe(bgcd(a, b))
+      expect(a * x + b * y).toBe(g)
+      let p = 1 % m
+      for (let i = 0; i < power; i++) p = (p * a) % m
+      expect(result.pow).toBe(p)
+      let inv = -1
+      for (let k = 0; k < b; k++) if (((a % b) * k) % b === 1 % b) { inv = k; break }
+      expect(result.inv).toBe(inv)
+      const primes = [...Array(n - 1).keys()].map((k) => k + 2).filter((q) => [...Array(q).keys()].slice(2).every((d) => q % d))
+      expect(result.primes).toEqual(primes)
+    }
+  })
+  it('counterexample: skipping the gcd check for inv(6, 9) gives 8 (6·8 mod 9 = 3); product reports −1 and the step says so', () => {
+    expect((6 * 8) % 9).toBe(3)
+    const { result, steps } = solve('number-theory', { a: 6, b: 9, power: 2, m: 7, n: 10 })
+    expect(result.inv).toBe(-1)
+    expect(steps.some((s) => s.message.includes('逆元不存在'))).toBe(true)
+  })
+  it('sample: 7 40 13 1000 30 → 1, [1,-17,3], 407, 23', () => {
+    const { result } = solve('number-theory', { a: 7, b: 40, power: 13, m: 1000, n: 30 })
+    expect([result.gcd, result.exgcd, result.pow, result.inv]).toEqual([1, [1, -17, 3], 407, 23])
+  })
+})

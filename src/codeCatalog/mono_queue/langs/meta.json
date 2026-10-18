@@ -1,0 +1,9 @@
+{ "algo": "mono-queue", "idPrefix": "monoQueue", "titleBase": "单调队列 Monotonic Queue（教学版）",
+  "files": { "python": "mono_queue.py", "cpp": "mono_queue.cpp", "java": "MonoQueue.java", "rust": "mono_queue.rs", "go": "mono_queue.go" },
+  "ts": "mono_queue.ts.txt",
+  "labels": {
+    "mqPopBack": "队尾：比新元素小（或相等）的下标不可能再是最大值，从队尾弹出",
+    "mqPush": "新下标从队尾入队（队内值严格递减）",
+    "mqExpire": "队首：下标已滑出窗口（≤ i − k）则从队首弹出",
+    "mqEmit": "窗口已满（i ≥ k − 1）：队首就是窗口最大值"
+  } }

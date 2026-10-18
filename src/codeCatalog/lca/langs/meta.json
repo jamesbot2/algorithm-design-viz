@@ -1,0 +1,12 @@
+{ "algo": "lca", "idPrefix": "lca", "titleBase": "最近公共祖先 LCA 倍增（教学版）",
+  "files": { "python": "lca.py", "cpp": "lca.cpp", "java": "Lca.java", "rust": "lca.rs", "go": "lca.go" },
+  "ts": "lca.ts.txt",
+  "labels": {
+    "lcaDepth": "深度：depth[v] = depth[父] + 1（父编号比 v 小，所以父的深度已算好）",
+    "lcaBase": "up[0][v] = 父结点（根的父结点记为自己）",
+    "lcaTable": "up[j][v] = up[j−1][ up[j−1][v] ]：2^j 级祖先 = 两次 2^(j−1) 级祖先",
+    "lcaLift": "把更深的 u 抬到与 v 同深：对差值 diff 的每个二进制位 j，走 2^j 步",
+    "lcaJump": "从高位到低位：两边的 2^j 级祖先不同就一起跳（跳到“刚好还没汇合”的位置）",
+    "lcaParent": "此时 u、v 是 LCA 的两个孩子，LCA = 父结点",
+    "lcaAnswer": "记录这次询问的 LCA"
+  } }

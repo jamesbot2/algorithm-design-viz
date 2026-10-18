@@ -13,6 +13,14 @@
 | 线段树 (`segtree`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `maxSubarrayDC`（链接，非复制） |
 | 懒标记线段树 (`segtree-lazy`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
 | 前缀和与差分 (`prefix-diff`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `kadane`（链接，非复制） |
+| 离散化 (`discretize`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `binarySearch`（链接，非复制） |
+| 二分答案 (`bs-answer`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `binarySearch`（链接，非复制） |
+| 单调栈 (`mono-stack`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| 单调队列 (`mono-queue`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| 拓扑排序 (`topo`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `bfs`（链接，非复制） |
+| 最近公共祖先 LCA（倍增） (`lca`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| 最长上升子序列 LIS (`lis`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| 数论：gcd / exgcd / 快速幂 / 逆元 / 筛法 (`number-theory`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
 
 测试：`tests/advanced/advanced.test.ts`（vitest）、`tests/e2e/adv-p1.spec.ts`（Playwright，真实鼠标键盘、0 次重试）、`scripts/advanced-validate.mjs`（真实工具链）。
 
@@ -24,14 +32,6 @@
 | queue / deque 实验 / queue / deque | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | unique + erase 实验 / unique + erase | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | set / multiset / map 实验 / set / map | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 离散化 / Coordinate compression | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 二分答案 / Binary search on answer | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 单调栈 / Monotonic stack | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 单调队列 / Monotonic queue | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 拓扑排序 / Topological sort | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| LCA 倍增 / LCA (binary lifting) | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| LIS O(n log n) / LIS | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 数论工具 / Number theory tools | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | 强连通分量 / SCC | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 
 旧课程中可复用的算法（未被改写）：`binarySearch`、`kruskal`、`dijkstraHeap` 等；其中 Kruskal 的并查集内核已抽到 `src/algorithms/advanced/dsuCore.ts`（见 ADVANCED_DELIVERY.md 的 Kruskal 一节）。

@@ -1,0 +1,10 @@
+{ "algo": "lis", "idPrefix": "lis", "titleBase": "最长上升子序列 LIS O(n log n)（教学版）",
+  "files": { "python": "lis.py", "cpp": "lis.cpp", "java": "Lis.java", "rust": "lis.rs", "go": "lis.go" },
+  "ts": "lis.ts.txt",
+  "labels": {
+    "lisSearch": "二分：在 tails 里找第一个 ≥ a[i] 的位置 lo（严格上升，所以相等也要替换）",
+    "lisPrev": "记录 a[i] 的前驱：长度 lo 的最优结尾（用于最后还原）",
+    "lisPlace": "把 a[i] 放到 tails[lo]：lo 等于当前长度则长度 +1，否则替换成更小的结尾",
+    "lisRecover": "从最长长度的结尾出发，沿 prev 一路回溯得到一个具体序列（倒序）",
+    "lisReturn": "翻转成正序，返回 [长度, 序列…]"
+  } }

@@ -1,0 +1,11 @@
+{ "algo": "topo", "idPrefix": "topo", "titleBase": "拓扑排序 Kahn Topological Sort（教学版）",
+  "files": { "python": "topo.py", "cpp": "topo.cpp", "java": "Topo.java", "rust": "topo.rs", "go": "topo.go" },
+  "ts": "topo.ts.txt",
+  "labels": {
+    "tsBuild": "建图：记录出边 u→v，并把 v 的入度 +1",
+    "tsSeed": "入度为 0 的结点先入队（没有任何前置要求）",
+    "tsPop": "队首出队，加入排序结果",
+    "tsRelax": "删除 u 的一条出边：目标结点入度 −1",
+    "tsEnqueue": "入度降到 0：前置要求全部满足，入队",
+    "tsResult": "已处理结点数 = n → 无环，返回完整顺序；否则有环，返回已处理的部分"
+  } }

@@ -71,6 +71,118 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "full": "c689b9e157807a0b03093cdbf6e9eb3d8ff5f5a8a28694eff18562826fbfc441"
     }
   },
+  "discretize": {
+    "teach": {
+      "typescript": "f67d8ead9dcb225e54148d9a9577b629d0d1c45d63f117570b596828fae4f473",
+      "python": "f035ad714811dc17f7e3a900684053d1c92fd564cd0c891a3010370681cd0ce8",
+      "cpp": "fe918de843600ddc29ddfe8e5f7044bb85d833f9f2cb593dd222acf7f647fb1d",
+      "java": "6fb7aa72904b07f46b1b443bd50c7a9015b0702dac7ea09e58d1561b1f3dd17b",
+      "rust": "64859f33d24fcfca4cd6b80aa99d590939d9a9b504adca9445d3ee9159d36fe3",
+      "go": "6a7ed2491a759db7cf0e767fbc0f234608f535c6617991dfcd8f275ccf508f61"
+    },
+    "contest": {
+      "core": "e1d583681ce2371fce651cc92274c86ae7d5f2ecba12e332dd90245bf61cc93a",
+      "full": "43b6e70c5c24b4ded15eb20bc182a74dc9a2f584e9d5d1deb2ad4def2c588a51"
+    }
+  },
+  "bs-answer": {
+    "teach": {
+      "typescript": "92d99e81d908cb306d315ba4010ae1d4afcf4029ec9b0a652e040f02b5512fc8",
+      "python": "98b2c93054465e5ddfc7ac0892273451e09b8ef65b2172c3bda68c7dc508462d",
+      "cpp": "dd1ce98cb353bd36e4a1af09d027627742f218641840d7515342a2ecf2734531",
+      "java": "f04f76f6634e2d2ad70c28644e912fc262d1d2efcb4db523dea834230b1a5d4b",
+      "rust": "82ed264db03c5acb1b9116de0096b58be39cb4046da64ebc0531a0b64f2d36fa",
+      "go": "f1800f1cdbf1bf6c7a615da54b8d7bb695a2abad8c0ef59ed077fcde635f9628"
+    },
+    "contest": {
+      "core": "d0395009ff352bd399037079e5f9b93f62d089526463a67ed19513bf8d4afb6b",
+      "full": "136cc73325da8703760194afcd0bbea734473c3c23a71c86c63b2ec47f90939f"
+    }
+  },
+  "mono-stack": {
+    "teach": {
+      "typescript": "f5df684baed06ae26eaf884beddff463dc5f7f4f0c743e2ffe03f52fbe8b2644",
+      "python": "e82551f8d693320ee2029d67038410b40e124c765058f9426a9831d14dc53c06",
+      "cpp": "0239cc48b4e8316f068621eb46165347596447c4ca298d7fd140391fc0bfc944",
+      "java": "45eca5c9eacd888e7c5ac9d4dba9194f033c711eaa630656837cc93c4a0f5d6c",
+      "rust": "e78f102d98e5ca413f500d4c04955b4fc9fb9a8817153ac8f9440f0b234dcc31",
+      "go": "55e12d463a279ba951ea19ab1f460dcce624fb8590c3d24a0428436bea12cc6c"
+    },
+    "contest": {
+      "core": "0f97b0e7a15e28d62988219af41732db0a40ad7cd788ee96a6d6386536b6096c",
+      "full": "4ea5ce3c9373c1645275f2c2709fcc7acb8ee82bdc08d741952fab09465d6b00"
+    }
+  },
+  "mono-queue": {
+    "teach": {
+      "typescript": "490138ac51e5b3cfdb99295b200e2a5b1fbdea0716eb922ebd93b71ee0fe8c11",
+      "python": "11e6c4820aae8c73580ffa66dc3a7c39f57a80f348af7d5d7f707a315f2b90fe",
+      "cpp": "d5e9a1d26f90e6f5675536072cab0473d42433eef2d7aa3e6e93c1d98bb22606",
+      "java": "506f45164cf78dafe99edaefe4d9907d546c80fe610570b5784eb4bbd08a3817",
+      "rust": "c7971a237904410df37bb03981d9e5fdf432c763f6ec8a098be43fe2234ddda4",
+      "go": "fd989c2d937c27ba6c25d519ca8622f2ed02f609dc78a0208ab6edc1c60f5e7e"
+    },
+    "contest": {
+      "core": "fc3c4094c5f21f7e2edcf673c5d661f1cd9beebb6d46af8ccd813e52e632ccc9",
+      "full": "005f35400c1602e42dd1eea6dd0f63126fac4ee0136fb18b34fe2aa519c5801b"
+    }
+  },
+  "topo": {
+    "teach": {
+      "typescript": "6a2b2f8492960659cbcb0eff1e0be01a65a9d5909994df04ee7aa5026de2f64d",
+      "python": "5d27e5d3924c90e406dfdda309f2de56cd713d01b8fa2847ae3c308f8076198f",
+      "cpp": "a39167fdcf2b93305a5ab685333fe9b4803e4dc3376860d57df0ba4f18f87211",
+      "java": "caa955f6a48494d9682ea69872827f2a2b9a61683bd2affc8ca46cd122544ea9",
+      "rust": "519096798f25c18f473e9126e66f5ae1a88c8b20184cad9df91cc69a7b6b099b",
+      "go": "2b0014f5c3d16659697fe8c003c20046b79f007bcc5f68d7487e4203fe0cd19a"
+    },
+    "contest": {
+      "core": "1da1c3b9b8ff6017f771e1d2dcbfca676ca4a9acf624a0dc7136a3cf877a74a9",
+      "full": "b2b9dfb3c56842e6e3a01bf1e82690b83e7e934fc2ee5a34c89a4807db1b3299"
+    }
+  },
+  "lca": {
+    "teach": {
+      "typescript": "508332f72b88f340e8928be0c862b2dc414e23e984cead17ab2eab3a9a2846d3",
+      "python": "b7b996ae322880580b06f79dc759131d619657f62b1da08fbdb0f56ac765ff3b",
+      "cpp": "d64428b5413ce5896ee5c4e296e656fafeece0454fdc658f85853bb44e1bd2da",
+      "java": "a465d70dd3b2ccc29a28c6a9abb1953d6fa9d80e9f3105f886ba3f3208d37059",
+      "rust": "6003cabd92085e7f961e8ff4ef1db5917b9b3b0dd5069d3c98e31a0ee1965a6c",
+      "go": "adf1e6e9ae711eaeaab05d165a974f6772074c3a10405ae0a2ae25342d4511f7"
+    },
+    "contest": {
+      "core": "5b3a052119998c48ecc9542233ad02b54aa980f907f14dde42aca9d9f6695004",
+      "full": "5e442b2fc46fa0c1568dd04c1647f18998642d1fe4a6248d7ee08bc86116b716"
+    }
+  },
+  "lis": {
+    "teach": {
+      "typescript": "cacad263356d32d1da5e909561c188488feaa0770ae8767aa39acdf0991788bc",
+      "python": "22cf46b4665898f5468bfd2dfe61e21a07efcea3a76b41d3b55fb099e3cd7996",
+      "cpp": "dc72b49fe10b3992b4df091139063774d8f4d3a47d26b47944c4768a0fe7a57f",
+      "java": "b6ef26232fe657fdc54f9127f8698a293d53e376b85ba66f7fe2bf50e9e11fe0",
+      "rust": "96e1b87d041f7d78f0ea5f659d58352a9a6f598c8f6d6b2773a8431a6764083b",
+      "go": "9ef9984ddd117492b946f23a885751c29578f05ed31a83003a6130b8173cf0ce"
+    },
+    "contest": {
+      "core": "f6035cf2f23d617817794371b0cd5830808afc4010f4b847505f069d05e7a63c",
+      "full": "c60b5675359bf0578803b38d5ce76785783abe99e322957e6b22d77253f0f55f"
+    }
+  },
+  "number-theory": {
+    "teach": {
+      "typescript": "7ba5dc9f9416ff3393eea01eb8d9b1e3f6defe65931b7bf16207aecd308f7ae4",
+      "python": "d764f91040dd71f2410d7c6b5b4c353a0a31edd03b2a6112ae242d2a581815e0",
+      "cpp": "7dd7117428ff7962c5265b5c778be8ff4a714e2765a05fbc0c016d096a561aa7",
+      "java": "7cbcc28e1535ba5da3077add867dfd09ed1a4e69e80b49d19803369590df3727",
+      "rust": "e3bcf0991f8b52ca8c2dc81ca77a6766878090953ca672a23af7e59965933b02",
+      "go": "6489201d1285b276d5a4c48c2a8c60bc855c0d25695df4543d4548b88b411c3d"
+    },
+    "contest": {
+      "core": "2c5eb5a73edfb4cf05727121f1765299c78c3e35e80da6436225093df1d09151",
+      "full": "d8f6ced0cd5484d8ea531a7237f7534a360394c7d5b55af2e0fb8345f701f8df"
+    }
+  },
   "stl-bounds": {
     "teach": {
       "cpp": "e695e94ca5682d1b1046fe8bfe5f980ec5fdbe9a8851cadf696c6386909198ed"

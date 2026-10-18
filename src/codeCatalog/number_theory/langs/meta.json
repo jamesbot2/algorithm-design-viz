@@ -1,0 +1,22 @@
+{ "algo": "number_theory", "idPrefix": "number-theory", "titleBase": "数论工具箱 gcd / exgcd / 快速幂 / 逆元 / 筛法（教学版）",
+  "files": { "python": "number_theory.py", "cpp": "number_theory.cpp", "java": "NumberTheory.java", "rust": "number_theory.rs", "go": "number_theory.go" },
+  "ts": "nt.ts.txt",
+  "labels": {
+    "nGcdStep": "辗转相除：(a, b) → (b, a mod b)",
+    "nGcdRet": "b = 0 时 a 就是最大公约数",
+    "nExInit": "初值：r = (a, b)，s = (1, 0)，t = (0, 1)；不变量 r = a·s + b·t",
+    "nExStep": "同一个商 q 同时更新 r、s、t，不变量保持成立",
+    "nExRet": "r0 = gcd，(s0, t0) 满足 a·s0 + b·t0 = gcd",
+    "nPowInit": "result = 1（对 m 取模，m = 1 时是 0）；base 先取模",
+    "nPowBit": "power 的当前最低位是 1：把 base 乘进结果",
+    "nPowSquare": "base 自乘（对应下一位的权重 2 倍）",
+    "nPowRet": "所有二进制位处理完，返回结果",
+    "nInvEx": "a 的逆元由 exgcd(a mod m, m) 的系数给出",
+    "nInvNone": "gcd ≠ 1：逆元不存在，返回 −1（不假装有答案）",
+    "nInvRet": "a·x + m·y = 1 ⇒ a·x ≡ 1 (mod m)，把 x 规约到 [0, m)",
+    "nSieveInit": "composite[0..n] 全部置为 false",
+    "nSieveSkip": "i 已被更小的素数标成合数：跳过",
+    "nSievePrime": "i 没被标记：它是素数",
+    "nSieveMark": "从 i·i 起标记 i 的倍数（更小的倍数已被更小的素因子标过）",
+    "nSieveRet": "返回所有素数"
+  } }

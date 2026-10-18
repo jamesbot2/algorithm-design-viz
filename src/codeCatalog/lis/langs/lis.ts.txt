@@ -1,0 +1,20 @@
+/** Strictly increasing LIS in O(n log n) with recovery. Returns [length, ...one longest strictly increasing subsequence]. */
+export function lis(a: number[]): number[] {
+  const tails: number[] = [] // tails[k] = index of the smallest possible tail of a strictly increasing subsequence of length k+1
+  const prev = new Array<number>(a.length).fill(-1)
+  for (let i = 0; i < a.length; i++) {
+    let lo = 0
+    let hi = tails.length
+    while (lo < hi) { // @a: lisSearch+3
+      const mid = (lo + hi) >> 1
+      if (a[tails[mid]!]! < a[i]!) lo = mid + 1
+      else hi = mid
+    }
+    if (lo > 0) prev[i] = tails[lo - 1]! // @a: lisPrev
+    tails[lo] = i // @a: lisPlace
+  }
+  const seq: number[] = []
+  for (let k = tails.length ? tails[tails.length - 1]! : -1; k >= 0; k = prev[k]!) seq.push(a[k]!) // @a: lisRecover
+  seq.reverse()
+  return [seq.length, ...seq] // @a: lisReturn
+}

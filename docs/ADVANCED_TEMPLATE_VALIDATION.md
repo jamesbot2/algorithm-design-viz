@@ -79,6 +79,70 @@
 | `prefix-diff|teach|go|run` | 通过 | 400 | go vet; go run | c79eedf13a58 |
 | `prefix-diff|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 2efe1fa60c7c |
 | `prefix-diff|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | c689b9e15780 |
+| `discretize|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | f67d8ead9dcb |
+| `discretize|teach|python|run` | 通过 | 400 | python3 -X dev | f035ad714811 |
+| `discretize|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | fe918de84360 |
+| `discretize|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | 6fb7aa72904b |
+| `discretize|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | 64859f33d24f |
+| `discretize|teach|go|run` | 通过 | 400 | go vet; go run | 6a7ed2491a75 |
+| `discretize|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | e1d583681ce2 |
+| `discretize|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 43b6e70c5c24 |
+| `bs-answer|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | 92d99e81d908 |
+| `bs-answer|teach|python|run` | 通过 | 400 | python3 -X dev | 98b2c9305446 |
+| `bs-answer|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | dd1ce98cb353 |
+| `bs-answer|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | f04f76f6634e |
+| `bs-answer|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | 82ed264db03c |
+| `bs-answer|teach|go|run` | 通过 | 400 | go vet; go run | f1800f1cdbf1 |
+| `bs-answer|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | d0395009ff35 |
+| `bs-answer|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 136cc73325da |
+| `mono-stack|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | f5df684baed0 |
+| `mono-stack|teach|python|run` | 通过 | 400 | python3 -X dev | e82551f8d693 |
+| `mono-stack|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | 0239cc48b4e8 |
+| `mono-stack|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | 45eca5c9eacd |
+| `mono-stack|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | e78f102d98e5 |
+| `mono-stack|teach|go|run` | 通过 | 400 | go vet; go run | 55e12d463a27 |
+| `mono-stack|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 0f97b0e7a15e |
+| `mono-stack|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 4ea5ce3c9373 |
+| `mono-queue|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | 490138ac51e5 |
+| `mono-queue|teach|python|run` | 通过 | 400 | python3 -X dev | 11e6c4820aae |
+| `mono-queue|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | d5e9a1d26f90 |
+| `mono-queue|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | 506f45164cf7 |
+| `mono-queue|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | c7971a237904 |
+| `mono-queue|teach|go|run` | 通过 | 400 | go vet; go run | fd989c2d937c |
+| `mono-queue|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | fc3c4094c5f2 |
+| `mono-queue|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 005f35400c16 |
+| `topo|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | 6a2b2f849296 |
+| `topo|teach|python|run` | 通过 | 400 | python3 -X dev | 5d27e5d3924c |
+| `topo|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | a39167fdcf2b |
+| `topo|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | caa955f6a484 |
+| `topo|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | 519096798f25 |
+| `topo|teach|go|run` | 通过 | 400 | go vet; go run | 2b0014f5c3d1 |
+| `topo|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 1da1c3b9b8ff |
+| `topo|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | b2b9dfb3c568 |
+| `lca|teach|typescript|run` | 通过 | 300 | node strip-types (displayed .ts imported unchanged) | 508332f72b88 |
+| `lca|teach|python|run` | 通过 | 300 | python3 -X dev | b7b996ae3228 |
+| `lca|teach|cpp|run` | 通过 | 300 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | d64428b5413c |
+| `lca|teach|java|run` | 通过 | 300 | javac -Xlint:all; java -ea | a465d70dd3b2 |
+| `lca|teach|rust|run` | 通过 | 300 | rustc -D warnings, overflow-checks=on | 6003cabd9208 |
+| `lca|teach|go|run` | 通过 | 300 | go vet; go run | adf1e6e9ae71 |
+| `lca|contest-core|cpp|run` | 通过 | 300 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 5b3a05211999 |
+| `lca|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 5e442b2fc46f |
+| `lis|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | cacad263356d |
+| `lis|teach|python|run` | 通过 | 400 | python3 -X dev | 22cf46b46658 |
+| `lis|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | dc72b49fe10b |
+| `lis|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | b6ef26232fe6 |
+| `lis|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | 96e1b87d041f |
+| `lis|teach|go|run` | 通过 | 400 | go vet; go run | 9ef9984ddd11 |
+| `lis|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | f6035cf2f23d |
+| `lis|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | c60b5675359b |
+| `number-theory|teach|typescript|run` | 通过 | 300 | node strip-types (displayed .ts imported unchanged) | 7ba5dc9f9416 |
+| `number-theory|teach|python|run` | 通过 | 300 | python3 -X dev | d764f91040dd |
+| `number-theory|teach|cpp|run` | 通过 | 300 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | 7dd7117428ff |
+| `number-theory|teach|java|run` | 通过 | 300 | javac -Xlint:all; java -ea | 7cbcc28e1535 |
+| `number-theory|teach|rust|run` | 通过 | 300 | rustc -D warnings, overflow-checks=on | e3bcf0991f8b |
+| `number-theory|teach|go|run` | 通过 | 300 | go vet; go run | 6489201d1285 |
+| `number-theory|contest-core|cpp|run` | 通过 | 300 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 2c5eb5a73edf |
+| `number-theory|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | d8f6ced0cd54 |
 
 ## 命令与退出码
 

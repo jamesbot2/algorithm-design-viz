@@ -1,0 +1,33 @@
+/** Coordinate compression (discretization). Ranks are 0-based indices among the sorted distinct values. */
+export function uniqueSorted(a: number[]): number[] {
+  const s = [...a].sort((x, y) => x - y) // @a: sortCopy
+  const u: number[] = []
+  for (const v of s) {
+    if (u.length === 0 || u[u.length - 1] !== v) u.push(v) // @a: dedupKeep
+  }
+  return u
+}
+
+/** First index i with u[i] >= x (u sorted ascending); u.length if none. */
+export function lowerBound(u: number[], x: number): number {
+  let lo = 0
+  let hi = u.length
+  while (lo < hi) {
+    const mid = lo + ((hi - lo) >> 1)
+    if (u[mid]! < x) lo = mid + 1
+    else hi = mid
+  }
+  return lo // @a: lbReturn
+}
+
+/** rank[i] = index of a[i] among the distinct sorted values. */
+export function compress(a: number[]): number[] {
+  const u = uniqueSorted(a)
+  return a.map((v) => lowerBound(u, v)) // @a: rankCall
+}
+
+/** For each query x: how many distinct values are < x. */
+export function lowerRanks(a: number[], qs: number[]): number[] {
+  const u = uniqueSorted(a)
+  return qs.map((x) => lowerBound(u, x)) // @a: queryCall
+}

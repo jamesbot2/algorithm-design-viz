@@ -1,0 +1,31 @@
+/** Binary search on the answer: split a (all > 0) into at most k contiguous parts, minimise the largest part sum. */
+export function segmentsNeeded(a: number[], cap: number): number {
+  let cnt = 1 // @a: fInit
+  let cur = 0
+  for (const x of a) {
+    if (cur + x > cap) { // @a: fCheck
+      cnt++ // @a: fNew+1
+      cur = x
+    } else cur += x // @a: fExtend
+  }
+  return cnt // @a: fReturn
+}
+
+/** segmentsNeeded for each cap in caps (every cap must be >= max(a)). */
+export function segmentsList(a: number[], caps: number[]): number[] {
+  return caps.map((c) => segmentsNeeded(a, c))
+}
+
+export function minLargestSum(a: number[], k: number): number {
+  let lo = Math.max(...a) // @a: bsInit+1
+  let hi = a.reduce((s, x) => s + x, 0)
+  while (lo < hi) {
+    const mid = lo + Math.floor((hi - lo) / 2) // @a: bsMid
+    if (segmentsNeeded(a, mid) <= k) { // @a: bsCheck
+      hi = mid // @a: bsShrink
+    } else {
+      lo = mid + 1 // @a: bsRaise
+    }
+  }
+  return lo // @a: bsReturn
+}

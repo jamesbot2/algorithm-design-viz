@@ -1,0 +1,28 @@
+/** Monotonic stack. nextGreater: index of the next STRICTLY greater element to the right, or -1. */
+export function nextGreater(a: number[]): number[] {
+  const res = new Array<number>(a.length).fill(-1) // @a: msInit
+  const st: number[] = [] // indices; values never increase from bottom to top
+  for (let i = 0; i < a.length; i++) {
+    while (st.length > 0 && a[st[st.length - 1]!]! < a[i]!) { // @a: msPopCheck
+      res[st.pop()!] = i // @a: msPop
+    }
+    st.push(i) // @a: msPush
+  }
+  return res // @a: msReturn
+}
+
+/** Largest rectangle in a histogram of non-negative heights (unit-width bars). */
+export function largestRectangle(h: number[]): number {
+  const st: number[] = [] // indices; heights strictly increase from bottom to top
+  let best = 0
+  for (let i = 0; i <= h.length; i++) {
+    const cur = i === h.length ? 0 : h[i]! // sentinel height 0 flushes the stack
+    while (st.length > 0 && h[st[st.length - 1]!]! >= cur) { // @a: lrPopCheck
+      const height = h[st.pop()!]! // @a: lrPop
+      const left = st.length === 0 ? 0 : st[st.length - 1]! + 1 // @a: lrArea+1
+      best = Math.max(best, height * (i - left))
+    }
+    st.push(i) // @a: lrPush
+  }
+  return best // @a: lrReturn
+}
