@@ -125,6 +125,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'discretize',
+    section: 'algorithms',
+    titleZh: '离散化',
+    titleEn: 'Coordinate Compression',
+    aliases: ['discretization', 'coordinate compression', '坐标压缩', '离散化', '名次', 'rank'],
+    tags: ['数组', '排序', '二分'],
+    difficulty: 'basic',
+    prereqs: [],
+    summary: '排序、去重、用 lower_bound 求名次：把大范围数值压成 0..m−1，同时保持大小关系。',
+    routeOrder: 7,
+    demoId: 'discretize',
+    templateId: 'discretize',
+    relatedAlgos: ['binarySearch'],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

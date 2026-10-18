@@ -110,3 +110,29 @@ describe('prefix-diff vs independent reference', () => {
     expect([0, 1, 2].map((i) => (run += wrong[i]!))).toEqual([5, 5, 5])
   })
 })
+
+describe('discretize vs independent reference', () => {
+  it('unique, ranks and query counts equal set-based brute force; ranks are compact and order-preserving', () => {
+    const r = prng(9)
+    for (let c = 0; c < 200; c++) {
+      const arr = Array.from({ length: ri(r, 1, 12) }, () => ri(r, -6, 6))
+      const qs = Array.from({ length: ri(r, 0, 6) }, () => ri(r, -8, 8))
+      const { steps, result } = solve('discretize', { arr, qs })
+      const dist = [...new Set(arr)].sort((x, y) => x - y)
+      const less = (x: number) => dist.filter((v) => v < x).length
+      expect(result.unique).toEqual(dist)
+      expect(result.ranks).toEqual(arr.map(less))
+      expect(result.queryRanks).toEqual(qs.map(less))
+      expect([...new Set(result.ranks as number[])].sort((a, b) => a - b)).toEqual(dist.map((_, i) => i)) // compact 0..m-1
+      for (let i = 0; i < arr.length; i++) for (let j = 0; j < arr.length; j++) expect(Math.sign(arr[i]! - arr[j]!)).toBe(Math.sign(result.ranks[i] - result.ranks[j]))
+      const last = fv(steps[steps.length - 1]!)
+      expect(last.rows.find((x) => x.id === 'r')!.cells).toEqual(arr.map(less))
+    }
+  })
+  it('counterexample: skipping the dedup step leaves holes in the ranks (a=[5,5,7] → [0,0,2])', () => {
+    const sorted = [5, 5, 7]
+    const lbound = (x: number) => sorted.findIndex((v) => v >= x)
+    expect([5, 5, 7].map(lbound)).toEqual([0, 0, 2])
+    expect(solve('discretize', { arr: [5, 5, 7], qs: [] }).result.ranks).toEqual([0, 0, 1])
+  })
+})

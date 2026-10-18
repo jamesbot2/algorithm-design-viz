@@ -107,3 +107,46 @@ FAM['prefix-diff'] = {
     return { input: `${n} ${u} ${q}\n${a.join(' ')}\n${ups.map((x) => x.join(' ')).join('\n')}${u ? '\n' : ''}${qs.map((x) => x.join(' ')).join('\n')}\n`, expected: qs.map(([l, rr]) => cur.slice(l, rr).reduce((x, y) => x + y, 0) + '\n').join('') }
   },
 }
+
+// ───────────────────────── discretize ─────────────────────────
+FAM['discretize'] = {
+  dir: 'discretize',
+  cls: 'Discretize',
+  gen(seed) {
+    const r = mulberry32(seed)
+    const cs = []
+    for (let t = 0; t < 400; t++) {
+      const n = t < 4 ? t : rint(r, 1, 30)
+      const span = t % 3 === 0 ? 5 : 40
+      const a = rl(r, n, -span, span, t % 5 === 0)
+      const qs = rl(r, rint(r, 0, 8), -span - 2, span + 2, t % 7 === 0)
+      cs.push({ k: 0, a, b: [], c: qs })
+    }
+    return cs
+  },
+  naive(c) {
+    const distinct = [...new Set(c.a)]
+    const less = (x) => distinct.filter((v) => v < x).length
+    return [S([...new Set(c.a)].sort((x, y) => x - y)), S(c.a.map(less)), S(c.c.map(less))]
+  },
+  calls: {
+    python: ['unique_sorted(a)', 'compress(a)', 'lower_ranks(a,c)'],
+    typescript: ['M.uniqueSorted(a)', 'M.compress(a)', 'M.lowerRanks(a,c)'],
+    cpp: ['unique_sorted(a)', 'compress(a)', 'lower_ranks(a,c)'],
+    java: ['Discretize.uniqueSorted(a)', 'Discretize.compress(a)', 'Discretize.lowerRanks(a,c)'],
+    rust: ['unique_sorted(&a)', 'compress(&a)', 'lower_ranks(&a,&c)'],
+    go: ['UniqueSorted(a)', 'Compress(a)', 'LowerRanks(a,c)'],
+  },
+  core: [
+    '{Compress<long long> C(a);pr(C.u);}',
+    '{Compress<long long> C(a);std::vector<long long> o;for(auto x:a)o.push_back(C.id(x));pr(o);}',
+    '{Compress<long long> C(a);std::vector<long long> o;for(auto x:c)o.push_back(C.id(x));pr(o);}',
+  ],
+  full(r) {
+    const n = rint(r, 1, 12), q = rint(r, 0, 6)
+    const a = rl(r, n, -6, 6)
+    const qs = rl(r, q, -8, 8)
+    const less = (x) => new Set(a.filter((v) => v < x)).size
+    return { input: `${n} ${q}\n${a.join(' ')}\n${qs.join(' ')}\n`, expected: a.map(less).join(' ') + '\n' + qs.map(less).join(' ') + '\n' }
+  },
+}

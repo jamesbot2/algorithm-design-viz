@@ -1,0 +1,10 @@
+{ "algo": "discretize", "idPrefix": "discretize", "titleBase": "离散化 Coordinate Compression（教学版）",
+  "files": { "python": "discretize.py", "cpp": "discretize.cpp", "java": "Discretize.java", "rust": "discretize.rs", "go": "discretize.go" },
+  "ts": "discretize.ts.txt",
+  "labels": {
+    "sortCopy": "排序：复制一份并升序排序",
+    "dedupKeep": "去重：与上一个保留值不同才保留",
+    "lbReturn": "lower_bound：返回第一个 ≥ x 的下标（二分结果）",
+    "rankCall": "编号：每个元素的名次 = lower_bound(去重后数组, 元素)",
+    "queryCall": "查询：比 x 小的不同取值有几个 = lower_bound(去重数组, x)"
+  } }

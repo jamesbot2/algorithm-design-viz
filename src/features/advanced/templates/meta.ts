@@ -265,6 +265,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'discretize',
+    topicId: 'discretize',
+    title: '离散化（排序 + 去重 + lower_bound）',
+    category: '数组',
+    difficulty: '竞赛基础',
+    prereqs: ['排序', 'lower_bound'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<algorithm>', '<vector>'],
+      depends: [],
+      indexing: '名次 0-based：最小的不同取值名次为 0（树状数组要 1-based 时整体 +1）',
+      interval: '无区间参数；id(x) = 比 x 小的不同取值个数',
+      limits: 'C++/Java/Rust/Go 用 64 位值；TypeScript 为 Number（|值| ≤ 2^53−1）；Python 任意精度',
+      timeComplexity: '构造 O(n log n)；id O(log n)',
+      spaceComplexity: 'O(n)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版直接用 std::sort / std::unique / std::lower_bound，教学版手写二分：结果相同、控制流不同构，作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '6 3\n90 15 90 -7 15 1000\n15 16 2000\n', output: '2 1 2 0 1 3\n1 2 4\n', note: '去重后 u = [-7, 15, 90, 1000]：各元素名次 2 1 2 0 1 3；查询 15 → 1（只有 −7 更小），16 → 2，2000 → 4。' },
+    counterexample: {
+      title: '忘了去重',
+      explanation: '若只排序不去重，lower_bound 对重复值仍返回第一次出现的位置，名次会出现空洞：a=[5,5,7] 排序后 [5,5,7]，7 的 lower_bound 是 2 而不是 1，名次 {0,0,2} 不再是 0..m−1 的紧凑编号，用它开的数组会浪费空间，用它建树状数组会多出空位。',
+      input: 'a = [5, 5, 7]',
+      wrong: '名次 [0, 0, 2]（出现空洞）',
+      correct: '名次 [0, 0, 1]',
+    },
+    ioProtocol: '第 1 行 N Q；第 2 行 a_0..a_{N−1}；第 3 行 q_1..q_Q。输出：第 1 行每个 a_i 的名次；第 2 行每个 q 的"比 q 小的不同取值个数"。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)
