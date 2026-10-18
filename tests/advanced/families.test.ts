@@ -168,7 +168,7 @@ describe('bs-answer vs independent reference', () => {
       expect(last.result).toEqual([brute(arr, k)])
     }
   })
-  it('counterexample: a lower bound of 0 misjudges cap < max(a) as feasible (a=[10,1], k=2, cap=5 → 2 parts)', () => {
+  it('counterexample: with lo = 0 the same search returns 0 for a=[10,1], k=3 (cap < max(a) is misjudged feasible); the product returns 10', () => {
     const greedy = (a: number[], cap: number) => {
       let cnt = 1, cur = 0
       for (const x of a) {
@@ -176,7 +176,14 @@ describe('bs-answer vs independent reference', () => {
       }
       return cnt
     }
-    expect(greedy([10, 1], 5)).toBe(2) // "feasible" for k=2 although 10 > 5
-    expect(solve('bs-answer', { arr: [10, 1], k: 2 }).result.answer).toBe(10)
+    expect(greedy([10, 1], 0)).toBe(3) // "feasible" for k = 3 although 10 > 0
+    let lo = 0, hi = 11 // BUG: lo should be max(a)
+    while (lo < hi) {
+      const mid = lo + ((hi - lo) >> 1)
+      if (greedy([10, 1], mid) <= 3) hi = mid
+      else lo = mid + 1
+    }
+    expect(lo).toBe(0)
+    expect(solve('bs-answer', { arr: [10, 1], k: 3 }).result.answer).toBe(10)
   })
 })
