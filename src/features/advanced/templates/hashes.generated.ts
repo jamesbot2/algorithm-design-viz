@@ -127,6 +127,20 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "full": "005f35400c1602e42dd1eea6dd0f63126fac4ee0136fb18b34fe2aa519c5801b"
     }
   },
+  "topo": {
+    "teach": {
+      "typescript": "6a2b2f8492960659cbcb0eff1e0be01a65a9d5909994df04ee7aa5026de2f64d",
+      "python": "5d27e5d3924c90e406dfdda309f2de56cd713d01b8fa2847ae3c308f8076198f",
+      "cpp": "a39167fdcf2b93305a5ab685333fe9b4803e4dc3376860d57df0ba4f18f87211",
+      "java": "caa955f6a48494d9682ea69872827f2a2b9a61683bd2affc8ca46cd122544ea9",
+      "rust": "519096798f25c18f473e9126e66f5ae1a88c8b20184cad9df91cc69a7b6b099b",
+      "go": "2b0014f5c3d16659697fe8c003c20046b79f007bcc5f68d7487e4203fe0cd19a"
+    },
+    "contest": {
+      "core": "1da1c3b9b8ff6017f771e1d2dcbfca676ca4a9acf624a0dc7136a3cf877a74a9",
+      "full": "b2b9dfb3c56842e6e3a01bf1e82690b83e7e934fc2ee5a34c89a4807db1b3299"
+    }
+  },
   "stl-bounds": {
     "teach": {
       "cpp": "e695e94ca5682d1b1046fe8bfe5f980ec5fdbe9a8851cadf696c6386909198ed"

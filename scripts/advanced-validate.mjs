@@ -625,9 +625,10 @@ async function validateFam(id) {
         n = 1
         const r2 = famRng(777 + id.length)
         for (let k = 0; k < 150; k++) {
-          const { input: inp, expected } = F.full(r2)
+          const { input: inp, expected, verify } = F.full(r2)
           const o = need(run('./full', [], { cwd: d, input: inp, env: ASAN_ENV }), 'full random')
-          if (o.stdout !== expected) throw new Error(`${id} full: random stdin mismatch\n${inp}\ngot ${JSON.stringify(o.stdout)} want ${JSON.stringify(expected)}`)
+          if (verify) verify(o.stdout)
+          else if (o.stdout !== expected) throw new Error(`${id} full: random stdin mismatch\n${inp}\ngot ${JSON.stringify(o.stdout)} want ${JSON.stringify(expected)}`)
           n++
         }
         checks = 'full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan'

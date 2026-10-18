@@ -324,3 +324,77 @@ FAM['mono-queue'] = {
     return { input: `${n} ${k}\n${a.join(' ')}\n`, expected: mx.join(' ') + '\n' + mn.join(' ') + '\n' }
   },
 }
+
+// ───────────────────────── topo ─────────────────────────
+// Independent reference: transitive closure (Floyd–Warshall). Nodes that sit on a cycle or are reachable from one can never be
+// processed by Kahn; every other node is. The program's order is then checked as a valid topological order of the processed set.
+function topoReference(n, flat) {
+  const reach = Array.from({ length: n }, () => new Array(n).fill(false))
+  for (let i = 0; i + 1 < flat.length; i += 2) reach[flat[i]][flat[i + 1]] = true
+  for (let k = 0; k < n; k++) for (let i = 0; i < n; i++) if (reach[i][k]) for (let j = 0; j < n; j++) if (reach[k][j]) reach[i][j] = true
+  const onCycle = (v) => reach[v][v]
+  const blocked = (v) => onCycle(v) || [...Array(n).keys()].some((u) => onCycle(u) && reach[u][v])
+  const processed = [...Array(n).keys()].filter((v) => !blocked(v))
+  return { status: processed.length === n ? 1 : 0, processed }
+}
+function topoVerify(n, flat, outLine, what) {
+  const ref = topoReference(n, flat)
+  const v = outLine.trim().split(/\s+/).filter(Boolean).map(Number)
+  const [status, ...ord] = v
+  if (status !== ref.status) throw new Error(`${what}: status ${status}, want ${ref.status} (n=${n}, edges=${flat})`)
+  if ([...ord].sort((a, b) => a - b).join(',') !== ref.processed.join(',')) throw new Error(`${what}: processed set ${ord} != reference ${ref.processed} (edges=${flat})`)
+  const pos = new Map(ord.map((x, i) => [x, i]))
+  for (let i = 0; i + 1 < flat.length; i += 2) if (pos.has(flat[i]) && pos.has(flat[i + 1]) && pos.get(flat[i]) >= pos.get(flat[i + 1])) throw new Error(`${what}: edge ${flat[i]}->${flat[i + 1]} violated in ${ord}`)
+}
+FAM['topo'] = {
+  dir: 'topo',
+  cls: 'Topo',
+  gen(seed) {
+    const r = mulberry32(seed)
+    const cs = []
+    for (let t = 0; t < 400; t++) {
+      const n = t < 3 ? t + 1 : rint(r, 1, 9)
+      const m = rint(r, 0, 14)
+      const e = []
+      const dag = t % 2 === 0
+      for (let i = 0; i < m; i++) {
+        let u = rint(r, 0, n - 1), v = rint(r, 0, n - 1)
+        if (dag) {
+          if (u === v) continue
+          if (u > v) [u, v] = [v, u]
+        }
+        e.push(u, v)
+      }
+      cs.push({ k: n, a: [], b: e, c: [] })
+    }
+    return cs
+  },
+  naive(c) {
+    return [JSON.stringify(topoReference(c.k, c.b))]
+  },
+  check(c, got) {
+    topoVerify(c.k, c.b, got[0], 'topo')
+  },
+  calls: {
+    python: ['topo_sort(k,b)'],
+    typescript: ['M.topoSort(k,b)'],
+    cpp: ['topo_sort(k,b)'],
+    java: ['Topo.topoSort(k,b)'],
+    rust: ['topo_sort(k,&b)'],
+    go: ['TopoSort(k,b)'],
+  },
+  core: ['{std::vector<std::pair<int,int>> E;for(size_t i=0;i+1<b.size();i+=2)E.push_back({(int)b[i],(int)b[i+1]});auto o=topo_order((int)k,E);std::vector<long long> r{(int)o.size()==(int)k?1LL:0LL};r.insert(r.end(),o.begin(),o.end());pr(r);}'],
+  full(r) {
+    const n = rint(r, 1, 8), m = rint(r, 0, 12)
+    const e = []
+    for (let i = 0; i < m; i++) e.push(rint(r, 0, n - 1), rint(r, 0, n - 1))
+    const input = `${n} ${m}\n` + Array.from({ length: m }, (_, i) => `${e[2 * i]} ${e[2 * i + 1]}`).join('\n') + (m ? '\n' : '')
+    return {
+      input,
+      verify: (out) => {
+        const lines = out.replace(/\n$/, '').split('\n')
+        topoVerify(n, e, lines[0] + ' ' + (lines[1] ?? ''), 'topo full')
+      },
+    }
+  },
+}

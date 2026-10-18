@@ -23,7 +23,7 @@ const CAT = join(ROOT, 'src', 'codeCatalog')
 const SRC = join(ROOT, 'src', 'features', 'advanced', 'sources')
 const TPL = join(ROOT, 'src', 'features', 'advanced', 'templates')
 
-export const SIX = ['dsu', 'fenwick', 'segtree', 'segtree_lazy', 'prefix_diff', 'discretize', 'bs_answer', 'mono_stack', 'mono_queue']
+export const SIX = ['dsu', 'fenwick', 'segtree', 'segtree_lazy', 'prefix_diff', 'discretize', 'bs_answer', 'mono_stack', 'mono_queue', 'topo']
 export const CPP_ONLY = ['stl_bounds', 'stl_priority_queue']
 export const TESTSET_VERSION = 'adv-tests-v1'
 

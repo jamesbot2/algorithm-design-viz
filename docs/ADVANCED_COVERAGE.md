@@ -17,6 +17,7 @@
 | 二分答案 (`bs-answer`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `binarySearch`（链接，非复制） |
 | 单调栈 (`mono-stack`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
 | 单调队列 (`mono-queue`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| 拓扑排序 (`topo`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `bfs`（链接，非复制） |
 
 测试：`tests/advanced/advanced.test.ts`（vitest）、`tests/e2e/adv-p1.spec.ts`（Playwright，真实鼠标键盘、0 次重试）、`scripts/advanced-validate.mjs`（真实工具链）。
 
@@ -28,7 +29,6 @@
 | queue / deque 实验 / queue / deque | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | unique + erase 实验 / unique + erase | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | set / multiset / map 实验 / set / map | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 拓扑排序 / Topological sort | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | LCA 倍增 / LCA (binary lifting) | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | LIS O(n log n) / LIS | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | 数论工具 / Number theory tools | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |

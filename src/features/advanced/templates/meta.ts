@@ -389,6 +389,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'topo',
+    topicId: 'topo',
+    title: '拓扑排序（Kahn + 判环）',
+    category: '图',
+    difficulty: '竞赛基础',
+    prereqs: ['队列', '图的邻接表'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<utility>', '<vector>'],
+      depends: [],
+      indexing: '结点 0..n−1；边 u→v 表示"先 u 后 v"',
+      interval: '无区间参数；返回的 order.size() == n 当且仅当无环',
+      limits: '重边、自环允许（自环必判为有环）；顺序由 FIFO + 输入顺序唯一确定',
+      timeComplexity: 'O(n + m)',
+      spaceComplexity: 'O(n + m)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版把建图、入度、扫描压成几行并用 vector 当队列，返回已处理的结点序列（size < n 即有环）；教学版返回 [status, ...order]：控制流与接口不同构，作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '6 6\n5 2\n5 0\n4 0\n4 1\n2 3\n3 1\n', output: '1\n4 5 2 0 3 1\n', note: '经典 DAG：Kahn（零入度按编号、出边按输入顺序）得到 4 5 2 0 3 1；任何合法顺序都满足每条边 u 在 v 之前。' },
+    counterexample: {
+      title: '有环却把部分顺序当答案',
+      explanation: '图 0→1→2→1（1 与 2 成环）。Kahn 只能处理结点 0，之后 1、2 互相等待。若不检查"已处理数 == n"，会把 [0] 当成完整拓扑序。正确做法是发现 1 < 3 并报告有环。',
+      input: 'n = 3，边 0→1、1→2、2→1',
+      wrong: '输出顺序 [0]（只有 1 个结点，却当作完整排序）',
+      correct: 'status = 0（有环）；已处理 [0]，卡住的结点 {1, 2}',
+    },
+    ioProtocol: '第 1 行 N M；随后 M 行 u v（有向边 u→v，结点 0..N−1）。输出：第 1 行 1（无环）或 0（有环）；第 2 行已处理结点的顺序。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

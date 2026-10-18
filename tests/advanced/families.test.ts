@@ -276,3 +276,38 @@ describe('mono-queue vs independent reference', () => {
     expect(solve('mono-queue', { arr: a, k }).result.max).toEqual([5, 1])
   })
 })
+
+describe('topo vs independent reference (transitive closure)', () => {
+  it('status, processed set and edge order agree with closure-based reference; cycle runs end honestly', () => {
+    const r = prng(23)
+    let cyc = 0
+    for (let c = 0; c < 300; c++) {
+      const n = ri(r, 1, 8)
+      const m = ri(r, 0, 12)
+      const e: number[] = []
+      for (let i = 0; i < m; i++) e.push(ri(r, 0, n - 1), ri(r, 0, n - 1))
+      const { result, steps } = solve('topo', { n, edges: e })
+      const reach = Array.from({ length: n }, () => new Array<boolean>(n).fill(false))
+      for (let i = 0; i < e.length; i += 2) reach[e[i]!]![e[i + 1]!] = true
+      for (let k = 0; k < n; k++) for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) if (reach[i]![k] && reach[k]![j]) reach[i]![j] = true
+      const blocked = (v: number) => reach[v]![v] || reach.some((_, u) => reach[u]![u] && reach[u]![v])
+      const proc = [...Array(n).keys()].filter((v) => !blocked(v))
+      expect([...result.order].sort((a: number, b: number) => a - b), `${n} ${e}`).toEqual(proc)
+      expect(result.status).toBe(proc.length === n ? 1 : 0)
+      if (!result.status) {
+        cyc++
+        expect(steps[steps.length - 1]!.message).toContain('有环')
+      }
+      const pos = new Map<number, number>(result.order.map((x: number, i: number) => [x, i]))
+      for (let i = 0; i < e.length; i += 2) if (pos.has(e[i]!) && pos.has(e[i + 1]!)) expect(pos.get(e[i]!)!).toBeLessThan(pos.get(e[i + 1]!)!)
+    }
+    expect(cyc).toBeGreaterThan(20)
+  })
+  it('counterexample: ignoring "processed == n" returns [0] for 0→1,1→2,2→1; product reports status 0 with stuck {1,2}', () => {
+    const { result } = solve('topo', { n: 3, edges: [0, 1, 1, 2, 2, 1] })
+    expect(result).toEqual({ status: 0, order: [0], stuck: [1, 2] })
+  })
+  it('sample matches contest sample 4 5 2 0 3 1', () => {
+    expect(solve('topo', { n: 6, edges: [5, 2, 5, 0, 4, 0, 4, 1, 2, 3, 3, 1] }).result.order).toEqual([4, 5, 2, 0, 3, 1])
+  })
+})

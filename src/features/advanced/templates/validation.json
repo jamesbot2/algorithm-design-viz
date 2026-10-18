@@ -555,6 +555,62 @@
       "tests": 151,
       "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
       "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "topo|teach|typescript|run": {
+      "hash": "6a2b2f8492960659cbcb0eff1e0be01a65a9d5909994df04ee7aa5026de2f64d",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "v24.20.0",
+      "checks": "node strip-types (displayed .ts imported unchanged)"
+    },
+    "topo|teach|python|run": {
+      "hash": "5d27e5d3924c90e406dfdda309f2de56cd713d01b8fa2847ae3c308f8076198f",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "Python 3.13.5",
+      "checks": "python3 -X dev"
+    },
+    "topo|teach|cpp|run": {
+      "hash": "a39167fdcf2b93305a5ab685333fe9b4803e4dc3376860d57df0ba4f18f87211",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean"
+    },
+    "topo|teach|java|run": {
+      "hash": "caa955f6a48494d9682ea69872827f2a2b9a61683bd2affc8ca46cd122544ea9",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "javac 21.0.12.1",
+      "checks": "javac -Xlint:all; java -ea"
+    },
+    "topo|teach|rust|run": {
+      "hash": "519096798f25c18f473e9126e66f5ae1a88c8b20184cad9df91cc69a7b6b099b",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "checks": "rustc -D warnings, overflow-checks=on"
+    },
+    "topo|teach|go|run": {
+      "hash": "2b0014f5c3d16659697fe8c003c20046b79f007bcc5f68d7487e4203fe0cd19a",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "checks": "go vet; go run"
+    },
+    "topo|contest-core|cpp|run": {
+      "hash": "1da1c3b9b8ff6017f771e1d2dcbfca676ca4a9acf624a0dc7136a3cf877a74a9",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline"
+    },
+    "topo|contest-full|cpp|run": {
+      "hash": "b2b9dfb3c56842e6e3a01bf1e82690b83e7e934fc2ee5a34c89a4807db1b3299",
+      "status": "pass",
+      "tests": 151,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
     }
   }
 }
