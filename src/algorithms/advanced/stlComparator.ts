@@ -115,7 +115,7 @@ export const spec: FamSpec = {
     { key: 'arr', label: '成对的整数 a, b, a, b …（2..16 个数，共 1..8 个 pair）', kind: 'ints', minLen: 2, maxLen: 16, min: -9, max: 9 },
     { key: 'ops', label: '操作（用分号隔开）', kind: 'ops', grammar: GRAMMAR, maxOps: 12 },
   ],
-  defaultDraft: { arr: '2, 5, 1, 5, 2, 3, 1, 9', ops: 'sfirst; ssecd; sortlex; rbeg; minel; lbf 2; grtr' },
+  defaultDraft: { arr: '2, 5, 1, 5, 2, 3, 1, 9', ops: 'sfirst; ssecd; sortlex; sfirst; lbf 2; minel; rbeg; grtr' },
   check: (i) => ((i.arr as number[]).length % 2 ? { field: 'arr', reason: '整数个数必须是偶数（每两个组成一个 pair）' } : null),
   readyText: '尚未执行任何操作。',
   generate(i: FamInput) {
