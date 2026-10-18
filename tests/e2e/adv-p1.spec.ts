@@ -14,6 +14,56 @@ async function open(page: Page, hash: string, vp = { width: 1366, height: 768 })
   })
   await page.goto(hash)
   await expect(page.getByTestId('app-sidebar')).toBeAttached()
+  await injectFault(page)
+}
+
+/**
+ * [FI] fault injection (env ADV_FAULT) — the SAME detectors run against a deliberately broken page so each
+ * detector is proven to fail:  hide-tree (main scene hidden, data kept) | nav-keys (nav keystrokes forwarded to the player).
+ */
+async function injectFault(page: Page) {
+  const f = process.env.ADV_FAULT
+  if (!f) return
+  await page.evaluate((fault) => {
+    if (fault === 'hide-tree') {
+      const st = document.createElement('style')
+      st.textContent = '[data-testid="adv-scene"]{visibility:hidden!important} [data-testid="dsu-forest"],[data-testid="fw-tree"],[data-testid="heap-tree"]{display:none!important}'
+      document.head.appendChild(st)
+    }
+    if (fault === 'nav-keys') {
+      document.addEventListener(
+        'keydown',
+        (e) => {
+          const t = e.target as HTMLElement | null
+          if (t?.closest('#app-sidebar')) {
+            const viz = document.querySelector('[data-testid="visualizer"]')
+            viz?.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true }))
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true }))
+          }
+        },
+        true,
+      )
+    }
+  }, f)
+}
+
+/** The main scene must be PAINTED and carry the structure: every node visible and inside the scene box (not just present in the DOM). */
+async function sceneAudit(page: Page, nodeTestId: string, expectedCount: number) {
+  const scene = page.getByTestId('adv-scene')
+  await expect(scene).toBeVisible()
+  const nodes = page.getByTestId(nodeTestId)
+  await expect(nodes).toHaveCount(expectedCount)
+  for (let i = 0; i < expectedCount; i++) await expect(nodes.nth(i)).toBeVisible()
+  const sb = (await scene.boundingBox())!
+  const bad = await nodes.evaluateAll(
+    (els, box) =>
+      els.filter((e) => {
+        const r = e.getBoundingClientRect()
+        return !(r.width > 2 && r.height > 2 && r.left >= box.x - 1 && r.right <= box.x + box.w + 1 && r.top >= box.y - 1 && r.bottom <= box.y + box.h + 1)
+      }).length,
+    { x: sb.x, y: sb.y, w: sb.width, h: sb.height },
+  )
+  expect(bad, `${nodeTestId}: nodes painted inside the scene`).toBe(0)
 }
 
 const attr = (page: Page, sel: string, a: string) => page.locator(sel).evaluateAll((els, name) => els.map((e) => e.getAttribute(name as string)), a)
@@ -222,8 +272,9 @@ test.describe('ADV-03 DSU demo (main scene, real values)', () => {
   test('1366: run → end: forest nodes/parents/sizes/components match independent reference', async ({ page }) => {
     await open(page, '#/advanced/algorithms/dsu?view=demo')
     await expect(page.getByTestId('visualizer')).toHaveAttribute('data-preview', '1')
-    await expect(page.getByTestId('dsu-node')).toHaveCount(8) // preview already shows the 8 singleton trees
+    await sceneAudit(page, 'dsu-node', 8) // preview already shows the 8 singleton trees, painted
     await runAndEnd(page)
+    await sceneAudit(page, 'dsu-node', 8)
     const ref = refDsu(8, DSU_OPS.split(';'))
     const nodes = await page.locator('[data-testid="dsu-node"]').evaluateAll((els) => els.map((e) => ({ n: +e.getAttribute('data-node')!, p: +e.getAttribute('data-parent')!, s: +e.getAttribute('data-size')! })).sort((a, b) => a.n - b.n))
     expect(nodes.map((x) => x.p)).toEqual(ref.parent)
@@ -283,8 +334,9 @@ test.describe('ADV-03 DSU demo (main scene, real values)', () => {
 test.describe('ADV-04 Fenwick demo', () => {
   test('1366: tree nodes carry lowbit coverage; final tree and array equal the reference BIT', async ({ page }) => {
     await open(page, '#/advanced/algorithms/fenwick?view=demo')
-    await expect(page.getByTestId('fw-node')).toHaveCount(8)
+    await sceneAudit(page, 'fw-node', 8)
     await runAndEnd(page)
+    await sceneAudit(page, 'fw-node', 8)
     const ref = refBit(8, FW_OPS.split(';'))
     const nodes = await page.locator('[data-testid="fw-node"]').evaluateAll((els) => els.map((e) => ({ i: +e.getAttribute('data-i')!, v: +e.getAttribute('data-value')!, a: +e.getAttribute('data-from')!, b: +e.getAttribute('data-to')!, lb: +e.getAttribute('data-lowbit')! })).sort((x, y) => x.i - y.i))
     expect(nodes.map((x) => x.v)).toEqual(ref.tree.slice(1))
@@ -323,6 +375,7 @@ test.describe('ADV-05 priority_queue lab (C++ only, simulator notice)', () => {
     const ref = refHeap(PQ_OPS.split(';'))
     const cells = (await page.locator('[data-testid="heap-cell"][data-filled="1"]').evaluateAll((els) => els.map((e) => +e.getAttribute('data-value')!)))
     expect(cells).toEqual(ref)
+    await sceneAudit(page, 'heap-node', ref.length)
     const nodes = await page.locator('[data-testid="heap-node"]').evaluateAll((els) => els.map((e) => ({ i: +e.getAttribute('data-index')!, v: +e.getAttribute('data-value')! })).sort((a, b) => a.i - b.i))
     expect(nodes.map((x) => x.v)).toEqual(ref)
     await expect(page.getByTestId('heap-top')).toHaveAttribute('data-value', String(ref[0]))
@@ -469,6 +522,55 @@ test.describe('ADV-08 representative flow, five viewports', () => {
       await expect(page.getByTestId('adv-template')).toBeVisible()
       await page.getByTestId('back-to-demo').click()
       await expect(page.getByTestId('adv-demo')).toBeVisible()
+    })
+  }
+})
+
+test.describe('ADV-09 keyboard ownership on the advanced demo page', () => {
+  for (const vp of [
+    { width: 1366, height: 768 },
+    { width: 1920, height: 1080 },
+  ]) {
+    test(`${vp.width}: keys on a focused nav link / nav search do not drive the player`, async ({ page }) => {
+      await open(page, '#/advanced/algorithms/dsu?view=demo', vp)
+      await page.getByTestId('run-btn').click()
+      await expect(page.getByTestId('visualizer')).toHaveAttribute('data-preview', '0', { timeout: 20_000 })
+      await page.getByTestId('next-step-btn').click()
+      await expect(page.getByTestId('visualizer')).toHaveAttribute('data-step-index', '1')
+      const sb = page.getByTestId('app-sidebar')
+      const link = sb.getByRole('link', { name: '全部算法', exact: true })
+      await link.focus()
+      await expect(link).toBeFocused()
+      for (const k of ['ArrowRight', 'ArrowRight', ' ', 'ArrowLeft']) await page.keyboard.press(k)
+      await expect(page.getByTestId('visualizer')).toHaveAttribute('data-step-index', '1')
+      await expect(page.getByTestId('visualizer')).toHaveAttribute('data-playing', '0')
+      if (vp.width >= 1440) {
+        const search = sb.getByTestId('algo-search')
+        await search.click()
+        await page.keyboard.type('  kk ')
+        await page.keyboard.press('ArrowRight')
+        await expect(page.getByTestId('visualizer')).toHaveAttribute('data-step-index', '1')
+        await expect(page.getByTestId('visualizer')).toHaveAttribute('data-playing', '0')
+      }
+    })
+  }
+})
+
+test.describe('ADV-10 template headers are complete for every template', () => {
+  for (const id of ['stl-bounds', 'stl-priority-queue', 'dsu', 'fenwick']) {
+    test(`${id}: eight header fields, all non-empty, plus sample/counterexample/source`, async ({ page }) => {
+      await open(page, `#/advanced/templates/${id}`)
+      const dd = page.locator('[data-testid="tpl-header"] dd')
+      await expect(dd).toHaveCount(8)
+      const texts = await dd.allTextContents()
+      expect(texts.every((t) => t.trim().length > 0), JSON.stringify(texts)).toBe(true)
+      await expect(page.getByTestId('tpl-header')).toContainText('O(')
+      await expect(page.getByTestId('tpl-counter')).toBeVisible()
+      await expect(page.getByTestId('tpl-source')).toBeVisible()
+      await page.getByTestId('variant-contest').click()
+      await page.getByTestId('form-full').click()
+      await expect(page.getByTestId('tpl-sample')).toBeVisible()
+      await expect(page.getByTestId('tpl-contest-code')).toBeVisible()
     })
   }
 })
