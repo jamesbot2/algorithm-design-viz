@@ -1,7 +1,9 @@
-import type { ReactNode } from 'react'
 import type { Step } from '../../../types/step'
 import type { BoundsView, DsuView, FenwickView, HeapView } from '../../../types/advancedView'
-import { useBox } from './useBox'
+import { Frame } from './frame'
+import { cell } from './cell'
+import { SegScene } from './SegScene'
+import { FamScene } from './FamScene'
 import { dsuLayout, fenwickCover, heapSlot, levelsFor, lowbit } from './scenes'
 import './advanced.css'
 
@@ -15,29 +17,12 @@ export default function AdvancedScene({ step }: { step: Step; prevStep?: Step })
       {v.kind === 'fenwick' && <FenwickScene v={v} />}
       {v.kind === 'heap' && <HeapScene v={v} />}
       {v.kind === 'bounds' && <BoundsScene v={v} />}
+      {v.kind === 'seg' && <SegScene v={v} />}
+      {v.kind === 'fam' && <FamScene v={v} />}
     </div>
   )
 }
 
-function Frame({ head, children }: { head: ReactNode; children: (w: number, h: number) => ReactNode }) {
-  const [ref, box] = useBox<HTMLDivElement>()
-  return (
-    <div className="adv-frame">
-      <div className="adv-head" data-testid="adv-head">
-        {head}
-      </div>
-      <div className="adv-canvas" ref={ref}>
-        {box.w > 0 && box.h > 0 && (
-          <svg width={box.w} height={box.h} viewBox={`0 0 ${box.w} ${box.h}`} role="img" aria-label="高阶算法主场景">
-            {children(box.w, box.h)}
-          </svg>
-        )}
-      </div>
-    </div>
-  )
-}
-
-const cell = (w: number, count: number, max: number, pad = 8) => Math.max(14, Math.min(max, Math.floor((w - 2 * pad) / Math.max(1, count))))
 
 /* ───────────────────────── DSU ───────────────────────── */
 function DsuScene({ v }: { v: DsuView }) {

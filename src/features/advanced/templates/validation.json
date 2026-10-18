@@ -163,6 +163,174 @@
       "tests": 151,
       "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
       "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "segtree|teach|typescript|run": {
+      "hash": "112b7b6fd84d25567a18cf2ac55366c2fa896bf065582c76780e42a146f3f6f7",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "v24.20.0",
+      "checks": "node strip-types (displayed .ts imported unchanged)"
+    },
+    "segtree|teach|python|run": {
+      "hash": "385c2ac3dde07af7d69d04b0797959f10ee42ca833123f5d663c9c32286eb7e3",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "Python 3.13.5",
+      "checks": "python3 -X dev"
+    },
+    "segtree|teach|cpp|run": {
+      "hash": "558bc5e29c6db86d4c3452f216163e39c6d9964e646582b9760ddc755bb899c6",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean"
+    },
+    "segtree|teach|java|run": {
+      "hash": "7f71e5496473f695113f99d25dbf2f0e622c370c86b8fb3e1cfdd7f5bbdff59a",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "javac 21.0.12.1",
+      "checks": "javac -Xlint:all; java -ea"
+    },
+    "segtree|teach|rust|run": {
+      "hash": "8c995f20c942b18f32c25df7de2cb8580bbaf3ce46f369f4b032e6dc202a11c5",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "checks": "rustc -D warnings, overflow-checks=on"
+    },
+    "segtree|teach|go|run": {
+      "hash": "9b66a3e7e37f902a0865bd1bc25fee901d1672733aabb49eb78f178264c8ea21",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "checks": "go vet; go run"
+    },
+    "segtree|contest-core|cpp|run": {
+      "hash": "9beceb2a4c16c39e30865ea3d526c085836b40a9d2880fc67fa6d08ac9f911a2",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline"
+    },
+    "segtree|contest-full|cpp|run": {
+      "hash": "6452fc34bcca3e9e31abe744b7474c6e177025e890d89164bd2b4e8f1ae851b7",
+      "status": "pass",
+      "tests": 151,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "segtree-lazy|teach|typescript|run": {
+      "hash": "3eeb4aee02f336247309c12c4aed9a1ca49b140f5813f96f226ef76ebe1a6f86",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "v24.20.0",
+      "checks": "node strip-types (displayed .ts imported unchanged)"
+    },
+    "segtree-lazy|teach|python|run": {
+      "hash": "4be97b2c9f2ceae0bce487cba5bd51dcda6800e564b0a09853ff84fca112ae5c",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "Python 3.13.5",
+      "checks": "python3 -X dev"
+    },
+    "segtree-lazy|teach|cpp|run": {
+      "hash": "6e626d7f8f9fe637879aea61f5d81404382333c1b4ac1daca93c8bcba0adb68a",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean"
+    },
+    "segtree-lazy|teach|java|run": {
+      "hash": "767aea4c157f533a6c495a7aa15b8784d720cc6939920006147b20ed0776c987",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "javac 21.0.12.1",
+      "checks": "javac -Xlint:all; java -ea"
+    },
+    "segtree-lazy|teach|rust|run": {
+      "hash": "eb130a0fffb694c48ccfac4f17a2b96ea39a4d285305857398d93c17d02b0aa3",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "checks": "rustc -D warnings, overflow-checks=on"
+    },
+    "segtree-lazy|teach|go|run": {
+      "hash": "a0c5930ca22b8b2abcbc13e80fd9345047aa1cc65802373025a8707998b6c2c1",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "checks": "go vet; go run"
+    },
+    "segtree-lazy|contest-core|cpp|run": {
+      "hash": "778ed3d91d20a7ae51485c46a0926b105d2f9136499e2d8e2cf0eca7c9b44233",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline"
+    },
+    "segtree-lazy|contest-full|cpp|run": {
+      "hash": "e01f685f33e44a4a418090ddf405f0e1ea7ce9c349247eeeefeaa7712972daef",
+      "status": "pass",
+      "tests": 151,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "prefix-diff|teach|typescript|run": {
+      "hash": "f2cdbf35463378866bdd6fbaaef07039dca1ddf95e7bbecee79fa13f0f41abdd",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "v24.20.0",
+      "checks": "node strip-types (displayed .ts imported unchanged)"
+    },
+    "prefix-diff|teach|python|run": {
+      "hash": "65a20297c4e2f5194d9581d4b90385d240ba32f6e385cc08dd726ca4d4b4ab66",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "Python 3.13.5",
+      "checks": "python3 -X dev"
+    },
+    "prefix-diff|teach|cpp|run": {
+      "hash": "fb5a5e1b848c1036129a3c1fa2eb7d3cf1e942415055ddce367276346c24b18d",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean"
+    },
+    "prefix-diff|teach|java|run": {
+      "hash": "ea786fbbb874f4747aed7cc3e353d9b994015b354370102dff33e05139bfa27f",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "javac 21.0.12.1",
+      "checks": "javac -Xlint:all; java -ea"
+    },
+    "prefix-diff|teach|rust|run": {
+      "hash": "d047053f76a7c230ff51d0b3a040ef0f9527fd618234bbf586561bdc1aa5592a",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "checks": "rustc -D warnings, overflow-checks=on"
+    },
+    "prefix-diff|teach|go|run": {
+      "hash": "c79eedf13a587bd69c1fb5d3434e66d31f4e94bbf8ae8995106a95bb6eccfa98",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "checks": "go vet; go run"
+    },
+    "prefix-diff|contest-core|cpp|run": {
+      "hash": "2efe1fa60c7cca3645cfcc96fbbfdc28f281706060813bb9db13978aa5d7bc17",
+      "status": "pass",
+      "tests": 400,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline"
+    },
+    "prefix-diff|contest-full|cpp|run": {
+      "hash": "c689b9e157807a0b03093cdbf6e9eb3d8ff5f5a8a28694eff18562826fbfc441",
+      "status": "pass",
+      "tests": 151,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
     }
   }
 }

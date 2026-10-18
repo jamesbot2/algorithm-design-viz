@@ -80,4 +80,60 @@ export interface BoundsView {
   cmp?: { index: number; text: string; goRight: boolean }
 }
 
-export type AdvancedView = DsuView | FenwickView | HeapView | BoundsView
+export interface SegView {
+  kind: 'seg'
+  /** logical array length; leaves cover [i,i+1) */
+  n: number
+  /** tree[node] for heap-numbered nodes (node 1 = root = [0,n); children 2k, 2k+1); null = not built yet */
+  tree: (number | null)[]
+  op: string
+  /** node of the current call frame */
+  node?: number
+  /** nodes touched by the current operation so far, with the role each played (query: outside / inside / split; set: descend) */
+  visited: { node: number; role: 'outside' | 'inside' | 'split' | 'path' | 'leaf' }[]
+  /** public half-open query [l,r) */
+  query?: [number, number]
+  /** point-assign target */
+  target?: { index: number; value: number }
+  /** running sum of the 'inside' nodes of the current query */
+  accum?: number
+  result?: number
+  /** lazy segment tree only: pending tag per heap node (amount still to add to EACH element below) */
+  lazy?: number[]
+  /** nodes whose tag was just written / pushed in this frame */
+  tagged?: number[]
+  /** range-add in progress: [l,r) and v */
+  adding?: { l: number; r: number; v: number }
+}
+
+export type FamMark = 'cur' | 'hit' | 'done' | 'warn' | 'range' | 'pivot'
+export interface FamRow {
+  id: string
+  label: string
+  cells: (number | string | null)[]
+  marks?: Record<number, FamMark>
+  /** label of the first cell (default 0): index row shows offset+i */
+  offset?: number
+}
+export interface FamGraph {
+  n: number
+  edges: [number, number][]
+  directed: boolean
+  /** 'tree' = layered by depth (needs depth[]), 'circle' = nodes on a circle */
+  layout: 'circle' | 'tree'
+  depth?: number[]
+  marks?: Record<number, FamMark>
+  /** key `${u}-${v}` */
+  edgeMarks?: Record<string, FamMark>
+}
+/** Generic multi-row scene for the array / graph / number families (prefix, discretization, monotone, topo, LCA, LIS, math…). */
+export interface FamView {
+  kind: 'fam'
+  op: string
+  rows: FamRow[]
+  graph?: FamGraph
+  scalars?: { id: string; label: string; value: string | number }[]
+  result?: (number | string)[]
+}
+
+export type AdvancedView = DsuView | FenwickView | HeapView | BoundsView | SegView | FamView

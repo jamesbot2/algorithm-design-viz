@@ -226,6 +226,18 @@ function DemoInner({ entry, topic }: { entry: AdvancedEntry; topic: TopicMeta })
 }
 
 function DraftFields({ entry, draft, patch }: { entry: AdvancedEntry; draft: Record<string, string>; patch: (k: string, v: string) => void }) {
+  if (entry.fields) {
+    return (
+      <>
+        {entry.fields.map((f) => (
+          <label key={f.key}>
+            {f.label}
+            <input data-testid={`adv-input-${f.key}`} value={draft[f.key] ?? ''} inputMode={f.kind === 'int' ? 'numeric' : 'text'} onChange={(e) => patch(f.key, e.target.value)} />
+          </label>
+        ))}
+      </>
+    )
+  }
   if (entry.id === 'stl-bounds') {
     return (
       <>
@@ -243,6 +255,20 @@ function DraftFields({ entry, draft, patch }: { entry: AdvancedEntry; draft: Rec
             <option value="lower">lower_bound（第一个 ≥ x）</option>
             <option value="upper">upper_bound（第一个 &gt; x）</option>
           </select>
+        </label>
+      </>
+    )
+  }
+  if (entry.id === 'segtree' || entry.id === 'segtree-lazy') {
+    return (
+      <>
+        <label>
+          初始数组（逗号分隔，长度 1..16）
+          <input data-testid="adv-input-arr" value={draft.arr ?? ''} onChange={(e) => patch('arr', e.target.value)} />
+        </label>
+        <label>
+          操作序列（; 或换行分隔：{entry.id === 'segtree' ? 'set i v / sum l r' : 'add l r v / sum l r'}，区间为 [l,r)）
+          <textarea data-testid="adv-input-ops" rows={3} value={draft.ops ?? ''} onChange={(e) => patch('ops', e.target.value)} />
         </label>
       </>
     )

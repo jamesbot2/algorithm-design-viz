@@ -29,6 +29,48 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "full": "da994cf41201899947c711b5ef4fe59242240aa7cc171cfa9d41ce4613dec0a6"
     }
   },
+  "segtree": {
+    "teach": {
+      "typescript": "112b7b6fd84d25567a18cf2ac55366c2fa896bf065582c76780e42a146f3f6f7",
+      "python": "385c2ac3dde07af7d69d04b0797959f10ee42ca833123f5d663c9c32286eb7e3",
+      "cpp": "558bc5e29c6db86d4c3452f216163e39c6d9964e646582b9760ddc755bb899c6",
+      "java": "7f71e5496473f695113f99d25dbf2f0e622c370c86b8fb3e1cfdd7f5bbdff59a",
+      "rust": "8c995f20c942b18f32c25df7de2cb8580bbaf3ce46f369f4b032e6dc202a11c5",
+      "go": "9b66a3e7e37f902a0865bd1bc25fee901d1672733aabb49eb78f178264c8ea21"
+    },
+    "contest": {
+      "core": "9beceb2a4c16c39e30865ea3d526c085836b40a9d2880fc67fa6d08ac9f911a2",
+      "full": "6452fc34bcca3e9e31abe744b7474c6e177025e890d89164bd2b4e8f1ae851b7"
+    }
+  },
+  "segtree-lazy": {
+    "teach": {
+      "typescript": "3eeb4aee02f336247309c12c4aed9a1ca49b140f5813f96f226ef76ebe1a6f86",
+      "python": "4be97b2c9f2ceae0bce487cba5bd51dcda6800e564b0a09853ff84fca112ae5c",
+      "cpp": "6e626d7f8f9fe637879aea61f5d81404382333c1b4ac1daca93c8bcba0adb68a",
+      "java": "767aea4c157f533a6c495a7aa15b8784d720cc6939920006147b20ed0776c987",
+      "rust": "eb130a0fffb694c48ccfac4f17a2b96ea39a4d285305857398d93c17d02b0aa3",
+      "go": "a0c5930ca22b8b2abcbc13e80fd9345047aa1cc65802373025a8707998b6c2c1"
+    },
+    "contest": {
+      "core": "778ed3d91d20a7ae51485c46a0926b105d2f9136499e2d8e2cf0eca7c9b44233",
+      "full": "e01f685f33e44a4a418090ddf405f0e1ea7ce9c349247eeeefeaa7712972daef"
+    }
+  },
+  "prefix-diff": {
+    "teach": {
+      "typescript": "f2cdbf35463378866bdd6fbaaef07039dca1ddf95e7bbecee79fa13f0f41abdd",
+      "python": "65a20297c4e2f5194d9581d4b90385d240ba32f6e385cc08dd726ca4d4b4ab66",
+      "cpp": "fb5a5e1b848c1036129a3c1fa2eb7d3cf1e942415055ddce367276346c24b18d",
+      "java": "ea786fbbb874f4747aed7cc3e353d9b994015b354370102dff33e05139bfa27f",
+      "rust": "d047053f76a7c230ff51d0b3a040ef0f9527fd618234bbf586561bdc1aa5592a",
+      "go": "c79eedf13a587bd69c1fb5d3434e66d31f4e94bbf8ae8995106a95bb6eccfa98"
+    },
+    "contest": {
+      "core": "2efe1fa60c7cca3645cfcc96fbbfdc28f281706060813bb9db13978aa5d7bc17",
+      "full": "c689b9e157807a0b03093cdbf6e9eb3d8ff5f5a8a28694eff18562826fbfc441"
+    }
+  },
   "stl-bounds": {
     "teach": {
       "cpp": "e695e94ca5682d1b1046fe8bfe5f980ec5fdbe9a8851cadf696c6386909198ed"

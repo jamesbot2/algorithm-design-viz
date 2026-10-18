@@ -83,3 +83,4 @@
 .adv-demo-wrap { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
 .adv-demo-wrap > .adv-tabs { padding: 0.25rem 0.75rem 0; flex: 0 0 auto; }
 .adv-tabs button.active, .adv-tabs a.active { font-weight: 600; border-bottom: 2px solid var(--sem-current, currentColor); }
+.fam-edge-hot { stroke: var(--sem-focus, #38bdf8); stroke-width: 2.5; opacity: 1; }

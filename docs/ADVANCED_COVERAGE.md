@@ -10,6 +10,9 @@
 | priority_queue 优先队列 (`stl-priority-queue`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `dijkstraHeap`（链接，非复制） |
 | 并查集 (`dsu`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `kruskal`（链接，非复制） |
 | 树状数组 (`fenwick`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| 线段树 (`segtree`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `maxSubarrayDC`（链接，非复制） |
+| 懒标记线段树 (`segtree-lazy`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| 前缀和与差分 (`prefix-diff`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | `kadane`（链接，非复制） |
 
 测试：`tests/advanced/advanced.test.ts`（vitest）、`tests/e2e/adv-p1.spec.ts`（Playwright，真实鼠标键盘、0 次重试）、`scripts/advanced-validate.mjs`（真实工具链）。
 
@@ -21,8 +24,6 @@
 | queue / deque 实验 / queue / deque | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | unique + erase 实验 / unique + erase | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | set / multiset / map 实验 / set / map | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 线段树 / Segment Tree | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| 前缀和 / 差分 / Prefix sum / Difference | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | 离散化 / Coordinate compression | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | 二分答案 / Binary search on answer | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | 单调栈 / Monotonic stack | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
