@@ -201,8 +201,7 @@ test.describe('ADV-27 advanced demos at 375x812: measured budget', () => {
       const rec = { id, sceneW: Math.round(sb.width), sceneH: Math.round(sb.height), sceneShareOfViewportH: +(sb.height / 812).toFixed(2), pieces: m.n, minPieceW: Math.round(m.minW), minPieceH: Math.round(m.minH), pageOverflowX: over }
       rows.push(rec)
       test.info().annotations.push({ type: 'measure', description: JSON.stringify(rec) })
-      const fs = await import('node:fs')
-      fs.appendFileSync('/workspace/adv/logs/adv27-measure.jsonl', JSON.stringify(rec) + '\n')
+      await test.info().attach(`measure-${id}.json`, { body: JSON.stringify(rec), contentType: 'application/json' })
       await sceneAudit(page, cellTid, 1)
       expect(sb.width).toBeLessThanOrEqual(375)
       expect(sb.height, JSON.stringify(rec)).toBeGreaterThanOrEqual(180)
