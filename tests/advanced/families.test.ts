@@ -32,7 +32,6 @@ const solve = (id: AdvancedAlgoId, d: Record<string, number | number[]>) => {
   return e.solve(p.value) as { steps: Step[]; result: any }
 }
 const fv = (s: Step) => s.advanced as FamView
-const lastFinal = (steps: Step[]) => steps[steps.length - 1]!.result as any
 
 const docsGlob = import.meta.glob('../../src/codeCatalog/*/langs.generated.ts', { eager: true }) as Record<string, { default: { language: string; source: string; anchors: { id: string }[] }[] }>
 const idxGlob = import.meta.glob('../../src/codeCatalog/*/index.ts', { eager: true }) as Record<string, Record<string, () => { typescript: { language: string; source: string; anchors: { id: string }[] } }>>
