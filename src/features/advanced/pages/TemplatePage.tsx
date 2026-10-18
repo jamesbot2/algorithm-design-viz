@@ -6,6 +6,7 @@ import { peekLanguageDoc, loadAlgoLanguages, LANGUAGE_LABEL } from '../../../cod
 import type { CodeDocument, CodeLanguage } from '../../../codeCatalog/types'
 import { TOPICS } from '../catalog/topics'
 import { templateById } from '../templates/meta'
+import { pushRecent } from '../templates/prefs'
 import { SOURCE_HASHES, VALIDATION_LABEL, validationState, toolchainInfo } from '../templates/validation'
 import { CATALOG_LOADERS, type CatalogBundle } from '../components/catalogLoaders'
 import { useAsync } from './useAsync'
@@ -51,6 +52,10 @@ export default function TemplatePage() {
   const setMsg = (t: string) => setMsgState({ k: shownKey, t })
   const [extraState, setExtraState] = useState<{ k: string; doc: CodeDocument | null }>({ k: '', doc: null })
   const extra = extraState.k === `${tpl?.id}|${teachLang}` ? extraState.doc : null
+
+  useEffect(() => {
+    if (tpl) pushRecent(tpl.id)
+  }, [tpl])
 
   useEffect(() => {
     let live = true
