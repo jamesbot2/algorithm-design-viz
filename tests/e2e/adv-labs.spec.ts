@@ -3,10 +3,15 @@
  * Expected values are computed HERE by independent JS references and compared with the numbers painted in the main scene.
  */
 import { test, expect, type Page } from '@playwright/test'
-import { open, runAndEnd, sceneAudit, cells } from './adv-helpers'
+import { open, runAndEnd as runEnd, sceneAudit, cells } from './adv-helpers'
 
 test.describe.configure({ retries: 0 })
 
+/** run, jump to the last frame, and require every painted cell to be visibly inside the scene box */
+async function runAndEnd(page: Page) {
+  await runEnd(page)
+  await sceneAudit(page, 'fam-cell', 1)
+}
 const demo = (id: string) => `#/advanced/stl/${id}?view=demo`
 const NOTICE = '演示运行本站内置的操作模型；右侧为参考代码。本页不会执行用户任意编辑的 C++ 源码。'
 const filled = (xs: string[]) => xs.filter((x) => x !== '' && x !== '░')
