@@ -1,0 +1,17 @@
+[
+ {
+  "label": "home /",
+  "files": 2,
+  "jsBytes": 1184658
+ },
+ {
+  "label": "advanced fenwick demo (cold)",
+  "files": 9,
+  "jsBytes": 1361843
+ },
+ {
+  "label": "fenwick demo + switch to Python",
+  "files": 11,
+  "jsBytes": 1413958
+ }
+]
