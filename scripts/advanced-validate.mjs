@@ -110,7 +110,7 @@ function checkDsu(cs, nv, outText) {
     const roots = rootsS.split(/\s+/).map(Number)
     if (res.length !== ops.length) throw new Error(`dsu case ${ci}: result count`)
     const exp = nv[ci]
-    ops.forEach(([k, a], i) => {
+    ops.forEach(([k], i) => {
       if (k !== 'f' && res[i] !== exp.per[i]) throw new Error(`dsu case ${ci} op ${i} (${k}): got ${res[i]} want ${exp.per[i]}`)
     })
     if (Number(cntS) !== exp.count) throw new Error(`dsu case ${ci}: count ${cntS} want ${exp.count}`)
@@ -284,7 +284,6 @@ const CD = {
 }
 
 // ---------- docs of the displayed sources ----------
-const LANGS = ['typescript', 'python', 'cpp', 'java', 'rust', 'go']
 async function teachDocs(id) {
   const dir = id.replace(/-/g, '_')
   const cap = id.split('-').map((w) => w[0].toUpperCase() + w.slice(1)).join('')
@@ -335,7 +334,6 @@ async function validateTopic(id) {
   const check = (outText) => (nv ? chk(cases, nv, outText) : chk(cases, outText))
   const docs = await teachDocs(id)
   const hashes = SOURCE_HASHES[id]
-  const tc = (k) => toolchain[k]
 
   // teaching sources
   for (const [lang, doc] of Object.entries(docs)) {
@@ -362,8 +360,7 @@ async function validateTopic(id) {
         r = need(run('node', ['--experimental-strip-types', '--no-warnings', 'main.ts'], { cwd: d, input }), 'node')
         checks = 'node strip-types (displayed .ts imported unchanged)'
       } else if (lang === 'cpp') {
-        const cls = id === 'stl-bounds' || id === 'stl-priority-queue' ? '' : ''
-        writeFileSync(join(d, 'main.cpp'), doc.source + '\n' + (id.startsWith('stl') ? '' : '') + drv)
+        writeFileSync(join(d, 'main.cpp'), doc.source + '\n' + drv)
         need(run('g++', [...CXX, 'main.cpp', '-o', 'main'], { cwd: d }), 'g++ compile')
         const c = run('g++', [...CXX, 'main.cpp', '-o', 'main'], { cwd: d })
         if (/warning:/.test(c.stderr)) throw new Error('compiler warnings: ' + c.stderr.slice(0, 500))

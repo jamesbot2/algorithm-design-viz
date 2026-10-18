@@ -44,9 +44,9 @@ export function dsuLayout(v: Pick<DsuView, 'n' | 'parent'>, w: number, areaTop: 
 /** Fenwick node i (1-based) covers 1-based (i-lowbit(i), i] = 0-based [i-lowbit(i), i). */
 export const fenwickCover = (i: number): [number, number] => [i - lowbit(i), i]
 
-/** Heap tree slot for array index i in a tree sized for `cap` slots: stable regardless of current size. */
-export function heapSlot(i: number, cap: number, w: number, top: number, gapY: number): Pos {
+/** Heap tree slot for array index i (fixed-depth tree layout): stable regardless of current size. */
+export function heapSlot(i: number, w: number, top: number, gapY: number): Pos {
   const d = Math.floor(Math.log2(i + 1))
   const j = i + 1 - 2 ** d
-  return { x: ((j + 0.5) / 2 ** d) * w, y: top + d * gapY + 0 * cap }
+  return { x: ((j + 0.5) / 2 ** d) * w, y: top + d * gapY }
 }

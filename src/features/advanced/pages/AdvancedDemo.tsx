@@ -47,6 +47,7 @@ function DemoInner({ entry, topic }: { entry: AdvancedEntry; topic: TopicMeta })
   const generationRef = useRef(0)
   const seekReq = useRef(0)
   const alive = useRef(true)
+  const catalogId = entry.catalogId
 
   useEffect(() => {
     alive.current = true
@@ -59,11 +60,11 @@ function DemoInner({ entry, topic }: { entry: AdvancedEntry; topic: TopicMeta })
 
   useEffect(() => {
     let live = true
-    void CATALOG_LOADERS[entry.catalogId]!().then((c) => live && setCatalog(c))
+    void CATALOG_LOADERS[catalogId]!().then((c) => live && setCatalog(c))
     return () => {
       live = false
     }
-  }, [entry.catalogId])
+  }, [catalogId])
 
   const onRun = useCallback(() => {
     const parsed = entry.parseDraft(draft)

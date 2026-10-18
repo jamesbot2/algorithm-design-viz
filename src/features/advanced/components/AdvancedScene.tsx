@@ -239,7 +239,7 @@ function HeapScene({ v }: { v: HeapView }) {
         const stripH = 48
         const r = Math.max(10, Math.min(16, Math.floor(w / 2 ** (levels - 1) / 2) - 2))
         const gapY = levels > 1 ? Math.min(52, (h - stripH - 2 * r - 8) / (levels - 1)) : 0
-        const nodePos = (i: number) => heapSlot(i, v.cap, w, 6 + r, gapY)
+        const nodePos = (i: number) => heapSlot(i, w, 6 + r, gapY)
         const role = (i: number) => (sw.has(i) ? 'swap' : cmp.has(i) ? 'compare' : v.cursor === i ? 'focus' : 'plain')
         return (
           <>

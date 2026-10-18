@@ -40,21 +40,23 @@ export default function TemplatePage() {
   const [variant, setVariant] = useState<'teach' | 'contest'>('teach')
   const [form, setForm] = useState<'core' | 'full'>('core')
   const [pref] = useCodeLanguage()
-  const [msg, setMsg] = useState('')
+  const [msgState, setMsgState] = useState({ k: '', t: '' })
   const teach = useAsync<CatalogBundle>(() => CATALOG_LOADERS[tpl?.id.replace(/-/g, '_') ?? '']!(), [tpl?.id])
   const contest = useAsync(() => import('../templates/sources.generated').then((m) => m.default), [])
   const cppOnly = tpl ? tpl.teachLanguages.length === 1 : true
   const teachLang: CodeLanguage = cppOnly ? 'cpp' : pref
-  const [extra, setExtra] = useState<CodeDocument | null>(null)
+  // transient UI state is keyed to what is shown, so it can never describe a different variant/language
+  const shownKey = `${tpl?.id}|${variant}|${form}|${teachLang}`
+  const msg = msgState.k === shownKey ? msgState.t : ''
+  const setMsg = (t: string) => setMsgState({ k: shownKey, t })
+  const [extraState, setExtraState] = useState<{ k: string; doc: CodeDocument | null }>({ k: '', doc: null })
+  const extra = extraState.k === `${tpl?.id}|${teachLang}` ? extraState.doc : null
 
   useEffect(() => {
-    setMsg('')
-  }, [variant, form, teachLang, tpl?.id])
-  useEffect(() => {
     let live = true
-    setExtra(null)
     if (!tpl || cppOnly || teachLang === 'typescript') return
-    void loadAlgoLanguages(tpl.id, teach.value?.typescript.anchors ?? []).then((m) => live && setExtra(m.get(teachLang as Exclude<CodeLanguage, 'typescript'>) ?? null))
+    const k = `${tpl.id}|${teachLang}`
+    void loadAlgoLanguages(tpl.id, teach.value?.typescript.anchors ?? []).then((m) => live && setExtraState({ k, doc: m.get(teachLang as Exclude<CodeLanguage, 'typescript'>) ?? null }))
     return () => {
       live = false
     }

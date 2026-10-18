@@ -331,8 +331,9 @@ describe('template sources, hashes and validation binding', () => {
     const idx = boundIndex(a, 3, 'lower')
     expect(idx).toBe(1)
     expect(a[idx]).not.toBe(3)
-    // fenwick: lowbit(0)=0 → p never advances
-    expect(0 & -0).toBe(0)
+    // fenwick: lowbit(0)=0 → p never advances (p + lowbit(p) === p at p=0)
+    const p0 = 0
+    expect(p0 + (p0 & -p0)).toBe(p0)
     // pq: [9,7,3,5] is a valid heap but not sorted
     const h = view(solveDraft('stl-priority-queue', { ops: 'push(5); push(9); push(3); push(7)' }).steps.at(-1)).heap
     expect(h).toEqual([9, 7, 3, 5])
