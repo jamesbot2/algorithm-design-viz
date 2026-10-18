@@ -101,7 +101,7 @@ export const TEMPLATES: TemplateMeta[] = [
     sample: { input: '6\n5 9 3 9 12 7\n', output: '12 9 9 7 5 3\n', note: '重复值 9 保留两份；输出按非增顺序。' },
     counterexample: {
       title: '把堆数组当成有序数组',
-      explanation: 'push 5,9,3 后数组是 [9,5,3]；再 push 7 得 [9,7,3,5]。数组下标 1 是 7，但第二大的元素是 7 只是巧合：堆序只保证父 ≥ 子，兄弟之间、叶子之间没有顺序。',
+      explanation: 'push 5,9,3 后数组是 [9,5,3]；再 push 7 得 [9,7,3,5]。这是合法的堆，但数组并不是降序（3 排在 5 前面）：堆序只保证父 ≥ 子，兄弟之间、叶子之间没有顺序。',
       input: 'push(5); push(9); push(3); push(7)',
       wrong: '读成 [9,7,3,5] 就是从大到小',
       correct: '只有反复 pop 才得到 9,7,5,3；[9,7,3,5] 里 3 在 5 前面',

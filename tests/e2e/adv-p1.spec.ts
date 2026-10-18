@@ -359,6 +359,7 @@ test.describe('ADV-06 lower_bound / upper_bound lab', () => {
     await page.getByTestId('adv-input-mode').selectOption('upper')
     await runAndEnd(page)
     await expect(page.getByTestId('bd-result')).toHaveAttribute('data-index', '4')
+    await page.getByTestId('input-edit-toggle').click()
     await page.getByTestId('adv-input-target').fill('14')
     await runAndEnd(page)
     await expect(page.getByTestId('bd-result')).toHaveAttribute('data-index', '8')
