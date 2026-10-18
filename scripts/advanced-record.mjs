@@ -23,13 +23,13 @@ async function playToEnd(page, maxMs = 150_000) {
 }
 
 const demos = [
-  ['stl-bounds', 'stl', 'stl-bounds'],
-  ['stl-priority-queue', 'stl', 'stl-priority-queue'],
+  ['stl-vector', 'stl', 'stl-vector'],
   ['dsu', 'algorithms', 'dsu'],
   ['fenwick', 'algorithms', 'fenwick'],
+  ['segtree', 'algorithms', 'segtree'],
 ]
 const log = []
-for (const [name, section, id] of demos) {
+for (const [name, section, id] of process.env.SKIP_VIDEOS ? [] : demos) {
   const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, recordVideo: { dir: join(out, '_vid'), size: { width: 1366, height: 768 } } })
   await ctx.addInitScript(() => localStorage.setItem('adv-lab-theme', 'lab-dark'))
   const page = await ctx.newPage()
@@ -59,7 +59,7 @@ for (const [vw, vh] of [[1920, 1080], [390, 844], [844, 390], [1024, 600]]) {
     await page.goto(`${base}#/advanced/${section}/${id}?view=demo`)
     await page.getByTestId('run-btn').click()
     await page.getByTestId('visualizer').and(page.locator('[data-preview="0"]')).waitFor({ timeout: 20_000 })
-    for (let i = 0; i < 6; i++) await page.getByTestId('next-step-btn').click()
+    for (let i = 0; i < 6 && (await page.getByTestId('next-step-btn').isEnabled()); i++) await page.getByTestId('next-step-btn').click()
     await page.screenshot({ path: join(out, `${name}-${vw}x${vh}.png`) })
     await ctx.close()
   }
@@ -76,4 +76,4 @@ for (const [vw, vh] of [[1366, 768], [390, 844]]) {
   await ctx.close()
 }
 await browser.close()
-import('node:fs').then((fs) => fs.writeFileSync(join(out, 'recordings.json'), JSON.stringify({ at: new Date().toISOString(), note: 'Playwright recordVideo, default player speed, real clicks, no slowMo/time-lapse', log }, null, 2)))
+if (!process.env.SKIP_VIDEOS) import('node:fs').then((fs) => fs.writeFileSync(join(out, 'recordings.json'), JSON.stringify({ at: new Date().toISOString(), note: 'Playwright recordVideo, default player speed, real clicks, no slowMo/time-lapse', log }, null, 2)))
