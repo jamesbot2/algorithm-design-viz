@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
 import { chapters } from '../../data/chapters'
 import { algorithms } from '../../algorithms'
+import { searchTopics, matchesModule } from '../../features/advanced/catalog/search'
 import { byDesignThought, byProblemType, completionLabel } from '../../data/curriculum'
 
 export type NavMode = 'design' | 'problem' | 'chapter'
@@ -64,9 +65,17 @@ export function NavCatalog(props: {
           ],
         }))
 
-  const visible = groups
-    .map((g) => ({ ...g, links: g.links.filter((l) => match(l.title)) }))
-    .filter((g) => g.links.length > 0 || (!q && g.chapterHref) || (q && g.chapterHref && match(g.title)))
+  // 高阶算法: delivered topics only; searchable by Chinese/English names and abbreviations (BIT, DSU, SCC…).
+  const advTopics = !q || matchesModule(q) ? searchTopics() : searchTopics({ q })
+  const advGroup: Group[] = advTopics.length
+    ? [{ id: 'advanced', title: '高阶算法', links: [{ to: '/advanced', title: '高阶算法 · 总览' }, ...advTopics.map((t) => ({ to: `/advanced/${t.section}/${t.id}`, title: t.titleZh }))] }]
+    : []
+  const visible = [
+    ...groups
+      .map((g) => ({ ...g, links: g.links.filter((l) => match(l.title)) }))
+      .filter((g) => g.links.length > 0 || (!q && g.chapterHref) || (q && g.chapterHref && match(g.title))),
+    ...advGroup,
+  ]
 
   useEffect(() => {
     if (!autoFocusSearch) return

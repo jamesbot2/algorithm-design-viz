@@ -50,6 +50,11 @@ interface Props {
    * line when no anchor is given. 'forbidden' → never (see NUMERIC_LINE_FALLBACK).
    */
   numericFallback?: 'forbidden' | 'legacy-unverified'
+  /**
+   * 高阶算法 (STL topics): the catalog's single document IS this language (C++ only). The language
+   * switcher shows only that language; the user's saved language preference is neither used nor overwritten.
+   */
+  singleLanguage?: CodeLanguage
 }
 
 class ExecMarker extends GutterMarker {
@@ -194,6 +199,7 @@ export default function CodeBrowser({
   onTabChange,
   unmapped = false,
   numericFallback = 'legacy-unverified',
+  singleLanguage,
 }: Props) {
   const [tab, setTab] = useState<'ts' | 'pseudo'>('ts')
   const [fontSize, setFontSize] = useState(13)
@@ -220,8 +226,8 @@ export default function CodeBrowser({
   const pinTopRef = useRef(0)
   // V28: language choice (persisted, shared) and the per-language CodeMirror grammar.
   const [prefLanguage, setPrefLanguage] = useCodeLanguage()
-  const langs = useMemo(() => availableLanguages(algoId), [algoId])
-  const language: CodeLanguage = langs.includes(prefLanguage) ? prefLanguage : 'typescript'
+  const langs = useMemo(() => (singleLanguage ? [singleLanguage] : availableLanguages(algoId)), [algoId, singleLanguage])
+  const language: CodeLanguage = singleLanguage ?? (langs.includes(prefLanguage) ? prefLanguage : 'typescript')
   const [loadTick, setLoadTick] = useState(0)
   const [loadFailure, setLoadError] = useState<{ lang: CodeLanguage; msg: string } | null>(null)
   const [langCompartment] = useState(() => new Compartment())
@@ -262,7 +268,7 @@ export default function CodeBrowser({
   // V28: the document of the active language (null while its chunk/grammar is loading).
   const langDoc: CodeDocument | null = !docs
     ? null
-    : language === 'typescript'
+    : language === 'typescript' || singleLanguage
       ? docs.typescript
       : peekLanguageDoc(algoId, language)
   const langSupportReady = peekLanguageSupport(language) != null
@@ -756,7 +762,7 @@ export default function CodeBrowser({
   const showPseudo = Boolean(docs.pseudocode)
   const shownLanguage = showPseudoTab ? 'pseudocode' : language
   const title = activeDoc?.title ?? `${docs.typescript.title.replace(/\s*\(TypeScript\)\s*$/, '')} (${LANGUAGE_LABEL[language]})`
-  const langFallback = !showPseudoTab && prefLanguage !== language
+  const langFallback = !singleLanguage && !showPseudoTab && prefLanguage !== language
 
   return (
     <div

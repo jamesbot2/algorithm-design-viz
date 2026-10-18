@@ -206,6 +206,21 @@ function AlgorithmLibrary() {
   )
 }
 
+/** 高阶算法 entry on the home page: one compact strip (not a hero, not part of the 22-card library count). */
+function AdvancedStrip() {
+  return (
+    <section className="section adv-strip" aria-labelledby="adv-strip-title" data-testid="home-advanced">
+      <div className="section-head-row">
+        <h2 id="adv-strip-title">高阶算法</h2>
+        <Link to="/advanced" data-testid="home-advanced-link">
+          进入高阶算法
+        </Link>
+      </div>
+      <p className="hint">STL 专题、并查集、树状数组，每项带讲解、逐步演示与竞赛模板。</p>
+    </section>
+  )
+}
+
 export default function Home() {
   const [navMode, setNavMode] = useState<'design' | 'problem'>('design')
 
@@ -238,6 +253,7 @@ export default function Home() {
         </ul>
       </header>
 
+      <AdvancedStrip />
       <AlgorithmLibrary />
 
       <section className="section">

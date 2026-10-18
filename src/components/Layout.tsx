@@ -7,6 +7,7 @@ import { NavIcon, type NavIconName } from './nav/NavIcons'
 import { useMotion } from '../theme/MotionContext'
 import { useLabTheme, type LabThemeId } from '../theme/LabThemeContext'
 import { BUILD_INFO, buildInfoLabel } from '../buildInfo'
+import { advancedPageKind } from '../features/advanced/catalog/route'
 import { WorkspaceBudgetContext, type WorkspaceBudget } from './workbench/WorkspaceBudget'
 
 const RAIL_MQ = '(min-width: 961px) and (max-width: 1439px)'
@@ -228,8 +229,14 @@ export default function Layout() {
 
   const isAlgo = location.pathname.startsWith('/algo/')
   const isTeach = location.pathname.startsWith('/teach/')
+  // 高阶算法 page types: index pages = reading/list; demo (?view=demo) = workbench (same lab-fill budget as /algo);
+  // template pages = wide code-reading pages.
+  const advKind = advancedPageKind(location.pathname, location.search)
+  const isAdvDemo = advKind === 'demo'
   const isWide =
     isAlgo ||
+    isAdvDemo ||
+    advKind === 'template' ||
     isTeach ||
     location.pathname.startsWith('/practice') ||
     location.pathname.startsWith('/experiment')
@@ -237,6 +244,7 @@ export default function Layout() {
   const title = (() => {
     if (location.pathname === '/' || location.pathname === '') return '全部算法'
     if (location.pathname.startsWith('/teach/knapsack')) return '背包多策略教学'
+    if (location.pathname.startsWith('/advanced')) return '高阶算法'
     if (location.pathname.startsWith('/practice')) return '练习台'
     if (location.pathname.startsWith('/experiment')) return '实验台'
     if (location.pathname.startsWith('/lab/')) return '实验讲义'
@@ -267,11 +275,12 @@ export default function Layout() {
   }
   const primaryNav: { to: string; label: string; icon: NavIconName; end?: boolean; match?: string }[] = [
     { to: '/', label: '全部算法', icon: 'home', end: true },
+    { to: '/advanced', label: '高阶算法', icon: 'advanced', match: '/advanced' },
     { to: '/practice', label: '练习台', icon: 'practice' },
     { to: '/experiment', label: '实验台', icon: 'lab' },
     { to: '/lab/core', label: '实验讲义', icon: 'notes', match: '/lab/' },
   ]
-  const onAlgoPage = isAlgo || isTeach
+  const onAlgoPage = isAlgo || isTeach || isAdvDemo
 
   return (
     <div
@@ -421,7 +430,7 @@ export default function Layout() {
         </div>
       )}
 
-      <div className="main-wrap" data-lab-fill={isAlgo ? '1' : '0'} inert={mobileModalOpen ? true : undefined}>
+      <div className="main-wrap" data-lab-fill={isAlgo || isAdvDemo ? '1' : '0'} inert={mobileModalOpen ? true : undefined}>
         <header className="topbar">
           <button
             type="button"

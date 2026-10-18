@@ -7,6 +7,7 @@ import KnapsackUnit from './pages/teaching/KnapsackUnit'
 import PracticePage from './pages/practice/PracticePage'
 import ExperimentPage from './pages/experiment/ExperimentPage'
 import LabKnapsackDijkstraQueens from './content/labs/LabKnapsackDijkstraQueens'
+import { advancedRoutes } from './features/advanced/AdvancedRoutes'
 import { MotionProvider } from './theme/MotionContext'
 import { LabThemeProvider } from './theme/LabThemeContext'
 
@@ -20,6 +21,7 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="chapter/:id" element={<Chapter />} />
             <Route path="algo/:id" element={<AlgoPage />} />
+            {advancedRoutes}
             <Route path="teach/knapsack" element={<KnapsackUnit />} />
             <Route path="practice" element={<PracticePage />} />
             <Route path="experiment" element={<ExperimentPage />} />
