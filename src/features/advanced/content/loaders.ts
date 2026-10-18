@@ -6,5 +6,6 @@ export const CONTENT_LOADERS: Record<string, () => Promise<TopicContent>> = {
   'stl-priority-queue': () => import('./stl-priority-queue').then((m) => m.default),
   dsu: () => import('./dsu').then((m) => m.default),
   segtree: () => import('./segtree').then((m) => m.default),
+  'segtree-lazy': () => import('./segtree-lazy').then((m) => m.default),
   fenwick: () => import('./fenwick').then((m) => m.default),
 }

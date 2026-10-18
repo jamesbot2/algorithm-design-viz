@@ -6,7 +6,6 @@ export const ROADMAP: RoadmapItem[] = [
   { id: 'stl-deque', section: 'stl', titleZh: 'queue / deque 实验', titleEn: 'queue / deque', aliases: ['queue', 'deque', '双端队列'], note: '固定槽位的队首/队尾操作' },
   { id: 'stl-unique', section: 'stl', titleZh: 'unique + erase 实验', titleEn: 'unique + erase', aliases: ['unique', 'erase'], note: '逻辑新终点与容器 size' },
   { id: 'stl-set-map', section: 'stl', titleZh: 'set / multiset / map 实验', titleEn: 'set / map', aliases: ['set', 'map', 'multiset'], note: '有序键、重复次数、map[] 插入副作用' },
-  { id: 'segtree-lazy', section: 'algorithms', titleZh: '线段树 · 懒标记', titleEn: 'Segment Tree (lazy propagation)', aliases: ['lazy', '懒标记', '区间加', 'lazy propagation'], note: '区间加 + 区间和；下推顺序是关键（未做）' },
   { id: 'prefix-diff', section: 'algorithms', titleZh: '前缀和 / 差分', titleEn: 'Prefix sum / Difference', aliases: ['prefix sum', 'difference array'], note: '一维前缀和与区间增量' },
   { id: 'discretize', section: 'algorithms', titleZh: '离散化', titleEn: 'Coordinate compression', aliases: ['discretization'], note: '排序、去重、值到秩映射' },
   { id: 'bs-answer', section: 'algorithms', titleZh: '二分答案', titleEn: 'Binary search on answer', aliases: ['parametric search'], note: '整数可行性与 check 函数' },

@@ -44,6 +44,11 @@ export function SegScene({ v }: { v: SegView }) {
               累计 <b data-testid="seg-accum">{v.accum ?? 0}</b>
             </span>
           )}
+          {v.adding && (
+            <span data-testid="seg-adding" data-l={v.adding.l} data-r={v.adding.r} data-v={v.adding.v}>
+              每个元素 += {v.adding.v}
+            </span>
+          )}
           {v.target && (
             <span data-testid="seg-target" data-index={v.target.index} data-value={v.target.value}>
               a[{v.target.index}] ← {v.target.value}
@@ -91,12 +96,19 @@ export function SegScene({ v }: { v: SegView }) {
                     data-built={val == null ? '0' : '1'}
                     data-role={role}
                     data-current={cur ? '1' : '0'}
+                    data-lazy={v.lazy ? (v.lazy[s.node] ?? 0) : ''}
+                    data-tagged={v.tagged?.includes(s.node) ? '1' : '0'}
                     transform={`translate(${pos(s).x - bw / 2},${pos(s).y - bh / 2})`}
                   >
                     <rect width={bw} height={bh} rx={4} />
                     <text x={bw / 2} y={bh / 2 - 3} textAnchor="middle" dy="0.35em">
                       {val ?? '·'}
                     </text>
+                    {v.lazy && (v.lazy[s.node] ?? 0) !== 0 && (
+                      <text className="seg-tag" data-testid="seg-tag" x={bw + 2} y={4} textAnchor="start">
+                        ⚑{v.lazy[s.node]}
+                      </text>
+                    )}
                     <text className="adv-idx" x={bw / 2} y={bh + 9} textAnchor="middle">
                       [{s.lo},{s.hi})
                     </text>

@@ -98,6 +98,12 @@ export interface SegView {
   /** running sum of the 'inside' nodes of the current query */
   accum?: number
   result?: number
+  /** lazy segment tree only: pending tag per heap node (amount still to add to EACH element below) */
+  lazy?: number[]
+  /** nodes whose tag was just written / pushed in this frame */
+  tagged?: number[]
+  /** range-add in progress: [l,r) and v */
+  adding?: { l: number; r: number; v: number }
 }
 
 export type AdvancedView = DsuView | FenwickView | HeapView | BoundsView | SegView

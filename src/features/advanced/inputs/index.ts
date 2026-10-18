@@ -271,3 +271,38 @@ export function parseSegOps(text: string): ValidateResult<SegOp[]> {
   }
   return { ok: true, value: ops }
 }
+
+// ───────── LazyInput (lazy segment tree: range add + range sum) ─────────
+export type LazyOp = { t: 'add'; l: number; r: number; v: number } | { t: 'sum'; l: number; r: number }
+export interface LazyInput {
+  arr: number[]
+  ops: LazyOp[]
+}
+export function validateLazyInput(raw: unknown): ValidateResult<LazyInput> {
+  const r = raw as Partial<LazyInput> | null
+  if (!Array.isArray(r?.arr)) return fail('arr', '数组须为整数列表')
+  const n = r!.arr!.length
+  if (n < 1 || n > ADV_LIMITS.segN) return fail('arr', `数组长度须为 1..${ADV_LIMITS.segN}`)
+  if (!r!.arr!.every((x) => Number.isSafeInteger(x) && Math.abs(x) <= ADV_LIMITS.absValue)) return fail('arr', `元素须为绝对值 ≤ ${ADV_LIMITS.absValue} 的整数`)
+  if (!Array.isArray(r?.ops)) return fail('ops', '操作须为数组')
+  if (r!.ops!.length > ADV_LIMITS.ops) return fail('ops', `操作数 ${r!.ops!.length} 超过演示上限 ${ADV_LIMITS.ops}`)
+  for (const [i, op] of r!.ops!.entries()) {
+    if (op?.t !== 'add' && op?.t !== 'sum') return fail('ops', `第 ${i + 1} 个操作类型不受支持`, i)
+    if (!Number.isInteger(op.l) || !Number.isInteger(op.r) || op.l < 0 || op.r > n || op.l > op.r) return fail('ops', `第 ${i + 1} 个 ${op.t}(l,r) 须满足 0 ≤ l ≤ r ≤ ${n}（半开区间 [l,r)）`, i)
+    if (op.t === 'add' && (!Number.isSafeInteger(op.v) || Math.abs(op.v) > ADV_LIMITS.absValue)) return fail('ops', `第 ${i + 1} 个 add 的增量无效`, i)
+  }
+  return { ok: true, value: { arr: r!.arr as number[], ops: r!.ops as LazyOp[] } }
+}
+/** Whitelist grammar: `add l r v | sum l r`. */
+export function parseLazyOps(text: string): ValidateResult<LazyOp[]> {
+  const ops: LazyOp[] = []
+  const parts = text.split(/[;\n]+/).map((s) => s.trim()).filter(Boolean)
+  for (const [i, p] of parts.entries()) {
+    const w = p.split(/\s+/)
+    const nums = w.slice(1).map(parseIntToken)
+    if (w[0] === 'add' && w.length === 4 && nums.every((x) => x !== null)) ops.push({ t: 'add', l: nums[0]!, r: nums[1]!, v: nums[2]! })
+    else if (w[0] === 'sum' && w.length === 3 && nums.every((x) => x !== null)) ops.push({ t: 'sum', l: nums[0]!, r: nums[1]! })
+    else return fail('ops', `无法解析第 ${i + 1} 个操作「${p}」。仅支持 add l r v / sum l r`, i, p)
+  }
+  return { ok: true, value: ops }
+}

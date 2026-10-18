@@ -7,6 +7,7 @@ export const CATALOG_LOADERS: Record<string, () => Promise<CatalogBundle>> = {
   dsu: () => import('../../../codeCatalog/dsu').then((m) => m.getDsuCatalog()),
   fenwick: () => import('../../../codeCatalog/fenwick').then((m) => m.getFenwickCatalog()),
   segtree: () => import('../../../codeCatalog/segtree').then((m) => m.getSegtreeCatalog()),
+  segtree_lazy: () => import('../../../codeCatalog/segtree_lazy').then((m) => m.getSegtreeLazyCatalog()),
   stl_bounds: () => import('../../../codeCatalog/stl_bounds').then((m) => m.getStlBoundsCatalog()),
   stl_priority_queue: () => import('../../../codeCatalog/stl_priority_queue').then((m) => m.getStlPriorityQueueCatalog()),
 }

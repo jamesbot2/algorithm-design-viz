@@ -91,6 +91,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'segtree-lazy',
+    section: 'algorithms',
+    titleZh: '懒标记线段树',
+    titleEn: 'Lazy Segment Tree',
+    aliases: ['lazy propagation', 'lazy segment tree', '懒标记', '区间加', '区间修改', 'push down', 'pushdown'],
+    tags: ['数据结构', '区间修改', '区间查询'],
+    difficulty: 'topic',
+    prereqs: ['segtree'],
+    summary: '区间加 + 区间和：完全覆盖只打标记，需要下探时先 push 再递归、回溯时 pull；看清标记是怎样"欠账、还账"的。',
+    routeOrder: 5,
+    demoId: 'segtree-lazy',
+    templateId: 'segtree-lazy',
+    relatedAlgos: [],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

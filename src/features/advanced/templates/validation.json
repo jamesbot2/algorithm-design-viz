@@ -219,6 +219,62 @@
       "tests": 151,
       "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
       "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "segtree-lazy|teach|typescript|run": {
+      "hash": "3eeb4aee02f336247309c12c4aed9a1ca49b140f5813f96f226ef76ebe1a6f86",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "v24.20.0",
+      "checks": "node strip-types (displayed .ts imported unchanged)"
+    },
+    "segtree-lazy|teach|python|run": {
+      "hash": "4be97b2c9f2ceae0bce487cba5bd51dcda6800e564b0a09853ff84fca112ae5c",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "Python 3.13.5",
+      "checks": "python3 -X dev"
+    },
+    "segtree-lazy|teach|cpp|run": {
+      "hash": "6e626d7f8f9fe637879aea61f5d81404382333c1b4ac1daca93c8bcba0adb68a",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean"
+    },
+    "segtree-lazy|teach|java|run": {
+      "hash": "767aea4c157f533a6c495a7aa15b8784d720cc6939920006147b20ed0776c987",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "javac 21.0.12.1",
+      "checks": "javac -Xlint:all; java -ea"
+    },
+    "segtree-lazy|teach|rust|run": {
+      "hash": "eb130a0fffb694c48ccfac4f17a2b96ea39a4d285305857398d93c17d02b0aa3",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "checks": "rustc -D warnings, overflow-checks=on"
+    },
+    "segtree-lazy|teach|go|run": {
+      "hash": "a0c5930ca22b8b2abcbc13e80fd9345047aa1cc65802373025a8707998b6c2c1",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "checks": "go vet; go run"
+    },
+    "segtree-lazy|contest-core|cpp|run": {
+      "hash": "778ed3d91d20a7ae51485c46a0926b105d2f9136499e2d8e2cf0eca7c9b44233",
+      "status": "pass",
+      "tests": 401,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline"
+    },
+    "segtree-lazy|contest-full|cpp|run": {
+      "hash": "e01f685f33e44a4a418090ddf405f0e1ea7ce9c349247eeeefeaa7712972daef",
+      "status": "pass",
+      "tests": 151,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
     }
   }
 }

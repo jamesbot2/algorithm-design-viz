@@ -17,6 +17,8 @@ import {
   parsePqOps,
   parseIntList,
   parseSegOps,
+  parseLazyOps,
+  validateLazyInput,
   validateSegInput,
   parseIntToken,
   ADV_LIMITS,
@@ -24,10 +26,11 @@ import {
 import * as dsu from './dsu'
 import * as fenwick from './fenwick'
 import * as segtree from './segtree'
+import * as segtreeLazy from './segtreeLazy'
 import * as stlBounds from './stlBounds'
 import * as stlPq from './stlPriorityQueue'
 
-export type AdvancedAlgoId = 'dsu' | 'fenwick' | 'segtree' | 'stl-bounds' | 'stl-priority-queue'
+export type AdvancedAlgoId = 'dsu' | 'fenwick' | 'segtree' | 'segtree-lazy' | 'stl-bounds' | 'stl-priority-queue'
 
 export interface AdvancedEntry {
   id: AdvancedAlgoId
@@ -103,6 +106,23 @@ export const advancedEntries: Record<AdvancedAlgoId, AdvancedEntry> = {
     },
     validate: validateSegInput,
     solve: (i) => segtree.generateSegSteps(i as Parameters<typeof segtree.generateSegSteps>[0]),
+  },
+  'segtree-lazy': {
+    id: 'segtree-lazy',
+    meta: segtreeLazy.meta,
+    catalogId: 'segtree_lazy',
+    languages: 'six',
+    presentation: ADV,
+    defaultDraft: { arr: segtreeLazy.meta.defaultArr, ops: segtreeLazy.meta.defaultOps },
+    parseDraft: (d) => {
+      const arr = parseIntList(d.arr ?? '', 'arr', ADV_LIMITS.segN)
+      if (!arr.ok) return arr
+      const ops = parseLazyOps(d.ops ?? '')
+      if (!ops.ok) return ops
+      return validateLazyInput({ arr: arr.value, ops: ops.value })
+    },
+    validate: validateLazyInput,
+    solve: (i) => segtreeLazy.generateLazySteps(i as Parameters<typeof segtreeLazy.generateLazySteps>[0]),
   },
   'stl-bounds': {
     id: 'stl-bounds',

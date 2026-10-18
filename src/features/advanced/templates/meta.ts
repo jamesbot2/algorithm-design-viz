@@ -203,6 +203,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'segtree-lazy',
+    topicId: 'segtree-lazy',
+    title: '懒标记线段树（区间加 + 区间和）',
+    category: '数据结构',
+    difficulty: '进阶',
+    prereqs: ['线段树（单点赋值 + 区间和）', '半开区间 [l, r)'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<vector>'],
+      depends: [],
+      indexing: '对外 0-based；结点堆式编号（根 = 1，孩子 2k、2k+1）',
+      interval: '半开区间 [l, r)；结点区间 [lo, hi)，mid = lo + (hi − lo) / 2',
+      limits: 'C++/Java/Rust/Go 用 64 位和；TypeScript 为 Number，|和| ≤ 2^53−1；Python 任意精度',
+      timeComplexity: '建树 O(n)；add / sum O(log n)',
+      spaceComplexity: 'O(4n)（total 与 lazy 两个数组）',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版把 apply / push 压成单行函数，控制流与教学版的分行写法不同构：作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '5 5\n1 2 3 4 5\n1 0 5\n0 1 4 10\n1 0 2\n1 2 5\n0 0 5 -1\n', output: '15\n13\n32\n', note: '操作 0 l r x：a[l..r) += x；操作 1 l r：输出 a[l..r) 的和。a=[1,2,3,4,5]：sum[0,5)=15；给 a[1..4) 加 10 得 [1,12,13,14,5]；sum[0,2)=13；sum[2,5)=13+14+5=32；最后的 add 不输出。' },
+    counterexample: {
+      title: '在 sum 的部分重叠分支漏掉 push',
+      explanation: 'a = [1,2,3,4]。add(0,4,10) 把根结点完全覆盖：只改 total[1] 与 lazy[1]，孩子仍是旧值。随后 sum(0,2)：根部分重叠，必须先 push 把标记交给孩子；漏掉 push 就直接读到孩子 [0,2) 的旧 total = 3，而正确答案是 (1+10)+(2+10) = 23。',
+      input: 'a=[1,2,3,4]；add(0,4,10)；sum(0,2)',
+      wrong: '3（读到孩子的旧值）',
+      correct: '23',
+    },
+    ioProtocol: '第 1 行 N Q；第 2 行 a_0..a_{N−1}；随后 Q 行：0 l r x（a[l..r) += x）；1 l r（输出 a[l..r) 的和）。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

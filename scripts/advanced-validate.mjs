@@ -217,6 +217,39 @@ function naiveSeg(cs) {
 }
 const segInput = (cs) => `${cs.length}\n` + cs.map(({ n, init, ops }) => `${n} ${ops.length}\n${init.join(' ')}\n` + ops.map(([k, a, b]) => `${k} ${a} ${b}`).join('\n')).join('\n') + '\n'
 
+function genLazy(seed) {
+  const r = mulberry32(seed)
+  const cases = []
+  for (let c = 0; c < 400; c++) {
+    const n = c < 5 ? 1 + c : rint(r, 1, 70)
+    const init = Array.from({ length: n }, () => rint(r, -1000, 1000))
+    const m = rint(r, 0, 80)
+    const ops = []
+    for (let i = 0; i < m; i++) {
+      const l = rint(r, 0, n)
+      const rr = rint(r, l, n)
+      if (r() < 0.5) ops.push(['a', l, rr, c % 7 === 0 ? rint(r, -1_000_000_000, 1_000_000_000) : rint(r, -1000, 1000)])
+      else ops.push(['s', l, rr, 0])
+    }
+    cases.push({ n, init, ops })
+  }
+  // exact int64 pressure: big values times long ranges (TS Number would lose precision beyond 2^53; sums here stay below 2^53)
+  cases.push({ n: 1024, init: Array.from({ length: 1024 }, () => 3_000_000), ops: [['s', 0, 1024, 0], ['a', 0, 1024, 4_000_000], ['s', 0, 1024, 0], ['a', 5, 900, -7_000_000], ['s', 3, 1000, 0]] })
+  return cases
+}
+function naiveLazy(cs) {
+  return cs.map(({ init, ops }) => {
+    const a = init.map((v) => BigInt(v))
+    const out = []
+    for (const [k, x, y, v] of ops) {
+      if (k === 'a') for (let i = x; i < y; i++) a[i] += BigInt(v)
+      else out.push(a.slice(x, y).reduce((s, q) => s + q, 0n))
+    }
+    return out.map(String)
+  })
+}
+const lazyInput = (cs) => `${cs.length}\n` + cs.map(({ n, init, ops }) => `${n} ${ops.length}\n${init.join(' ')}\n` + ops.map(([k, a, b, v]) => `${k} ${a} ${b} ${v}`).join('\n')).join('\n') + '\n'
+
 function genBounds(seed) {
   const r = mulberry32(seed)
   const cases = []
@@ -310,6 +343,14 @@ const D = {
     rust: `#[path = "segtree.rs"]\nmod segtree;\nuse segtree::SegTree;\nuse std::io::Read;\nfn main(){let mut s=String::new();std::io::stdin().read_to_string(&mut s).unwrap();let mut it=s.split_whitespace();let t:usize=it.next().unwrap().parse().unwrap();let mut out=String::new();for _ in 0..t{let n:usize=it.next().unwrap().parse().unwrap();let m:usize=it.next().unwrap().parse().unwrap();let a:Vec<i64>=(0..n).map(|_|it.next().unwrap().parse().unwrap()).collect();let mut st=SegTree::new(&a);let mut r:Vec<String>=vec![];for _ in 0..m{let k=it.next().unwrap();let x:i64=it.next().unwrap().parse().unwrap();let y:i64=it.next().unwrap().parse().unwrap();match k{"a"=>st.set(x as usize,y),_=>r.push(st.sum(x as usize,y as usize).to_string())}}\nout.push_str(&r.join(" "));out.push('\\n');}print!("{}",out);}\n`,
     go: `package main\nimport ("bufio";"fmt";"os";"strings")\nfunc main(){rd:=bufio.NewReader(os.Stdin);var t int;fmt.Fscan(rd,&t);var o strings.Builder;for ;t>0;t--{var n,m int;fmt.Fscan(rd,&n,&m);a:=make([]int64,n);for i:=range a{fmt.Fscan(rd,&a[i])};st:=NewSegTree(a);var r []string;for i:=0;i<m;i++{var k string;var x,y int64;fmt.Fscan(rd,&k,&x,&y);if k=="a"{st.Set(int(x),y)}else{r=append(r,fmt.Sprint(st.Sum(int(x),int(y))))}};o.WriteString(strings.Join(r," ")+"\\n")};fmt.Print(o.String())}\n`,
   },
+  'segtree-lazy': {
+    python: `import sys\nfrom segtree_lazy import LazySegTree\nd=sys.stdin.read().split();p=1\nout=[]\nfor _ in range(int(d[0])):\n    n=int(d[p]);m=int(d[p+1]);p+=2\n    a=[int(x) for x in d[p:p+n]];p+=n\n    t=LazySegTree(a);res=[]\n    for _ in range(m):\n        k=d[p];x=int(d[p+1]);y=int(d[p+2]);v=int(d[p+3]);p+=4\n        if k=='a':t.add(x,y,v)\n        else:res.append(str(t.sum(x,y)))\n    out.append(' '.join(res))\nprint('\\n'.join(out))\n`,
+    typescript: `import { LazySegTree } from './segtree_lazy.ts'\nimport { readFileSync } from 'node:fs'\nconst d = readFileSync(0, 'utf8').split(/\\s+/).filter(Boolean); let p = 1\nconst out: string[] = []\nfor (let T = Number(d[0]); T > 0; T--) {\n  const n = Number(d[p]), m = Number(d[p + 1]); p += 2\n  const a: number[] = []\n  for (let i = 0; i < n; i++) a.push(Number(d[p++]))\n  const t = new LazySegTree(a); const res: string[] = []\n  for (let i = 0; i < m; i++) {\n    const k = d[p], x = Number(d[p + 1]), y = Number(d[p + 2]), v = Number(d[p + 3]); p += 4\n    if (k === 'a') t.add(x, y, v)\n    else res.push(String(t.sum(x, y)))\n  }\n  out.push(res.join(' '))\n}\nconsole.log(out.join('\\n'))\n`,
+    cpp: `#include <cstdio>\nint main(){int T;std::scanf("%d",&T);while(T--){int n,m;std::scanf("%d %d",&n,&m);std::vector<long long> a(n);for(auto&x:a)std::scanf("%lld",&x);LazySegTree t(a);bool first=true;for(int i=0;i<m;i++){char k;long long x,y,v;std::scanf(" %c %lld %lld %lld",&k,&x,&y,&v);if(k=='a')t.add((int)x,(int)y,v);else{std::printf(first?"%lld":" %lld",t.sum((int)x,(int)y));first=false;}}std::printf("\\n");}}\n`,
+    java: `import java.io.*;import java.util.*;\npublic class Main{public static void main(String[] z)throws IOException{StreamTokenizer s=new StreamTokenizer(new BufferedReader(new InputStreamReader(System.in)));s.resetSyntax();s.wordChars(33,255);s.whitespaceChars(0,32);s.nextToken();int T=Integer.parseInt(s.sval);StringBuilder o=new StringBuilder();while(T-->0){s.nextToken();int n=Integer.parseInt(s.sval);s.nextToken();int m=Integer.parseInt(s.sval);long[] a=new long[n];for(int i=0;i<n;i++){s.nextToken();a[i]=Long.parseLong(s.sval);}LazySegTree t=new LazySegTree(a);StringJoiner r=new StringJoiner(" ");for(int i=0;i<m;i++){s.nextToken();String k=s.sval;s.nextToken();long x=Long.parseLong(s.sval);s.nextToken();long y=Long.parseLong(s.sval);s.nextToken();long v=Long.parseLong(s.sval);if(k.equals("a"))t.add((int)x,(int)y,v);else r.add(Long.toString(t.sum((int)x,(int)y)));}\no.append(r).append('\\n');}System.out.print(o);}}\n`,
+    rust: `#[path = "segtree_lazy.rs"]\nmod segtree_lazy;\nuse segtree_lazy::LazySegTree;\nuse std::io::Read;\nfn main(){let mut s=String::new();std::io::stdin().read_to_string(&mut s).unwrap();let mut it=s.split_whitespace();let t:usize=it.next().unwrap().parse().unwrap();let mut out=String::new();for _ in 0..t{let n:usize=it.next().unwrap().parse().unwrap();let m:usize=it.next().unwrap().parse().unwrap();let a:Vec<i64>=(0..n).map(|_|it.next().unwrap().parse().unwrap()).collect();let mut st=LazySegTree::new(&a);let mut r:Vec<String>=vec![];for _ in 0..m{let k=it.next().unwrap();let x:i64=it.next().unwrap().parse().unwrap();let y:i64=it.next().unwrap().parse().unwrap();let v:i64=it.next().unwrap().parse().unwrap();match k{"a"=>st.add(x as usize,y as usize,v),_=>r.push(st.sum(x as usize,y as usize).to_string())}}\nout.push_str(&r.join(" "));out.push('\\n');}print!("{}",out);}\n`,
+    go: `package main\nimport ("bufio";"fmt";"os";"strings")\nfunc main(){rd:=bufio.NewReader(os.Stdin);var t int;fmt.Fscan(rd,&t);var o strings.Builder;for ;t>0;t--{var n,m int;fmt.Fscan(rd,&n,&m);a:=make([]int64,n);for i:=range a{fmt.Fscan(rd,&a[i])};st:=NewLazySegTree(a);var r []string;for i:=0;i<m;i++{var k string;var x,y,v int64;fmt.Fscan(rd,&k,&x,&y,&v);if k=="a"{st.Add(int(x),int(y),v)}else{r=append(r,fmt.Sprint(st.Sum(int(x),int(y))))}};o.WriteString(strings.Join(r," ")+"\\n")};fmt.Print(o.String())}\n`,
+  },
   'stl-bounds': {
     cpp: `#include <cstdio>\nint main(){int T;std::scanf("%d",&T);while(T--){int n,q;std::scanf("%d %d",&n,&q);std::vector<int> a(n);for(int&x:a)std::scanf("%d",&x);bool first=true;for(int i=0;i<q;i++){int x;std::scanf("%d",&x);std::printf(first?"%zu %zu %zu %zu":" %zu %zu %zu %zu",lower_bound_idx(a,x),upper_bound_idx(a,x),std_lower_bound_idx(a,x),std_upper_bound_idx(a,x));first=false;}std::printf("\\n");}}\n`,
   },
@@ -322,6 +363,7 @@ const CD = {
   dsu: `#include "core.cpp"\n#include <cstdio>\n#include <string>\nint main(){int T;std::scanf("%d",&T);while(T--){int n,m;std::scanf("%d %d",&n,&m);DSU x(n);std::string res;for(int i=0;i<m;i++){char k;int a,b;std::scanf(" %c %d %d",&k,&a,&b);if(k=='u')res+=x.unite(a,b)?"1 ":"0 ";else if(k=='s')res+=x.same(a,b)?"1 ":"0 ";else res+=std::to_string(x.find(a))+" ";}\nint cnt=0;for(int i=0;i<n;i++)if(x.find(i)==i)cnt++;std::printf("%s| %d |",res.c_str(),cnt);for(int i=0;i<n;i++)std::printf(" %d",x.find(i));std::printf("\\n");}}\n`,
   fenwick: `#include "core.cpp"\n#include <cstdio>\nint main(){int T;std::scanf("%d",&T);while(T--){int n,m;std::scanf("%d %d",&n,&m);BIT<long long> f(n);bool first=true;for(int i=0;i<m;i++){char k;long long a,b;std::scanf(" %c %lld %lld",&k,&a,&b);if(k=='a')f.add((int)a,b);else{long long v=k=='p'?f.prefix((int)a):f.sum((int)a,(int)b);std::printf(first?"%lld":" %lld",v);first=false;}}std::printf("\\n");}}\n`,
   segtree: `#include "core.cpp"\n#include <cstdio>\nint main(){int T;std::scanf("%d",&T);while(T--){int n,m;std::scanf("%d %d",&n,&m);std::vector<long long> a(n);for(auto&x:a)std::scanf("%lld",&x);SegTree<long long> t(n);for(int i=0;i<n;i++)t.set(i,a[i]);bool first=true;for(int i=0;i<m;i++){char k;long long x,y;std::scanf(" %c %lld %lld",&k,&x,&y);if(k=='a')t.set((int)x,y);else{std::printf(first?"%lld":" %lld",t.sum((int)x,(int)y));first=false;}}std::printf("\\n");}}\n`,
+  'segtree-lazy': `#include "core.cpp"\n#include <cstdio>\nint main(){int T;std::scanf("%d",&T);while(T--){int n,m;std::scanf("%d %d",&n,&m);std::vector<long long> a(n);for(auto&x:a)std::scanf("%lld",&x);LazySeg<long long> t(a);bool first=true;for(int i=0;i<m;i++){char k;long long x,y,v;std::scanf(" %c %lld %lld %lld",&k,&x,&y,&v);if(k=='a')t.add((int)x,(int)y,v);else{std::printf(first?"%lld":" %lld",t.sum((int)x,(int)y));first=false;}}std::printf("\\n");}}\n`,
   'stl-bounds': `#include "core.cpp"\n#include <cstdio>\nint main(){int T;std::scanf("%d",&T);while(T--){int n,q;std::scanf("%d %d",&n,&q);std::vector<int> a(n);for(int&x:a)std::scanf("%d",&x);bool first=true;for(int i=0;i<q;i++){int x;std::scanf("%d",&x);int lo=first_ge(a,x),hi=first_gt(a,x);std::printf(first?"%d %d %d %d":" %d %d %d %d",lo,hi,lo,hi);first=false;if(count_equal(a,x)!=hi-lo)return 3;}std::printf("\\n");}}\n`,
   'stl-priority-queue': `#include "core.cpp"\n#include <cstdio>\n#include <cstdlib>\nint main(){int T;std::scanf("%d",&T);while(T--){int m;std::scanf("%d",&m);std::priority_queue<int> mx;MinPQ<int> mn;bool first=true;for(int i=0;i<m;i++){char k;int v;std::scanf(" %c %d",&k,&v);if(k=='p'){mx.push(v);mn.push(v);}else if(k=='o'){mx.pop();mn.pop();}\nif(mx.empty())std::printf(first?"E %d ok":" E %d ok",0);else std::printf(first?"%d %zu ok":" %d %zu ok",mx.top(),mx.size());first=false;}std::printf("\\n");}\n  std::vector<int> v{5,1,4,1,5,9,2,6};auto d=drain_desc(v);for(size_t i=1;i<d.size();i++)if(d[i-1]<d[i])return 4;return 0;}\n`,
 }
@@ -331,7 +373,7 @@ async function teachDocs(id) {
   const dir = id.replace(/-/g, '_')
   const cap = id.split('-').map((w) => w[0].toUpperCase() + w.slice(1)).join('')
   const out = {}
-  if (id === 'dsu' || id === 'fenwick' || id === 'segtree') {
+  if (['dsu', 'fenwick', 'segtree', 'segtree-lazy'].includes(id)) {
     const idx = await imp(`src/codeCatalog/${dir}/index.ts`)
     const cat = idx[`get${cap}Catalog`]()
     out.typescript = cat.typescript
@@ -369,7 +411,8 @@ const need = (r, what) => {
 }
 
 async function validateTopic(id) {
-  const gens = { dsu: [genDsu, naiveDsu, dsuInput, checkDsu], fenwick: [genFenwick, naiveFenwick, fwInput, checkFenwick], segtree: [genSeg, naiveSeg, segInput, checkFenwick], 'stl-bounds': [genBounds, null, bdInput, checkBounds], 'stl-priority-queue': [genPq, null, pqInput, checkPq] }
+  const dir = id.replace(/-/g, '_')
+  const gens = { dsu: [genDsu, naiveDsu, dsuInput, checkDsu], fenwick: [genFenwick, naiveFenwick, fwInput, checkFenwick], segtree: [genSeg, naiveSeg, segInput, checkFenwick], 'segtree-lazy': [genLazy, naiveLazy, lazyInput, checkFenwick], 'stl-bounds': [genBounds, null, bdInput, checkBounds], 'stl-priority-queue': [genPq, null, pqInput, checkPq] }
   const [gen, naive, inp, chk] = gens[id]
   const cases = gen(20260101 + id.length)
   const nv = naive ? naive(cases) : null
@@ -392,13 +435,13 @@ async function validateTopic(id) {
       let r
       let checks
       if (lang === 'python') {
-        writeFileSync(join(d, `${id}.py`), doc.source)
+        writeFileSync(join(d, `${dir}.py`), doc.source)
         writeFileSync(join(d, 'main.py'), drv)
         writeFileSync(join(d, 'in.txt'), input)
         r = need(run('python3', ['-X', 'dev', 'main.py'], { cwd: d, input }), 'python3')
         checks = 'python3 -X dev'
       } else if (lang === 'typescript') {
-        writeFileSync(join(d, `${id}.ts`), doc.source)
+        writeFileSync(join(d, `${dir}.ts`), doc.source)
         writeFileSync(join(d, 'main.ts'), drv)
         r = need(run('node', ['--experimental-strip-types', '--no-warnings', 'main.ts'], { cwd: d, input }), 'node')
         checks = 'node strip-types (displayed .ts imported unchanged)'
@@ -410,20 +453,20 @@ async function validateTopic(id) {
         r = need(run('./main', [], { cwd: d, input, env: ASAN_ENV }), 'run under ASan/UBSan')
         checks = 'g++ -std=c++17 ASan+UBSan -Wall -Wextra clean'
       } else if (lang === 'java') {
-        const cls = { dsu: 'DSU', fenwick: 'Fenwick', segtree: 'SegTree' }[id]
+        const cls = { dsu: 'DSU', fenwick: 'Fenwick', segtree: 'SegTree', 'segtree-lazy': 'LazySegTree' }[id]
         writeFileSync(join(d, `${cls}.java`), doc.source)
         writeFileSync(join(d, 'Main.java'), drv)
         need(run('javac', ['-Xlint:all', `${cls}.java`, 'Main.java'], { cwd: d }), 'javac')
         r = need(run('java', ['-ea', '-cp', d, 'Main'], { cwd: d, input }), 'java')
         checks = 'javac -Xlint:all; java -ea'
       } else if (lang === 'rust') {
-        writeFileSync(join(d, `${id}.rs`), doc.source)
+        writeFileSync(join(d, `${dir}.rs`), doc.source)
         writeFileSync(join(d, 'main.rs'), drv)
         need(run('rustc', ['--edition', '2021', '-C', 'debuginfo=0', '-C', 'overflow-checks=on', '-D', 'warnings', 'main.rs', '-o', 'main'], { cwd: d }), 'rustc')
         r = need(run('./main', [], { cwd: d, input }), 'rust run')
         checks = 'rustc -D warnings, overflow-checks=on'
       } else if (lang === 'go') {
-        writeFileSync(join(d, `${id}.go`), doc.source)
+        writeFileSync(join(d, `${dir}.go`), doc.source)
         writeFileSync(join(d, 'main.go'), drv)
         writeFileSync(join(d, 'go.mod'), 'module advtmp\ngo 1.21\n')
         need(run('go', ['vet', './...'], { cwd: d, env: { ...process.env, GOFLAGS: '-mod=mod', GOCACHE: join(d, '.cache') } }), 'go vet')
@@ -535,6 +578,26 @@ function randomStdin(id, d, r) {
     const input = `${n} ${q}\n${a.join(' ')}\n${lines.join('\n')}\n`
     const o = need(run('./full', [], { cwd: d, input, env: ASAN_ENV }), 'full random')
     if (o.stdout !== exp.map((x) => x + '\n').join('')) throw new Error('segtree full: random stdin mismatch\n' + input)
+  } else if (id === 'segtree-lazy') {
+    const n = rint(r, 1, 12), q = rint(r, 1, 30)
+    const a = Array.from({ length: n }, () => rint(r, -50, 50))
+    const lines = []
+    const exp = []
+    const cur = [...a]
+    for (let i = 0; i < q; i++) {
+      const l = rint(r, 0, n), rr = rint(r, l, n)
+      if (r() < 0.5) {
+        const x = rint(r, -50, 50)
+        lines.push(`0 ${l} ${rr} ${x}`)
+        for (let j = l; j < rr; j++) cur[j] += x
+      } else {
+        lines.push(`1 ${l} ${rr}`)
+        exp.push(cur.slice(l, rr).reduce((s, v) => s + v, 0))
+      }
+    }
+    const input = `${n} ${q}\n${a.join(' ')}\n${lines.join('\n')}\n`
+    const o = need(run('./full', [], { cwd: d, input, env: ASAN_ENV }), 'full random')
+    if (o.stdout !== exp.map((x) => x + '\n').join('')) throw new Error('segtree-lazy full: random stdin mismatch\n' + input)
   } else if (id === 'stl-bounds') {
     const n = rint(r, 0, 12)
     const a = Array.from({ length: n }, () => rint(r, -5, 5)).sort((x, y) => x - y)
@@ -560,7 +623,7 @@ function randomStdin(id, d, r) {
   return 1
 }
 
-const ids = ['stl-bounds', 'stl-priority-queue', 'dsu', 'fenwick', 'segtree'].filter((i) => !only || i === only)
+const ids = ['stl-bounds', 'stl-priority-queue', 'dsu', 'fenwick', 'segtree', 'segtree-lazy'].filter((i) => !only || i === only)
 for (const id of ids) await validateTopic(id)
 
 const outPath = join(ROOT, 'src/features/advanced/templates/validation.json')

@@ -14,11 +14,11 @@ export function buildPreview(id: string, draft: Record<string, string>): Step | 
     if (n === null || n < 1 || n > ADV_LIMITS.fenwickN) return null
     return { ...base, message: `就绪：长度 ${n} 的全 0 数组。点击「运行」执行操作序列。`, advanced: { kind: 'fenwick', n, tree: new Array<number>(n).fill(0), values: new Array<number>(n).fill(0), op: '预览', path: [] } }
   }
-  if (id === 'segtree') {
+  if (id === 'segtree' || id === 'segtree-lazy') {
     const arr = parseIntList(draft.arr ?? '', 'arr', ADV_LIMITS.segN)
     if (!arr.ok || arr.value.length < 1) return null
     const n = arr.value.length
-    return { ...base, message: `就绪：数组长度 ${n}，线段树尚未建立。点击「运行」先建树再执行操作序列。`, advanced: { kind: 'seg', n, tree: new Array<number | null>(4 * n).fill(null), op: '预览', visited: [] } }
+    return { ...base, message: `就绪：数组长度 ${n}，线段树尚未建立。点击「运行」先建树再执行操作序列。`, advanced: { kind: 'seg', n, tree: new Array<number | null>(4 * n).fill(null), op: '预览', visited: [], ...(id === 'segtree-lazy' ? { lazy: new Array<number>(4 * n).fill(0) } : {}) } }
   }
   if (id === 'stl-priority-queue') {
     return { ...base, message: '就绪：空的 priority_queue。点击「运行」执行操作序列。', advanced: { kind: 'heap', heap: [], cap: 1, op: '预览' } }

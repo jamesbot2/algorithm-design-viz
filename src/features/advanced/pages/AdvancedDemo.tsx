@@ -247,7 +247,7 @@ function DraftFields({ entry, draft, patch }: { entry: AdvancedEntry; draft: Rec
       </>
     )
   }
-  if (entry.id === 'segtree') {
+  if (entry.id === 'segtree' || entry.id === 'segtree-lazy') {
     return (
       <>
         <label>
@@ -255,7 +255,7 @@ function DraftFields({ entry, draft, patch }: { entry: AdvancedEntry; draft: Rec
           <input data-testid="adv-input-arr" value={draft.arr ?? ''} onChange={(e) => patch('arr', e.target.value)} />
         </label>
         <label>
-          操作序列（; 或换行分隔：set i v / sum l r，区间为 [l,r)）
+          操作序列（; 或换行分隔：{entry.id === 'segtree' ? 'set i v / sum l r' : 'add l r v / sum l r'}，区间为 [l,r)）
           <textarea data-testid="adv-input-ops" rows={3} value={draft.ops ?? ''} onChange={(e) => patch('ops', e.target.value)} />
         </label>
       </>
