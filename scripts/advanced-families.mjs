@@ -398,3 +398,58 @@ FAM['topo'] = {
     }
   },
 }
+
+// ───────────────────────── lca ─────────────────────────
+// Independent baseline: walk both nodes up by parent pointers, marking u's whole ancestor chain, then the first marked ancestor of v.
+function lcaNaive(par, u, v) {
+  const mark = new Set()
+  for (let x = u; ; x = par[x - 1]) {
+    mark.add(x)
+    if (x === 0) break
+  }
+  for (let x = v; ; x = par[x - 1]) {
+    if (mark.has(x)) return x
+    if (x === 0) throw new Error('no root')
+  }
+}
+FAM['lca'] = {
+  dir: 'lca',
+  cls: 'Lca',
+  gen(seed) {
+    const r = mulberry32(seed)
+    const cs = []
+    for (let t = 0; t < 300; t++) {
+      const n = t < 2 ? t + 1 : rint(r, 1, 12)
+      const par = []
+      const chain = t % 5 === 0
+      for (let v = 1; v < n; v++) par.push(chain ? v - 1 : rint(r, 0, v - 1))
+      const q = []
+      for (let i = 0; i < rint(r, 1, 8); i++) q.push(rint(r, 0, n - 1), rint(r, 0, n - 1))
+      cs.push({ k: 0, a: par, b: q, c: [] })
+    }
+    return cs
+  },
+  naive(c) {
+    const o = []
+    for (let i = 0; i + 1 < c.b.length; i += 2) o.push(lcaNaive(c.a, c.b[i], c.b[i + 1]))
+    return [o.join(' ')]
+  },
+  calls: {
+    python: ['lca_all(a,b)'],
+    typescript: ['M.lcaAll(a,b)'],
+    cpp: ['lca_all(a,b)'],
+    java: ['Lca.lcaAll(a,b)'],
+    rust: ['lca_all(&a,&b)'],
+    go: ['LcaAll(a,b)'],
+  },
+  core: ['{std::vector<int> par(a.size()+1,0);for(size_t i=0;i<a.size();i++)par[i+1]=(int)a[i];LCA t(par);std::vector<long long> r;for(size_t i=0;i+1<b.size();i+=2)r.push_back(t.query((int)b[i],(int)b[i+1]));pr(r);}'],
+  full(r) {
+    const n = rint(r, 1, 12), q = rint(r, 1, 8)
+    const par = []
+    for (let v = 1; v < n; v++) par.push(rint(r, 0, v - 1))
+    const qs = []
+    for (let i = 0; i < q; i++) qs.push([rint(r, 0, n - 1), rint(r, 0, n - 1)])
+    const input = `${n} ${q}\n${par.join(' ')}\n` + qs.map((x) => x.join(' ')).join('\n') + '\n'
+    return { input, expected: qs.map(([u, v]) => lcaNaive(par, u, v)).join('\n') + '\n' }
+  },
+}

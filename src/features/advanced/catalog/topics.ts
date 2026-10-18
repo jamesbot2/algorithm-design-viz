@@ -210,6 +210,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'lca',
+    section: 'algorithms',
+    titleZh: '最近公共祖先 LCA（倍增）',
+    titleEn: 'LCA (Binary Lifting)',
+    aliases: ['LCA', 'lowest common ancestor', '最近公共祖先', '倍增', 'binary lifting', '树上倍增'],
+    tags: ['树', '倍增', '查询'],
+    difficulty: 'intermediate',
+    prereqs: [],
+    summary: '预处理 2^j 级祖先；先抬到同深，再从高位到低位"不同才跳"，最后取父结点。',
+    routeOrder: 12,
+    demoId: 'lca',
+    templateId: 'lca',
+    relatedAlgos: [],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

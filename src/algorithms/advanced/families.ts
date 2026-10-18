@@ -5,6 +5,7 @@ import { spec as bsAnswer } from './bsAnswer'
 import { spec as monoStack } from './monoStack'
 import { spec as monoQueue } from './monoQueue'
 import { spec as topo } from './topo'
+import { spec as lca } from './lca'
 
 /** Registered generic families (each file exports `spec`). */
-export const FAMILIES: FamSpec[] = [prefixDiff, discretize, bsAnswer, monoStack, monoQueue, topo]
+export const FAMILIES: FamSpec[] = [prefixDiff, discretize, bsAnswer, monoStack, monoQueue, topo, lca]

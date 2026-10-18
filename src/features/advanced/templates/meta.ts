@@ -420,6 +420,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'lca',
+    topicId: 'lca',
+    title: '最近公共祖先（倍增）',
+    category: '树',
+    difficulty: '竞赛基础',
+    prereqs: ['树的父结点表示', '二进制拆分'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<utility>', '<vector>'],
+      depends: [],
+      indexing: '结点 0..n−1，0 为根；par[v] < v（v ≥ 1），par[0] = 0',
+      interval: '询问 (u, v) 两点都在 0..n−1；lca(u, u) = u',
+      limits: 'n 约 10^5 ~ 10^6 时内存 n·log n 个 int；父编号必须小于子编号，否则先 DFS 求 depth',
+      timeComplexity: '预处理 O(n log n)，询问 O(log n)',
+      spaceComplexity: 'O(n log n)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版是一个 LCA 结构体（构造即预处理，query 回答询问）；教学版是 lcaAll(par, queries) 批量接口：控制流同源但接口不同构，作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '8 4\n0 0 1 1 2 2 4\n3 6\n5 7\n3 4\n7 7\n', output: '0\n0\n1\n7\n', note: '树：0 为根，1、2 是它的孩子，3、4 挂在 1 下，5、6 挂在 2 下，7 挂在 4 下。lca(3,4)=1；lca(7,7)=7（自己）。' },
+    counterexample: {
+      title: '抬升后忘了判 u == v',
+      explanation: '链 0→1→2，询问 (2, 1)：抬升后 u = 1 = v。若直接进入"一起跳"并最后取父结点，会得到 0，而正确答案是 1（结点是自己的祖先）。',
+      input: 'par = [0, 1]，询问 (2, 1)',
+      wrong: '输出 0（多走了一层）',
+      correct: '输出 1',
+    },
+    ioProtocol: '第 1 行 N Q；第 2 行 N−1 个整数 par[1..N−1]（par[v] < v）；随后 Q 行 u v。输出 Q 行：每对的 LCA。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

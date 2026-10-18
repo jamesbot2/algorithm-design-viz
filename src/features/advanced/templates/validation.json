@@ -611,6 +611,62 @@
       "tests": 151,
       "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
       "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
+    },
+    "lca|teach|typescript|run": {
+      "hash": "508332f72b88f340e8928be0c862b2dc414e23e984cead17ab2eab3a9a2846d3",
+      "status": "pass",
+      "tests": 300,
+      "toolchain": "v24.20.0",
+      "checks": "node strip-types (displayed .ts imported unchanged)"
+    },
+    "lca|teach|python|run": {
+      "hash": "b7b996ae322880580b06f79dc759131d619657f62b1da08fbdb0f56ac765ff3b",
+      "status": "pass",
+      "tests": 300,
+      "toolchain": "Python 3.13.5",
+      "checks": "python3 -X dev"
+    },
+    "lca|teach|cpp|run": {
+      "hash": "d64428b5413ce5896ee5c4e296e656fafeece0454fdc658f85853bb44e1bd2da",
+      "status": "pass",
+      "tests": 300,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean"
+    },
+    "lca|teach|java|run": {
+      "hash": "a465d70dd3b2ccc29a28c6a9abb1953d6fa9d80e9f3105f886ba3f3208d37059",
+      "status": "pass",
+      "tests": 300,
+      "toolchain": "javac 21.0.12.1",
+      "checks": "javac -Xlint:all; java -ea"
+    },
+    "lca|teach|rust|run": {
+      "hash": "6003cabd92085e7f961e8ff4ef1db5917b9b3b0dd5069d3c98e31a0ee1965a6c",
+      "status": "pass",
+      "tests": 300,
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "checks": "rustc -D warnings, overflow-checks=on"
+    },
+    "lca|teach|go|run": {
+      "hash": "adf1e6e9ae711eaeaab05d165a974f6772074c3a10405ae0a2ae25342d4511f7",
+      "status": "pass",
+      "tests": 300,
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "checks": "go vet; go run"
+    },
+    "lca|contest-core|cpp|run": {
+      "hash": "5b3a052119998c48ecc9542233ad02b54aa980f907f14dde42aca9d9f6695004",
+      "status": "pass",
+      "tests": 300,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline"
+    },
+    "lca|contest-full|cpp|run": {
+      "hash": "5e442b2fc46fa0c1568dd04c1647f18998642d1fe4a6248d7ee08bc86116b716",
+      "status": "pass",
+      "tests": 151,
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan"
     }
   }
 }

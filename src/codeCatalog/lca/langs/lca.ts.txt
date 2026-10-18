@@ -1,0 +1,28 @@
+/** LCA by binary lifting. par[v-1] = parent of node v (1..n-1) and must satisfy par[v-1] < v; node 0 is the root. queries = flat pairs (u v). Returns one LCA per pair. */
+export function lcaAll(par: number[], queries: number[]): number[] {
+  const n = par.length + 1
+  let LOG = 1
+  while (1 << LOG < n) LOG++
+  const depth = new Array<number>(n).fill(0)
+  for (let v = 1; v < n; v++) depth[v] = depth[par[v - 1]!]! + 1 // @a: lcaDepth
+  const up: number[][] = [[0, ...par]] // @a: lcaBase
+  for (let j = 1; j < LOG; j++) up.push(up[j - 1]!.map((m) => up[j - 1]![m]!)) // @a: lcaTable
+  const out: number[] = []
+  for (let q = 0; q + 1 < queries.length; q += 2) {
+    let u = queries[q]!
+    let v = queries[q + 1]!
+    if (depth[u]! < depth[v]!) [u, v] = [v, u]
+    const diff = depth[u]! - depth[v]!
+    for (let j = 0; j < LOG; j++) {
+      if ((diff >> j) & 1) u = up[j]![u]! // @a: lcaLift
+    }
+    if (u !== v) {
+      for (let j = LOG - 1; j >= 0; j--) {
+        if (up[j]![u] !== up[j]![v]) { u = up[j]![u]!; v = up[j]![v]! } // @a: lcaJump
+      }
+      u = up[0]![u]! // @a: lcaParent
+    }
+    out.push(u) // @a: lcaAnswer
+  }
+  return out
+}

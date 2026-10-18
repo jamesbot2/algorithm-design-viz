@@ -311,3 +311,42 @@ describe('topo vs independent reference (transitive closure)', () => {
     expect(solve('topo', { n: 6, edges: [5, 2, 5, 0, 4, 0, 4, 1, 2, 3, 3, 1] }).result.order).toEqual([4, 5, 2, 0, 3, 1])
   })
 })
+
+describe('lca vs independent parent-walk reference', () => {
+  it('answers equal the naive ancestor-chain LCA; sample 0 0 1 7', () => {
+    const r = prng(31)
+    for (let c = 0; c < 200; c++) {
+      const n = ri(r, 1, 9)
+      const par: number[] = []
+      for (let v = 1; v < n; v++) par.push(ri(r, 0, v - 1))
+      const q: number[] = []
+      for (let i = 0; i < ri(r, 1, 4); i++) q.push(ri(r, 0, n - 1), ri(r, 0, n - 1))
+      const chain = (x: number) => {
+        const s: number[] = [x]
+        while (x !== 0) s.push((x = par[x - 1]!))
+        return s
+      }
+      const want: number[] = []
+      for (let i = 0; i < q.length; i += 2) {
+        const cu = new Set(chain(q[i]!))
+        want.push(chain(q[i + 1]!).find((x) => cu.has(x))!)
+      }
+      expect(solve('lca', { par, queries: q }).result.answers, `${par} / ${q}`).toEqual(want)
+    }
+    expect(solve('lca', { par: [0, 0, 1, 1, 2, 2, 4], queries: [3, 6, 5, 7, 3, 4, 7, 7] }).result.answers).toEqual([0, 0, 1, 7])
+  })
+  it('counterexample: no u==v check after lifting answers 0 for chain par=[0,1], query (2,1); product answers 1', () => {
+    const par = [0, 1]
+    const LOG = 2
+    const depth = [0, 1, 2]
+    const up = [[0, 0, 1], [0, 0, 0]]
+    let u = 2
+    let v = 1
+    for (let j = 0; j < LOG; j++) if (((depth[u]! - depth[v]!) >> j) & 1) u = up[j]![u]!
+    for (let j = LOG - 1; j >= 0; j--) if (up[j]![u] !== up[j]![v]) [u, v] = [up[j]![u]!, up[j]![v]!]
+    u = up[0]![u]! // BUG: parent taken even though u === v
+    expect(u).toBe(0)
+    expect(par.length).toBe(2)
+    expect(solve('lca', { par, queries: [2, 1] }).result.answers).toEqual([1])
+  })
+})
