@@ -16,6 +16,9 @@ import { validationState } from '../../src/features/advanced/templates/validatio
 import validationJson from '../../src/features/advanced/templates/validation.json'
 import dsuDocs from '../../src/codeCatalog/dsu/langs.generated'
 import fwDocs from '../../src/codeCatalog/fenwick/langs.generated'
+import segDocs from '../../src/codeCatalog/segtree/langs.generated'
+import { getSegtreeCatalog } from '../../src/codeCatalog/segtree'
+import { maxNodeId } from '../../src/algorithms/advanced/segtree'
 import { getDsuCatalog } from '../../src/codeCatalog/dsu'
 import { getFenwickCatalog } from '../../src/codeCatalog/fenwick'
 import { getStlBoundsCatalog } from '../../src/codeCatalog/stl_bounds'
@@ -125,6 +128,78 @@ describe('fenwick trace vs prefix-array reference', () => {
       expect(result.answers.map((x: { value: number }) => x.value), `n=${n} ops=${ops.join(';')}`).toEqual(answers)
       expect(result.tree).toEqual(t.slice(1))
       expect(result.values).toEqual(a)
+    }
+  })
+})
+
+describe('segtree trace vs naive array reference', () => {
+  it('random inputs: every sum answer, final values, and invariant tree[node] = sum(a[lo,hi))', () => {
+    const r = prng(31)
+    for (let c = 0; c < 150; c++) {
+      const n = ri(r, 1, 16)
+      const arr = Array.from({ length: n }, () => ri(r, -20, 20))
+      const ops: string[] = []
+      for (let i = 0; i < ri(r, 1, 18); i++) {
+        if (r() < 0.5) ops.push(`set ${ri(r, 0, n - 1)} ${ri(r, -30, 30)}`)
+        else {
+          const l = ri(r, 0, n)
+          ops.push(`sum ${l} ${ri(r, l, n)}`)
+        }
+      }
+      const { steps, result } = solveDraft('segtree', { arr: arr.join(', '), ops: ops.join('; ') }) as { steps: Step[]; result: any }
+      const a = [...arr]
+      const ans: number[] = []
+      for (const o of ops) {
+        const [k, x, y] = o.split(' ')
+        if (k === 'set') a[+x!] = +y!
+        else ans.push(a.slice(+x!, +y!).reduce((s, v) => s + v, 0))
+      }
+      expect(result.answers.map((q: { value: number }) => q.value), `${arr}|${ops}`).toEqual(ans)
+      expect(result.values).toEqual(a)
+      // invariant on the final tree: every built node equals the naive sum of its range
+      const check = (node: number, lo: number, hi: number) => {
+        expect(result.tree[node]).toBe(a.slice(lo, hi).reduce((s, v) => s + v, 0))
+        if (hi - lo > 1) {
+          const mid = lo + ((hi - lo) >> 1)
+          check(2 * node, lo, mid)
+          check(2 * node + 1, mid, hi)
+        }
+      }
+      check(1, 0, n)
+      // 'inside' nodes of each query cover [l,r) exactly once
+      for (const st of steps) {
+        const v = view(st)
+        if (v.query && v.result !== undefined) {
+          const cover = new Array<number>(n).fill(0)
+          for (const x of v.visited) if (x.role === 'inside') {
+            let lo = 0, hi = n, node = 1
+            const path: number[] = []
+            for (let m = x.node; m > 1; m >>= 1) path.unshift(m & 1)
+            for (const bit of path) { const mid = lo + ((hi - lo) >> 1); if (bit === 0) hi = mid; else lo = mid; node = node * 2 + bit }
+            for (let i = lo; i < hi; i++) cover[i]!++
+          }
+          for (let i = 0; i < n; i++) expect(cover[i]).toBe(i >= v.query[0] && i < v.query[1] ? 1 : 0)
+        }
+      }
+    }
+  })
+  it('counterexample: recursive layout for n=5 reaches node 15 > 2n=10', () => {
+    expect(maxNodeId(5)).toBe(15)
+    expect(maxNodeId(5)).toBeGreaterThan(2 * 5)
+    expect(maxNodeId(5)).toBeLessThan(4 * 5)
+    for (let n = 1; n <= 64; n++) expect(maxNodeId(n)).toBeLessThan(4 * n)
+  })
+  it('all six documents carry every emitted anchor', () => {
+    const need = new Set<string>()
+    for (const d of [advancedEntries.segtree.defaultDraft, { arr: '1,2,3,4,5', ops: 'set 2 9; sum 0 5; sum 4 4; sum 1 3' }]) for (const st of solveDraft('segtree', d).steps) for (const r of st.codeRefs ?? []) need.add(r.anchorId)
+    expect(need.size).toBeGreaterThanOrEqual(9)
+    const docs = [getSegtreeCatalog().typescript, ...segDocs]
+    expect(docs.map((d) => d.language).sort()).toEqual(['cpp', 'go', 'java', 'python', 'rust', 'typescript'])
+    for (const d of docs) {
+      const ids = new Set(d.anchors.map((a) => a.id))
+      for (const a of need) expect(ids.has(a), `segtree/${d.language} lacks ${a}`).toBe(true)
+      expect(d.source).not.toContain('@a:')
+      expect(sha(d.source)).toBe(SOURCE_HASHES.segtree!.teach![d.language])
     }
   })
 })
@@ -305,7 +380,7 @@ describe('template sources, hashes and validation binding', () => {
   it('validation.json is bound to the CURRENT hashes and test-set version; a changed hash is stale, never verified', () => {
     expect(validationJson.testsetVersion).toBe(TESTSET_VERSION)
     const keys = Object.keys(validationJson.entries)
-    expect(keys.length).toBe(22)
+    expect(keys.length).toBe(30)
     for (const k of keys) {
       const [id, variant, lang] = k.split('|') as [string, string, string]
       const cur = variant === 'teach' ? SOURCE_HASHES[id]!.teach![lang] : SOURCE_HASHES[id]!.contest![variant === 'contest-core' ? 'core' : 'full']

@@ -8,6 +8,7 @@ import type { ValidateResult, ValidationIssue } from '../../../core/trace/types'
 export const ADV_LIMITS = {
   dsuN: 12,
   fenwickN: 16,
+  segN: 16,
   ops: 24,
   boundsLen: 16,
   heapOps: 20,
@@ -231,4 +232,42 @@ export function validateMathInput(raw: unknown): ValidateResult<MathInput> {
   if (!dec(r?.a) || !dec(r?.b)) return fail('a/b', '须为十进制整数字符串（≤30 位，用 BigInt 处理）')
   if (r?.mod !== undefined && (!dec(r.mod) || BigInt(r.mod) <= 0n)) return fail('mod', '模数须为正整数')
   return { ok: true, value: { a: r!.a as string, b: r!.b as string, mod: r?.mod } }
+}
+
+// ───────── SegInput (segment tree: point assign + range sum) ─────────
+export type SegOp = { t: 'set'; i: number; v: number } | { t: 'sum'; l: number; r: number }
+export interface SegInput {
+  arr: number[]
+  ops: SegOp[]
+}
+export function validateSegInput(raw: unknown): ValidateResult<SegInput> {
+  const r = raw as Partial<SegInput> | null
+  if (!Array.isArray(r?.arr)) return fail('arr', '数组须为整数列表')
+  const n = r!.arr!.length
+  if (n < 1 || n > ADV_LIMITS.segN) return fail('arr', `数组长度须为 1..${ADV_LIMITS.segN}`)
+  if (!r!.arr!.every((x) => Number.isSafeInteger(x) && Math.abs(x) <= ADV_LIMITS.absValue)) return fail('arr', `元素须为绝对值 ≤ ${ADV_LIMITS.absValue} 的整数`)
+  if (!Array.isArray(r?.ops)) return fail('ops', '操作须为数组')
+  if (r!.ops!.length > ADV_LIMITS.ops) return fail('ops', `操作数 ${r!.ops!.length} 超过演示上限 ${ADV_LIMITS.ops}`)
+  for (const [i, op] of r!.ops!.entries()) {
+    if (op?.t === 'set') {
+      if (!Number.isInteger(op.i) || op.i < 0 || op.i >= n) return fail('ops', `第 ${i + 1} 个 set 的下标 ${op.i} 越界（合法 0..${n - 1}）`, i)
+      if (!Number.isSafeInteger(op.v) || Math.abs(op.v) > ADV_LIMITS.absValue) return fail('ops', `第 ${i + 1} 个 set 的值无效`, i)
+    } else if (op?.t === 'sum') {
+      if (!Number.isInteger(op.l) || !Number.isInteger(op.r) || op.l < 0 || op.r > n || op.l > op.r) return fail('ops', `第 ${i + 1} 个 sum(l,r) 须满足 0 ≤ l ≤ r ≤ ${n}（半开区间 [l,r)）`, i)
+    } else return fail('ops', `第 ${i + 1} 个操作类型不受支持`, i)
+  }
+  return { ok: true, value: { arr: r!.arr as number[], ops: r!.ops as SegOp[] } }
+}
+/** Whitelist grammar: `set i v | sum l r`. */
+export function parseSegOps(text: string): ValidateResult<SegOp[]> {
+  const ops: SegOp[] = []
+  const parts = text.split(/[;\n]+/).map((s) => s.trim()).filter(Boolean)
+  for (const [i, p] of parts.entries()) {
+    const w = p.split(/\s+/)
+    const nums = w.slice(1).map(parseIntToken)
+    if (w[0] === 'set' && w.length === 3 && nums.every((x) => x !== null)) ops.push({ t: 'set', i: nums[0]!, v: nums[1]! })
+    else if (w[0] === 'sum' && w.length === 3 && nums.every((x) => x !== null)) ops.push({ t: 'sum', l: nums[0]!, r: nums[1]! })
+    else return fail('ops', `无法解析第 ${i + 1} 个操作「${p}」。仅支持 set i v / sum l r`, i, p)
+  }
+  return { ok: true, value: ops }
 }

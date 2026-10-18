@@ -74,6 +74,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'segtree',
+    section: 'algorithms',
+    titleZh: '线段树',
+    titleEn: 'Segment Tree',
+    aliases: ['segment tree', 'segtree', '区间树', '区间查询', '单点修改', '区间和'],
+    tags: ['数据结构', '区间查询', '分治'],
+    difficulty: 'intermediate',
+    prereqs: ['fenwick'],
+    summary: '递归线段树：建树、单点赋值、半开区间求和；看清"不相交 / 完全包含 / 部分重叠"三种结点。（懒标记版本未交付）',
+    routeOrder: 4,
+    demoId: 'segtree',
+    templateId: 'segtree',
+    relatedAlgos: ['maxSubarrayDC'],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

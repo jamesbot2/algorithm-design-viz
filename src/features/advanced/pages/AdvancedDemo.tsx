@@ -247,6 +247,20 @@ function DraftFields({ entry, draft, patch }: { entry: AdvancedEntry; draft: Rec
       </>
     )
   }
+  if (entry.id === 'segtree') {
+    return (
+      <>
+        <label>
+          初始数组（逗号分隔，长度 1..16）
+          <input data-testid="adv-input-arr" value={draft.arr ?? ''} onChange={(e) => patch('arr', e.target.value)} />
+        </label>
+        <label>
+          操作序列（; 或换行分隔：set i v / sum l r，区间为 [l,r)）
+          <textarea data-testid="adv-input-ops" rows={3} value={draft.ops ?? ''} onChange={(e) => patch('ops', e.target.value)} />
+        </label>
+      </>
+    )
+  }
   const hasN = entry.id === 'dsu' || entry.id === 'fenwick'
   return (
     <>

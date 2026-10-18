@@ -80,4 +80,24 @@ export interface BoundsView {
   cmp?: { index: number; text: string; goRight: boolean }
 }
 
-export type AdvancedView = DsuView | FenwickView | HeapView | BoundsView
+export interface SegView {
+  kind: 'seg'
+  /** logical array length; leaves cover [i,i+1) */
+  n: number
+  /** tree[node] for heap-numbered nodes (node 1 = root = [0,n); children 2k, 2k+1); null = not built yet */
+  tree: (number | null)[]
+  op: string
+  /** node of the current call frame */
+  node?: number
+  /** nodes touched by the current operation so far, with the role each played (query: outside / inside / split; set: descend) */
+  visited: { node: number; role: 'outside' | 'inside' | 'split' | 'path' | 'leaf' }[]
+  /** public half-open query [l,r) */
+  query?: [number, number]
+  /** point-assign target */
+  target?: { index: number; value: number }
+  /** running sum of the 'inside' nodes of the current query */
+  accum?: number
+  result?: number
+}
+
+export type AdvancedView = DsuView | FenwickView | HeapView | BoundsView | SegView

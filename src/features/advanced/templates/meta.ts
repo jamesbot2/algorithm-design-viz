@@ -172,6 +172,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'segtree',
+    topicId: 'segtree',
+    title: '线段树（单点赋值 + 区间和）',
+    category: '数据结构',
+    difficulty: '进阶',
+    prereqs: ['递归与分治', '半开区间 [l, r)'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<vector>'],
+      depends: [],
+      indexing: '对外 0-based；教学版结点堆式编号（根 = 1，孩子 2k、2k+1），竞赛版叶子在 [n, 2n)',
+      interval: '半开区间 [l, r)；结点区间 [lo, hi)，mid = lo + (hi − lo) / 2',
+      limits: 'C++/Java/Rust/Go 用 64 位和；TypeScript 为 Number，|和| ≤ 2^53−1；Python 任意精度',
+      timeComplexity: '建树 O(n)；set / sum O(log n)',
+      spaceComplexity: '教学版 O(4n)（递归堆式编号）；竞赛版 O(2n)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版是自底向上的迭代写法（叶子在 [n,2n)），控制流与教学版（递归、堆式编号）不同构：作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '5 4\n1 2 3 4 5\n1 0 5\n0 2 10\n1 1 4\n1 2 3\n', output: '15\n16\n10\n', note: '输入格式参考 Library Checker "Point Add Range Sum"，但操作 0 是赋值 a[p]=x：[0,5) = 15；赋值 a[2]=10 后 [1,4) = 2+10+4 = 16；[2,3) = 10。' },
+    counterexample: {
+      title: '递归线段树只开 2n 个槽位',
+      explanation: '堆式编号的递归线段树，当 n 不是 2 的幂时最大结点编号会超过 2n。例如 n=5：结点 7 管辖 [3,5)，它的孩子是 14 和 15，而 2n=10，数组下标 14、15 越界。因此递归写法要开 4n（或按 2^⌈log2 n⌉ 取整后开 2 倍）。',
+      input: 'n = 5，tree 大小 = 2n = 10',
+      wrong: '访问 tree[14]、tree[15]：越界（未定义行为 / 数组越界异常）',
+      correct: '开 4n = 20 个槽位：最大使用的编号是 15',
+    },
+    ioProtocol: '第 1 行 N Q；第 2 行 a_0..a_{N−1}；随后 Q 行：0 p x（a[p] = x）；1 l r（输出 a[l..r) 的和）。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

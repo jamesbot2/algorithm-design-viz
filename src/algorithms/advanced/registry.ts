@@ -16,15 +16,18 @@ import {
   parseRangeOps,
   parsePqOps,
   parseIntList,
+  parseSegOps,
+  validateSegInput,
   parseIntToken,
   ADV_LIMITS,
 } from '../../features/advanced/inputs'
 import * as dsu from './dsu'
 import * as fenwick from './fenwick'
+import * as segtree from './segtree'
 import * as stlBounds from './stlBounds'
 import * as stlPq from './stlPriorityQueue'
 
-export type AdvancedAlgoId = 'dsu' | 'fenwick' | 'stl-bounds' | 'stl-priority-queue'
+export type AdvancedAlgoId = 'dsu' | 'fenwick' | 'segtree' | 'stl-bounds' | 'stl-priority-queue'
 
 export interface AdvancedEntry {
   id: AdvancedAlgoId
@@ -83,6 +86,23 @@ export const advancedEntries: Record<AdvancedAlgoId, AdvancedEntry> = {
     },
     validate: validateRangeOperationsInput,
     solve: (i) => fenwick.generateFenwickSteps(i as Parameters<typeof fenwick.generateFenwickSteps>[0]),
+  },
+  segtree: {
+    id: 'segtree',
+    meta: segtree.meta,
+    catalogId: 'segtree',
+    languages: 'six',
+    presentation: ADV,
+    defaultDraft: { arr: segtree.meta.defaultArr, ops: segtree.meta.defaultOps },
+    parseDraft: (d) => {
+      const arr = parseIntList(d.arr ?? '', 'arr', ADV_LIMITS.segN)
+      if (!arr.ok) return arr
+      const ops = parseSegOps(d.ops ?? '')
+      if (!ops.ok) return ops
+      return validateSegInput({ arr: arr.value, ops: ops.value })
+    },
+    validate: validateSegInput,
+    solve: (i) => segtree.generateSegSteps(i as Parameters<typeof segtree.generateSegSteps>[0]),
   },
   'stl-bounds': {
     id: 'stl-bounds',
