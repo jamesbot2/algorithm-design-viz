@@ -1,0 +1,16 @@
+{ "algo": "bs-answer", "idPrefix": "bsAnswer", "titleBase": "二分答案 Binary Search on the Answer（教学版）",
+  "files": { "python": "bs_answer.py", "cpp": "bs_answer.cpp", "java": "BsAnswer.java", "rust": "bs_answer.rs", "go": "bs_answer.go" },
+  "ts": "bs_answer.ts.txt",
+  "labels": {
+    "fInit": "判定：至少 1 段，当前段和 cur = 0",
+    "fCheck": "判定：再放一个元素会超过 cap 吗？",
+    "fNew": "判定：超过 → 开新的一段，cur 从当前元素重新开始",
+    "fExtend": "判定：没超过 → 放进当前段",
+    "fReturn": "判定：返回所需段数（≤ k 即可行）",
+    "bsInit": "搜索区间：下界 = max(a)（每段至少装得下最大元素），上界 = sum(a)",
+    "bsMid": "取中点 mid = lo + (hi − lo) / 2（向下取整，防溢出）",
+    "bsCheck": "判定 mid：所需段数 ≤ k 吗？",
+    "bsShrink": "可行 → 答案 ≤ mid：hi = mid（保留 mid）",
+    "bsRaise": "不可行 → 答案 > mid：lo = mid + 1",
+    "bsReturn": "lo == hi：最小可行值"
+  } }

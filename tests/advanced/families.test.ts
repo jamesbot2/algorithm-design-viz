@@ -136,3 +136,47 @@ describe('discretize vs independent reference', () => {
     expect(solve('discretize', { arr: [5, 5, 7], qs: [] }).result.ranks).toEqual([0, 0, 1])
   })
 })
+
+describe('bs-answer vs independent reference', () => {
+  const brute = (a: number[], k: number) => {
+    let best = Infinity
+    const go = (i: number, parts: number, mx: number) => {
+      if (i === a.length) return void (best = Math.min(best, mx))
+      if (parts === k) return
+      let s = 0
+      for (let j = i; j < a.length; j++) {
+        s += a[j]!
+        go(j + 1, parts + 1, Math.max(mx, s))
+      }
+    }
+    go(0, 0, 0)
+    return best
+  }
+  it('answer equals exhaustive partition search; every tested cap ≥ answer is ✓ and every cap < answer is ✗', () => {
+    const r = prng(11)
+    for (let c = 0; c < 200; c++) {
+      const arr = Array.from({ length: ri(r, 1, 8) }, () => ri(r, 1, 25))
+      const k = ri(r, 1, arr.length + 1)
+      const { result, steps } = solve('bs-answer', { arr, k })
+      expect(result.answer, `${arr} k=${k}`).toBe(brute(arr, k))
+      for (const t of result.tried as string[]) {
+        const cap = parseInt(t)
+        expect(t.endsWith('✓')).toBe(cap >= result.answer)
+      }
+      const last = fv(steps[steps.length - 1]!)
+      expect(last.scalars!.find((s) => s.id === 'lo')!.value).toBe(brute(arr, k))
+      expect(last.result).toEqual([brute(arr, k)])
+    }
+  })
+  it('counterexample: a lower bound of 0 misjudges cap < max(a) as feasible (a=[10,1], k=2, cap=5 → 2 parts)', () => {
+    const greedy = (a: number[], cap: number) => {
+      let cnt = 1, cur = 0
+      for (const x of a) {
+        if (cur + x > cap) { cnt++; cur = x } else cur += x
+      }
+      return cnt
+    }
+    expect(greedy([10, 1], 5)).toBe(2) // "feasible" for k=2 although 10 > 5
+    expect(solve('bs-answer', { arr: [10, 1], k: 2 }).result.answer).toBe(10)
+  })
+})

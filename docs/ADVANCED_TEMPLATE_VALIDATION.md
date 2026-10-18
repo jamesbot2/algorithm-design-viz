@@ -79,6 +79,22 @@
 | `prefix-diff|teach|go|run` | 通过 | 400 | go vet; go run | c79eedf13a58 |
 | `prefix-diff|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 2efe1fa60c7c |
 | `prefix-diff|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | c689b9e15780 |
+| `discretize|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | f67d8ead9dcb |
+| `discretize|teach|python|run` | 通过 | 400 | python3 -X dev | f035ad714811 |
+| `discretize|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | fe918de84360 |
+| `discretize|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | 6fb7aa72904b |
+| `discretize|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | 64859f33d24f |
+| `discretize|teach|go|run` | 通过 | 400 | go vet; go run | 6a7ed2491a75 |
+| `discretize|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | e1d583681ce2 |
+| `discretize|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 43b6e70c5c24 |
+| `bs-answer|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | 92d99e81d908 |
+| `bs-answer|teach|python|run` | 通过 | 400 | python3 -X dev | 98b2c9305446 |
+| `bs-answer|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | dd1ce98cb353 |
+| `bs-answer|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | f04f76f6634e |
+| `bs-answer|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | 82ed264db03c |
+| `bs-answer|teach|go|run` | 通过 | 400 | go vet; go run | f1800f1cdbf1 |
+| `bs-answer|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | d0395009ff35 |
+| `bs-answer|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 136cc73325da |
 
 ## 命令与退出码
 

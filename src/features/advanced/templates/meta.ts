@@ -296,6 +296,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'bs-answer',
+    topicId: 'bs-answer',
+    title: '二分答案（最小化最大段和）',
+    category: '二分与判定',
+    difficulty: '竞赛基础',
+    prereqs: ['二分查找', '贪心'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<algorithm>', '<numeric>', '<vector>'],
+      depends: [],
+      indexing: '数组 0-based；答案区间 [lo, hi] 为闭区间（求最小可行整数）',
+      interval: '搜索区间闭区间 [lo, hi]；hi 始终可行；可行 → hi = mid，不可行 → lo = mid + 1',
+      limits: '元素须 > 0；C++/Java/Rust/Go 用 64 位；TypeScript 为 Number（sum ≤ 2^53−1）',
+      timeComplexity: 'O(n log sum(a))',
+      spaceComplexity: 'O(1)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版抽出通用的 first_true(lo, hi, ok) 并用 lambda 写判定，教学版是显式循环：控制流不同构，作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '5 2\n7 2 5 10 8\n', output: '18\n', note: '经典例题：[7,2,5,10,8] 分成 2 段，最优是 [7,2,5] 与 [10,8]，最大段和 18。' },
+    counterexample: {
+      title: '下界写成 0（或可行时写 hi = mid − 1）',
+      explanation: '下界必须是 max(a)：cap 小于最大元素时没有任何一段装得下它，贪心得到的"段数"没有意义，可能误判为可行。例：a=[10,1], k=2，cap=5 时贪心把 10 单独成一段、1 成一段共 2 段 ≤ k，被误判可行，二分会返回 5；真正最小的最大段和是 10。',
+      input: 'a = [10, 1]，k = 2，lo 取 0',
+      wrong: '返回 5（cap 小于最大元素 10，本不可能）',
+      correct: '下界取 max(a) = 10，返回 10',
+    },
+    ioProtocol: '第 1 行 N K；第 2 行 a_1..a_N（均 > 0）。输出最小的"最大段和"。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

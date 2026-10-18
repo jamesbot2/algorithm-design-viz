@@ -10,6 +10,7 @@ export const CATALOG_LOADERS: Record<string, () => Promise<CatalogBundle>> = {
   segtree_lazy: () => import('../../../codeCatalog/segtree_lazy').then((m) => m.getSegtreeLazyCatalog()),
   prefix_diff: () => import('../../../codeCatalog/prefix_diff').then((m) => m.getPrefixDiffCatalog()),
   discretize: () => import('../../../codeCatalog/discretize').then((m) => m.getDiscretizeCatalog()),
+  bs_answer: () => import('../../../codeCatalog/bs_answer').then((m) => m.getBsAnswerCatalog()),
   stl_bounds: () => import('../../../codeCatalog/stl_bounds').then((m) => m.getStlBoundsCatalog()),
   stl_priority_queue: () => import('../../../codeCatalog/stl_priority_queue').then((m) => m.getStlPriorityQueueCatalog()),
 }

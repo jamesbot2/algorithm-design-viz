@@ -142,6 +142,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'bs-answer',
+    section: 'algorithms',
+    titleZh: '二分答案',
+    titleEn: 'Binary Search on the Answer',
+    aliases: ['parametric search', 'binary search on answer', '二分答案', '最小化最大值', '判定函数'],
+    tags: ['二分', '贪心', '判定'],
+    difficulty: 'intermediate',
+    prereqs: ['binarySearch'],
+    summary: '把"求最优值"变成"判定 + 二分"：最小化最大段和，看清 lo / hi / mid 与每次贪心判定的结果。',
+    routeOrder: 8,
+    demoId: 'bs-answer',
+    templateId: 'bs-answer',
+    relatedAlgos: ['binarySearch'],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

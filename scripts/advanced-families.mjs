@@ -150,3 +150,74 @@ FAM['discretize'] = {
     return { input: `${n} ${q}\n${a.join(' ')}\n${qs.join(' ')}\n`, expected: a.map(less).join(' ') + '\n' + qs.map(less).join(' ') + '\n' }
   },
 }
+
+// ───────────────────────── bs-answer ─────────────────────────
+FAM['bs-answer'] = {
+  dir: 'bs_answer',
+  cls: 'BsAnswer',
+  gen(seed) {
+    const r = mulberry32(seed)
+    const cs = []
+    for (let t = 0; t < 400; t++) {
+      const n = t < 3 ? t + 1 : rint(r, 1, 9)
+      const a = Array.from({ length: n }, () => (t % 11 === 0 ? rint(r, 1, 1_000_000_000) : rint(r, 1, 30)))
+      const k = rint(r, 1, n + 1)
+      const mx = Math.max(...a)
+      const sm = a.reduce((s, x) => s + x, 0)
+      const caps = Array.from({ length: rint(r, 0, 6) }, () => rint(r, mx, sm + 3))
+      cs.push({ k, a, b: [], c: caps })
+    }
+    return cs
+  },
+  naive(c) {
+    // independent: min-max partition DP (no binary search, no greedy)
+    const n = c.a.length
+    const pre = [0]
+    for (const x of c.a) pre.push(pre[pre.length - 1] + x)
+    const INF = Infinity
+    let dp = Array.from({ length: n + 1 }, (_, i) => (i === 0 ? INF : pre[i]))
+    dp[0] = 0
+    for (let j = 2; j <= Math.min(c.k, n); j++) {
+      const nd = new Array(n + 1).fill(INF)
+      nd[0] = 0
+      for (let i = 1; i <= n; i++) for (let p = 0; p < i; p++) nd[i] = Math.min(nd[i], Math.max(dp[p], pre[i] - pre[p]))
+      dp = nd
+    }
+    // dp over exactly min(k,n) parts is monotone non-increasing in the number of parts, so this is the optimum for "at most k"
+    const ans = n === 0 ? 0 : dp[n]
+    // greedy-free segment count for each cap: simulate by definition (scan, cut as late as possible)
+    const segs = c.c.map((cap) => {
+      let cnt = 1, cur = 0
+      for (const x of c.a) {
+        if (cur + x <= cap) cur += x
+        else { cnt++; cur = x }
+      }
+      return cnt
+    })
+    return [String(ans), S(segs)]
+  },
+  calls: {
+    python: ['[min_largest_sum(a,k)]', 'segments_list(a,c)'],
+    typescript: ['[M.minLargestSum(a,k)]', 'M.segmentsList(a,c)'],
+    cpp: ['std::vector<long long>{min_largest_sum(a,k)}', 'segments_list(a,c)'],
+    java: ['new long[]{BsAnswer.minLargestSum(a,k)}', 'BsAnswer.segmentsList(a,c)'],
+    rust: ['vec![min_largest_sum(&a,k)]', 'segments_list(&a,&c)'],
+    go: ['[]int64{MinLargestSum(a,k)}', 'SegmentsList(a,c)'],
+  },
+  core: ['pr(std::vector<long long>{min_largest(a,k)});', '{std::vector<long long> o;for(auto cap:c)o.push_back(parts_needed(a,cap));pr(o);}'],
+  full(r) {
+    const n = rint(r, 1, 9)
+    const a = Array.from({ length: n }, () => rint(r, 1, 20))
+    const k = rint(r, 1, n + 1)
+    const pre = [0]
+    for (const x of a) pre.push(pre[pre.length - 1] + x)
+    let best = Infinity
+    const rec = (i, parts, mx) => {
+      if (i === n) return void (best = Math.min(best, mx))
+      if (parts === k) return
+      for (let j = i + 1; j <= n; j++) rec(j, parts + 1, Math.max(mx, pre[j] - pre[i]))
+    }
+    rec(0, 0, 0)
+    return { input: `${n} ${k}\n${a.join(' ')}\n`, expected: best + '\n' }
+  },
+}
