@@ -135,6 +135,14 @@
 | `lis|teach|go|run` | 通过 | 400 | go vet; go run | 9ef9984ddd11 |
 | `lis|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | f6035cf2f23d |
 | `lis|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | c60b5675359b |
+| `number-theory|teach|typescript|run` | 通过 | 300 | node strip-types (displayed .ts imported unchanged) | 7ba5dc9f9416 |
+| `number-theory|teach|python|run` | 通过 | 300 | python3 -X dev | d764f91040dd |
+| `number-theory|teach|cpp|run` | 通过 | 300 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | 7dd7117428ff |
+| `number-theory|teach|java|run` | 通过 | 300 | javac -Xlint:all; java -ea | 7cbcc28e1535 |
+| `number-theory|teach|rust|run` | 通过 | 300 | rustc -D warnings, overflow-checks=on | e3bcf0991f8b |
+| `number-theory|teach|go|run` | 通过 | 300 | go vet; go run | 6489201d1285 |
+| `number-theory|contest-core|cpp|run` | 通过 | 300 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 2c5eb5a73edf |
+| `number-theory|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | d8f6ced0cd54 |
 
 ## 命令与退出码
 

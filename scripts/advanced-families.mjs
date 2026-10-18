@@ -504,3 +504,89 @@ FAM['lis'] = {
     }
   },
 }
+
+// ───────────────────────── number-theory ─────────────────────────
+// Independent baselines: brute-force divisor search, identity check for exgcd, repeated BigInt multiplication, brute-force inverse search, trial division.
+const ntGcd = (a, b) => {
+  if (a === 0 && b === 0) return 0
+  for (let d = Math.max(a, b); d >= 1; d--) if (a % d === 0 && b % d === 0) return d
+  return 1
+}
+const ntPow = (b, e, m) => {
+  let r = 1n % BigInt(m)
+  for (let i = 0; i < e; i++) r = (r * BigInt(b)) % BigInt(m)
+  return r
+}
+const ntInv = (a, m) => {
+  const am = ((a % m) + m) % m
+  for (let x = 0; x < m; x++) if ((am * x) % m === 1 % m) return x
+  return -1
+}
+const ntPrimes = (n) => {
+  const o = []
+  for (let p = 2; p <= n; p++) {
+    let ok = true
+    for (let d = 2; d * d <= p; d++) if (p % d === 0) { ok = false; break }
+    if (ok) o.push(p)
+  }
+  return o
+}
+FAM['number-theory'] = {
+  dir: 'number_theory',
+  cls: 'NumberTheory',
+  gen(seed) {
+    const r = mulberry32(seed)
+    const cs = []
+    for (let t = 0; t < 300; t++) {
+      const big = t % 6 === 0
+      const M = big ? 1_000_000 : 60
+      const x = rint(r, 0, t < 4 ? t : M), y = rint(r, 0, M)
+      const m = t === 1 ? 1 : rint(r, 1, M)
+      cs.push({ k: 0, a: [x, y], b: [rint(r, 0, M), big ? rint(r, 0, 200_000) : rint(r, 0, 40), m], c: [rint(r, -M, M), rint(r, 1, M), rint(r, 0, big ? 3000 : 120)] })
+    }
+    return cs
+  },
+  naive(c) {
+    const [x, y] = c.a
+    const [bs, e, m] = c.b
+    const [ia, im, n] = c.c
+    return [String(ntGcd(x, y)), String(ntGcd(x, y)), String(ntPow(bs, e, m)), String(ntInv(ia, im)), ntPrimes(n).join(' ')]
+  },
+  check(c, got, want) {
+    for (const i of [0, 2, 3, 4]) if (got[i].trim() !== want[i]) throw new Error(`number-theory line ${i}: got "${got[i]}" want "${want[i]}" for ${JSON.stringify(c)}`)
+    const [g, xx, yy] = got[1].trim().split(/\s+/).map(Number)
+    if (String(g) !== want[1]) throw new Error(`exgcd g=${g} want ${want[1]}`)
+    if (c.a[0] * xx + c.a[1] * yy !== g) throw new Error(`exgcd identity broken: ${c.a[0]}*${xx}+${c.a[1]}*${yy} != ${g}`)
+  },
+  calls: {
+    python: ['[gcd(a[0],a[1])]', 'ex_gcd(a[0],a[1])', '[pow_mod(b[0],b[1],b[2])]', '[inv_mod(c[0],c[1])]', 'sieve(c[2])'],
+    typescript: ['[M.gcd(a[0],a[1])]', 'M.exGcd(a[0],a[1])', '[M.powMod(b[0],b[1],b[2])]', '[M.invMod(c[0],c[1])]', 'M.sieve(c[2])'],
+    cpp: ['std::vector<long long>{gcd_ll(a[0],a[1])}', 'ex_gcd(a[0],a[1])', 'std::vector<long long>{pow_mod(b[0],b[1],b[2])}', 'std::vector<long long>{inv_mod(c[0],c[1])}', 'sieve(c[2])'],
+    java: ['new long[]{NumberTheory.gcd(a[0],a[1])}', 'NumberTheory.exGcd(a[0],a[1])', 'new long[]{NumberTheory.powMod(b[0],b[1],b[2])}', 'new long[]{NumberTheory.invMod(c[0],c[1])}', 'NumberTheory.sieve(c[2])'],
+    rust: ['vec![gcd(a[0],a[1])]', 'ex_gcd(a[0],a[1]).to_vec()', 'vec![pow_mod(b[0],b[1],b[2])]', 'vec![inv_mod(c[0],c[1])]', 'sieve(c[2])'],
+    go: ['[]int64{Gcd(a[0],a[1])}', 'ExGcd(a[0],a[1])', '[]int64{PowMod(b[0],b[1],b[2])}', '[]int64{InvMod(c[0],c[1])}', 'Sieve(c[2])'],
+  },
+  core: [
+    'pr({gcd_ll(a[0],a[1])});',
+    '{long long x,y;long long g=ex_gcd(a[0],a[1],x,y);pr({g,x,y});}',
+    'pr({pow_mod(b[0],b[1],b[2])});',
+    'pr({inv_mod(c[0],c[1])});',
+    '{auto p=sieve((int)c[2]);pr(std::vector<long long>(p.begin(),p.end()));}',
+  ],
+  full(r) {
+    const a = rint(r, 0, 60), b = rint(r, 1, 60), p = rint(r, 0, 40), m = rint(r, 1, 60), n = rint(r, 0, 80)
+    return {
+      input: `${a} ${b} ${p} ${m} ${n}\n`,
+      verify: (out) => {
+        const L = out.replace(/\n$/, '').split('\n')
+        const g = ntGcd(a, b)
+        if (L[0] !== String(g)) throw new Error(`full gcd ${L[0]} want ${g}`)
+        const [gg, x, y] = L[1].split(' ').map(Number)
+        if (gg !== g || a * x + b * y !== g) throw new Error(`full exgcd ${L[1]}`)
+        if (L[2] !== String(ntPow(a, p, m))) throw new Error(`full pow ${L[2]}`)
+        if (L[3] !== String(ntInv(a, b))) throw new Error(`full inv ${L[3]}`)
+        if ((L[4] ?? '') !== ntPrimes(n).join(' ')) throw new Error(`full sieve ${L[4]}`)
+      },
+    }
+  },
+}

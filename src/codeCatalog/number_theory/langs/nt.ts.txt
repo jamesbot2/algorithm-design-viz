@@ -1,0 +1,51 @@
+// Number theory toolkit. Preconditions: gcd/exGcd take a, b >= 0; powMod takes base >= 0, power >= 0, m >= 1; invMod takes any a, m >= 1.
+// All values stay below 2^53 as long as m <= 10^6 (products < 10^12), so doubles are exact.
+
+/** Euclid: gcd(a, 0) = a. */
+export function gcd(a: number, b: number): number {
+  while (b !== 0) [a, b] = [b, a % b] // @a: nGcdStep
+  return a // @a: nGcdRet
+}
+
+/** Extended Euclid: returns [g, x, y] with a*x + b*y = g = gcd(a, b). */
+export function exGcd(a: number, b: number): number[] {
+  let [r0, r1, s0, s1, t0, t1] = [a, b, 1, 0, 0, 1] // @a: nExInit
+  while (r1 !== 0) { // @a: nExStep+4
+    const q = Math.floor(r0 / r1)
+    ;[r0, r1] = [r1, r0 - q * r1]
+    ;[s0, s1] = [s1, s0 - q * s1]
+    ;[t0, t1] = [t1, t0 - q * t1]
+  }
+  return [r0, s0, t0] // @a: nExRet
+}
+
+/** Fast power: base^power mod m by scanning the bits of power. */
+export function powMod(base: number, power: number, m: number): number {
+  let result = 1 % m // @a: nPowInit
+  base %= m
+  while (power > 0) {
+    if (power % 2 === 1) result = (result * base) % m // @a: nPowBit
+    base = (base * base) % m // @a: nPowSquare
+    power = Math.floor(power / 2)
+  }
+  return result // @a: nPowRet
+}
+
+/** Modular inverse of a mod m via exGcd; -1 when gcd(a, m) != 1 (no inverse exists). */
+export function invMod(a: number, m: number): number {
+  const [g, x] = exGcd(((a % m) + m) % m, m) // @a: nInvEx
+  if (g !== 1) return -1 // @a: nInvNone
+  return ((x! % m) + m) % m // @a: nInvRet
+}
+
+/** Sieve of Eratosthenes: all primes <= n in increasing order. */
+export function sieve(n: number): number[] {
+  const composite = new Array<boolean>(n + 1).fill(false) // @a: nSieveInit
+  const primes: number[] = []
+  for (let i = 2; i <= n; i++) {
+    if (composite[i]) continue // @a: nSieveSkip
+    primes.push(i) // @a: nSievePrime
+    for (let j = i * i; j <= n; j += i) composite[j] = true // @a: nSieveMark
+  }
+  return primes // @a: nSieveRet
+}

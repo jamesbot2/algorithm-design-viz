@@ -244,6 +244,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'number-theory',
+    section: 'algorithms',
+    titleZh: '数论：gcd / exgcd / 快速幂 / 逆元 / 筛法',
+    titleEn: 'Number Theory Basics',
+    aliases: ['gcd', 'exgcd', 'extended euclid', '扩展欧几里得', '快速幂', 'fast power', '模逆元', 'modular inverse', '筛法', 'sieve', 'Eratosthenes', '素数'],
+    tags: ['数论', '取模', '素数'],
+    difficulty: 'intermediate',
+    prereqs: [],
+    summary: '辗转相除、扩展欧几里得（带验算）、二进制快速幂、模逆元（无逆元时如实返回 −1）、埃氏筛。',
+    routeOrder: 14,
+    demoId: 'number-theory',
+    templateId: 'number-theory',
+    relatedAlgos: [],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

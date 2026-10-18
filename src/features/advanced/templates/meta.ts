@@ -482,6 +482,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'number-theory',
+    topicId: 'number-theory',
+    title: '数论工具箱（gcd / exgcd / 快速幂 / 逆元 / 筛法）',
+    category: '数学',
+    difficulty: '竞赛基础',
+    prereqs: ['取模运算', '二进制'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<vector>'],
+      depends: [],
+      indexing: '无下标约定；sieve(n) 返回 n 以内按升序的素数',
+      interval: 'gcd/exgcd：a, b ≥ 0；pow_mod：base, power ≥ 0 且 m ≥ 1；inv_mod：m ≥ 1',
+      limits: '64 位整数下 m ≤ 3·10^9（乘积不溢出）；sieve 需要 O(n) 内存；inv_mod 在 gcd(a, m) ≠ 1 时返回 −1',
+      timeComplexity: 'gcd/exgcd O(log)；pow_mod O(log power)；sieve O(n log log n)',
+      spaceComplexity: 'O(1)；sieve O(n)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版把五个工具压成短函数（ex_gcd 用引用返回系数，sieve 返回 int 向量）；教学版统一返回数组并逐步展开。接口与写法不同构，作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '7 40 13 1000 30\n', output: '1\n1 -17 3\n407\n23\n2 3 5 7 11 13 17 19 23 29\n', note: 'gcd(7,40)=1；exgcd 给出 7·(−17) + 40·3 = 1；7^13 mod 1000 = 407；7 在模 40 下的逆元是 23（7·23 = 161 = 4·40 + 1）；30 以内共 10 个素数。' },
+    counterexample: {
+      title: '不检查逆元是否存在',
+      explanation: '求 6 在模 9 下的逆元：gcd(6, 9) = 3 ≠ 1，不存在 x 使 6x ≡ 1 (mod 9)。若直接取 exgcd 的系数 x = −1 并规约，得到 8，但 6·8 = 48 ≡ 3 (mod 9)，并不是 1。正确做法是先检查 g == 1，否则返回"无逆元"。',
+      input: 'inv_mod(6, 9)',
+      wrong: '返回 8（6·8 mod 9 = 3 ≠ 1）',
+      correct: '返回 −1（逆元不存在）',
+    },
+    ioProtocol: '一行：a b power m n。输出 5 行：gcd(a,b)；g x y；a^power mod m；a 模 b 的逆元（或 −1）；n 以内的素数。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

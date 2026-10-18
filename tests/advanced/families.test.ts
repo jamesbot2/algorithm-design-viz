@@ -392,3 +392,43 @@ describe('lis vs independent O(n²) dp', () => {
     expect(s.seq).not.toEqual([1, 3])
   })
 })
+
+describe('number-theory vs independent brute force', () => {
+  const bgcd = (a: number, b: number) => {
+    for (let d = Math.max(a, b); d >= 1; d--) if (a % d === 0 && b % d === 0) return d
+    return 0
+  }
+  it('gcd, exgcd identity, powMod, invMod and sieve agree with brute force over random inputs', () => {
+    const r = prng(53)
+    for (let c = 0; c < 200; c++) {
+      const a = ri(r, 0, 60)
+      const b = ri(r, 1, 60)
+      const power = ri(r, 0, 30)
+      const m = ri(r, 1, 60)
+      const n = ri(r, 2, 40)
+      const { result } = solve('number-theory', { a, b, power, m, n })
+      expect(result.gcd, `${a},${b}`).toBe(bgcd(a, b))
+      const [g, x, y] = result.exgcd
+      expect(g).toBe(bgcd(a, b))
+      expect(a * x + b * y).toBe(g)
+      let p = 1 % m
+      for (let i = 0; i < power; i++) p = (p * a) % m
+      expect(result.pow).toBe(p)
+      let inv = -1
+      for (let k = 0; k < b; k++) if (((a % b) * k) % b === 1 % b) { inv = k; break }
+      expect(result.inv).toBe(inv)
+      const primes = [...Array(n - 1).keys()].map((k) => k + 2).filter((q) => [...Array(q).keys()].slice(2).every((d) => q % d))
+      expect(result.primes).toEqual(primes)
+    }
+  })
+  it('counterexample: skipping the gcd check for inv(6, 9) gives 8 (6·8 mod 9 = 3); product reports −1 and the step says so', () => {
+    expect((6 * 8) % 9).toBe(3)
+    const { result, steps } = solve('number-theory', { a: 6, b: 9, power: 2, m: 7, n: 10 })
+    expect(result.inv).toBe(-1)
+    expect(steps.some((s) => s.message.includes('逆元不存在'))).toBe(true)
+  })
+  it('sample: 7 40 13 1000 30 → 1, [1,-17,3], 407, 23', () => {
+    const { result } = solve('number-theory', { a: 7, b: 40, power: 13, m: 1000, n: 30 })
+    expect([result.gcd, result.exgcd, result.pow, result.inv]).toEqual([1, [1, -17, 3], 407, 23])
+  })
+})
