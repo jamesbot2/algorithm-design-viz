@@ -148,3 +148,22 @@ test.describe('ADV-25 representative flow at five viewports (real values, real c
     })
   }
 })
+
+test.describe('ADV-26 every template page has a complete header and its pieces', () => {
+  test('all templates in the library: eight non-empty header fields, complexity, sample, counterexample, source', async ({ page }) => {
+    await open(page, lib)
+    await expect(visibleCards(page).first()).toBeVisible()
+    const ids = (await visibleCards(page).evaluateAll((els) => els.map((e) => e.getAttribute('data-testid')!.replace('tpl-item-', ''))))
+    expect(ids.length).toBeGreaterThanOrEqual(23)
+    for (const id of ids) {
+      await page.goto(`#/advanced/templates/${id}`)
+      const dd = page.locator('[data-testid="tpl-header"] dd')
+      await expect(dd, id).toHaveCount(8)
+      const texts = await dd.allTextContents()
+      expect(texts.every((t) => t.trim().length > 0), `${id}: ${JSON.stringify(texts)}`).toBe(true)
+      await expect(page.getByTestId('tpl-header'), id).toContainText('O(')
+      await expect(page.getByTestId('tpl-counter'), id).toBeVisible()
+      await expect(page.getByTestId('tpl-source'), id).toBeVisible()
+    }
+  })
+})
