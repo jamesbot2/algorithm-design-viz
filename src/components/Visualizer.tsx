@@ -20,6 +20,8 @@ interface Props {
   context?: ReactNode
   /** V24: algorithm id — selects the module's declared presentation contract. */
   algoId?: string
+  /** 高阶算法: page-provided renderer for `step.advanced` main scenes (keeps scene code out of the main bundle). */
+  renderAdvanced?: (step: Step, prevStep: Step | undefined) => ReactNode
 }
 
 type LegendRole = HighlightRole | EdgeRole | 'frontier' | 'settled' | 'pruned' | 'optimal' | 'error'
@@ -140,7 +142,7 @@ function computeSignedDomain(steps: Step[]): Record<string, { hasPos: boolean; h
  * timer, no transport, no inspector band and no body Portal. Current data and
  * the transport are Workbench siblings fed by the same PlaybackController.
  */
-export default function Visualizer({ player, staleResult = false, context, algoId }: Props) {
+export default function Visualizer({ player, staleResult = false, context, algoId, renderAdvanced }: Props) {
   const { steps, idx, step, prevStep, playing, isPreview, runId, snapSwap, speedVars, transition, motionStep } = player
   const usedRoles = useMemo(() => collectUsedRoles(steps), [steps])
   const scaleMaxByArray = useMemo(() => computeScaleMax(steps), [steps])
@@ -267,7 +269,9 @@ export default function Visualizer({ player, staleResult = false, context, algoI
         data-has-aux={treeAux ? '1' : undefined}
         id="stage-viewport"
       >
-        {step && declaredArray ? (
+        {step && step.advanced && renderAdvanced ? (
+          renderAdvanced(step, prevStep)
+        ) : step && declaredArray ? (
           <div className="stage-split" data-aux-open={treeAux && auxOpen ? '1' : '0'}>
             <div className="stage-primary-pane" data-testid="stage-primary-pane">
               <ArraysFromStep

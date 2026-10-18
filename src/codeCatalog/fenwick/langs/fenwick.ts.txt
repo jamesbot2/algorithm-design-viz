@@ -1,0 +1,37 @@
+/** Fenwick tree (binary indexed tree), teaching version.
+ *  Public API uses 0-based indices and half-open ranges [l, r). Internally T is 1-based:
+ *  T[i] stores the sum of a over (i - lowbit(i), i] in 1-based terms. */
+export class Fenwick {
+  n: number
+  tree: number[] // tree[0] is unused
+
+  constructor(n: number) {
+    this.n = n
+    this.tree = new Array<number>(n + 1).fill(0) // @a: init
+  }
+
+  /** a[i] += delta (i is 0-based). */
+  add(i: number, delta: number): void {
+    let p = i + 1 // @a: addStart
+    while (p <= this.n) {
+      this.tree[p] += delta // @a: addApply
+      p += p & -p // @a: addNext
+    }
+  }
+
+  /** Sum of a[0..r). */
+  prefix(r: number): number {
+    let sum = 0 // @a: prefixStart+1
+    let p = r
+    while (p > 0) {
+      sum += this.tree[p] // @a: prefixAccum
+      p -= p & -p // @a: prefixNext
+    }
+    return sum // @a: prefixReturn
+  }
+
+  /** Sum of a[l..r). */
+  range(l: number, r: number): number {
+    return this.prefix(r) - this.prefix(l) // @a: rangeCompute
+  }
+}

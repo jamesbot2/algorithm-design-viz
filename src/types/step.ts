@@ -1,3 +1,5 @@
+import type { AdvancedView } from './advancedView'
+
 export type EdgeRole = 'checking' | 'accepted' | 'rejected' | 'tree' | 'path' | 'relaxing'
 
 export type NodeRole = 'current' | 'frontier' | 'settled' | 'source' | 'target' | 'neg-cycle'
@@ -123,6 +125,8 @@ export interface Step {
     role?: 'primary' | 'context' | 'condition'
   }[]
   ranges?: StepRanges
+  /** 高阶算法: typed main-scene state (discriminated by `kind`). */
+  advanced?: AdvancedView
   /**
    * Explicit active search-tree path (node ids). Prefer over guessing
    * the first child with status===exploring.

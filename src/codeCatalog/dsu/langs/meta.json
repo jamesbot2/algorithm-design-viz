@@ -1,0 +1,16 @@
+{ "algo": "dsu", "idPrefix": "dsu", "titleBase": "并查集 DSU（教学版）",
+  "files": { "python": "dsu.py", "cpp": "dsu.cpp", "java": "DSU.java", "rust": "dsu.rs", "go": "dsu.go" },
+  "ts": "dsu.ts.txt",
+  "labels": {
+    "init": "初始化：parent[i]=i，size[i]=1",
+    "findStart": "find：从 x 出发",
+    "findClimb": "find：沿 parent 向上找根",
+    "compress": "路径压缩：路径上结点直接指向根",
+    "findReturn": "find：返回根",
+    "unionFind": "union：分别 find 两端的根",
+    "unionSame": "已在同一集合：不合并",
+    "unionSwap": "按大小比较，必要时交换",
+    "unionLink": "小树挂到大树：parent、size、集合数",
+    "unionDone": "union：返回 true",
+    "sameCompare": "same：比较两个根"
+  } }

@@ -1,0 +1,14 @@
+{ "algo": "fenwick", "idPrefix": "fenwick", "titleBase": "树状数组 Fenwick（教学版）",
+  "files": { "python": "fenwick.py", "cpp": "fenwick.cpp", "java": "Fenwick.java", "rust": "fenwick.rs", "go": "fenwick.go" },
+  "ts": "fenwick.ts.txt",
+  "labels": {
+    "init": "初始化：长度 n 的全 0 树（内部 1-based）",
+    "addStart": "add：对外 0-based 下标 → 内部 p = i + 1",
+    "addApply": "add：T[p] += delta（T[p] 管辖含新位置的区间）",
+    "addNext": "add：p += lowbit(p) 向上",
+    "prefixStart": "prefix：累加器 0，p = r",
+    "prefixAccum": "prefix：累加 T[p]",
+    "prefixNext": "prefix：p -= lowbit(p) 向下",
+    "prefixReturn": "prefix：返回 [0,r) 的和",
+    "rangeCompute": "range：prefix(r) − prefix(l)，区间 [l,r)"
+  } }

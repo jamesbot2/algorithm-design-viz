@@ -1,0 +1,7 @@
+{ "id": "stl_bounds", "title": "lower_bound / upper_bound（C++17 教学模型）", "file": "stl_bounds.cpp",
+  "labels": {
+    "lbInit": "lower_bound：区间 [0,n)", "lbLoop": "lower_bound：区间非空", "lbMid": "lower_bound：取 mid",
+    "lbCmp": "lower_bound：比较 a[mid] < x", "lbGoRight": "lower_bound：first = mid + 1", "lbGoLeft": "lower_bound：last = mid", "lbDone": "lower_bound：返回 first（可能是 end）",
+    "ubInit": "upper_bound：区间 [0,n)", "ubLoop": "upper_bound：区间非空", "ubMid": "upper_bound：取 mid",
+    "ubCmp": "upper_bound：比较 !(x < a[mid])", "ubGoRight": "upper_bound：first = mid + 1", "ubGoLeft": "upper_bound：last = mid", "ubDone": "upper_bound：返回 first（可能是 end）"
+  } }

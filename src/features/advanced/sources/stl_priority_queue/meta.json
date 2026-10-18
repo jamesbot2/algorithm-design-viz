@@ -1,0 +1,6 @@
+{ "id": "stl_priority_queue", "title": "priority_queue（C++17 教学模型：二叉大根堆）", "file": "stl_priority_queue.cpp",
+  "labels": {
+    "pushAppend": "push：追加到数组末尾", "siftUpLoop": "上浮：未到根", "siftUpCmp": "上浮：父 < 子？否则停止",
+    "siftUpSwap": "上浮：交换父子", "top": "top：返回 h[0]", "popSwap": "pop：堆顶与末尾交换", "popShrink": "pop：pop_back 移除末尾",
+    "siftDownCmp": "下沉：与较大孩子比较", "siftDownSwap": "下沉：交换"
+  } }

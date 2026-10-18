@@ -7,7 +7,7 @@
  * Modules without a descriptor keep the legacy inference (graph → board → matrix →
  * array → tree) so simple views stay compatible.
  */
-export type PrimaryKind = 'array' | 'matrix' | 'graph' | 'board' | 'forest' | 'search-tree'
+export type PrimaryKind = 'array' | 'matrix' | 'graph' | 'board' | 'forest' | 'search-tree' | 'advanced'
 
 export interface AuxiliaryView {
   /** recursion-tree / search-tree come from step.searchTree */

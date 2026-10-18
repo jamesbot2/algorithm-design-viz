@@ -1,0 +1,80 @@
+import type { TopicMeta } from './types'
+
+/**
+ * Delivered topics ONLY (index metadata; loaded with the app shell, a few KB).
+ * Everything that is merely planned lives in roadmap.ts and is never rendered as a learnable card.
+ * Capability claims here are checked against the real registries by tests/advanced-catalog.test.ts.
+ */
+export const TOPICS: TopicMeta[] = [
+  {
+    id: 'stl-bounds',
+    section: 'stl',
+    titleZh: 'lower_bound / upper_bound',
+    titleEn: 'lower_bound / upper_bound',
+    aliases: ['二分查找', '下界', '上界', 'binary search', 'lower bound', 'upper bound', 'partition_point', 'equal_range', 'end()', '闭开区间'],
+    tags: ['STL', '二分', '迭代器', '闭开区间'],
+    difficulty: 'basic',
+    prereqs: ['algo:binarySearch'],
+    summary: '在有序区间 [first,last) 上定位第一个满足条件的位置：重复值、目标不存在、返回 end()，并检查"必须已排序"。',
+    routeOrder: 1,
+    demoId: 'stl-bounds',
+    templateId: 'stl-bounds',
+    relatedAlgos: ['binarySearch'],
+    standard: 'C++17 <algorithm>',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'cpp', anchors: 'done' },
+  },
+  {
+    id: 'stl-priority-queue',
+    section: 'stl',
+    titleZh: 'priority_queue 优先队列',
+    titleEn: 'priority_queue',
+    aliases: ['堆', '大根堆', '小根堆', 'heap', 'pq', 'std::priority_queue', 'push_heap', 'pop_heap', '优先级队列'],
+    tags: ['STL', '堆', '容器适配器'],
+    difficulty: 'basic',
+    prereqs: [],
+    summary: '默认大根堆：top 是最大值；push 上浮、pop 下沉。堆数组只满足堆序，不是有序数组。',
+    routeOrder: 2,
+    demoId: 'stl-priority-queue',
+    templateId: 'stl-priority-queue',
+    relatedAlgos: ['dijkstraHeap'],
+    standard: 'C++17 <queue>',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'cpp', anchors: 'done' },
+  },
+  {
+    id: 'dsu',
+    section: 'algorithms',
+    titleZh: '并查集',
+    titleEn: 'Disjoint Set Union (DSU)',
+    aliases: ['DSU', 'union-find', 'union find', 'disjoint set', '不相交集合', '并查集 DSU', '路径压缩', '按大小合并'],
+    tags: ['数据结构', '连通性', '图'],
+    difficulty: 'basic',
+    prereqs: [],
+    summary: '维护不相交集合：find 找根并压缩路径，union 按大小合并。Kruskal 的核心工具。',
+    routeOrder: 3,
+    demoId: 'dsu',
+    templateId: 'dsu',
+    relatedAlgos: ['kruskal'],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
+  {
+    id: 'fenwick',
+    section: 'algorithms',
+    titleZh: '树状数组',
+    titleEn: 'Fenwick Tree (BIT)',
+    aliases: ['Fenwick', 'BIT', 'binary indexed tree', 'Fenwick tree', '二叉索引树', 'lowbit', '前缀和', '单点修改'],
+    tags: ['数据结构', '前缀和', '区间查询'],
+    difficulty: 'basic',
+    prereqs: [],
+    summary: '用 lowbit 把前缀和拆成 O(log n) 个结点：单点加、前缀和、区间和 [l,r)。内部 1-based，对外 0-based 半开区间。',
+    routeOrder: 4,
+    demoId: 'fenwick',
+    templateId: 'fenwick',
+    relatedAlgos: [],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
+]
+
+export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)
+export const topicsOf = (section: 'stl' | 'algorithms') => TOPICS.filter((t) => t.section === section).sort((a, b) => a.routeOrder - b.routeOrder)

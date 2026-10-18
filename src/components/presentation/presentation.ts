@@ -17,7 +17,7 @@ export function getPresentation(algoId?: string): PresentationDescriptor | undef
 }
 
 /** Stage `data-primary-scene` value (V18 names kept; forest/search-tree added). */
-export type PrimaryScene = 'graph' | 'board' | 'matrix' | 'array' | 'tree' | 'forest' | 'empty'
+export type PrimaryScene = 'graph' | 'board' | 'matrix' | 'array' | 'tree' | 'forest' | 'advanced' | 'empty'
 
 export interface ResolvedPresentation {
   scene: PrimaryScene
@@ -30,6 +30,7 @@ export interface ResolvedPresentation {
  * modules without a descriptor.
  */
 export function inferLegacyScene(step: Step | undefined, hasBoard: boolean, hasOtherMatrix: boolean): PrimaryScene {
+  if (step?.advanced) return 'advanced'
   if (step?.graph) return 'graph'
   if (hasBoard) return 'board'
   if (hasOtherMatrix) return 'matrix'
@@ -44,6 +45,7 @@ const KIND_TO_SCENE: Record<PrimaryKind, PrimaryScene> = {
   graph: 'graph',
   board: 'board',
   forest: 'forest',
+  advanced: 'advanced',
   'search-tree': 'tree',
 }
 
