@@ -69,3 +69,82 @@ test.describe('ADV-24 template library: favorites, recent, filters (local only)'
     expect(rec).toEqual(['recent-dsu', 'recent-fenwick'])
   })
 })
+
+const FW_FINAL_A = [3, 0, 5, 4, 0, 2, -1, 0] // add 0 3; add 2 5; add 5 2; add 6 -1; add 3 4 (default ops of the fenwick demo)
+const VIEWPORTS = [
+  { width: 1366, height: 768 },
+  { width: 1920, height: 1080 },
+  { width: 1024, height: 600 },
+  { width: 390, height: 844 },
+  { width: 844, height: 390 },
+]
+test.describe('ADV-25 representative flow at five viewports (real values, real clicks)', () => {
+  for (const vp of VIEWPORTS) {
+    test(`${vp.width}x${vp.height}: enter → search → explain → demo → run → step → languages → pause → resize → template/contest → copy/export → back to demo`, async ({ page, context }) => {
+      await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+      await open(page, '#/', vp)
+      if (vp.width <= 960) await page.getByTestId('menu-btn').click()
+      await page.getByTestId('app-sidebar').getByRole('link', { name: '高阶算法', exact: true }).click()
+      await expect(page.getByTestId('adv-home')).toBeVisible()
+      await page.getByTestId('adv-search').fill('BIT')
+      await page.getByTestId('topic-fenwick').click()
+      await expect(page.getByTestId('adv-content')).toBeVisible()
+      await expect(page.getByTestId('sec-complexity')).toBeVisible()
+      await page.getByTestId('tab-demo').click()
+      await expect(page.getByTestId('adv-demo')).toBeVisible()
+      await page.getByTestId('run-btn').click()
+      await expect(page.getByTestId('visualizer')).toHaveAttribute('data-preview', '0', { timeout: 20_000 })
+      await expect(page.getByTestId('adv-demo')).toHaveAttribute('data-solve-count', '1')
+      // step through a few frames with the real button, then jump to the end and read the painted array
+      for (let i = 1; i <= 3; i++) {
+        await page.getByTestId('next-step-btn').click()
+        await expect(page.getByTestId('visualizer')).toHaveAttribute('data-step-index', String(i))
+      }
+      await page.getByRole('slider', { name: '步骤进度' }).focus()
+      await page.keyboard.press('End')
+      await expect(page.getByTestId('fw-node').first()).toBeVisible()
+      const cellsNow = await page.locator('[data-testid="fw-cell"]').evaluateAll((els) => els.map((e) => Number(e.getAttribute('data-value'))))
+      expect(cellsNow).toEqual(FW_FINAL_A)
+      // languages: switching must not solve again, and the selected language is reflected
+      const narrowLayout = !(await page.getByTestId('code-lang-switch').isVisible())
+      if (narrowLayout) await page.getByTestId('workbench-tab-code').click() // single-pane layout: real tab press
+      for (const l of ['python', 'cpp', 'typescript']) {
+        const tab = page.getByTestId(l === 'typescript' ? 'tab-ts' : `tab-lang-${l}`)
+        await tab.click()
+        await expect(tab).toHaveAttribute('aria-pressed', 'true')
+        await expect(page.getByTestId('adv-demo')).toHaveAttribute('data-solve-count', '1')
+      }
+      if (narrowLayout) await page.getByTestId('workbench-tab-demo').click()
+      // play then pause
+      await page.getByTestId('reset-playback-btn').click()
+      await page.getByTestId('play-btn').click()
+      await expect(page.getByTestId('visualizer')).toHaveAttribute('data-playing', '1')
+      await page.getByTestId('play-btn').click()
+      await expect(page.getByTestId('visualizer')).toHaveAttribute('data-playing', '0')
+      // resize to a SMALLER viewport: still no extra solve, scene still painted
+      await page.setViewportSize({ width: Math.min(vp.width, 360), height: Math.min(vp.height, 640) })
+      await expect(page.getByTestId('adv-scene')).toBeVisible()
+      await expect(page.getByTestId('adv-demo')).toHaveAttribute('data-solve-count', '1')
+      await page.setViewportSize(vp)
+      // back to the explanation, then the template page: contest/full, copy, export
+      await page.goBack()
+      await expect(page.getByTestId('adv-content')).toBeVisible()
+      await page.getByTestId('tab-template').click()
+      await expect(page.getByTestId('adv-template')).toBeVisible()
+      await page.getByTestId('variant-contest').click()
+      await page.getByTestId('form-full').click()
+      await expect(page.getByTestId('tpl-shown')).toHaveAttribute('data-form', 'full')
+      await page.getByTestId('tpl-copy').click()
+      await expect(page.getByTestId('tpl-msg')).toHaveText('已复制')
+      const clip = await page.evaluate(() => navigator.clipboard.readText())
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.getByTestId('tpl-export').click()])
+      expect(dl.suggestedFilename()).toBe('fenwick_contest_full.cpp')
+      const fs = await import('node:fs')
+      const saved = fs.readFileSync((await dl.path())!, 'utf8')
+      expect(saved).toBe(clip)
+      expect(saved).toContain('int main')
+      await page.getByTestId('back-to-demo').click()
+      await expect(page.getByTestId('adv-demo')).toBeVisible()
+    })
+  }
+})
