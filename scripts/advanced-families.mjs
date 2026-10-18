@@ -453,3 +453,54 @@ FAM['lca'] = {
     return { input, expected: qs.map(([u, v]) => lcaNaive(par, u, v)).join('\n') + '\n' }
   },
 }
+
+// ───────────────────────── lis ─────────────────────────
+// Independent baseline: O(n^2) dp length. Validator checks the printed sequence really is a strictly increasing subsequence of that length.
+function lisLen(a) {
+  const d = a.map(() => 1)
+  for (let i = 0; i < a.length; i++) for (let j = 0; j < i; j++) if (a[j] < a[i]) d[i] = Math.max(d[i], d[j] + 1)
+  return d.length ? Math.max(...d) : 0
+}
+function lisVerify(a, tokens, what) {
+  const [len, ...seq] = tokens
+  if (len !== lisLen(a)) throw new Error(`${what}: length ${len}, want ${lisLen(a)} for ${a}`)
+  if (seq.length !== len) throw new Error(`${what}: sequence has ${seq.length} items, length says ${len}`)
+  for (let i = 1; i < seq.length; i++) if (!(seq[i - 1] < seq[i])) throw new Error(`${what}: not strictly increasing ${seq}`)
+  let p = 0
+  for (const x of a) if (p < seq.length && x === seq[p]) p++
+  if (p !== seq.length) throw new Error(`${what}: ${seq} is not a subsequence of ${a}`)
+}
+FAM['lis'] = {
+  dir: 'lis',
+  cls: 'Lis',
+  gen(seed) {
+    const r = mulberry32(seed)
+    const cs = []
+    for (let t = 0; t < 400; t++) {
+      const n = t < 2 ? t : rint(r, 0, 14)
+      const hi = t % 3 === 0 ? 3 : 12
+      const a = Array.from({ length: n }, () => rint(r, -hi, hi))
+      cs.push({ k: 0, a, b: [], c: [] })
+    }
+    return cs
+  },
+  naive(c) {
+    return [String(lisLen(c.a))]
+  },
+  check(c, got) {
+    lisVerify(c.a, got[0].trim().split(/\s+/).filter(Boolean).map(Number), 'lis')
+  },
+  calls: { python: ['lis(a)'], typescript: ['M.lis(a)'], cpp: ['lis(a)'], java: ['Lis.lis(a)'], rust: ['lis(&a)'], go: ['Lis(a)'] },
+  core: ['{auto s=lis_strict(a);std::vector<long long> r{(long long)s.size()};r.insert(r.end(),s.begin(),s.end());pr(r);}'],
+  full(r) {
+    const n = rint(r, 1, 14)
+    const a = Array.from({ length: n }, () => rint(r, -9, 9))
+    return {
+      input: `${n}\n${a.join(' ')}\n`,
+      verify: (out) => {
+        const lines = out.replace(/\n$/, '').split('\n')
+        lisVerify(a, (lines[0] + ' ' + (lines[1] ?? '')).trim().split(/\s+/).map(Number), 'lis full')
+      },
+    }
+  },
+}

@@ -127,6 +127,14 @@
 | `lca|teach|go|run` | 通过 | 300 | go vet; go run | adf1e6e9ae71 |
 | `lca|contest-core|cpp|run` | 通过 | 300 | core compiled as displayed + driver; ASan+UBSan; naive baseline | 5b3a05211999 |
 | `lca|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | 5e442b2fc46f |
+| `lis|teach|typescript|run` | 通过 | 400 | node strip-types (displayed .ts imported unchanged) | cacad263356d |
+| `lis|teach|python|run` | 通过 | 400 | python3 -X dev | 22cf46b46658 |
+| `lis|teach|cpp|run` | 通过 | 400 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean | dc72b49fe10b |
+| `lis|teach|java|run` | 通过 | 400 | javac -Xlint:all; java -ea | b6ef26232fe6 |
+| `lis|teach|rust|run` | 通过 | 400 | rustc -D warnings, overflow-checks=on | 96e1b87d041f |
+| `lis|teach|go|run` | 通过 | 400 | go vet; go run | 9ef9984ddd11 |
+| `lis|contest-core|cpp|run` | 通过 | 400 | core compiled as displayed + driver; ASan+UBSan; naive baseline | f6035cf2f23d |
+| `lis|contest-full|cpp|run` | 通过 | 151 | full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan | c60b5675359b |
 
 ## 命令与退出码
 

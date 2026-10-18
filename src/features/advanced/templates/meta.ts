@@ -451,6 +451,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'lis',
+    topicId: 'lis',
+    title: '最长上升子序列（严格，O(n log n) + 还原）',
+    category: '动态规划',
+    difficulty: '竞赛基础',
+    prereqs: ['二分查找', '动态规划基础'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<algorithm>', '<vector>'],
+      depends: [],
+      indexing: '0-indexed 下标；序列元素为 long long',
+      interval: '无区间参数',
+      limits: 'n 可到 10^5~10^6；严格上升（相邻必须 <）；还原的序列不唯一',
+      timeComplexity: 'O(n log n)',
+      spaceComplexity: 'O(n)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版用 lower_bound 在 tails 值数组上二分，返回序列本身；教学版手写二分并返回 [长度, ...序列]：控制流同源但写法与接口不同构，作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '8\n10 9 2 5 3 7 101 18\n', output: '4\n2 3 7 18\n', note: '长度 4。最长不唯一（例如 2 5 7 101 也合法），本模板的二分规则还原出 2 3 7 18。' },
+    counterexample: {
+      title: '把 tails 当作答案',
+      explanation: '序列 [2, 5, 3, 1]：处理完后 tails = [1, 3]（长度 2 的最小结尾 3，长度 1 的最小结尾 1）。长度 2 是对的，但 "1 3" 不是子序列（1 在 3 之后）。必须用 prev 回溯，得到 [2, 5] 或 [2, 3] 这类真正的子序列。',
+      input: 'a = [2, 5, 3, 1]',
+      wrong: '输出 tails = [1, 3]（不是原序列的子序列）',
+      correct: '长度 2，序列例如 [2, 3]',
+    },
+    ioProtocol: '第 1 行 N；第 2 行 N 个整数。输出：第 1 行 LIS 长度；第 2 行一个最长严格上升子序列。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

@@ -14,5 +14,6 @@ export const CONTENT_LOADERS: Record<string, () => Promise<TopicContent>> = {
   'mono-queue': () => import('./mono-queue').then((m) => m.default),
   'topo': () => import('./topo').then((m) => m.default),
   'lca': () => import('./lca').then((m) => m.default),
+  'lis': () => import('./lis').then((m) => m.default),
   fenwick: () => import('./fenwick').then((m) => m.default),
 }

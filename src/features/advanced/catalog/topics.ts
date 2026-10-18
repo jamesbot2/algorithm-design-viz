@@ -227,6 +227,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'lis',
+    section: 'algorithms',
+    titleZh: '最长上升子序列 LIS',
+    titleEn: 'Longest Increasing Subsequence',
+    aliases: ['LIS', 'longest increasing subsequence', '最长上升子序列', 'tails', 'n log n'],
+    tags: ['动态规划', '二分', '子序列'],
+    difficulty: 'intermediate',
+    prereqs: [],
+    summary: '严格上升的 O(n log n)：tails 保存各长度的最小结尾，二分定位；prev 数组还原一个具体序列。',
+    routeOrder: 13,
+    demoId: 'lis',
+    templateId: 'lis',
+    relatedAlgos: [],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

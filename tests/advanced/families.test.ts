@@ -350,3 +350,45 @@ describe('lca vs independent parent-walk reference', () => {
     expect(solve('lca', { par, queries: [2, 1] }).result.answers).toEqual([1])
   })
 })
+
+describe('lis vs independent O(n²) dp', () => {
+  const dp = (a: number[]) => {
+    const d = a.map(() => 1)
+    for (let i = 0; i < a.length; i++) for (let j = 0; j < i; j++) if (a[j]! < a[i]!) d[i] = Math.max(d[i]!, d[j]! + 1)
+    return Math.max(...d)
+  }
+  it('length equals the dp; recovered sequence is a strictly increasing subsequence', () => {
+    const r = prng(41)
+    for (let c = 0; c < 300; c++) {
+      const a = Array.from({ length: ri(r, 1, 10) }, () => ri(r, -4, 4))
+      const { result } = solve('lis', { arr: a })
+      expect(result.length, `${a}`).toBe(dp(a))
+      expect(result.seq).toHaveLength(result.length)
+      for (let i = 1; i < result.seq.length; i++) expect(result.seq[i - 1]).toBeLessThan(result.seq[i])
+      let p = 0
+      for (const x of a) if (p < result.seq.length && x === result.seq[p]) p++
+      expect(p).toBe(result.seq.length)
+    }
+    expect(solve('lis', { arr: [10, 9, 2, 5, 3, 7, 101, 18] }).result.seq).toEqual([2, 3, 7, 18])
+  })
+  it('counterexamples: tails=[1,3] for [2,5,3,1] is not a subsequence; upper_bound (non-strict) gives 2 for [2,2]', () => {
+    const tails: number[] = []
+    for (const x of [2, 5, 3, 1]) {
+      let lo = 0
+      while (lo < tails.length && tails[lo]! < x) lo++
+      tails[lo] = x
+    }
+    expect(tails).toEqual([1, 3])
+    const ub: number[] = []
+    for (const x of [2, 2]) {
+      let lo = 0
+      while (lo < ub.length && ub[lo]! <= x) lo++
+      ub[lo] = x
+    }
+    expect(ub.length).toBe(2)
+    expect(solve('lis', { arr: [2, 2] }).result.length).toBe(1)
+    const s = solve('lis', { arr: [2, 5, 3, 1] }).result
+    expect(s.length).toBe(2)
+    expect(s.seq).not.toEqual([1, 3])
+  })
+})

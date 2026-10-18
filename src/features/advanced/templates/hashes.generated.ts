@@ -155,6 +155,20 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "full": "5e442b2fc46fa0c1568dd04c1647f18998642d1fe4a6248d7ee08bc86116b716"
     }
   },
+  "lis": {
+    "teach": {
+      "typescript": "cacad263356d32d1da5e909561c188488feaa0770ae8767aa39acdf0991788bc",
+      "python": "22cf46b4665898f5468bfd2dfe61e21a07efcea3a76b41d3b55fb099e3cd7996",
+      "cpp": "dc72b49fe10b3992b4df091139063774d8f4d3a47d26b47944c4768a0fe7a57f",
+      "java": "b6ef26232fe657fdc54f9127f8698a293d53e376b85ba66f7fe2bf50e9e11fe0",
+      "rust": "96e1b87d041f7d78f0ea5f659d58352a9a6f598c8f6d6b2773a8431a6764083b",
+      "go": "9ef9984ddd117492b946f23a885751c29578f05ed31a83003a6130b8173cf0ce"
+    },
+    "contest": {
+      "core": "f6035cf2f23d617817794371b0cd5830808afc4010f4b847505f069d05e7a63c",
+      "full": "c60b5675359bf0578803b38d5ce76785783abe99e322957e6b22d77253f0f55f"
+    }
+  },
   "stl-bounds": {
     "teach": {
       "cpp": "e695e94ca5682d1b1046fe8bfe5f980ec5fdbe9a8851cadf696c6386909198ed"

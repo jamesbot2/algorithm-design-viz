@@ -15,6 +15,7 @@ export const CATALOG_LOADERS: Record<string, () => Promise<CatalogBundle>> = {
   mono_queue: () => import('../../../codeCatalog/mono_queue').then((m) => m.getMonoQueueCatalog()),
   topo: () => import('../../../codeCatalog/topo').then((m) => m.getTopoCatalog()),
   lca: () => import('../../../codeCatalog/lca').then((m) => m.getLcaCatalog()),
+  lis: () => import('../../../codeCatalog/lis').then((m) => m.getLisCatalog()),
   stl_bounds: () => import('../../../codeCatalog/stl_bounds').then((m) => m.getStlBoundsCatalog()),
   stl_priority_queue: () => import('../../../codeCatalog/stl_priority_queue').then((m) => m.getStlPriorityQueueCatalog()),
 }
