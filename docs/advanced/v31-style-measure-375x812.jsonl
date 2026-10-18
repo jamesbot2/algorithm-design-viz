@@ -1,0 +1,5 @@
+{"id":"fenwick","sceneW":346,"sceneH":363,"sceneShareOfViewportH":0.45,"pieces":8,"minPieceW":39,"minPieceH":42,"pageOverflowX":0}
+{"id":"dsu","sceneW":346,"sceneH":363,"sceneShareOfViewportH":0.45,"pieces":8,"minPieceW":32,"minPieceH":32,"pageOverflowX":0}
+{"id":"stl-vector","sceneW":346,"sceneH":252,"sceneShareOfViewportH":0.31,"pieces":6,"minPieceW":42,"minPieceH":34,"pageOverflowX":0}
+{"id":"mono-stack","sceneW":346,"sceneH":384,"sceneShareOfViewportH":0.47,"pieces":18,"minPieceW":31,"minPieceH":34,"pageOverflowX":0}
+{"id":"stl-set-map","sceneW":346,"sceneH":313,"sceneShareOfViewportH":0.39,"pieces":4,"minPieceW":42,"minPieceH":34,"pageOverflowX":0}

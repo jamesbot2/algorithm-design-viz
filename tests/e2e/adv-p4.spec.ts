@@ -1,6 +1,6 @@
 /** 高阶算法 — P3 template-library preferences + P4 flows. Real mouse/keyboard, full HTTP app, retries 0. */
 import { test, expect, type Page } from '@playwright/test'
-import { open } from './adv-helpers'
+import { open, sceneAudit } from './adv-helpers'
 
 test.describe.configure({ retries: 0 })
 
@@ -166,4 +166,48 @@ test.describe('ADV-26 every template page has a complete header and its pieces',
       await expect(page.getByTestId('tpl-source'), id).toBeVisible()
     }
   })
+})
+
+/**
+ * V31-style measurement on the ADVANCED demos at 375x812. NOTE: V31's "main array vs companion band" budget belongs to the array-scene
+ * algorithms (merge sort etc., still covered by v31-mobile-budget.spec.ts). The advanced module paints its own scene (adv-scene), so
+ * here we measure the analogous quantities — scene height, painted cell size, in-box painting, page overflow — and record them.
+ */
+test.describe('ADV-27 advanced demos at 375x812: measured budget', () => {
+  test.use({ viewport: { width: 375, height: 812 } })
+  const rows: Record<string, unknown>[] = []
+  for (const [id, section, cellTid] of [
+    ['fenwick', 'algorithms', 'fw-cell'],
+    ['dsu', 'algorithms', 'dsu-node'],
+    ['stl-vector', 'stl', 'fam-cell'],
+    ['mono-stack', 'algorithms', 'fam-cell'],
+    ['stl-set-map', 'stl', 'fam-cell'],
+  ] as const) {
+    test(`${id}: scene is tall enough, every painted piece inside the scene box, no page-level horizontal overflow`, async ({ page }) => {
+      await open(page, `#/advanced/${section}/${id}?view=demo`, { width: 375, height: 812 })
+      await page.getByTestId('run-btn').click()
+      await expect(page.getByTestId('visualizer')).toHaveAttribute('data-preview', '0', { timeout: 20_000 })
+      await page.getByRole('slider', { name: '步骤进度' }).focus()
+      await page.keyboard.press('End')
+      const scene = page.getByTestId('adv-scene')
+      await expect(scene).toBeVisible()
+      const sb = (await scene.boundingBox())!
+      const pieces = page.getByTestId(cellTid)
+      const m = await pieces.evaluateAll((els) => {
+        const w = els.map((e) => e.getBoundingClientRect())
+        return { n: w.length, minW: Math.min(...w.map((r) => r.width)), minH: Math.min(...w.map((r) => r.height)) }
+      })
+      const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+      const rec = { id, sceneW: Math.round(sb.width), sceneH: Math.round(sb.height), sceneShareOfViewportH: +(sb.height / 812).toFixed(2), pieces: m.n, minPieceW: Math.round(m.minW), minPieceH: Math.round(m.minH), pageOverflowX: over }
+      rows.push(rec)
+      test.info().annotations.push({ type: 'measure', description: JSON.stringify(rec) })
+      const fs = await import('node:fs')
+      fs.appendFileSync('/workspace/adv/logs/adv27-measure.jsonl', JSON.stringify(rec) + '\n')
+      await sceneAudit(page, cellTid, 1)
+      expect(sb.width).toBeLessThanOrEqual(375)
+      expect(sb.height, JSON.stringify(rec)).toBeGreaterThanOrEqual(180)
+      expect(m.minW, JSON.stringify(rec)).toBeGreaterThanOrEqual(12)
+      expect(over, JSON.stringify(rec)).toBeLessThanOrEqual(0)
+    })
+  }
 })
