@@ -205,7 +205,7 @@ function genSeg(seed) {
   return cases
 }
 function naiveSeg(cs) {
-  return cs.map(({ n, init, ops }) => {
+  return cs.map(({ init, ops }) => {
     const a = init.map((v) => BigInt(v))
     const out = []
     for (const [k, x, y] of ops) {
