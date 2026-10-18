@@ -1,0 +1,2 @@
+{ "id": "stl_string", "title": "string / pair / tuple 实验（C++17）", "file": "stl_string.cpp",
+  "labels": { "stApp": "operator+=：追加", "stSub": "substr(p, n)：从 p 起至多 n 个字符（p > size 抛 out_of_range）", "stFind": "find：第一次出现的位置，没有则 npos", "stRfind": "rfind：最后一次出现的位置，没有则 npos", "stErase": "erase(p, n)：删除从 p 起至多 n 个字符", "stIns": "insert(p, x)：在 p 之前插入", "stPair": "pair 比较：先比 first，相等再比 second", "stTuple": "tuple 比较：按字典序逐个元素比较" } }

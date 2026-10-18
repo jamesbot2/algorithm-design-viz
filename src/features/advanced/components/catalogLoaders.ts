@@ -21,6 +21,10 @@ export const CATALOG_LOADERS: Record<string, () => Promise<CatalogBundle>> = {
   stl_deque: () => import('../../../codeCatalog/stl_deque').then((m) => m.getStlDequeCatalog()),
   stl_unique: () => import('../../../codeCatalog/stl_unique').then((m) => m.getStlUniqueCatalog()),
   stl_set_map: () => import('../../../codeCatalog/stl_set_map').then((m) => m.getStlSetMapCatalog()),
+  stl_string: () => import('../../../codeCatalog/stl_string').then((m) => m.getStlStringCatalog()),
+  stl_algo: () => import('../../../codeCatalog/stl_algo').then((m) => m.getStlAlgoCatalog()),
+  stl_numeric: () => import('../../../codeCatalog/stl_numeric').then((m) => m.getStlNumericCatalog()),
+  stl_comparator: () => import('../../../codeCatalog/stl_comparator').then((m) => m.getStlComparatorCatalog()),
   stl_bounds: () => import('../../../codeCatalog/stl_bounds').then((m) => m.getStlBoundsCatalog()),
   stl_priority_queue: () => import('../../../codeCatalog/stl_priority_queue').then((m) => m.getStlPriorityQueueCatalog()),
 }

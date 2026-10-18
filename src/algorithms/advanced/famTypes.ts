@@ -1,6 +1,6 @@
 import type { Step } from '../../types/step'
 
-export type StlLabId = 'stl-vector' | 'stl-deque' | 'stl-unique' | 'stl-set-map' | 'stl-string' | 'stl-numeric' | 'stl-comparator'
+export type StlLabId = 'stl-vector' | 'stl-deque' | 'stl-unique' | 'stl-set-map' | 'stl-string' | 'stl-algo' | 'stl-numeric' | 'stl-comparator'
 export interface LabOp {
   t: string
   n: number[]

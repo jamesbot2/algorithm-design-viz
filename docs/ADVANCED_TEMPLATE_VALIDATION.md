@@ -155,6 +155,18 @@
 | `stl-set-map|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | a8bdf747e8c2 |
 | `stl-set-map|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 46b885a3be08 |
 | `stl-set-map|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 7e2aa96ba921 |
+| `stl-string|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | a8e158fc4628 |
+| `stl-string|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 96762667944d |
+| `stl-string|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | c883c0c3ac58 |
+| `stl-algo|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | 8d06d6d9ee11 |
+| `stl-algo|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | a0bf301826c8 |
+| `stl-algo|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 5398587bccd0 |
+| `stl-numeric|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | 6c31b04a9479 |
+| `stl-numeric|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | a2309069c4a7 |
+| `stl-numeric|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | cc93c8486884 |
+| `stl-comparator|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | c459bb2fa730 |
+| `stl-comparator|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 701ce94f58a6 |
+| `stl-comparator|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 817dd56c254f |
 
 ## 命令与退出码
 

@@ -236,5 +236,41 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "core": "46b885a3be083eff44cab347fa2f7cc5ffd696ce0b387e54a48d5cc55cf80b7e",
       "full": "7e2aa96ba92132325ab6a0b99216fa5d5b38237abaf910ff38677485f1512591"
     }
+  },
+  "stl-string": {
+    "teach": {
+      "cpp": "a8e158fc4628372d7d6938eed4f9e2dfd02f51b33cae048a6e0843ff5d2d9296"
+    },
+    "contest": {
+      "core": "96762667944df265d9238849271c508d262f362b90b2d17bfc91bc21596fea27",
+      "full": "c883c0c3ac5813caf10c4dd4ba66da53556c06fd22392e2edb3ed4b56aad94f8"
+    }
+  },
+  "stl-algo": {
+    "teach": {
+      "cpp": "8d06d6d9ee11d1707f88042d1511a71b8f7f7809e43fa715fad05ebd50e8d41e"
+    },
+    "contest": {
+      "core": "a0bf301826c894caac90ecff15a2f0870a54e4c49cc6dc0d114ce65c445768ab",
+      "full": "5398587bccd0566628336bab6c989d8e2b453417ac7ddea0b226ca9c8c0c56c7"
+    }
+  },
+  "stl-numeric": {
+    "teach": {
+      "cpp": "6c31b04a9479b5f0ebbe15924065e498970e8e7a820aeae805d0fba7714a5a19"
+    },
+    "contest": {
+      "core": "a2309069c4a79b4f6ff17fdec8d6cd0a3d5553291c600840b4328e71dc05ac98",
+      "full": "cc93c848688490fa9fdc85eb720836b41e734fb9f110e519fa642cc24efbfac7"
+    }
+  },
+  "stl-comparator": {
+    "teach": {
+      "cpp": "c459bb2fa730493e8ec0fa6fffa8413a897683bb9fa4b33023fad2af1a33863b"
+    },
+    "contest": {
+      "core": "701ce94f58a6424160111a3eaf01596c11139c54edb95fa1e01e6aac0aeddda9",
+      "full": "817dd56c254fb900383b5395ca77718944af5b78f8a2a3b5ec49986808fe35b0"
+    }
   }
 }

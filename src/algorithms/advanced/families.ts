@@ -12,6 +12,10 @@ import { spec as stlVector } from './stlVector'
 import { spec as stlDeque } from './stlDeque'
 import { spec as stlUnique } from './stlUnique'
 import { spec as stlSetMap } from './stlSetMap'
+import { spec as stlString } from './stlString'
+import { spec as stlAlgo } from './stlAlgo'
+import { spec as stlNumeric } from './stlNumeric'
+import { spec as stlComparator } from './stlComparator'
 
 /** Registered generic families (each file exports `spec`). */
-export const FAMILIES: FamSpec[] = [prefixDiff, discretize, bsAnswer, monoStack, monoQueue, topo, lca, lis, numberTheory, stlVector, stlDeque, stlUnique, stlSetMap]
+export const FAMILIES: FamSpec[] = [prefixDiff, discretize, bsAnswer, monoStack, monoQueue, topo, lca, lis, numberTheory, stlVector, stlDeque, stlUnique, stlSetMap, stlString, stlAlgo, stlNumeric, stlComparator]

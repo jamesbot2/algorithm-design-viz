@@ -25,6 +25,14 @@
 | queue / deque 实验 (`stl-deque`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `bfs`（链接，非复制） |
 | unique + erase 实验 (`stl-unique`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `discretize`（链接，非复制） |
 | set / multiset / map 实验 (`stl-set-map`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `stl-bounds`（链接，非复制） |
+| string / pair / tuple 实验 (`stl-string`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `kmp`, `z-function`（链接，非复制） |
+| 标准算法实验：sort / nth_element / next_permutation (`stl-algo`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `merge-sort`, `stl-bounds`（链接，非复制） |
+| numeric 与 bitset 实验 (`stl-numeric`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `prefix-diff`, `number-theory`（链接，非复制） |
+| 迭代器与比较器实验 (`stl-comparator`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `merge-sort`, `stl-bounds`（链接，非复制） |
+| string / pair / tuple 实验 (`stl-string`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `kmp`, `z-function`（链接，非复制） |
+| 标准算法实验：sort / nth_element / next_permutation (`stl-algo`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `merge-sort`, `stl-bounds`（链接，非复制） |
+| numeric 与 bitset 实验 (`stl-numeric`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `prefix-diff`, `number-theory`（链接，非复制） |
+| 迭代器与比较器实验 (`stl-comparator`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `merge-sort`, `stl-bounds`（链接，非复制） |
 
 测试：`tests/advanced/advanced.test.ts`（vitest）、`tests/e2e/adv-p1.spec.ts`（Playwright，真实鼠标键盘、0 次重试）、`scripts/advanced-validate.mjs`（真实工具链）。
 

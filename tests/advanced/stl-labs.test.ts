@@ -114,3 +114,76 @@ describe('stl-unique', () => {
     expect(run([1, 2, 1, 3, 2], 1, 2).result.kept).toEqual([1, 1, 3])
   })
 })
+
+import { simString } from '../../src/algorithms/advanced/stlString'
+import { simAlgo } from '../../src/algorithms/advanced/stlAlgo'
+import { simNumeric } from '../../src/algorithms/advanced/stlNumeric'
+import { simComparator } from '../../src/algorithms/advanced/stlComparator'
+const wop = (t: string, n: number[], w: string[]): LabOp => ({ t, n, w })
+
+describe('stl-string', () => {
+  it('find failure is npos (never -1); rfind returns the LAST occurrence', () => {
+    const r = simString('abcabab', [wop('find', [], ['zz']), wop('rfind', [], ['ab']), wop('find', [], ['ab'])])
+    expect(r.states.map((s) => s.split(' ')[0])).toEqual(['r=npos', 'r=5', 'r=0'])
+  })
+  it('substr at pos == size is legal and empty; pos > size stops BEFORE the call', () => {
+    expect(simString('abc', [wop('sub', [3, 2], [])]).states[0]).toBe('r= s=abc')
+    const r = simString('abc', [wop('sub', [4, 1], [])])
+    expect(r.ok).toBe(false)
+    expect(r.reason).toContain('out_of_range')
+    expect(r.states).toHaveLength(0)
+  })
+  it('erase clamps n to the end; insert/erase out of range are stopped', () => {
+    expect(simString('abcde', [wop('ers', [3, 30], [])]).final).toBe('abc')
+    expect(simString('ab', [wop('ins', [3], ['x'])]).ok).toBe(false)
+  })
+  it('pair / tuple order is lexicographic', () => {
+    expect(simString('', [wop('pless', [1, 9, 2, 0], []), wop('pless', [2, 1, 2, 1], []), wop('tless', [1, 2, 3, 1, 2, 4], []), wop('tless', [1, 2, 4, 1, 2, 3], [])]).states.map((s) => s[2])).toEqual(['1', '0', '1', '0'])
+  })
+})
+
+describe('stl-algo', () => {
+  it('counterexample: next_permutation from an unsorted start does not visit all permutations', () => {
+    const seen = new Set<string>()
+    const ops = Array.from({ length: 12 }, () => wop('nperm', [], []))
+    const r = simAlgo([3, 1, 2], ops)
+    r.states.forEach((s) => seen.add(s.split('v=')[1]!))
+    expect(r.states[0]).toBe('r=1 v=[3 2 1]')
+    expect(r.states[1]).toBe('r=0 v=[1 2 3]') // wraps around, returns false
+    const sortedStart = simAlgo([1, 2, 3], Array.from({ length: 5 }, () => wop('nperm', [], []))).states.map((s) => s.split('v=')[1])
+    expect(new Set(sortedStart).size).toBe(5)
+  })
+  it('lower_bound / rot / nth guard the preconditions instead of inventing results', () => {
+    expect(simAlgo([3, 1, 2], [wop('lbd', [2], [])]).ok).toBe(false)
+    expect(simAlgo([3, 1, 2], [wop('rot', [4], [])]).ok).toBe(false)
+    expect(simAlgo([3, 1, 2], [wop('nth', [3], [])]).ok).toBe(false)
+    expect(simAlgo([3, 1, 2], [wop('srt', [], []), wop('lbd', [2], [])]).states[1]).toBe('r=1 v=[1 2 3]')
+  })
+  it('nth_element reports the k-th smallest and leaves the shown array unchanged', () => {
+    expect(simAlgo([5, 1, 4, 2], [wop('nth', [2], [])]).states[0]).toBe('r=4 v=[5 1 4 2]')
+  })
+})
+
+describe('stl-numeric', () => {
+  it('psum then adiff restores the array; gcd of zeros is 0; bitset indices count from the right', () => {
+    expect(simNumeric([4, 6, 8, 10], [wop('psum', [], []), wop('adiff', [], [])]).final).toEqual([4, 6, 8, 10])
+    expect(simNumeric([0, 0], [wop('gcdall', [], [])]).states[0]!.startsWith('r=0 ')).toBe(true)
+    expect(simNumeric([-4, 6], [wop('gcdall', [], [])]).states[0]!.startsWith('r=2 ')).toBe(true)
+    expect(simNumeric([1], [wop('bset', [3], [])]).bits).toBe('0000000000001000')
+    expect(simNumeric([1], [wop('bset', [15], []), wop('bshl', [1], [])]).bits).toBe('0000000000000000') // bit 15 shifted out
+  })
+})
+
+describe('stl-comparator', () => {
+  it('stable_sort keeps the order of equal first keys; sort by lex is a total order', () => {
+    expect(simComparator([[2, 5], [1, 5], [2, 3], [1, 9]], [wop('sfirst', [], [])]).final).toEqual([[1, 5], [1, 9], [2, 5], [2, 3]])
+    expect(simComparator([[2, 5], [1, 5], [2, 3], [1, 9]], [wop('sortlex', [], [])]).final).toEqual([[1, 5], [1, 9], [2, 3], [2, 5]])
+  })
+  it('lower_bound by first is refused unless sorted by first right before', () => {
+    expect(simComparator([[2, 5], [1, 5]], [wop('lbf', [1], [])]).ok).toBe(false)
+    expect(simComparator([[2, 5], [1, 5]], [wop('sfirst', [], []), wop('lbf', [2], [])]).states[1]).toBe('r=1 v=[1:5 2:5]')
+  })
+  it('min_element returns the FIRST minimum under ByFirst', () => {
+    expect(simComparator([[2, 1], [1, 7], [1, 3]], [wop('minel', [], [])]).states[0]).toBe('r=1 v=[2:1 1:7 1:3]')
+  })
+})
