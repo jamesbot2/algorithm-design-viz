@@ -12,6 +12,7 @@ export const CATALOG_LOADERS: Record<string, () => Promise<CatalogBundle>> = {
   discretize: () => import('../../../codeCatalog/discretize').then((m) => m.getDiscretizeCatalog()),
   bs_answer: () => import('../../../codeCatalog/bs_answer').then((m) => m.getBsAnswerCatalog()),
   mono_stack: () => import('../../../codeCatalog/mono_stack').then((m) => m.getMonoStackCatalog()),
+  mono_queue: () => import('../../../codeCatalog/mono_queue').then((m) => m.getMonoQueueCatalog()),
   stl_bounds: () => import('../../../codeCatalog/stl_bounds').then((m) => m.getStlBoundsCatalog()),
   stl_priority_queue: () => import('../../../codeCatalog/stl_priority_queue').then((m) => m.getStlPriorityQueueCatalog()),
 }

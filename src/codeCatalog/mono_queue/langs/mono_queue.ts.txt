@@ -1,0 +1,17 @@
+/** Monotonic deque. slidingMax: maximum of every window of length k (1 <= k <= a.length). */
+export function slidingMax(a: number[], k: number): number[] {
+  const out: number[] = []
+  const dq: number[] = [] // indices; values strictly decrease from front to back (shift() is O(n) here: fine for teaching)
+  for (let i = 0; i < a.length; i++) {
+    while (dq.length > 0 && a[dq[dq.length - 1]!]! <= a[i]!) dq.pop() // @a: mqPopBack
+    dq.push(i) // @a: mqPush
+    if (dq[0]! <= i - k) dq.shift() // @a: mqExpire
+    if (i >= k - 1) out.push(a[dq[0]!]!) // @a: mqEmit
+  }
+  return out
+}
+
+/** Minimum of every window: the maximum of the negated array, negated back. */
+export function slidingMin(a: number[], k: number): number[] {
+  return slidingMax(a.map((x) => -x), k).map((x) => -x)
+}

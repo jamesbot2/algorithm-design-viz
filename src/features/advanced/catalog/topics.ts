@@ -176,6 +176,23 @@ export const TOPICS: TopicMeta[] = [
     standard: 'C++17',
     caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
   },
+  {
+    id: 'mono-queue',
+    section: 'algorithms',
+    titleZh: '单调队列',
+    titleEn: 'Monotonic Queue',
+    aliases: ['monotonic queue', 'monotonic deque', 'sliding window maximum', '滑动窗口最大值', '单调队列', 'deque'],
+    tags: ['队列', '滑动窗口', '线性扫描'],
+    difficulty: 'intermediate',
+    prereqs: ['mono-stack'],
+    summary: '双端队列存下标、值严格递减：队尾弹更小的、队首弹过期的，队首就是窗口最大值。',
+    routeOrder: 10,
+    demoId: 'mono-queue',
+    templateId: 'mono-queue',
+    relatedAlgos: [],
+    standard: 'C++17',
+    caps: { explanation: 'done', demo: 'done', template: 'done', languages: 'six', anchors: 'done' },
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

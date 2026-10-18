@@ -358,6 +358,37 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE,
   },
+  {
+    id: 'mono-queue',
+    topicId: 'mono-queue',
+    title: '单调队列（滑动窗口最大 / 最小）',
+    category: '数组',
+    difficulty: '竞赛基础',
+    prereqs: ['双端队列', '单调栈'],
+    header: {
+      standard: 'C++17（教学版另有 Python / TypeScript / Java / Rust / Go）',
+      headers: ['<deque>', '<functional>', '<vector>'],
+      depends: [],
+      indexing: '0-based 下标；窗口 = [i − k + 1, i]；过期判定 front ≤ i − k',
+      interval: '窗口长度 k 满足 1 ≤ k ≤ n；输出 n − k + 1 个值',
+      limits: 'C++/Java/Rust/Go 用 64 位；TypeScript 为 Number（|值| ≤ 2^53−1）',
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(k)',
+    },
+    teachLanguages: ['typescript', 'python', 'cpp', 'java', 'rust', 'go'],
+    contestNote: '竞赛版用比较器参数化（>= 求最大、<= 求最小），教学版通过取负复用同一份最大值代码：控制流不同构，作为参考模板阅读，不显示"正在执行"箭头。',
+    sample: { input: '8 3\n1 3 -1 -3 5 3 6 7\n', output: '3 3 5 5 6 7\n-1 -3 -3 -3 3 3\n', note: '经典例题 [1,3,-1,-3,5,3,6,7]，k=3：窗口最大值 3 3 5 5 6 7；最小值 -1 -3 -3 -3 3 3。' },
+    counterexample: {
+      title: '过期判定差一位（front < i − k）',
+      explanation: '窗口是 [i−k+1, i]，所以下标 i−k 已经过期。若写成 front < i − k，则下标 i−k 在队首多留一步，窗口最大值可能取到窗口外的元素。例：a=[5,1,1]，k=2：i=2 时窗口 [1,2]，下标 0（值 5）已过期；差一的写法仍输出 5。',
+      input: 'a = [5, 1, 1]，k = 2',
+      wrong: '[5, 5]（第二个窗口 [1,1] 却输出 5）',
+      correct: '[5, 1]',
+    },
+    ioProtocol: '第 1 行 N K；第 2 行 a_0..a_{N−1}。输出：第 1 行每个长度为 K 的窗口的最大值；第 2 行最小值。',
+    source: ORIGINAL,
+    license: LICENSE,
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

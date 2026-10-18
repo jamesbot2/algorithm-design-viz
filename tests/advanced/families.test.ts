@@ -237,3 +237,42 @@ describe('mono-stack vs independent reference', () => {
     expect(solve('mono-stack', { arr: h }).result.best).toBe(6)
   })
 })
+
+describe('mono-queue vs independent reference', () => {
+  it('window maxima/minima equal brute force; deque invariant (values strictly decrease front→back) holds in every frame', () => {
+    const r = prng(17)
+    for (let c = 0; c < 200; c++) {
+      const a = Array.from({ length: ri(r, 1, 12) }, () => ri(r, -9, 9))
+      const k = ri(r, 1, a.length)
+      const { result, steps } = solve('mono-queue', { arr: a, k })
+      const mx: number[] = []
+      const mn: number[] = []
+      for (let i = 0; i + k <= a.length; i++) {
+        mx.push(Math.max(...a.slice(i, i + k)))
+        mn.push(Math.min(...a.slice(i, i + k)))
+      }
+      expect(result.max, `${a} k=${k}`).toEqual(mx)
+      expect(result.min).toEqual(mn)
+      for (const s of steps) {
+        const dv = fv(s).rows.find((x) => x.id === 'dv')!.cells.filter((x) => typeof x === 'number') as number[]
+        for (let i = 1; i < dv.length; i++) expect(dv[i - 1]! > dv[i]!).toBe(true)
+        const dq = fv(s).rows.find((x) => x.id === 'dq')!.cells.filter((x) => typeof x === 'number') as number[]
+        expect(dq.length).toBeLessThanOrEqual(k + 1)
+      }
+    }
+  })
+  it('counterexample: expiry test "front < i − k" (off by one) outputs [5,5] for a=[5,1,1], k=2; product gives [5,1]', () => {
+    const a = [5, 1, 1]
+    const k = 2
+    const dq: number[] = []
+    const out: number[] = []
+    for (let i = 0; i < a.length; i++) {
+      while (dq.length && a[dq[dq.length - 1]!]! <= a[i]!) dq.pop()
+      dq.push(i)
+      if (dq[0]! < i - k) dq.shift() // BUG
+      if (i >= k - 1) out.push(a[dq[0]!]!)
+    }
+    expect(out).toEqual([5, 5])
+    expect(solve('mono-queue', { arr: a, k }).result.max).toEqual([5, 1])
+  })
+})

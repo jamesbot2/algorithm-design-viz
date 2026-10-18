@@ -279,3 +279,48 @@ FAM['mono-stack'] = {
     return { input: `${n}\n${a.join(' ')}\n`, expected: ng.join(' ') + '\n' + best + '\n' }
   },
 }
+
+// ───────────────────────── mono-queue ─────────────────────────
+FAM['mono-queue'] = {
+  dir: 'mono_queue',
+  cls: 'MonoQueue',
+  gen(seed) {
+    const r = mulberry32(seed)
+    const cs = []
+    for (let t = 0; t < 400; t++) {
+      const n = t < 3 ? t + 1 : rint(r, 1, 30)
+      const a = Array.from({ length: n }, () => (t % 13 === 0 ? rint(r, -BIG, BIG) : rint(r, -10, 10)))
+      cs.push({ k: rint(r, 1, n), a, b: [], c: [] })
+    }
+    return cs
+  },
+  naive(c) {
+    const mx = [], mn = []
+    for (let i = 0; i + c.k <= c.a.length; i++) {
+      const w = c.a.slice(i, i + c.k)
+      mx.push(Math.max(...w))
+      mn.push(Math.min(...w))
+    }
+    return [S(mx), S(mn)]
+  },
+  calls: {
+    python: ['sliding_max(a,k)', 'sliding_min(a,k)'],
+    typescript: ['M.slidingMax(a,k)', 'M.slidingMin(a,k)'],
+    cpp: ['sliding_max(a,k)', 'sliding_min(a,k)'],
+    java: ['MonoQueue.slidingMax(a,k)', 'MonoQueue.slidingMin(a,k)'],
+    rust: ['sliding_max(&a,k)', 'sliding_min(&a,k)'],
+    go: ['SlidingMax(a,k)', 'SlidingMin(a,k)'],
+  },
+  core: ['pr(window_max(a,(int)k));', 'pr(window_min(a,(int)k));'],
+  full(r) {
+    const n = rint(r, 1, 12), k = rint(r, 1, n)
+    const a = Array.from({ length: n }, () => rint(r, -9, 9))
+    const mx = [], mn = []
+    for (let i = 0; i + k <= n; i++) {
+      const w = a.slice(i, i + k)
+      mx.push(Math.max(...w))
+      mn.push(Math.min(...w))
+    }
+    return { input: `${n} ${k}\n${a.join(' ')}\n`, expected: mx.join(' ') + '\n' + mn.join(' ') + '\n' }
+  },
+}
