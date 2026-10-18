@@ -21,7 +21,7 @@ const sources: Record<string, ContestSource> = {
       "hash": "da994cf41201899947c711b5ef4fe59242240aa7cc171cfa9d41ce4613dec0a6"
     }
   },
-  "stl_bounds": {
+  "stl-bounds": {
     "core": {
       "source": "// lower_bound / upper_bound — contest idiom (reference, uses the standard library).\n// C++17, header <algorithm>. Precondition: v sorted non-decreasing. Closed-open [begin, end).\n// idx = first position with !(v[i] < x) (lower) / x < v[i] (upper); idx == v.size() means \"none\".\n#include <algorithm>\n#include <vector>\nlong long count_equal(const std::vector<int>& v, int x) {\n  return std::upper_bound(v.begin(), v.end(), x) - std::lower_bound(v.begin(), v.end(), x);\n}\nint first_ge(const std::vector<int>& v, int x) {  // index of first v[i] >= x, or v.size()\n  return int(std::lower_bound(v.begin(), v.end(), x) - v.begin());\n}\nint first_gt(const std::vector<int>& v, int x) {  // index of first v[i] > x, or v.size()\n  return int(std::upper_bound(v.begin(), v.end(), x) - v.begin());\n}\n",
       "hash": "c26c4d156845cd1f0d2b11ae10fb65ae4b0578ac79f67f0e1626d82bab6f78e8"
@@ -31,7 +31,7 @@ const sources: Record<string, ContestSource> = {
       "hash": "9c15378a47feaa161f3c6246892f86409d2f8efb2cbec37ed60475281375e594"
     }
   },
-  "stl_priority_queue": {
+  "stl-priority-queue": {
     "core": {
       "source": "// priority_queue — contest idiom (reference, uses the standard library).\n// C++17, headers <functional> <queue> <vector>. push/pop O(log n), top O(1); top()/pop() on an empty queue is UB.\n// Default is a MAX-heap. Min-heap: third template argument std::greater<T>. Pair keys compare lexicographically.\n#include <functional>\n#include <queue>\n#include <vector>\ntemplate <class T>\nusing MinPQ = std::priority_queue<T, std::vector<T>, std::greater<T>>;\n// Pops everything, returns the values in non-increasing order (heap sort via the queue).\nstd::vector<int> drain_desc(std::vector<int> v) {\n  std::priority_queue<int> pq(v.begin(), v.end());\n  std::vector<int> out;\n  while (!pq.empty()) out.push_back(pq.top()), pq.pop();\n  return out;\n}\n",
       "hash": "145f24b07a75f019ed99d20fc18db0706a2debfc30ff41a85cd28b3b6c3c4b75"

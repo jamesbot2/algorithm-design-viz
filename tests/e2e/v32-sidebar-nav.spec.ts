@@ -62,13 +62,35 @@ for (const theme of ['lab-dark', 'lab-light'] as const) {
 test('1b · keyboard: rail Tab order is meaningful; Esc closes catalog and returns focus; outside click closes without switching', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 })
   await open(page, '#/algo/lcs')
-  const names: string[] = []
+  // Not a pinned icon count: every rail stop must have an accessible name, be operable (a/button), be
+  // visible (no hidden focusables), and the required entries must be present in a sensible order.
+  const stops: { name: string; tag: string; visible: boolean; inRail: boolean }[] = []
   await page.keyboard.press('Tab')
-  for (let i = 0; i < 7; i++) {
-    names.push(await page.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? ''))
+  for (let i = 0; i < 12; i++) {
+    const st = await page.evaluate(() => {
+      const a = document.activeElement as HTMLElement | null
+      const r = a?.getBoundingClientRect()
+      return {
+        name: (a?.getAttribute('aria-label') || a?.textContent || '').trim(),
+        tag: a?.tagName ?? '',
+        visible: !!r && r.width > 0 && r.height > 0 && r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight,
+        inRail: !!a?.closest('.sidebar'),
+      }
+    })
+    if (!st.inRail) break
+    stops.push(st)
     await page.keyboard.press('Tab')
   }
-  expect(names.slice(0, 7)).toEqual(['算法设计与分析 · 首页', '展开侧栏', '全部算法', '算法目录', '练习台', '实验台', '实验讲义'])
+  for (const st of stops) {
+    expect(st.name, 'rail stop has an accessible name').not.toBe('')
+    expect(['A', 'BUTTON']).toContain(st.tag)
+    expect(st.visible, `rail stop "${st.name}" is visible (no hidden focusable)`).toBe(true)
+  }
+  const names = stops.map((s) => s.name)
+  for (const n of ['全部算法', '算法目录', '高阶算法', '练习台', '实验台', '实验讲义']) expect(names, `rail has ${n}`).toContain(n)
+  expect(names.filter((n) => n === '高阶算法'), 'exactly one 高阶算法 entry').toHaveLength(1)
+  expect(names.indexOf('全部算法')).toBeLessThan(names.indexOf('算法目录'))
+  expect(names.indexOf('算法目录')).toBeLessThan(names.indexOf('高阶算法'))
   const entry = page.getByTestId('catalog-entry')
   await entry.focus()
   await page.keyboard.press('Enter')

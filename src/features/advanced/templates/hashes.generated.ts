@@ -29,7 +29,7 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "full": "da994cf41201899947c711b5ef4fe59242240aa7cc171cfa9d41ce4613dec0a6"
     }
   },
-  "stl_bounds": {
+  "stl-bounds": {
     "teach": {
       "cpp": "e695e94ca5682d1b1046fe8bfe5f980ec5fdbe9a8851cadf696c6386909198ed"
     },
@@ -38,7 +38,7 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "full": "9c15378a47feaa161f3c6246892f86409d2f8efb2cbec37ed60475281375e594"
     }
   },
-  "stl_priority_queue": {
+  "stl-priority-queue": {
     "teach": {
       "cpp": "424e184f1fde87cc3657b378db92bc615c7c4ad82931275a2f3059376fe16a8d"
     },

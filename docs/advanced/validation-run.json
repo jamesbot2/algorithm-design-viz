@@ -1,0 +1,3488 @@
+{
+  "ranAt": "2026-10-18T06:39:00.432Z",
+  "toolchain": {
+    "gpp": "gcc (Debian 14.2.0-19) 14.2.0",
+    "python": "Python 3.13.5",
+    "node": "v24.20.0",
+    "javac": "javac 21.0.12.1",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "rustc": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+    "go": "go version go1.27.2 linux/amd64"
+  },
+  "missing": [],
+  "logs": [
+    {
+      "key": "stl-bounds|teach|cpp|run",
+      "status": "pass",
+      "tests": 500,
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ --version",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "python3 --version",
+          "code": 0,
+          "ms": 2
+        },
+        {
+          "cmd": "node --version",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "javac -version",
+          "code": 0,
+          "ms": 98
+        },
+        {
+          "cmd": "java -version",
+          "code": 0,
+          "ms": 30
+        },
+        {
+          "cmd": "rustc --version",
+          "code": 0,
+          "ms": 19
+        },
+        {
+          "cmd": "go version",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 265
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 259
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 10
+        }
+      ]
+    },
+    {
+      "key": "stl-bounds|contest-core|cpp|run",
+      "status": "pass",
+      "tests": 500,
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 276
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 251
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 10
+        }
+      ]
+    },
+    {
+      "key": "stl-bounds|contest-full|cpp|run",
+      "status": "pass",
+      "tests": 151,
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra full.cpp -o full",
+          "code": 0,
+          "ms": 246
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        }
+      ]
+    },
+    {
+      "key": "stl-priority-queue|teach|cpp|run",
+      "status": "pass",
+      "tests": 400,
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 267
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 255
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 13
+        }
+      ]
+    },
+    {
+      "key": "stl-priority-queue|contest-core|cpp|run",
+      "status": "pass",
+      "tests": 400,
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 521
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 528
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 16
+        }
+      ]
+    },
+    {
+      "key": "stl-priority-queue|contest-full|cpp|run",
+      "status": "pass",
+      "tests": 151,
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra full.cpp -o full",
+          "code": 0,
+          "ms": 447
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        }
+      ]
+    },
+    {
+      "key": "dsu|teach|typescript|run",
+      "status": "pass",
+      "tests": 402,
+      "checks": "node strip-types (displayed .ts imported unchanged)",
+      "toolchain": "v24.20.0",
+      "commands": [
+        {
+          "cmd": "node --experimental-strip-types --no-warnings main.ts",
+          "code": 0,
+          "ms": 81
+        }
+      ]
+    },
+    {
+      "key": "dsu|teach|python|run",
+      "status": "pass",
+      "tests": 402,
+      "checks": "python3 -X dev",
+      "toolchain": "Python 3.13.5",
+      "commands": [
+        {
+          "cmd": "python3 -X dev main.py",
+          "code": 0,
+          "ms": 27
+        }
+      ]
+    },
+    {
+      "key": "dsu|teach|cpp|run",
+      "status": "pass",
+      "tests": 402,
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 447
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 455
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 13
+        }
+      ]
+    },
+    {
+      "key": "dsu|teach|java|run",
+      "status": "pass",
+      "tests": 402,
+      "checks": "javac -Xlint:all; java -ea",
+      "toolchain": "javac 21.0.12.1",
+      "commands": [
+        {
+          "cmd": "javac -Xlint:all DSU.java Main.java",
+          "code": 0,
+          "ms": 372
+        },
+        {
+          "cmd": "java -ea -cp $TMP Main",
+          "code": 0,
+          "ms": 59
+        }
+      ]
+    },
+    {
+      "key": "dsu|teach|rust|run",
+      "status": "pass",
+      "tests": 402,
+      "checks": "rustc -D warnings, overflow-checks=on",
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "commands": [
+        {
+          "cmd": "rustc --edition 2021 -C debuginfo=0 -C overflow-checks=on -D warnings main.rs -o main",
+          "code": 0,
+          "ms": 218
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 12
+        }
+      ]
+    },
+    {
+      "key": "dsu|teach|go|run",
+      "status": "pass",
+      "tests": 402,
+      "checks": "go vet; go run",
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "commands": [
+        {
+          "cmd": "go vet ./...",
+          "code": 0,
+          "ms": 2493
+        },
+        {
+          "cmd": "go run .",
+          "code": 0,
+          "ms": 138
+        }
+      ]
+    },
+    {
+      "key": "dsu|contest-core|cpp|run",
+      "status": "pass",
+      "tests": 402,
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 526
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 498
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 13
+        }
+      ]
+    },
+    {
+      "key": "dsu|contest-full|cpp|run",
+      "status": "pass",
+      "tests": 151,
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra full.cpp -o full",
+          "code": 0,
+          "ms": 235
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        }
+      ]
+    },
+    {
+      "key": "fenwick|teach|typescript|run",
+      "status": "pass",
+      "tests": 401,
+      "checks": "node strip-types (displayed .ts imported unchanged)",
+      "toolchain": "v24.20.0",
+      "commands": [
+        {
+          "cmd": "node --experimental-strip-types --no-warnings main.ts",
+          "code": 0,
+          "ms": 82
+        }
+      ]
+    },
+    {
+      "key": "fenwick|teach|python|run",
+      "status": "pass",
+      "tests": 401,
+      "checks": "python3 -X dev",
+      "toolchain": "Python 3.13.5",
+      "commands": [
+        {
+          "cmd": "python3 -X dev main.py",
+          "code": 0,
+          "ms": 31
+        }
+      ]
+    },
+    {
+      "key": "fenwick|teach|cpp|run",
+      "status": "pass",
+      "tests": 401,
+      "checks": "g++ -std=c++17 ASan+UBSan -Wall -Wextra clean",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 204
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 197
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 9
+        }
+      ]
+    },
+    {
+      "key": "fenwick|teach|java|run",
+      "status": "pass",
+      "tests": 401,
+      "checks": "javac -Xlint:all; java -ea",
+      "toolchain": "javac 21.0.12.1",
+      "commands": [
+        {
+          "cmd": "javac -Xlint:all Fenwick.java Main.java",
+          "code": 0,
+          "ms": 360
+        },
+        {
+          "cmd": "java -ea -cp $TMP Main",
+          "code": 0,
+          "ms": 65
+        }
+      ]
+    },
+    {
+      "key": "fenwick|teach|rust|run",
+      "status": "pass",
+      "tests": 401,
+      "checks": "rustc -D warnings, overflow-checks=on",
+      "toolchain": "rustc 1.85.1 (4eb161250 2025-03-15) (built from a source tarball)",
+      "commands": [
+        {
+          "cmd": "rustc --edition 2021 -C debuginfo=0 -C overflow-checks=on -D warnings main.rs -o main",
+          "code": 0,
+          "ms": 209
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 11
+        }
+      ]
+    },
+    {
+      "key": "fenwick|teach|go|run",
+      "status": "pass",
+      "tests": 401,
+      "checks": "go vet; go run",
+      "toolchain": "go version go1.27.2 linux/amd64",
+      "commands": [
+        {
+          "cmd": "go vet ./...",
+          "code": 0,
+          "ms": 2390
+        },
+        {
+          "cmd": "go run .",
+          "code": 0,
+          "ms": 111
+        }
+      ]
+    },
+    {
+      "key": "fenwick|contest-core|cpp|run",
+      "status": "pass",
+      "tests": 401,
+      "checks": "core compiled as displayed + driver; ASan+UBSan; naive baseline",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 198
+        },
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra main.cpp -o main",
+          "code": 0,
+          "ms": 199
+        },
+        {
+          "cmd": "./main",
+          "code": 0,
+          "ms": 11
+        }
+      ]
+    },
+    {
+      "key": "fenwick|contest-full|cpp|run",
+      "status": "pass",
+      "tests": 151,
+      "checks": "full compiled as displayed; sample output exact; random stdin vs naive; ASan+UBSan",
+      "toolchain": "gcc (Debian 14.2.0-19) 14.2.0",
+      "commands": [
+        {
+          "cmd": "g++ -std=c++17 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=undefined -Wall -Wextra full.cpp -o full",
+          "code": 0,
+          "ms": 197
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 5
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 3
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        },
+        {
+          "cmd": "./full",
+          "code": 0,
+          "ms": 4
+        }
+      ]
+    }
+  ]
+}
