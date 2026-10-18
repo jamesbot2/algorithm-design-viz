@@ -126,6 +126,7 @@ test.describe('ADV-11 segment tree (point assign + range sum)', () => {
   })
   test('out-of-range set index is rejected with a message and no solve', async ({ page }) => {
     await open(page, '#/advanced/algorithms/segtree?view=demo')
+    await page.getByTestId('input-edit-toggle').click()
     await page.getByTestId('adv-input-ops').fill('set 9 1')
     await page.getByTestId('run-btn').click()
     await expect(page.getByTestId('adv-errors')).toContainText('越界')
@@ -162,6 +163,7 @@ test.describe('ADV-12 lazy segment tree (range add + range sum)', () => {
   })
   test('invalid add (v missing) is rejected; grammar is whitelisted', async ({ page }) => {
     await open(page, '#/advanced/algorithms/segtree-lazy?view=demo')
+    await page.getByTestId('input-edit-toggle').click()
     await page.getByTestId('adv-input-ops').fill('add 1 3')
     await page.getByTestId('run-btn').click()
     await expect(page.getByTestId('adv-errors')).toContainText('add l r v')
@@ -201,6 +203,7 @@ test.describe('ADV-13 prefix sums & difference array', () => {
   })
   test('queries with l > r are rejected with the interval reason', async ({ page }) => {
     await open(page, '#/advanced/algorithms/prefix-diff?view=demo')
+    await page.getByTestId('input-edit-toggle').click()
     await page.getByTestId('adv-input-qs').fill('5 2')
     await page.getByTestId('run-btn').click()
     await expect(page.getByTestId('adv-errors')).toContainText('0 ≤ l ≤ r')
