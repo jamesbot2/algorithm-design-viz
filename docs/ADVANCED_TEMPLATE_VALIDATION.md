@@ -146,6 +146,15 @@
 | `stl-vector|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | 57a78ce36d4b |
 | `stl-vector|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 8afed492eb05 |
 | `stl-vector|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 8098ed01ceea |
+| `stl-deque|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | ae98c60e3da1 |
+| `stl-deque|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 3c212b889034 |
+| `stl-deque|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 4d8c5cbeffc1 |
+| `stl-unique|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | d3d6fccd9bb6 |
+| `stl-unique|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | d037e6d43f15 |
+| `stl-unique|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | a477b0a06316 |
+| `stl-set-map|teach|cpp|run` | 通过 | 250 | g++ -std=c++17 ASan+UBSan -Wall -Wextra clean; real std containers; golden recorded | a8bdf747e8c2 |
+| `stl-set-map|contest-core|cpp|run` | 通过 | 250 | core compiled as displayed; output identical to the teaching file on every case; ASan+UBSan | 46b885a3be08 |
+| `stl-set-map|contest-full|cpp|run` | 通过 | 64 | full compiled as displayed; sample output exact; random stdin equals the real-STL golden; ASan+UBSan | 7e2aa96ba921 |
 
 ## 命令与退出码
 

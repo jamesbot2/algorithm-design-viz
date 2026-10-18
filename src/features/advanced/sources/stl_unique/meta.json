@@ -1,0 +1,2 @@
+{ "id": "stl_unique", "title": "unique + erase 实验（C++17）", "file": "stl_unique.cpp",
+  "labels": { "uUnique": "unique：把每段相邻重复压成一个，返回逻辑新终点", "uRemove": "remove：把不等于 x 的元素按原顺序移到前面，返回逻辑新终点", "uSort": "sort：先排序，相同的值才会相邻", "uErase": "erase(新终点, end())：这一步才真的缩小 size" } }

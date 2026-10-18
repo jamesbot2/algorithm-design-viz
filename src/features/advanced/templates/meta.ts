@@ -556,6 +556,135 @@ export const TEMPLATES: TemplateMeta[] = [
     source: ORIGINAL,
     license: LICENSE
   },
+  {
+    prereqs: [
+      "数组",
+      "队列的先进先出"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<deque>",
+        "<queue>"
+      ],
+      depends: [],
+      indexing: "deque 支持 d[i]（0 = 队首）；queue 只有 front/back",
+      interval: "无区间参数",
+      limits: "front/back/pop 在空容器上是未定义行为；deque 两端操作不使元素引用失效，但会使迭代器失效",
+      timeComplexity: "两端 push/pop 均摊 O(1)；d[i] O(1)；中间插入 O(n)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用：BFS 用 queue（push / front / pop），滑动窗口用 deque（两端都要操作）。教学版把每个调用单独成函数，状态逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "3 1 2 3\n6\npushf 0\npushb 4\nfront\nback\npopf\npopb\n",
+      output: "r=- size=4 [0 1 2 3]\nr=- size=5 [0 1 2 3 4]\nr=0 size=5 [0 1 2 3 4]\nr=4 size=5 [0 1 2 3 4]\nr=- size=4 [1 2 3 4]\nr=- size=3 [1 2 3]\n",
+      note: "front / back 只读不删除；popf 就是 queue::pop；pushf 与 popb 是 deque 才有的。"
+    },
+    counterexample: {
+      title: "在空队列上 front() / pop()",
+      explanation: "BFS 循环写成 while (true) { auto u = q.front(); q.pop(); ... } 而忘了检查 q.empty()：队列空时 front() 是未定义行为。本站实验在执行这种调用之前停止，不画一个编造的值。",
+      input: "q 为空；q.front()",
+      wrong: "认为会得到 0 或抛出异常",
+      correct: "循环条件写 while (!q.empty())"
+    },
+    ioProtocol: "第 1 行 k 与 k 个初始整数（队首→队尾）；第 2 行操作数 m；随后 m 行 \"pushb x | pushf x | popb | popf | front | back\"。每个操作输出一行 \"r=<读到的值或-> size=.. [队首..队尾]\"。",
+    id: "stl-deque",
+    topicId: "stl-deque",
+    title: "queue / deque 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "vector",
+      "迭代器"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<algorithm>",
+        "<cstddef>",
+        "<vector>"
+      ],
+      depends: [],
+      indexing: "返回值是新终点的下标（begin() 起算）",
+      interval: "[begin, end)；erase(new_end, end)",
+      limits: "unique 只合并相邻相等元素：要得到不同值须先 sort；新终点之后的值有效但未指定",
+      timeComplexity: "unique / remove O(n)；sort O(n log n)",
+      spaceComplexity: "O(1)"
+    },
+    contestNote: "竞赛里写成一行：v.erase(std::unique(v.begin(), v.end()), v.end())。教学版把\"返回新终点\"和\"erase\"分成两个函数，便于看到 size 在 erase 之前不变。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "8 1 1 2 2 2 3 1 1\n2 0\n",
+      output: "k=3 kept=[1 2 3] final=[1 2 3] size_before_erase=8\n",
+      note: "模式 2：先 sort 得 [1,1,1,1,2,2,2,3]，再 unique 得到 [1,2,3]；erase 之前 size 仍是 8。模式 0（不排序）会得到 k=4 [1 2 3 1]。"
+    },
+    counterexample: {
+      title: "不排序就 unique",
+      explanation: "[1,1,2,2,2,3,1,1] 直接 unique 只合并相邻重复，得到 [1,2,3,1]：最后的 1 与前面的 1 不相邻，被保留。想要\"不同值\"必须先 sort。另外忘了 erase 时，size() 仍是 8。",
+      input: "v = [1,1,2,2,2,3,1,1]；v.erase(unique(v.begin(), v.end()), v.end())",
+      wrong: "认为结果是 [1,2,3]",
+      correct: "结果是 [1,2,3,1]；先 sort 再 unique 才是 [1,2,3]"
+    },
+    ioProtocol: "第 1 行 k 与 k 个整数；第 2 行 \"mode x\"（0 = unique，1 = remove x，2 = 先 sort 再 unique）。输出一行 \"k=<新大小> kept=[erase 前的前缀] final=[erase 后] size_before_erase=<原 size>\"。",
+    id: "stl-unique",
+    topicId: "stl-unique",
+    title: "unique + erase 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
+  {
+    prereqs: [
+      "二叉搜索树的概念"
+    ],
+    header: {
+      standard: "C++17",
+      headers: [
+        "<map>",
+        "<set>"
+      ],
+      depends: [],
+      indexing: "按键升序遍历",
+      interval: "lower_bound(x) = 第一个 ≥ x 的迭代器，没有则 end()",
+      limits: "键须可比较（严格弱序）；operator[] 需要值类型可默认构造；multiset::erase(值) 删除全部相同值",
+      timeComplexity: "insert / erase / find / count(set) / lower_bound：O(log n)；multiset::count O(log n + k)",
+      spaceComplexity: "O(n)"
+    },
+    contestNote: "竞赛版就是同一组标准库调用；教学版把每个调用单独成函数。每步容器内容逐条对拍真实 g++。作为参考模板阅读，不显示\"正在执行\"箭头。",
+    sample: {
+      input: "10\nsins 5\nsins 5\nmins 3\nmins 3\nmdel1 3\nmapget 7\nmapinc 7\nslb 6\nslb 5\nmdel 3\n",
+      output: "r=1 S=[5] M=[] P=[]\nr=0 S=[5] M=[] P=[]\nr=- S=[5] M=[3] P=[]\nr=- S=[5] M=[3 3] P=[]\nr=1 S=[5] M=[3] P=[]\nr=0 S=[5] M=[3] P=[7:0]\nr=- S=[5] M=[3] P=[7:1]\nr=end S=[5] M=[3] P=[7:1]\nr=5 S=[5] M=[3] P=[7:1]\nr=1 S=[5] M=[] P=[7:1]\n",
+      note: "第二次 sins 5 返回 0（已存在）；mapget 7 只想读，却把键 7 插入为 0；slb 6 越过末尾得 end；最后 mdel 3 删除剩下的所有 3。"
+    },
+    counterexample: {
+      title: "用 map[k] 判断键是否存在",
+      explanation: "if (p[k] == 0) 看起来只是读，但 p[k] 会在 k 不存在时插入 k → 0，使 map 变大，之后 size() 与遍历都被污染。判断存在应使用 count(k) 或 find(k) != end()。",
+      input: "map p 为空；p[7]；p.size()",
+      wrong: "认为 p.size() 仍是 0",
+      correct: "p.size() 变成 1（键 7 → 0 已被插入）"
+    },
+    ioProtocol: "第 1 行 m；随后 m 行 \"op x\"，op ∈ sins sdel mins mdel mdel1 mcnt slb mapinc mapget mapfind。每个操作输出一行 \"r=<结果或-> S=[set] M=[multiset] P=[k:v]\"（slb 越过末尾输出 end）。",
+    id: "stl-set-map",
+    topicId: "stl-set-map",
+    title: "set / multiset / map 实验",
+    category: "STL",
+    difficulty: "竞赛基础",
+    teachLanguages: [
+      "cpp"
+    ],
+    source: ORIGINAL,
+    license: LICENSE
+  },
 ]
 
 export const templateById = (id: string | undefined) => TEMPLATES.find((t) => t.id === id)

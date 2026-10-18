@@ -22,6 +22,9 @@
 | 最长上升子序列 LIS (`lis`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
 | 数论：gcd / exgcd / 快速幂 / 逆元 / 筛法 (`number-theory`) | done | done | done | 六语言 | done | 6/6 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
 | vector 与迭代器实验 (`stl-vector`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | —（链接，非复制） |
+| queue / deque 实验 (`stl-deque`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `bfs`（链接，非复制） |
+| unique + erase 实验 (`stl-unique`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `discretize`（链接，非复制） |
+| set / multiset / map 实验 (`stl-set-map`) | done | done | done | 仅 C++ | done | 1/1 通过 | 1/1 通过 | 1/1 通过 | `stl-bounds`（链接，非复制） |
 
 测试：`tests/advanced/advanced.test.ts`（vitest）、`tests/e2e/adv-p1.spec.ts`（Playwright，真实鼠标键盘、0 次重试）、`scripts/advanced-validate.mjs`（真实工具链）。
 
@@ -29,9 +32,6 @@
 
 | 主题 | 分组 | 状态 |
 |---|---|---|
-| queue / deque 实验 / queue / deque | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| unique + erase 实验 / unique + erase | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
-| set / multiset / map 实验 / set / map | STL | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 | 强连通分量 / SCC | 算法 | **未做**：无讲解、无演示、无模板、无六语言、无锚点、未编译、未测试 |
 
 旧课程中可复用的算法（未被改写）：`binarySearch`、`kruskal`、`dijkstraHeap` 等；其中 Kruskal 的并查集内核已抽到 `src/algorithms/advanced/dsuCore.ts`（见 ADVANCED_DELIVERY.md 的 Kruskal 一节）。

@@ -209,5 +209,32 @@ export const SOURCE_HASHES: Record<string, { teach?: Record<string, string>; con
       "core": "8afed492eb058dbcffc72b61cc79fd6eea779df90723f604a6314845fd4d68e1",
       "full": "8098ed01ceea39f4d8ca4a03ac980c5bc0a2bf9466e6514865204bb32aa74be5"
     }
+  },
+  "stl-deque": {
+    "teach": {
+      "cpp": "ae98c60e3da1bf44956b59296abadb21439c75c9945a6f7b7fed943e8ed1b876"
+    },
+    "contest": {
+      "core": "3c212b8890345e7f2a02b0d6c8e03125bbba63bee778e5ea74a94c17fc407272",
+      "full": "4d8c5cbeffc18d280a535efa40a91d4e3cf52d6ae0296a1b33514ec11ae31d0c"
+    }
+  },
+  "stl-unique": {
+    "teach": {
+      "cpp": "d3d6fccd9bb6181e240536d468b355a0223897c89dfc2f6653b2549fbd01feab"
+    },
+    "contest": {
+      "core": "d037e6d43f15b95593d13995eea6bc4fa3f209b1a02495c3731f0d51c0198a4e",
+      "full": "a477b0a0631616e6fb8c212bdd326c658f4e2bce57928816e097476eec99073b"
+    }
+  },
+  "stl-set-map": {
+    "teach": {
+      "cpp": "a8bdf747e8c2b0dc14f194effe6f8d2229231b22872f41a46c0909d44439ac65"
+    },
+    "contest": {
+      "core": "46b885a3be083eff44cab347fa2f7cc5ffd696ce0b387e54a48d5cc55cf80b7e",
+      "full": "7e2aa96ba92132325ab6a0b99216fa5d5b38237abaf910ff38677485f1512591"
+    }
   }
 }

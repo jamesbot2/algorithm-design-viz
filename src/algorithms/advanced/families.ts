@@ -9,6 +9,9 @@ import { spec as lca } from './lca'
 import { spec as lis } from './lis'
 import { spec as numberTheory } from './numberTheory'
 import { spec as stlVector } from './stlVector'
+import { spec as stlDeque } from './stlDeque'
+import { spec as stlUnique } from './stlUnique'
+import { spec as stlSetMap } from './stlSetMap'
 
 /** Registered generic families (each file exports `spec`). */
-export const FAMILIES: FamSpec[] = [prefixDiff, discretize, bsAnswer, monoStack, monoQueue, topo, lca, lis, numberTheory, stlVector]
+export const FAMILIES: FamSpec[] = [prefixDiff, discretize, bsAnswer, monoStack, monoQueue, topo, lca, lis, numberTheory, stlVector, stlDeque, stlUnique, stlSetMap]

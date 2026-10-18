@@ -300,6 +300,126 @@ export const TOPICS: TopicMeta[] = [
       "anchors": "done"
     }
   },
+  {
+    "id": "stl-deque",
+    "section": "stl",
+    "titleZh": "queue / deque 实验",
+    "titleEn": "queue / deque",
+    "aliases": [
+      "queue",
+      "deque",
+      "双端队列",
+      "队列",
+      "push_front",
+      "pop_front",
+      "front",
+      "back",
+      "BFS 队列"
+    ],
+    "tags": [
+      "STL",
+      "队列",
+      "双端队列",
+      "固定槽位"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "两端的加入 / 移除都不移动其他元素：每个元素占固定槽位。queue 只是 deque 的适配器。",
+    "routeOrder": 4,
+    "demoId": "stl-deque",
+    "templateId": "stl-deque",
+    "relatedAlgos": [
+      "bfs"
+    ],
+    "standard": "C++17 <queue> <deque>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-unique",
+    "section": "stl",
+    "titleZh": "unique + erase 实验",
+    "titleEn": "unique + erase",
+    "aliases": [
+      "unique",
+      "erase",
+      "remove",
+      "erase-remove",
+      "去重",
+      "逻辑新终点",
+      "sort unique"
+    ],
+    "tags": [
+      "STL",
+      "算法",
+      "去重",
+      "erase-remove"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "unique / remove 只移动元素并返回逻辑新终点，size() 不变；必须 erase 才真的缩小；unique 只合并相邻重复。",
+    "routeOrder": 5,
+    "demoId": "stl-unique",
+    "templateId": "stl-unique",
+    "relatedAlgos": [
+      "discretize"
+    ],
+    "standard": "C++17 <algorithm>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
+  {
+    "id": "stl-set-map",
+    "section": "stl",
+    "titleZh": "set / multiset / map 实验",
+    "titleEn": "set / multiset / map",
+    "aliases": [
+      "set",
+      "multiset",
+      "map",
+      "operator[]",
+      "lower_bound",
+      "erase",
+      "count",
+      "find",
+      "红黑树",
+      "有序容器"
+    ],
+    "tags": [
+      "STL",
+      "set",
+      "map",
+      "multiset",
+      "有序容器"
+    ],
+    "difficulty": "basic",
+    "prereqs": [],
+    "summary": "set 唯一有序，multiset 可重复（erase(值) 删全部），map 的 operator[] 在键不存在时会插入。",
+    "routeOrder": 6,
+    "demoId": "stl-set-map",
+    "templateId": "stl-set-map",
+    "relatedAlgos": [
+      "stl-bounds"
+    ],
+    "standard": "C++17 <set> <map>",
+    "caps": {
+      "explanation": "done",
+      "demo": "done",
+      "template": "done",
+      "languages": "cpp",
+      "anchors": "done"
+    }
+  },
 ]
 
 export const topicById = (id: string | undefined) => TOPICS.find((t) => t.id === id)

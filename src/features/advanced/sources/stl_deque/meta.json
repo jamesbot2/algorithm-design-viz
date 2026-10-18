@@ -1,0 +1,2 @@
+{ "id": "stl_deque", "title": "queue / deque 实验（C++17）", "file": "stl_deque.cpp",
+  "labels": { "dPushB": "push_back：队尾加入（queue::push）", "dPushF": "push_front：队首加入（仅 deque）", "dPopB": "pop_back：队尾移除（仅 deque）", "dPopF": "pop_front：队首移除（queue::pop）", "dFront": "front：读队首", "dBack": "back：读队尾" } }
