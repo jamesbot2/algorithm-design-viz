@@ -213,7 +213,7 @@ test.describe('ADV-01 routes and entry', () => {
       await page.goto(h)
       await expect(page.getByTestId(id)).toBeVisible()
     }
-    await page.goto('#/advanced/algorithms/segtree')
+    await page.goto('#/advanced/algorithms/scc') // roadmap-only topic: must stay not-found
     await expect(page.getByTestId('adv-notfound')).toBeVisible()
     await page.goto('#/advanced/stl/dsu') // wrong section
     await expect(page.getByTestId('adv-notfound')).toBeVisible()
@@ -262,7 +262,8 @@ test.describe('ADV-02 search and catalog honesty', () => {
 
   test('every card on index pages is a delivered topic with capability chips', async ({ page }) => {
     await open(page, '#/advanced/algorithms')
-    await expect(page.locator('[data-testid^="topic-"]')).toHaveCount(2)
+    await expect(page.locator('[data-testid^="topic-"]')).toHaveCount(13) // 13 delivered algorithm topics (was 2 at P1)
+    await expect(page.locator('[data-testid^="road-"]')).toHaveCount(0) // roadmap items are never cards on the index
     await page.getByTestId('topic-dsu').click()
     await expect(page.getByTestId('adv-caps')).toContainText('六语言')
   })

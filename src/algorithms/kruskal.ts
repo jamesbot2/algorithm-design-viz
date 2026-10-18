@@ -1,4 +1,5 @@
 import type { EdgeRole, Step } from '../types/step'
+import { findCompress } from './advanced/dsuCore'
 import { undirectedEdgeId } from '../utils/edgeId'
 import { layoutGraph } from '../utils/layoutGraph'
 
@@ -31,7 +32,7 @@ export function generateSteps(
   n = meta.defaultN,
 ): Step[] {
   const parent = Array.from({ length: n }, (_, i) => i)
-  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])))
+  const find = (x: number): number => findCompress(parent, x)
   const edgesSorted = [...edgeList].sort((a, b) => a[2] - b[2])
   const mst: [number, number, number][] = []
   const steps: Step[] = []
